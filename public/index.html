@@ -2,7 +2,78 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Melange Basic Template</title>
+    <title>BK Hack</title>
+		<link href="inter/inter.css" rel="stylesheet">
+		<style>
+/* start css reset */
+
+body {
+	margin: 0;
+}
+
+/* end css reset */
+
+.vertsep > *:not(:nth-child(1))::before {
+	content: "|";
+}
+.spacesep > *:not(:nth-child(1))::before {
+	content: " ";
+}
+
+* {
+	font-family: Inter, sans-serif;
+	font-size: 1em;
+}
+
+#root > header {
+	background-color: #ff6600;
+}
+
+#root > header a.logo + nav {
+	display: inline-block;
+}
+
+main {
+	border-radius: 0.5em;
+	background-color: #fbfbfb;
+	margin: auto;
+	margin-top: 1em;
+	padding: 0 1em;
+	width: 90vw;
+}
+
+main > header h1 {
+	display: inline-block;
+}
+
+#root {
+	min-height: 100vh;
+	display: grid;
+	grid-template-rows: 2em 1fr 32px;
+}
+
+footer {
+	text-align: center;
+}
+		</style>
+		<script>
+class I18n {
+	static translation_table = {
+		"dang nhap": "đăng nhập",
+		"ban tin": "bản tin",
+		"ban du an nguon mo": "bản dự án nguồn mở",
+		"phat trien boi nhom ttb-hcmut": "phát triển bởi nhóm ttb-hcmut",
+		"phan tich": "phân tích (AI)",
+	}
+
+	static translate(x) {
+		const value = I18n.translation_table[x]
+		if (value === undefined)
+			return x
+		return value
+	}
+}
+		</script>
     <script type="module" src="main.js"></script>
   </head>
   <body>

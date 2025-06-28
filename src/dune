@@ -22,6 +22,7 @@
  ; By default, Dune will include all modules in the folder to the targets. With `modules` field
  ; we can tweak this default behavior by excluding `hello` from the list of targets of this stanza.
  ; See https://dune.readthedocs.io/en/stable/reference/predicate-language.html#predicate-language
+ (libraries reason-react world melange-fetch melange-json)
  (modules :standard \ hello)
 
  ; Uncomment the following to copy the generated JavaScript files inside the source tree
