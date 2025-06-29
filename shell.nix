@@ -5,6 +5,8 @@ let
 		nixd
 		dune_3
 		pnpm
+		opam
+		nodejs
 	];
 in
 	nixpkgs.mkShell {

@@ -1,14 +1,16 @@
-## Develop
-
-Requires: [dune](https://dune.build), [pnpm](https://pnpm.io)
-
-### Setup
+## Development Environment
 
 ```sh
-pnpm init
+nix-shell
 ```
 
-### Watch & Serve
+## Setup
+
+```sh
+pnpm run init
+```
+
+## Watch & Serve
 
 ```sh
 pnpm dev
