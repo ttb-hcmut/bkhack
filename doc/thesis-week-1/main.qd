@@ -1,0 +1,121 @@
+.docname {BKHack: Week 1}
+.doctype {slides}
+
+# This is week 1
+
+The most important time
+
+.tableofcontents
+
+# Roadmap
+
+From XXX (fill in reference please)
+
+1. Identity
+2. Design
+3. Working Prototype
+4. Manuals
+5. Production
+6. Prepare for maintenance
+
+# Roadmap
+
+Part 1 DACN
+
+1. Identity & Survey
+2. Spec & Arch
+3. Sketch & Prototype 1.0
+
+Part 2 DATN
+
+4. Manuals
+5. Production
+6. Prepare for maintenance
+
+# SWE is like City planning..
+
+You don't have to waterfall UNLESS it's really necessary to.
+
+# Roadmap
+
+Part 1 DACN
+
+1. Identity & Survey 1
+2. Spec & Prototype 0.9 & _Simple_ Arch & Survey 2
+3. ~~Sketch~~ & Prototype 1.0 & _Revised Arch_
+
+Part 2 DATN
+
+(let's not care for now)
+
+# Identity is important
+
+Wording has to be precise
+
+There is no _leader_, everyone must be able to consistently articulate what the final goal is.
+
+# Case study: EnvironmentalWeb
+
+Vague statements (chatgpt?)
+
+Bao says: it's a _selfhosted_ Jupyter Notebook for _experts_
+
+Thu says: it's an _online_ weather database browser for _everyone_
+
+Duc says: it's a client-server app
+
+# Case study: Valve
+
+A repository of tasks
+
+Anyone can pick a task to work on by themselves
+
+(specifically, "pick task" here is Switching to a chair)
+
+Very high discipline or motivation
+
+# Appendix: FAQ
+
+# FAQ
+
+Q: Project management? Kanban board? Gantt chart?
+
+Focus on results! Avoid _management masturbation_
+
+# FAQ
+
+Q: Can I use X Y Z? (OCaml, Nix, `opam-monorepo`, ReasonML, Elixir, NLP topic filtering ...)
+
+As long as you have fun!
+
+As long as you don't change midway - take responsibility!
+
+# FAQ
+
+![](./janestreet-interview-ocaml.png)
+
+# FAQ
+
+![](./janestreet-hire-ocaml.png)
+
+# FAQ
+
+Q: Why so serious? Nobody seems to give a damn (sai nền văn minh)
+
+“Before entering workforce, school is the only time when you're learning” - Nguyen Phuong Duy
+
+_Try to_ make something that you can be proud of to tell to your grandchildren
+
+# FAQ
+
+Q: At a conflict deadlock (worst-case scenario), who gets the final say?
+
+Bao, since he first pitched this whole platform idea (first-mover privilege)
+
+# FAQ
+
+Q: "I want to do X Y Z but you know more than I do so ehh you should do it"
+
+Try something new and fun!
+
+# Let's start writing
