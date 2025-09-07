@@ -14,7 +14,6 @@ module Thread_data = {
 		}
 };
 
-
 module Decode = {
 	open Melange_json;
 
