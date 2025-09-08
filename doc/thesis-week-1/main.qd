@@ -42,8 +42,8 @@ You don't have to waterfall UNLESS it's really necessary to.
 
 Part 1 DACN
 
-1. Identity & Survey 1
-2. Spec & Prototype 0.9 & _Simple_ Arch & Survey 2
+1. Design & Identity & Survey
+2. Spec & Prototype 0.9 & _Simple_ Arch & Survey cont.
 3. ~~Sketch~~ & Prototype 1.0 & _Revised Arch_
 
 Part 2 DATN
@@ -74,7 +74,19 @@ Anyone can pick a task to work on by themselves
 
 (specifically, "pick task" here is Switching to a chair)
 
-Very high discipline or motivation
+Very high initiative
+
+# Literature review
+
+Existing social news web (reference!!)
+
+# Todo
+
+Try to finish problem statement this week
+
+Try to finish literature review this week
+
+Survey?
 
 # Appendix: FAQ
 
@@ -124,6 +136,17 @@ Try something new and fun!
 
 Q: Is there a writing style spec?
 
-https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style
+I suggest: https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style
+
+# FAQ
+
+Q: Am I frontend or backend?
+
+I suggest: be generalists
+
+Try to know how EVERYTHING works
+
+Credit: list components you worked on
+
 
 # Let's start writing
