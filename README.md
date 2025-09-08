@@ -32,4 +32,4 @@ You may also be interested in other resources:
 
 ## Try it out
 
-Currently hosted at www.bkhack.app
+Currently hosted at www.bkhack-2eb8c.web.app
