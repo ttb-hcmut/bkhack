@@ -1,0 +1,230 @@
+.docname {BKHack: Week 2: ML programming}
+.doctype {slides}
+.autopagebreak maxdepth:{2}
+
+# This is week 2: ML programming
+
+OCaml, ReasonML, etc
+
+Source: ttb-hcmut/bkhack/doc/thesis-week-2-ml
+
+.tableofcontents
+
+# The ML languages
+
+## Family tree
+
+```plain
+ML
+  Standard ML
+    Alice
+    Cake ML
+  OCaml: an OO dialect of ML
+    Caramel: OCaml for the BEAM
+    Multicore OCaml: introduce algebraic effects
+    MetaOCaml: introduce code value
+    OxCaml: Rust-ification, introduce modes
+    OCurrent: a workflow-programming dialect of OCaml
+    Hardcaml: a hardware-programming dialect of OCaml
+    F#: "OCaml" for .NET
+      Fable
+    Reason ML: a JavaScript-like dialect of OCaml
+      ReScript
+```
+
+## Choose OCaml for this study
+
+- Most "popular" ML language
+  - Academic research
+  - Industry
+- Transferable learning
+  - F#
+  - Reason
+
+## Choose OCaml for this study 2
+
+- Java: 100% OO
+- Python: 80% OO, 20% FP
+- OCaml: 80% FP, 20% OO
+- Haskell: 100% FP
+
+# The OCaml language
+
+*A pseudo-mathematical overview*
+
+## what
+
+- Everything is an expression
+- Expressions are connected through a treelike structure (cons list)
+- (Root is final return value)
+
+```antlr4
+expr_tree ::= 'let' pattern-id '=' expr 'in' expr_tree
+```
+
+Example OCaml
+
+```ocaml
+let name  = "kinten108101"
+and fpath = "main.qd" in
+  let addr = "https://github.com/" ^ name ^ "/" ^ fpath in
+    Printf.print_endline addr
+```
+
+## ..some note
+
+If we don't care about return value..
+
+```ocaml
+let _ = Printf.print_endline "foo" in
+let _ = Printf.print_endline "foo" in
+Printf.print_endline "foo"
+```
+
+shorthand
+
+```ocaml
+Printf.print_endline "foo";
+Printf.print_endline "foo";
+Printf.print_endline "foo"
+```
+
+## universe
+
+- Everything is in a universe — called *module*
+- A universe has its own algebra —  types, and operation on types (, and syntax)
+
+```ocaml
+module Math__linalg = struct
+  type mat = (* internal data... *)
+  let zero3x3 = ...
+  let add a b = ...
+  let (+.) = add
+end
+```
+
+## universe (cont.)
+
+To use a universe, you have to enter it (*opening a module*)
+
+```ocaml
+let open Math__linalg in
+zero3x3 +. zero3x3;
+
+Math__linalg.(zero3x3 +. zero3x3)
+```
+
+you can manually prefix the module name for each term (some special cases wont work)
+
+```ocaml
+Math__linalg.(+.) Math__linalg.zero3x3 Math__linalg.zero3x3
+```
+
+# The OCaml style
+
+## Gradual typing
+
+Normal FP
+
+```ocaml
+let add : int -> int -> context -> int =
+  fun x y ctx ->
+  Debug.log ctx "adding";
+  Stdlib.add x y
+
+let add (x: int) (y: int) (ctx: context) =
+  Debug.log ctx "adding";
+  Stdlib.add x y
+
+```
+
+## Gradual typing (cont.)
+
+ML-flavored FP
+
+Utilizing OCaml's type inteference algorithm
+
+```ocaml
+let add x y ctx =
+  Debug.log ctx "adding";
+  Stdlib.add x y
+
+let add x y (ctx: context) =
+  Debug.log ctx "adding";
+  Stdlib.add x y
+```
+
+## Partial application
+
+- Evaluation structuring
+- An art in programming
+
+## Partial application (cont.)
+
+Consider this
+
+```ocaml
+let test0 =
+  fun url ->
+  Debug.printf "url=%s" url;
+  fun () ->
+  assert Http.fetch url = `Ok
+```
+
+## Partial application (cont.)
+
+Consider this
+
+```ocaml
+let test1 url =
+  Debug.printf "url=%s" url;
+  fun () ->
+  assert Http.fetch url = `Ok
+```
+
+## Partial application (cont.)
+
+Consider this
+
+```ocaml
+let test2 url () =
+  Debug.printf "url=%s" url;
+  assert Http.fetch url = `Ok
+```
+
+## Partial application (cont.)
+
+How many times will the url be printed?
+
+```ocaml
+let test = test1 "bkhack.net" in
+(* let test = test2 "bkhack.net" in *)
+(* let test = test3 "bkhack.net" in *)
+for i := 1 to 5 do
+  test ()
+end
+```
+
+## Object-oriented programming
+
+Interface / API
+
+Internal / Implementation
+
+## Imperative programming
+
+As part of the standard library (Stdlib), OCaml already opens a module with syntax for that
+
+```ocaml
+let v = ref 10 in
+v := 5;
+print_int !v
+```
+
+## Concurrent programming
+
+Monadic style (JavaScript, Rust, Haskell)
+
+Direct style (Unison)
+
+# Questions?
