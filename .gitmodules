@@ -1,0 +1,3 @@
+[submodule "quel"]
+	path = quel
+	url = https://bitbucket.org/knih/quel.git
