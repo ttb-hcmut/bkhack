@@ -31,6 +31,7 @@ defmodule App do
     ]
     {:ok, sh} = JSON.encode(lol)
     conn
+    # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
     |> put_resp_header("Access-Control-Allow-Origin", "*")
     |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
     |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
