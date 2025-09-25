@@ -63,10 +63,39 @@ module App = {
 		React.useEffect0(() => {
 			open Fetch;
 			open Fetch_syntax;
-			fetch("http://0.0.0.0:5000/api/test-item")
-			>>= Response.json
-			>>= Decode.Response.thread_data
-			>>= (x => setThreadData(_ => Some(x)) |> return)
+			fetchWithInit(
+				Env.backend ++ "/api/test-item",
+				RequestInit.make(
+					~headers=HeadersInit.make({
+						// "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15",
+						"Accept": "text/html,application/xhtml+xml;q=0.9,*/*;q=0.8",
+					}), ()
+				)
+			)
+			>>= (x => {
+				let status = Response.status(x);
+				let content_type =
+					Response.headers(x)
+					|> Headers.get("Content-Type")
+					|> Option.get;
+				switch (status, content_type) {
+				| (503, "text/html; charset=utf-8") => {
+					open Thread_data;
+					setThreadData(_ => Some({
+						title: "spinning up",
+						rank: 0,
+						author: "nobody",
+						posts: []
+					}));
+					return(())
+				}
+				| (_, _) =>
+					return(x)
+					>>= Response.json
+					>>= Decode.Response.thread_data
+					>>= (x => setThreadData(_ => Some(x)) |> return)
+				}
+			})
 			|> ignore;
 			None
 		});
