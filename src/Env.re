@@ -1,1 +1,1 @@
-let backend = "https://bkhack.onrender.com"
+[@bs.val] external backend : string = "bkhackenv.backend_address"

@@ -46,21 +46,175 @@ module Decode = {
 	};
 };
 
-module App = {
-  let style =
-    ReactDOM.Style.make(
-			~fontSize="1.5em",
-			~display="flex",
-			~gap="0.5em",
-			()
-		);
+let string = x => React.string(T.__(x));
 
-	let string = x => React.string(T.__(x));
+module Header = {
+	[@react.component]
+	let make = () => {
+		<header>
+			<a className="logo" href="/">{string("BK Hack")}</a>
+			<nav className="vertsep">
+				<a href="/">{string("ban tin")}</a>
+				<a href="/projects">{string("ban du an nguon mo")}</a>
+				<a href="/about">{string("ve chung toi")}</a>
+			</nav>
+			<button onClick={_ => ReasonReactRouter.replace("/login")}>{string("dang nhap")}</button>
+		</header>
+	}
+};
 
+module Login = {
+	[@react.component]
+	let make = () => {
+		<div>
+			<form>
+				<div>
+					<label htmlFor="username">{string("username")}</label>
+					<input name="username" id="username" />
+				</div>
+				<div>
+					<label htmlFor="password">{string("password")}</label>
+					<input name="password" id="password" />
+				</div>
+				<button>{string("Login")}</button>
+			</form>
+		</div>
+	}
+}
+
+module Home = {
+	[@react.component]
+	let make = () => {
+		<>
+			<Header />
+		</>
+	}
+};
+
+module About = {
+	[@react.component]
+	let make = () => {
+		<>
+			<Header />
+			<hgroup>
+				<h1>{string("About us")}</h1>
+				<p>{string("by Le Nguyen Gia Bao")}</p>
+			</hgroup>
+			<p>{string("
+During my third year at HCMUT, I (Le
+Nguyen Gia BAO aka. Kinten Le) got the utmost
+pleasure to work with Ho Gia TUONG and
+Vu Hoang TUNG. I've got the pleasure to
+work with these two kind friends.
+During this time, I and Tung talked
+about our haboring interest of building
+a kind of group (or school club, community, ...) where we work on free
+softwares and teach each other
+programming, something that was lacking
+in HCMUT at the time. So the three
+friends started formulating a plan: a
+website platform to teach other and to
+advertise our free softwares.")}
+			</p>
+			<p>
+			<b>{string("TTB HCMUT")}</b>
+			{string("
+is an indie developer group
+focusing on the intersection of embedded systems, emulation
+systems, functional programming, and
+artificial intelligence. Our headquarter is at HCMUT (?).
+")}
+			</p>
+			<p>{string("
+The entry point is ")}
+			<b>{string("BKHack")}</b>
+			{string(", the social
+news website focusing on computer
+science and programming (and also, the
+capstone project of Bao and Tuong).
+")}
+			</p>
+			<p>{string("
+Then there are our software projects.
+All of our projects are listed at the
+Projects page of BKHack. ")}
+			<b>{string("Microcluster")}</b>
+			{string(" is a Python interpreter
+that parallelizes your Python codebase
+and distributes work across multiple
+small microcontroller-based computers;
+and it is written in OCaml. #lorem(60)
+")}
+			</p>
+			<p>{string("
+Every year, BKHack and projects are
+presented at computer science
+conferences, featured in journals and
+Programming Pearls in Viet Nam, Japan, and
+around the world. We also take part in
+various contests. All of these is our
+activity and also our funding model so
+that we can continue developing and
+running our products!
+")}
+			</p>
+			<p>{string("
+Of course, it's important that our
+software is free, contributions and
+suggestions are welcomed!
+")}
+			</p>
+		</>
+	}
+};
+
+module Promotion_list = {
+	module Item = {
+		[@react.component]
+		let make = (~name, ~description) => {
+			<div>
+				<header className="logo"></header>
+				<header className="title">{string(name)}</header>
+				<p className="description">{string(description)}</p>
+			</div>
+		}
+	}
+
+	[@react.component]
+	let make = () => {
+		<>
+			<Header />
+			<h1>{string("Projects")}</h1>
+			<p>{string("Know a bit of programming? Contribute to ttb-hcmut projects on GitHub! For more details e.g how to PR or report issues, visit our wiki.")}</p>
+			<ul>{
+				[ ("microcluster", "lol")
+				, ("ps3emu", "wtf")
+				]
+				|> List.map(x => {
+					let (x, description) = x;
+					<li key=x><Item name=x description=description /></li>
+				})
+				|> Array.of_list
+				|> React.array
+			}</ul>
+		</>
+	}
+};
+
+module Project_frontpage = {
+	[@react.component]
+	let make = (~project_id) => {
+		Js.Console.log(project_id);
+		<div>{string("wow")}</div>
+	}
+};
+
+module Thread = {
   [@react.component]
-  let make = () => {
+  let make = (~item_id) => {
 		let (threadData, setThreadData) = React.useState(_ => None);
 		React.useEffect0(() => {
+			print_endline(item_id);
 			open Fetch;
 			open Fetch_syntax;
 			fetchWithInit(
@@ -100,14 +254,7 @@ module App = {
 			None
 		});
     <>
-			<header>
-				<a className="logo" href="/">{string("BK Hack")}</a>
-				<nav className="vertsep">
-					<a href="/">{string("ban tin")}</a>
-					<a href="/projects">{string("ban du an nguon mo")}</a>
-				</nav>
-				<button>{string("dang nhap")}</button>
-			</header>
+			<Header />
 			{ switch (threadData) {
 			| None => React.null
 			| Some(threadData) =>
@@ -152,6 +299,45 @@ module App = {
 	};
 };
 
+module UnknownPage = {
+	[@react.component]
+	let make = () => {
+		<div>
+			<h1>{string("This page does not exist")}</h1>
+		</div>
+	}
+};
+
+module App = {
+	[@react.component]
+	let make = () => {
+		let get_item_id = {
+			let regexp = Js.Re.fromString("id=(.+)");
+			str => Js.Re.exec(~str, regexp)
+		};
+		let url = ReasonReactRouter.useUrl();
+		switch (url.path) {
+		| [] => <Home />
+		| ["about"] => <About />
+		| ["login"] => <Login />
+		| ["Projects", project_id, _] => <Project_frontpage project_id />
+		| ["projects"] => <Promotion_list />
+		| ["item"] =>
+			switch (get_item_id(url.search)) {
+			| None => failwith("fuck")
+			| Some(item_id) =>
+				let item_id =
+					Js.Re.captures(item_id)
+					-> Array.get(1)
+					|> Js.Nullable.toOption
+					|> Option.get;
+				<Thread item_id />
+			}
+		| _ => <UnknownPage />
+		}
+	}
+};
+
 module ReactDOM0 = {
 	let querySelector = x =>
 		switch (ReactDOM.querySelector(x)) {
@@ -162,8 +348,6 @@ module ReactDOM0 = {
 		}
 }
 
-let () = {
-	let element = ReactDOM0.querySelector("#root");
-	let root = ReactDOM.Client.createRoot(element);
-	ReactDOM.Client.render(root, <App />);
-}
+let element = ReactDOM0.querySelector("#root");
+let root = ReactDOM.Client.createRoot(element);
+ReactDOM.Client.render(root, <App />);
