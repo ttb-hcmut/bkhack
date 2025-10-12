@@ -27,9 +27,6 @@ pnpm dev
 
 Voila!
 
-You may also be interested in other resources:
-- Figma designs: https://www.figma.com/design/do9bkMD1kQD6SLJcsB5AFM/bkhack-?m=auto&t=YjWcmvBXT6cIHjgp-6
-
 ## Try it out
 
 Currently hosted at https://bkhack-2eb8c.web.app
