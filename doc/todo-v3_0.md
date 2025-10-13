@@ -1,4 +1,4 @@
 - [ ] OCaml communicates with BEAM nodes
 - [ ] Nethack <33
-- [ ] multi page serving
+- [ ] multi page serving with melange
 - [ ] storybook integration with melange
