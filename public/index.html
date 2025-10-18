@@ -13,6 +13,154 @@ body {
 
 /* end css reset */
 
+.mainpad {
+	margin-left: 100px;
+	margin-top: 20px;
+}
+
+@keyframes blink {
+	0% { opacity: 1; }
+	49% { opacity: 1; }
+	50% { opacity: 0; }
+	99% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+.blink {
+	animation: blink 1.5s infinite;
+}
+
+:has(.teaser) {
+	overflow: hidden;
+	width: 100vw;
+	height: 100vh;
+	background-color: #eff0f3;
+	display: flex;
+	justify-content: center;
+	align-items: center
+}
+
+.teaser header {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.teaser span.bk {
+	/* color: #032b91; */
+	font-weight: 700;
+}
+
+.teaser span.hack {
+	/* color: #eb4a00; */
+	font-weight: 700;
+}
+
+.promotion_list {
+	width: 800px;
+}
+
+.promotion_list ul {
+	/* reset list style */
+	list-style: none;
+	padding-left: 0;
+}
+
+.promotion_list ul > li:not(:first-child) {
+	margin-top: 20px;
+}
+
+.promotion_list .promotion-item {
+	display: grid;
+	grid:
+		"logo title misc" min-content
+		"logo desc  misc" minmax(0,1fr)
+	/ calc(3.5em + 8px) minmax(0,1fr) max-content
+}
+
+.promotion_list .promotion-item header.logo {
+	grid-area: logo;
+	margin-top: 0.2em;
+	width: 3.5em;
+	height: 2em;
+	background-color: gray;
+	border-radius: 0.5em;
+}
+
+.promotion_list .promotion-item header.title {
+	grid-area: title;
+}
+
+.promotion_list .promotion-item p.description {
+	grid-area: desc;
+
+	/* reset style */
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+.project_frontpage {
+	width: 1000px;
+	display: grid;
+	gap: 8px;
+	grid:
+		"hd      sidebar" min-content
+		"navsub  sidebar" min-content
+		"content sidebar"	minmax(0,1fr)
+	/ minmax(0,1fr) 300px;
+}
+
+.project_frontpage header {
+	grid-area: hd;
+	display: grid;
+	grid: 
+		"hd title" min-content
+		"hd sub" minmax(0,1fr)
+		/ calc(3.5em + 8px) minmax(0,1fr);
+}
+
+.project_frontpage header > img {
+	margin-top: 0.2em;
+	grid-row: 1 / -1;
+	background-color: gray;
+	width: 3.5em;
+	height: 2em;
+	border-radius: 0.5em;
+}
+
+.project_frontpage nav.sub {
+	grid-area: navsub;
+}
+
+.project_frontpage nav.sub > a {
+	display: inline-block;
+	padding-left: 12px;
+	padding-right: 12px;
+	border-radius: 8px;
+	text-decoration: none;
+	color: #666666FF;
+}
+
+.project_frontpage nav.sub > a:hover,
+.project_frontpage nav.sub > a:visited:hover
+{
+	background-color: #00000022;
+	color: #000000FF;
+}
+
+.project_frontpage nav.sub > a:visited {
+	color: #666666FF;
+}
+
+.project_frontpage aside.sidebar {
+	grid-area: sidebar;
+}
+
+.project_frontpage .content > :first-child {
+	/* reset css */
+	margin-top: 0;
+}
+
 .vertsep > *:not(:nth-child(1))::before {
 	content: "|";
 }

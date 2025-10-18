@@ -63,6 +63,16 @@ module Header = {
 	}
 };
 
+module Teaser = {
+	[@react.component]
+	let make = () => {
+		<div className="teaser">
+			<header className="blink">{string("@")}</header>
+			<p><span className="bk">{string("BK")}</span><span className="hack">{string("Hack")}</span>{string(" is under construction")}</p>
+		</div>
+	}
+}
+
 module Login = {
 	[@react.component]
 	let make = () => {
@@ -172,10 +182,23 @@ module Promotion_list = {
 	module Item = {
 		[@react.component]
 		let make = (~name, ~description) => {
-			<div>
+			let name_a =
+				switch (name) {
+				| `Page (x) => x
+				| `PageWithId (x, _) => x
+				};
+			let link =
+				switch (name) {
+				| `Page (x) => "~" ++ x
+				| `PageWithId (_, x) => "~" ++ x
+				};
+			let url = ReasonReactRouter.useUrl();
+			let next = s => (url.path |> String.concat("/")) ++ "/" ++ s;
+			<div className="promotion-item">
 				<header className="logo"></header>
-				<header className="title">{string(name)}</header>
+				<header className="title">{string(name_a)}</header>
 				<p className="description">{string(description)}</p>
+				<a href=(next(link))>{string("Read more >>")}</a>
 			</div>
 		}
 	}
@@ -184,28 +207,74 @@ module Promotion_list = {
 	let make = () => {
 		<>
 			<Header />
-			<h1>{string("Projects")}</h1>
-			<p>{string("Know a bit of programming? Contribute to ttb-hcmut projects on GitHub! For more details e.g how to PR or report issues, visit our wiki.")}</p>
-			<ul>{
-				[ ("microcluster", "lol")
-				, ("ps3emu", "wtf")
-				]
-				|> List.map(x => {
-					let (x, description) = x;
-					<li key=x><Item name=x description=description /></li>
-				})
-				|> Array.of_list
-				|> React.array
-			}</ul>
+			<div className="mainpad promotion_list">
+				<h1>{string("Projects")}</h1>
+				<p>{string("Know a bit of programming? Contribute to ttb-hcmut projects on GitHub! For more details e.g how to PR or report issues, visit our wiki.")}</p>
+				<ul>{
+					[ ((`PageWithId ("Microcluster", "microcluster")), "lol")
+					, ((`PageWithId ("bachkhoa.typ", "bachkhoa-typ")), "A report template for Bach Khoa HCMUT students. Not affiliated with the HCMUT university.")
+					]
+					|> List.map(x => {
+						let (x, description) = x;
+						let key =
+							switch (x) {
+							| `Page (x) => x
+							| `PageWithId (x, _) => x
+							};
+						<li key><Item name=x description=description /></li>
+					})
+					|> Array.of_list
+					|> React.array
+				}</ul>
+			</div>
 		</>
 	}
 };
 
-module Project_frontpage = {
+module Project_frontpage__bachkhoatyp = {
 	[@react.component]
-	let make = (~project_id) => {
-		Js.Console.log(project_id);
-		<div>{string("wow")}</div>
+	let make = (~paths) => {
+		switch (paths) {
+		| ["examples"] => <div>{string("lol")}</div>
+		| [_, ..._] => failwith("dsf")
+		| [] => {
+		let url = ReasonReactRouter.useUrl();
+		let next = s => "/" ++ (url.path |> String.concat("/")) ++ "/" ++ s;
+		<>
+		<Header />
+		<div className="mainpad project_frontpage">
+			<header>
+				<img />
+				<div>{string("bachkhoa.typ")}</div>
+				<div>{string("A suite of Typst document templates for HCMUT")}</div>
+			</header>
+			<nav className="sub">
+				<a href="https://github.com/ttb-hcmut/.github/tree/main/bachkhoa.typ">{string("Source code")}</a>
+				<a href=(next("examples"))>{string("Examples")}</a>
+				<a href=(next("manual"))>{string("Manual")}</a>
+				<a href=(next("doc"))>{string("Documentation")}</a>
+				<a href=(next("reference"))>{string("API Reference")}</a>
+			</nav>
+			<aside className="sidebar">
+				<section className="mirror">
+					<h2>{string("Mirrors")}</h2>
+					<u>
+						<li><a href="https://typst.app/universe/package/bachkhoa.typ">{string("Typst Universe")}</a></li>
+					</u>
+				</section>
+				<section className="releases">
+					<h2>{string("Releases")}</h2>
+					<u>
+						<li><a>{string("bachkhoa.typ-v0.1.0.tar.xz")}</a></li>
+					</u>
+				</section>
+			</aside>
+			<div className="content">
+				<p>{string("A template for writing reports and thesises in Bach Khoa University of Technology of Ho Chi Minh City (HCMUT). We are not affiliated with HCMUT.")}</p>
+			</div>
+		</div>
+		</>
+		}}
 	}
 };
 
@@ -316,13 +385,13 @@ module App = {
 			str => Js.Re.exec(~str, regexp)
 		};
 		let url = ReasonReactRouter.useUrl();
+		Js.Console.log(url);
 		switch (url.path) {
-		| [] => <Home />
+		| [] => <Teaser />
 		| ["about"] => <About />
-		| ["login"] => <Login />
-		| ["Projects", project_id, _] => <Project_frontpage project_id />
 		| ["projects"] => <Promotion_list />
-		| ["item"] =>
+		| ["projects", "~bachkhoa-typ", ...paths] => <Project_frontpage__bachkhoatyp paths />
+		| ["~debug", "item"] =>
 			switch (get_item_id(url.search)) {
 			| None => failwith("fuck")
 			| Some(item_id) =>
