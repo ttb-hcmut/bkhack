@@ -21,5 +21,8 @@ module.exports = {
 		new webpack.DefinePlugin({
 			"bkhackenv.backend_address": `\"${backend_address}\"`
 		})
-	]
+	],
+	devServer: {
+		allowedHosts: "all"
+	}
 }
