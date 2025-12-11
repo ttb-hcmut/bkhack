@@ -1,0 +1,21 @@
+# Multi-page bundling
+
+Web applications adopt one of these paradigms:
+
+- Multi-page application (MPA)
+- Single-page application (SPA)
+
+BKHack adopts a hybrid paradigm. At its core, it's MPA. But within a webpage there can be some "subpages", "subviews", which don't require a request to server to navigate to.
+
+The adoption of this paradigm has been somewhat troublesome. Most build tools support either MPA or SPA, not inbetween. For example, the Webpack bundler accepts a JavaScript entry point and outputs a single main bundle file intended for the entire website: this is SPA; so is the Webpack dev-server. Our build system involves in-house OCaml programming plus some hacking of Webpack: specifically, we spawn multiple Webpack instances to make multiple JS bundles corresponding to each route; and we abandon Webpack dev-server altogether in favor of our custom dev-server built on top of live-server.
+
+# Icon graphics, and how the website renders
+
+There are two encodings[^jfp]:
+
+1. The initial encoding. Prefer textual elements
+2. The final encoding. Prefer graphical elements
+
+For example, (TBA)
+
+[^jfp]: totally has nothing to do with initial vs. final encoding from theory of algebraic specification
