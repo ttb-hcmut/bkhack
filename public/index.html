@@ -7,6 +7,7 @@
 @import "/styles/debug.css";
 @import "/styles/reset.css";
 @import "/styles/variables.css";
+@import "/styles/components/headerbar.css";
 
 .mainpad {
 	margin-left: 100px;
@@ -176,40 +177,6 @@ html {
 	margin-top: var(--space-a);
 }
 
-#root > header {
-	background-color: var(--dark-b);
-	border-color: oklab(61.0324% -.0598051 -.144428 / .2);
-	border-bottom-width: 1px;
-	border-bottom-style: solid;
-	position: sticky;
-	top: 0px;
-	padding: var(--space-a);
-	display: flex;
-	flex-direction: row;
-}
-
-#root > header > :not(:first-child) {
-	margin-left: var(--space-a);
-}
-
-#root > header .logo {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	margin-left: var(--space-a);
-}
-
-#root > header .logo > img {
-	height: 32px;
-}
-
-#root > header .logo > .title {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	display: none;
-}
-
 #root > nav {
 	margin-left: var(--space-a);
 	margin-right: var(--space-a);
@@ -219,15 +186,26 @@ html {
 
 #root > nav > header {
 	display: grid;
-	grid-template-columns: calc(3rem) minmax(0,1fr);
+	grid-template-columns: minmax(0,1fr);
 	grid-template-rows: min-content min-content;
 	row-gap: var(--space-c);
+	padding-left: var(--space-a);
 	padding-right: var(--space-a);
 	padding-top: var(--space-d);
 	padding-bottom: var(--space-d);
 }
 
+#root[data-tileset="gui"] > nav > header {
+	grid-template-columns: calc(3rem) minmax(0,1fr);
+	padding-left: 0;
+}
+
 #root > nav > header > .logo {
+	display: none;
+}
+
+#root[data-tileset="gui"] > nav > header > .logo {
+	display: block;
 	grid-column: 1 / 2;
 	grid-row: 1 / -1;
 	display: flex;
@@ -236,7 +214,7 @@ html {
 	color: var(--cyan);
 }
 
-#root > nav > header > .logo > svg {
+#root[data-tileset="gui"] > nav > header > .logo > svg {
 	width: 1.3rem;
 	height: auto;
 }
@@ -380,7 +358,16 @@ html {
 	margin-left: var(--space-c);
 }
 
+
 #root > main > ol > li .activities > .comments::before {
+	content: "c:";
+}
+
+#root > main > ol > li .activities > .pullrequests::before {
+	content: "p:";
+}
+
+#root[data-tileset="gui"] > main > ol > li .activities > .comments::before {
 	content: " ";
 	display: inline-block;
 	background-image: url("/assets/icon.comment.light-blue.svg");
@@ -390,17 +377,7 @@ html {
 	margin-right: 4px;
 }
 
-@media (display-mode: minimal-ui) {
-	#root > main > ol > li .activities > .comments::before {
-		content: "c:";
-		background-image: none;
-		width: auto;
-		height: auto;
-		margin-right: 0;
-	}
-}
-
-#root > main > ol > li .activities > .pullrequests::before {
+#root[data-tileset="gui"] > main > ol > li .activities > .pullrequests::before {
 	content: " ";
 	display: inline-block;
 	background-image: url("/assets/icon.pullrequest.violet.svg");
@@ -408,16 +385,6 @@ html {
 	width: 1em;
 	height: 1em;
 	margin-right: 4px;
-}
-
-@media (display-mode: minimal-ui) {
-	#root > main > ol > li .activities > .pullrequests::before {
-		content: "p:";
-		background-image: none;
-		width: auto;
-		height: auto;
-		margin-right: 0;
-	}
 }
 
 #root > main > ol > li .last-activity {
@@ -575,6 +542,6 @@ class I18n {
     <script type="module" src="index.js"></script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root" data-tileset="gui"></div>
   </body>
 </html>

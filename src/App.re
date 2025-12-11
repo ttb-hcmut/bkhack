@@ -1,5 +1,3 @@
-open Melange__containers.Fun
-
 module Post = {
 	type t =
 		{ author: string
@@ -49,21 +47,6 @@ module Decode = {
 };
 
 let string = x => React.string(T.__(x));
-
-module Header = {
-	[@react.component]
-	let make = () => {
-		<header>
-			<a className="logo" href="/">{string("BK Hack")}</a>
-			<nav className="vertsep">
-				<a href="/">{string("ban tin")}</a>
-				<a href="/projects">{string("ban du an nguon mo")}</a>
-				<a href="/about">{string("ve chung toi")}</a>
-			</nav>
-			<button onClick={_ => ReasonReactRouter.replace("/login")}>{string("dang nhap")}</button>
-		</header>
-	}
-};
 
 module Teaser = {
 	[@react.component]
@@ -370,19 +353,6 @@ module Thread = {
 	};
 };
 
-module Header2 = {
-	[@react.component]
-	let make = () => {
-		<>
-			<a className="logo" href="/">
-				<img src="/assets/logo.svg" />
-				<div className="title">{string("BKHack")}</div>
-			</a>
-			<input />
-		</>
-	}
-}
-
 module Wifi = {
 	[@react.component]
 	let make = () => {
@@ -442,7 +412,7 @@ module Dashboard = {
 					<span>{React.int(rank)}</span>
 				</div>
 				<header>
-					<a href="item?id=lol">{string(title)}</a>
+					<a href="item/?id=lol">{string(title)}</a>
 				</header>
 				<footer>
 					<div className="has-left-indicator tagline">
@@ -512,7 +482,7 @@ module Dashboard = {
 		];
 		<>
 			<header>
-				<Header2 />
+				<Header />
 			</header>
 			<nav>
 				<header>
@@ -573,21 +543,6 @@ module UnknownPage = {
 	}
 };
 
-module Re = {
-	include Js.Re
-	let exec = (pattern, str) => exec(~str, pattern)
-}
-
-let get_item_id = {
-	let pattern = Re.fromString("id=(.+)");
-	Re.exec(pattern)
-	%> Option.get
-	%> Re.captures
-	%> (x => Array.get(x, 1))
-	%> Js.Nullable.toOption
-	%> Option.get
-}
-
 module App = {
 	[@react.component]
 	let make = () => {
@@ -599,9 +554,6 @@ module App = {
 		| ["about"] => <About />
 		| ["projects"] => <Promotion_list />
 		| ["projects", "~bachkhoa-typ", ...paths] => <Project_frontpage__bachkhoatyp paths />
-		| ["item"] =>
-			let item_id = get_item_id(url.search);
-			<ItemPage item_id />
 		| _ => <UnknownPage />
 		}
 	}

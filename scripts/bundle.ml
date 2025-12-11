@@ -14,6 +14,9 @@ let dist__styles cwd = Path.(dist cwd / "styles")
 let dist__styles__resetcss cwd = Path.(dist__styles cwd / "reset.css")
 let dist__styles__debugcss cwd = Path.(dist__styles cwd / "debug.css")
 let dist__styles__variablescss cwd = Path.(dist__styles cwd / "variables.css")
+let dist__styles__components cwd = Path.(dist__styles cwd / "components")
+let dist__styles__components__headerbarcss cwd = Path.(dist__styles__components cwd / "headerbar.css")
+let dist__styles__components__grepbarcss cwd = Path.(dist__styles__components cwd / "grepbar.css")
 
 let log cwd = Path.(cwd / "log")
 
@@ -92,4 +95,14 @@ let () =
     ( Fiber.fork ~sw @@ fun () ->
       Path.symlink ~link_to:"../../public/styles/variables.css"
         (dist__styles__variablescss cwd) );
+    ( Fiber.fork ~sw @@ fun () ->
+      Path.mkdir ~perm:0o700 (dist__styles__components cwd);
+      Switch.run @@ fun sw ->
+      ( Fiber.fork ~sw @@ fun () ->
+        Path.symlink ~link_to:"../../../public/styles/components/headerbar.css"
+          (dist__styles__components__headerbarcss cwd) );
+      ( Fiber.fork ~sw @@ fun () ->
+        Path.symlink ~link_to:"../../../public/styles/components/grepbar.css"
+          (dist__styles__components__grepbarcss cwd) );
+    )
   )

@@ -7,6 +7,12 @@
 @import "/styles/debug.css";
 @import "/styles/reset.css";
 @import "/styles/variables.css";
+@import "/styles/components/headerbar.css";
+
+html {
+	font-size: var(--text-base);
+	font-family: system-ui;
+}
 
 #root {
 	background-color: var(--dark-a);
@@ -14,41 +20,16 @@
 	padding-bottom: var(--space-a);
 }
 
-#root > header {
+#root > .innerbody {
+	margin-top: var(--space-a);
+	margin-left: var(--space-a);
+	margin-right: var(--space-a);
 	background-color: var(--dark-b);
-	border-color: oklab(61.0324% -.0598051 -.144428 / .2);
-	border-bottom-width: 1px;
-	border-bottom-style: solid;
-	position: sticky;
-	top: 0px;
-	padding: var(--space-a);
-	display: flex;
-	flex-direction: row;
-}
-
-#root > header > :not(:first-child) {
-	margin-left: var(--space-a);
-}
-
-#root > header .logo {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	margin-left: var(--space-a);
-}
-
-#root > header .logo > img {
-	height: 32px;
-}
-
-#root > header .logo > .title {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	display: none;
+	border: 1px solid var(--dark-c);
 }
 
 #root > .innerbody > nav {
+	background-color: var(--dark-a);
 	display: flex;
 	flex-direction: row;
 }
@@ -57,10 +38,39 @@
 	border: solid 1px yellow;
 }
 
+#root > .innerbody.article > header {
+	border-top: 1px solid var(--dark-c);
+	background-color: var(--dark-a);
+	display: grid;
+	grid-template-columns: 3rem minmax(0,1fr) 3rem;
+	grid-template-rows: min-content min-content min-content min-content;
+}
+
+#root > .innerbody.article > header > :first-child {
+	grid-row: 1 / -1;
+	grid-column: 1 / 2;
+}
+
+#root > .innerbody.article > header > :last-child {
+	grid-row: 1 / -1;
+	grid-column: 3 / 4;
+}
+
+#root > .innerbody.article > header > h1 {
+	font-size: var(--text-base);
+	font-weight: normal;
+	color: var(--light-b);
+}
+
+#root > .innerbody.article > header > ul.tags {
+	display: flex;
+	flex-direction: row;
+}
+
 		</style>
     <script type="module" src="index.js"></script>
 	</head>
   <body>
-    <div id="root"></div>
+    <div id="root" data-tileset="gui"></div>
   </body>
 </html>

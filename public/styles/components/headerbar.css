@@ -1,0 +1,56 @@
+@import "/styles/variables.css";
+
+#root > header {
+	background-color: var(--dark-b);
+	border-color: oklab(61.0324% -.0598051 -.144428 / .2);
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	position: sticky;
+	top: 0px;
+	padding: var(--space-a);
+	display: grid;
+	grid-template-columns: max-content max-content minmax(0, 1fr) max-content max-content;
+	align-items: center;
+	flex-direction: row;
+}
+
+#root > header > :not(:first-child) {
+	margin-left: var(--space-a);
+}
+
+#root > header > .logo {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	font-family: var(--font-mono);
+}
+
+#root:not([data-tileset="gui"]) > header > .logo::after {
+	content: "BKHack";
+}
+
+#root[data-tileset="gui"] > header > .logo {
+	content: " ";
+	margin-left: var(--space-a);
+	background-image: url("/assets/logo.svg");
+	background-size: 5rem 1.5rem;
+	width: 5rem;
+	height: 1.5rem;
+}
+
+#root > header > a.place {
+	font-size: var(--text-sm);
+	font-family: var(--font-mono);
+}
+
+#root > header > a.place:nth-child(3) {
+	grid-column-start: 4;
+}
+
+#root > header > a.place.projects::before {
+	content: "projects";
+}
+
+#root > header > a.place.wiki::before {
+	content: "wiki";
+}

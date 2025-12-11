@@ -1,38 +1,24 @@
 open Eio
 
-let dist cwd = Path.(cwd / "dist__serve")
-let dist__indexhtml cwd = Path.(dist cwd / "index.html")
-let dist__assets cwd = Path.(dist cwd / "assets")
-let dist__assets__logosvg cwd = Path.(dist__assets cwd / "logo.svg")
-let dist__assets__icon__pullrequestvioletsvg cwd = Path.(dist__assets cwd / "icon.pullrequest.violet.svg")
-let dist__assets__icon__commentlightbluesvg cwd = Path.(dist__assets cwd / "icon.comment.light-blue.svg")
-let dist__item cwd = Path.(dist cwd / "item")
-let dist__item__indexhtml cwd = Path.(dist__item cwd / "index.html")
-let dist__styles cwd = Path.(dist cwd / "styles")
-let dist__styles__resetcss cwd = Path.(dist__styles cwd / "reset.css")
-let dist__styles__debugcss cwd = Path.(dist__styles cwd / "debug.css")
-let dist__styles__variablescss cwd = Path.(dist__styles cwd / "variables.css")
-
-let public cwd = Path.(cwd / "public")
-let public__indexhtml cwd = Path.(public cwd / "index.html")
-let public__assets cwd = Path.(public cwd / "assets")
-let public__assets__logosvg cwd = Path.(public__assets cwd / "logo.svg")
-let public__assets__icon__pullrequestvioletsvg cwd = Path.(public__assets cwd / "icon.pullrequest.violet.svg")
-let public__assets__icon__commentlightbluesvg cwd = Path.(public__assets cwd / "icon.comment.light-blue.svg")
-let public__item cwd = Path.(public cwd / "item")
-let public__item__indexhtml cwd = Path.(public__item cwd / "index.html")
-let public__styles cwd = Path.(public cwd / "styles")
-let public__styles__resetcss cwd = Path.(public__styles cwd / "reset.css")
-let public__styles__debugcss cwd = Path.(public__styles cwd / "debug.css")
-let public__styles__variablescss cwd = Path.(public__styles cwd / "variables.css")
-
 let log cwd = Path.(cwd / "log")
+
+let mkdir ~sw ?(perm = 0o700) dirname filename f =
+  Fiber.fork ~sw @@ fun () ->
+  let newpath = Path.(dirname / filename) in
+  Path.mkdir ~perm newpath;
+  Switch.run @@ fun sw ->
+  f sw newpath
+
+let getdir dirname filename f =
+  let newpath = Path.(dirname / filename) in
+  assert (Path.is_directory newpath);
+  f newpath
 
 let () =
   Eio_main.run @@ fun env ->
   let cwd = Stdenv.cwd env
   and process_mgr = Stdenv.process_mgr env
-  and physlink = Buildlib.Path.physlink (Stdenv.process_mgr env) in
+  and physlink ~sw ~link_to x = Fiber.fork ~sw @@ fun () -> Buildlib.Path.physlink (Stdenv.process_mgr env) ~link_to x in
   Switch.run @@ fun sw ->
   let log =
   ( Fiber.fork_promise ~sw @@ fun () ->
@@ -40,18 +26,16 @@ let () =
     let newpath = Path.(log cwd / id) in
     Path.mkdirs ~perm:0o700 newpath; newpath
   ) in
-  Path.rmtree ~missing_ok:true (dist cwd);
-  Path.mkdir ~perm:0o700 (dist cwd);
-  ( Fiber.fork ~sw @@ fun () ->
-    Buildlib.Pnpm.Process.run process_mgr
-      [ "live-server"
-      ; "--cors"
-      ; "--no-browser"
-      ; "dist__serve"; "8080"
-      ]
-  );
-  ( Fiber.fork ~sw @@ fun () ->
-    Switch.run @@ fun sw ->
+  Path.rmtree ~missing_ok:true Path.(cwd / "dist__serve");
+  ( mkdir ~sw cwd "dist__serve" @@ fun sw dist ->
+    ( Fiber.fork ~sw @@ fun () ->
+      Buildlib.Pnpm.Process.run process_mgr
+        [ "live-server"
+        ; "--cors"
+        ; "--no-browser"
+        ; Path.native_exn dist; "8080"
+        ]
+    );
     ( Fiber.fork ~sw @@ fun () ->
       let log = Promise.await_exn log in
       Path.with_open_out Path.(log / "index.js.stdout") ~create:(`Exclusive 0o700) @@ fun stdout ->
@@ -60,54 +44,41 @@ let () =
         ; "--config"; "build_aux/webpack_preprocessor.js"
         ; "--mode"; "development"
         ; "--entry"; Buildlib.Output.src "App"
-        ; "--output-path"; Path.native_exn @@ dist cwd
+        ; "--output-path"; Path.native_exn dist
         ; "--output-filename"; "index.js"]
     );
-    ( Fiber.fork ~sw @@ fun () ->
-      physlink ~link_to:(public__indexhtml cwd)
-        (dist__indexhtml cwd) );
-  );
-  ( Fiber.fork ~sw @@ fun () ->
-    Path.mkdir ~perm:0o700 (dist__assets cwd);
-    Switch.run @@ fun sw ->
-    ( Fiber.fork ~sw @@ fun () ->
-      physlink ~link_to:(public__assets__logosvg cwd)
-        (dist__assets__logosvg cwd) );
-    ( Fiber.fork ~sw @@ fun () ->
-      physlink ~link_to:(public__assets__icon__pullrequestvioletsvg cwd)
-        (dist__assets__icon__pullrequestvioletsvg cwd) );
-    ( Fiber.fork ~sw @@ fun () ->
-      physlink ~link_to:(public__assets__icon__commentlightbluesvg cwd)
-        (dist__assets__icon__commentlightbluesvg cwd) );
-  );
-  ( Fiber.fork ~sw @@ fun () ->
-    Path.mkdir ~perm:0o700 (dist__item cwd);
-    Switch.run @@ fun sw ->
-    ( Fiber.fork ~sw @@ fun () ->
-      let log = Promise.await_exn log in
-      Path.with_open_out Path.(log / "item__index.js.stdout") ~create:(`Exclusive 0o700) @@ fun stdout ->
-      Buildlib.Pnpm.Process.run process_mgr ~stdout
-        [ "webpack"; "watch"
-        ; "--config"; "build_aux/webpack_preprocessor.js"
-        ; "--mode"; "development"
-        ; "--entry"; Buildlib.Output.src "Item"
-        ; "--output-path"; Path.native_exn @@ dist__item cwd
-        ; "--output-filename"; "index.js"]
+    getdir (Stdenv.cwd env) "public" @@ fun public ->
+    physlink ~sw ~link_to:Path.(public / "index.html") Path.(dist / "index.html");
+    ( mkdir ~sw dist "assets" @@ fun sw dist__assets ->
+      getdir public "assets" @@ fun public__assets ->
+      physlink ~sw ~link_to:Path.(public__assets / "logo.svg") Path.(dist__assets / "logo.svg");
+      physlink ~sw ~link_to:Path.(public__assets / "icon.pullrequest.violet.svg") Path.(dist__assets / "icon.pullrequest.violet.svg");
+      physlink ~sw ~link_to:Path.(public__assets / "icon.comment.light-blue.svg") Path.(dist__assets / "icon.comment.light-blue.svg");
     );
-    ( Fiber.fork ~sw @@ fun () ->
-      physlink ~link_to:(public__item__indexhtml cwd)
-        (dist__item__indexhtml cwd) );
-  );
-  ( Fiber.fork ~sw @@ fun () ->
-    Path.mkdir ~perm:0o700 (dist__styles cwd);
-    Switch.run @@ fun sw ->
-    ( Fiber.fork ~sw @@ fun () ->
-      physlink ~link_to:(public__styles__resetcss cwd)
-        (dist__styles__resetcss cwd) );
-    ( Fiber.fork ~sw @@ fun () ->
-      physlink ~link_to:(public__styles__debugcss cwd)
-        (dist__styles__debugcss cwd) );
-    ( Fiber.fork ~sw @@ fun () ->
-      physlink ~link_to:(public__styles__variablescss cwd)
-        (dist__styles__variablescss cwd) );
+    ( mkdir ~sw dist "item" @@ fun sw dist__item ->
+      getdir public "item" @@ fun public__item ->
+      physlink ~sw ~link_to:Path.(public__item / "index.html") Path.(dist__item / "index.html");
+      ( Fiber.fork ~sw @@ fun () ->
+        let log = Promise.await_exn log in
+        Path.with_open_out Path.(log / "item__index.js.stdout") ~create:(`Exclusive 0o700) @@ fun stdout ->
+        Buildlib.Pnpm.Process.run process_mgr ~stdout
+          [ "webpack"; "watch"
+          ; "--config"; "build_aux/webpack_preprocessor.js"
+          ; "--mode"; "development"
+          ; "--entry"; Buildlib.Output.src "Item"
+          ; "--output-path"; Path.native_exn dist__item
+          ; "--output-filename"; "index.js"]
+      );
+    );
+    ( mkdir ~sw dist "styles" @@ fun sw dist__styles ->
+      getdir public "styles" @@ fun public__styles ->
+      physlink ~sw ~link_to:Path.(public__styles / "reset.css") Path.(dist__styles / "reset.css");
+      physlink ~sw ~link_to:Path.(public__styles / "debug.css") Path.(dist__styles / "debug.css");
+      physlink ~sw ~link_to:Path.(public__styles / "variables.css") Path.(dist__styles / "variables.css");
+      ( mkdir ~sw dist__styles "components" @@ fun sw dist__styles__components ->
+        getdir public__styles "components" @@ fun public__styles__components ->
+        physlink ~sw ~link_to:Path.(public__styles__components / "headerbar.css") Path.(dist__styles__components / "headerbar.css");
+        physlink ~sw ~link_to:Path.(public__styles__components / "grepbar.css") Path.(dist__styles__components / "grepbar.css");
+      )
+    )
   )
