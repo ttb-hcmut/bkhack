@@ -1,7 +1,5 @@
 open Eio
 
-let ( %> ) f1 f2 = fun s -> f2 (f1 s)
-
 let dist cwd = Path.(cwd / "dist")
 let dist__indexhtml cwd = Path.(dist cwd / "index.html")
 let dist__resetcss cwd = Path.(dist cwd / "reset.css")
