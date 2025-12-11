@@ -14,8 +14,8 @@
     "format": "npm run format-check -- --auto-promote",
     "format-check": "npm run dune -- build @fmt",
     "watch": "npm run build -- --watch",
-    "bundle": "rm dist/main.js* && webpack --mode production --entry ./_build/default/src/output/src/App.js",
-    "serve": "webpack serve --config preprocessor.js --history-api-fallback --mode development --entry ./_build/default/src/output/src/App.js",
+    "bundle": "eval `opam env` && dune exec scripts/bundle.exe",
+    "serve": "eval `opam env` && dune exec scripts/serve.exe",
     "dev": "npm run watch & npm run serve; wait",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
@@ -38,6 +38,7 @@
     "dev": "# Watch and serve combined"
   },
   "dependencies": {
+    "live-server": "^1.2.2",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "storybook": "^9.1.13"

@@ -244,7 +244,7 @@ module Project_frontpage__bachkhoatyp = {
 		<Header />
 		<div className="mainpad project_frontpage">
 			<header>
-				<img />
+				<img className="logo" />
 				<div>{string("bachkhoa.typ")}</div>
 				<div>{string("A suite of Typst document templates for HCMUT")}</div>
 			</header>
@@ -368,6 +368,218 @@ module Thread = {
 	};
 };
 
+module Header2 = {
+	[@react.component]
+	let make = () => {
+		<>
+			<a className="logo" href="/">
+				<img src="/assets/logo.svg" />
+				<div className="title">{string("BKHack")}</div>
+			</a>
+			<input />
+		</>
+	}
+}
+
+module Wifi = {
+	[@react.component]
+	let make = () => {
+		<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg>
+	}
+}
+
+module HintPanel = {
+
+	let command = "feed --sort=hot --filter";
+
+	[@react.component]
+	let make = () => {
+		<>
+			// <img className="logo" src="/assets/icon__wifi.svg" />
+			<div className="logo">
+				<Wifi />
+			</div>
+			<h1>
+				{string("home feed")}
+			</h1>
+			<div className="sub">
+				<span className="command">{string(command)}</span>
+			</div>
+		</>
+	}
+}
+
+module Filter = {
+	[@react.component]
+	let make = () => {
+		<form className="dashboard-filter">
+			<input />
+			<select>
+				<option>{string("hot")}</option>
+				<option>{string("new")}</option>
+				<option>{string("top-voted")}</option>
+				<option>{string("most-discussed")}</option>
+				<option>{string("recent-activity")}</option>
+			</select>
+			<select>
+				<option>{React.int(10)}</option>
+				<option>{React.int(25)}</option>
+				<option>{React.int(50)}</option>
+				<option>{React.int(100)}</option>
+			</select>
+		</form>
+	}
+}
+
+module Dashboard = {
+	module Card = {
+		[@react.component]
+		let make = (~rank, ~title) => {
+			<>
+				<div className="counter">
+					<span>{React.int(rank)}</span>
+				</div>
+				<header>
+					<a href="item?id=lol">{string(title)}</a>
+				</header>
+				<footer>
+					<div className="has-left-indicator tagline">
+						<span className="tag" title="Algorithm, Optimization">{string("AgAa")}</span>
+					</div>
+					<div className="status">
+						<span>{string("verified")}</span>
+					</div>
+					<div className="activities">
+						<div>
+							<span>
+								{string("c")}
+							</span>
+							<span>
+								{React.int(12)}
+							</span>
+						</div>
+						<div>
+							<span>
+								{string("i")}
+							</span>
+							<span>
+								{React.int(12)}
+							</span>
+						</div>
+						<div>
+							<span>
+								{string("p")}
+							</span>
+							<span>
+								{React.int(12)}
+							</span>
+						</div>
+					</div>
+					<div className="last-activity">
+						<span className="verb">{string("commented")}</span>
+						<span className="agent">{string("@kinten108101")}</span>
+						<span className="theme"></span>
+						<span className="time">{string("2h ago")}</span>
+					</div>
+					<div className="created-from">
+						<span>{string("created ")}</span><span>{string("2d ago")}</span>
+					</div>
+					<div className="ref">
+						<span>{string("2000")}</span>
+					</div>
+				</footer>
+			</>
+		}
+	}
+
+  [@react.component]
+  let make = () => {
+		let testitems =
+		[
+			(198, "Reconciling Abstractions with High Performance"
+			)
+		,
+			(342, "Algebra-driven Design"
+			)
+		,
+			(034, "Reverse-engineer a PDF"
+			)
+		,
+			(012, "Haskell School of Music"
+			)
+		,
+			(123, "Compilers: Principles, Techniques, and Tools"
+			)
+		,
+			(139, "Tsoding: I wrote an Emacs plugin"
+			)
+		,
+			(752, "Why OCaml"
+			)
+		,
+			(711, "Seven Implementations of Incremental"
+			)
+		,
+			(812, "Attention is not all you need"
+			)
+		,
+			(820, "Neural Network in Assembly"
+			)
+		];
+		<>
+			<header>
+				<Header2 />
+			</header>
+			<nav>
+				<header>
+					<HintPanel />
+				</header>
+				<Filter />
+			</nav>
+			<main><ol>
+			{ testitems
+				|> List.map(((rank, title)) => {
+					<li
+						key=title
+					>
+						<Card
+							rank
+							title
+						/>
+					</li>
+				})
+				|> Array.of_list |> React.array
+			}
+			</ol></main>
+			<aside>
+				<section>
+					<h2>{string("my notes")}</h2>
+					<button>{string("new note")}</button>
+				</section>
+				<section>
+					<h2>{string("search")}</h2>
+				</section>
+				<section>
+					<h2>{string("quick filters")}</h2>
+				</section>
+			</aside>
+			<footer role="navigation">
+				<button>{string("prev")}</button>
+				<button>{string("next")}</button>
+			</footer>
+		</>
+	}
+};
+
+module ItemPage {
+	[@react.component]
+	let make = (~item_id) => {
+		ignore(item_id);
+		<>
+		</>
+	}
+}
+
 module UnknownPage = {
 	[@react.component]
 	let make = () => {
@@ -377,31 +589,35 @@ module UnknownPage = {
 	}
 };
 
+module Re = {
+	include Js.Re
+	let exec = (pattern, str) => exec(~str, pattern)
+}
+
+let get_item_id = {
+	let pattern = Re.fromString("id=(.+)");
+	Re.exec(pattern)
+	%> Option.get
+	%> Re.captures
+	%> (x => Array.get(x, 1))
+	%> Js.Nullable.toOption
+	%> Option.get
+}
+
 module App = {
 	[@react.component]
 	let make = () => {
-		let get_item_id = {
-			let regexp = Js.Re.fromString("id=(.+)");
-			str => Js.Re.exec(~str, regexp)
-		};
 		let url = ReasonReactRouter.useUrl();
 		Js.Console.log(url);
 		switch (url.path) {
-		| [] => <Teaser />
+		| [] =>
+			<Dashboard />
 		| ["about"] => <About />
 		| ["projects"] => <Promotion_list />
 		| ["projects", "~bachkhoa-typ", ...paths] => <Project_frontpage__bachkhoatyp paths />
-		| ["~debug", "item"] =>
-			switch (get_item_id(url.search)) {
-			| None => failwith("fuck")
-			| Some(item_id) =>
-				let item_id =
-					Js.Re.captures(item_id)
-					-> Array.get(1)
-					|> Js.Nullable.toOption
-					|> Option.get;
-				<Thread item_id />
-			}
+		| ["item"] =>
+			let item_id = get_item_id(url.search);
+			<ItemPage item_id />
 		| _ => <UnknownPage />
 		}
 	}

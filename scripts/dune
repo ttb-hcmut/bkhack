@@ -1,0 +1,7 @@
+(executable
+ (libraries eio eio_main buildlib)
+ (name bundle))
+
+(executable
+ (libraries eio eio_main buildlib)
+ (name serve))

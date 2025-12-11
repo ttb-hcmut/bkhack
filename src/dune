@@ -17,7 +17,8 @@
  ; Dune will look into those dependencies and generate rules with JavaScript targets
  ; for the modules in those libraries as well.
  ; Caveat: the libraries need to be specified with `(modes melange)`.
- (libraries reason-react melange-fetch melange-json)
+ (libraries reason-react melange-fetch melange-json melange__containers)
+ (flags -open Melange__containers.Fun)
 
  ; Uncomment the following to copy the generated JavaScript files inside the source tree
  ; (promote (until-clean))

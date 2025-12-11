@@ -1,0 +1,4 @@
+(library
+ (libraries eio containers)
+ (flags -open Containers.Fun)
+ (name buildlib))

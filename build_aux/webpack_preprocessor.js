@@ -1,4 +1,5 @@
 const webpack = require("webpack")
+const path = require("path")
 
 const backend_address = (() => {
 	switch (process.env.BKHACK_BACKEND_ADDRESS) {
@@ -21,8 +22,5 @@ module.exports = {
 		new webpack.DefinePlugin({
 			"bkhackenv.backend_address": `\"${backend_address}\"`
 		})
-	],
-	devServer: {
-		allowedHosts: "all"
-	}
+	]
 }

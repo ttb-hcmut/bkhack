@@ -2,3 +2,5 @@
 - [ ] Nethack <33
 - [ ] multi page serving with melange
 - [ ] storybook integration with melange
+- [ ] sh parser
+- [ ] light mode

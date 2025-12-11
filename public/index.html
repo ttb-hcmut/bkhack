@@ -5,13 +5,8 @@
     <title>BKHack</title>
 		<link href="/inter/inter.css" rel="stylesheet">
 		<style>
-/* start css reset */
-
-body {
-	margin: 0;
-}
-
-/* end css reset */
+@import "debug.css";
+@import "reset.css";
 
 .mainpad {
 	margin-left: 100px;
@@ -161,28 +156,379 @@ body {
 	margin-top: 0;
 }
 
-.vertsep > *:not(:nth-child(1))::before {
-	content: "|";
-}
-.spacesep > *:not(:nth-child(1))::before {
-	content: " ";
+html {
+	--dark-a: #10101A;
+	--dark-b: #1e1e2e;
+	--dark-c: #313244;
+	--dark-d: #6c7086;
+	--light-a: #ffffff;
+	--light-b: #cdd6f4;
+	--light-blue: #89b4fa;
+	--cyan: #1488db;
+	--cyan-50: #1488BB7D;
+	/* --space-a: 0.5cm; */
+	--space-a: calc(2.5 * 5.6px /* 0.25rem */);
+	--space-c: calc(1.5 * 5.6px /* 0.25rem */);
+	--space-d: calc(4 * 5.6px /* 0.25rem */);
+	/* tailwind start */
+	--text-xs: 12px /* 0.75rem */;
+	--text-sm: 14px /* 0.875rem */;
+	--text-base: 16px /* 1rem */;
+	/* tailwind end */
+	--font-mono: "Liberation Mono";
 }
 
-* {
-	font-family: Inter, sans-serif;
-	font-size: 1em;
+html {
+	font-size: var(--text-base);
+	font-family: system-ui;
+}
+
+.has-left-indicator {
+	border-left: solid 1px var(--light-blue);
+	padding-left: var(--space-a);
+}
+
+#root {
+	background-color: var(--dark-a);
+	min-height: 100vh;
 }
 
 #root > header {
-	background-color: #ff6600;
+	background-color: var(--dark-b);
+	border-color: oklab(61.0324% -.0598051 -.144428 / .2);
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	position: sticky;
+	top: 0px;
+	padding: var(--space-a);
+	display: flex;
+	flex-direction: row;
 }
 
-#root > header a.logo + nav {
-	display: inline-block;
+#root > header > :not(:first-child) {
+	margin-left: var(--space-a);
 }
 
-footer {
-	text-align: center;
+#root > header .logo {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin-left: var(--space-a);
+}
+
+#root > header .logo > img {
+	height: 32px;
+}
+
+#root > header .logo > .title {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	display: none;
+}
+
+#root > nav {
+	margin-top: var(--space-a);
+	margin-left: var(--space-a);
+	margin-right: var(--space-a);
+	background-color: var(--dark-b);
+	border: solid 1px var(--dark-c);
+}
+
+#root > nav > header {
+	display: grid;
+	grid-template-columns: calc(76px) minmax(0,1fr);
+	grid-template-rows: min-content min-content;
+	row-gap: var(--space-c);
+	padding-right: var(--space-a);
+	padding-top: var(--space-d);
+	padding-bottom: var(--space-d);
+}
+
+#root > nav > header > .logo {
+	grid-column: 1 / 2;
+	grid-row: 1 / -1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: var(--cyan);
+}
+
+#root > nav > header > .logo > svg {
+	width: 28px;
+	height: auto;
+}
+
+#root > nav > header > h1 {
+	line-height: 1em;
+	margin: 0;
+	font-family: var(--font-mono);
+	font-size: var(--text-sm);
+	font-weight: normal;
+	color: var(--light-b);
+}
+
+#root > nav > header > .sub {
+	color: var(--dark-d);
+	font-size: var(--text-xs);
+}
+
+#root > nav > form {
+	background-color: var(--dark-a);
+	border-top: solid 1px var(--dark-c);
+	padding: var(--space-a);
+}
+
+#root > nav > form > :not(:first-child) {
+	margin-left: var(--space-a);
+}
+
+#root > main {
+	margin-left: var(--space-a);
+	margin-right: var(--space-a);
+}
+
+#root > main > ol {
+	display: grid;
+	grid-template-columns: /* spacing for counter */ minmax(0,76px) /* tag */ minmax(0,80px) /* status */ minmax(0,80px) /* activities */ minmax(0,150px) /* last activity */ minmax(0,340px) /* created from */ minmax(0,180px) /* ... */ minmax(0,1fr);
+	grid-auto-rows: max-content;
+	row-gap: var(--space-a);
+	/** css reset start */
+	padding-left: 0;
+	padding-right: 0;
+	/** css reset end */
+}
+
+#root > main > ol > li {
+	background-color: var(--dark-b);
+	border: solid 1px var(--dark-c);
+	grid-column: 1 / -1;
+	display: grid;
+	grid-template-columns: subgrid;
+	grid-template-rows: min-content min-content;
+	row-gap: var(--space-c);
+	padding: var(--space-a);
+}
+
+#root > main > ol > li {
+	transition-property: all;
+	transition-duration: 300ms;
+}
+
+@media (prefers-reduced-motion) {
+	#root > main > ol > li {
+		transition-property: none;
+	}
+}
+
+#root > main > ol > li > .counter {
+	grid-column: 1 / 2;
+	grid-row: 1 / -1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-right: var(--space-a);
+	font-size: var(--text-sm);
+	color: var(--light-b);
+}
+
+#root > main > ol > li > header {
+	grid-column: 2 / -1;
+	grid-row: 1;
+}
+
+#root > main > ol > li > header > a {
+	color: var(--light-b);
+	text-decoration: none;
+}
+
+#root > main > ol > li > header > a {
+	transition-property: all;
+	transition-duration: 300ms;
+}
+
+@media (prefers-reduced-motion) {
+	#root > main > ol > li > header > a {
+		transition-property: none;
+	}
+}
+
+#root > main > ol > li > footer {
+	grid-column: 2 / -1;
+	grid-row: 2;
+	display: grid;
+	grid-template-columns: subgrid;
+	font-size: var(--text-xs);
+}
+
+#root > main > ol > li > footer > * {
+	overflow: hidden;
+	text-wrap: nowrap;
+}
+
+#root > main > ol > li > footer > *:not(:first-child) {
+	margin-left: var(--space-c);
+	padding-left: var(--space-c);
+	border-left: solid 1px var(--dark-c);
+}
+
+#root > main > ol > li .tagline {
+	color: var(--light-blue);
+	font-family: var(--font-mono); /* FIXME(kinten): we already rely on span.tag to set mono font. but for some reasons that isnt enough, the font will be mono but baseline is wrong. had to also set mono font here to get correct baseline */
+}
+
+#root > main > ol > li .status {
+	color: var(--light-blue);
+	font-family: var(--font-mono);
+}
+
+#root > main > ol > li .activities {
+	display: flex;
+	flex-direction: row;
+	color: var(--light-b);
+	font-family: var(--font-mono);
+}
+
+#root > main > ol > li .activities > div:not(:first-child) {
+	margin-left: var(--space-c);
+}
+
+#root > main > ol > li .activities > div > span:first-child::after {
+	content: ":";
+}
+
+#root > main > ol > li .last-activity {
+	display: flex;
+	flex-direction: row;
+	font-family: var(--font-mono);
+}
+
+#root > main > ol > li .last-activity > .verb {
+	color: var(--cyan);
+}
+
+#root > main > ol > li .last-activity > .agent {
+	color: var(--light-blue);
+}
+
+#root > main > ol > li .last-activity > .time {
+	color: var(--dark-d);
+}
+
+#root > main > ol > li .last-activity > .theme {
+	display: none;
+}
+
+#root > main > ol > li .last-activity > *:not(:first-child) {
+	margin-left: 1em;
+}
+
+#root > main > ol > li .created-from {
+	font-family: var(--font-mono);
+	color: var(--dark-d);
+}
+
+#root > main > ol > li .ref {
+	font-family: var(--font-mono);
+	color: var(--light-blue);
+}
+
+#root > main > ol > li .ref > ::before {
+	content: "ref:";
+}
+
+#root > main > ol > li:hover {
+	border: solid 1px var(--cyan-50);
+}
+
+#root > main > ol > li:hover > header > a {
+	color: var(--light-a);
+}
+
+#root > aside {
+	display: none;
+	margin-top: var(--space-a);
+}
+
+#root > aside h2 {
+	margin: 0;
+}
+
+#root > aside > section {
+	background-color: var(--dark-b);
+	border: solid 1px var(--dark-c);
+	border-radius: 0.5cm;
+	padding: var(--space-a);
+}
+
+#root > aside > *:not(:first-child) {
+	margin-top: var(--space-a);
+}
+
+#root > aside > * > h2::before {
+	content: "[";
+}
+
+#root > aside > * > h2::after {
+	content: "]";
+}
+
+#root > footer {
+	margin-left: var(--space-a);
+	margin-right: var(--space-a);
+	padding: var(--space-a);
+	background-color: var(--dark-b);
+	border: solid 1px var(--dark-c);
+}
+
+span.tag::before {
+	content: "#";
+}
+
+span.tag {
+	font-family: var(--font-mono);
+}
+
+form.dashboard-filter {
+	/* debug start */ height: 50px; /* debug end */
+	background-color: var(--dark-b);
+}
+
+.command::before {
+	content: "$ ";
+}
+
+.command {
+	font-family: var(--font-mono);
+}
+
+@media (min-width: 64rem) {
+	:root {
+		/* NOTE(kinten): make sure to manually sync these values */
+		--grid-1: minmax(0,1fr) calc(64rem - 300px) 400px  minmax(0,1fr);
+		--offset: calc((100vw - (64rem - 300px + 400px - 2 * var(--space-a))) / 2);
+	}
+
+	#root {
+		display: grid;
+		grid-auto-rows: max-content;
+		grid-template-columns: var(--grid-1);
+	}
+
+	#root > * {
+		grid-column: 2 / 3;
+	}
+
+	#root > header {
+		grid-column: 1 / -1;
+		padding-left: var(--offset);
+	}
+
+	#root > aside {
+		display: block !important;
+		grid-column: 3 / 4;
+		grid-row: 2 / 4;
+	}
 }
 		</style>
 		<script>
@@ -203,7 +549,7 @@ class I18n {
 	}
 }
 		</script>
-    <script type="module" src="/main.js"></script>
+    <script type="module" src="index.js"></script>
   </head>
   <body>
     <div id="root"></div>

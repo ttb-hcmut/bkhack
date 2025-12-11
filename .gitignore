@@ -4,6 +4,8 @@ _build
 _opam
 deps
 dist/
+dist__serve/
+log/
 
 *storybook.log
 storybook-static

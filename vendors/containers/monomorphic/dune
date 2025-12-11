@@ -1,0 +1,8 @@
+(library
+ (modes melange)
+ (name monomorphic)
+ (preprocess
+  (action
+   (run %{project_root}/vendors/containers/core/cpp/cpp.exe %{input-file})))
+ (modules CCMonomorphic)
+ (wrapped false))

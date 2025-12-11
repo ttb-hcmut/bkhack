@@ -1,0 +1,12 @@
+(library
+ (modes melange)
+ (name melange__containers)
+ (wrapped false)
+ (preprocess
+  (action
+   (run %{project_root}/vendors/containers/core/cpp/cpp.exe %{input-file})))
+ (flags :standard -nolabels -open CCMonomorphic)
+ (libraries monomorphic))
+
+(ocamllex
+ (modules CCSexp_lex))
