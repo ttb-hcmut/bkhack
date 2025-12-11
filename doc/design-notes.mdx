@@ -18,4 +18,12 @@ There are two encodings[^jfp]:
 
 For example, (TBA)
 
+# Some notes on bundling and asset management
+
+All static asset - html document, css stylesheet, icon svg - should be separated into files. This is opposite to the inline philosophy e.g. inline styling, css-in-js, etc.
+
+> Inspired by DHH's No Build paradigm. We split / distribute the application into as many file modules as possible, because modern browsers can handle multiple file modules very efficiently (compared to the bundle-based approach)
+
+It'd be nice to have a Reason abstraction for importing static assets. Currently, asset management is manual, requires programmable pipeline, and thus error-prone.
+
 [^jfp]: totally has nothing to do with initial vs. final encoding from theory of algebraic specification
