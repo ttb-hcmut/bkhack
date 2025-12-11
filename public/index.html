@@ -190,6 +190,11 @@ html {
 #root {
 	background-color: var(--dark-a);
 	min-height: 100vh;
+	padding-bottom: var(--space-a);
+}
+
+#root > :not(:first-child) {
+	margin-top: var(--space-a);
 }
 
 #root > header {
@@ -227,7 +232,6 @@ html {
 }
 
 #root > nav {
-	margin-top: var(--space-a);
 	margin-left: var(--space-a);
 	margin-right: var(--space-a);
 	background-color: var(--dark-b);
@@ -295,6 +299,7 @@ html {
 	/** css reset start */
 	padding-left: 0;
 	padding-right: 0;
+	margin: 0;
 	/** css reset end */
 }
 
