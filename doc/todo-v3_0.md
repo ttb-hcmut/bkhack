@@ -5,3 +5,6 @@
 - [ ] sh parser
 - [ ] light mode
 - [ ] homogeneous (OCaml?) build system. B0?
+- [ ] markdown parsing
+- [ ] subscription, watch thread, notifications
+- [ ] custom dialog input components
