@@ -1,0 +1,34 @@
+---
+config:
+  layout:
+  look: classic
+  heme: redux-dark
+---
+stateDiagram
+            [*] --> PullRequestsList
+            state PullRequestsList {
+              [*] --> PRL
+                PRL --> PRLFiltered: apply filters and/or sorts
+                PRLFiltered --> PRL: disable filters and sorts
+                PRL --> PRL: move to page
+                PRLFiltered --> PRLFiltered: move to page
+            }
+            PullRequestsList --> PREdit: Create PullRequests
+            PREdit --> [*]: Confirm creation 
+            PREdit --> PullRequestsList: cancelss
+            PullRequestsList --> PRView: view PullRequest
+            PRView --> PullRequestsList: back
+            PRView --> [*]: author approves
+            PRView --> PREdit: author edits PullRequest
+            PREdit --> [*]: author confirm edit
+            state PREdit{
+              [*] --> PREditor
+              PREditor --> PRPreview: preview rendered page
+              PRPreview --> PREditor: back to editor tab
+            }
+            state PRView {
+              [*] --> PRPost
+              PRPost --> PRChanges : view changes
+              PRChanges --> PRPost : view commit post & comments
+            }
+          

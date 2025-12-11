@@ -1,0 +1,138 @@
+stateDiagram
+  
+  state UI {
+    
+    state MainRegion {
+      
+      [*] --> HomeFeed
+      HomeFeed --> PostView:open post
+      Settings --> HomeFeed:back
+      PostView --> Settings:open settings
+      state HomeFeed {
+        
+        state FeedMain {
+          
+          [*] --> Feed
+          Feed --> Feed:jump page of HomeFeed
+          Feed --> Filtered:apply filter or sort criterias
+          Filtered --> Feed:disables filters and sorts
+          Filtered --> Filtered:jump page of HomeFeed
+        }
+        state FeedSide {
+          
+          [*] --> Sidebar
+          Sidebar --> NoSidebar:disable Sidebar
+          NoSidebar --> Sidebar:enable Sidebar
+        }
+      }
+      state PostView {
+        
+        state PostMain {
+          
+          state PostViewEntryChoice <<choice>>
+
+          PostViewEntryChoice --> Article:chose article
+          PostViewEntryChoice --> CommentThread:chose comments
+          PostViewEntryChoice --> RevisionHistory:chose history
+          PostViewEntryChoice --> IssueView:chose issues
+          PostViewEntryChoice --> PullRequests:chose pull requests
+          state PostViewTabs <<choice>>
+
+          PostViewTabs --> Article:chose article
+          PostViewTabs --> CommentThread:chose comments
+          PostViewTabs --> RevisionHistory:chose history
+          PostViewTabs --> IssueView:chose issues
+          PostViewTabs --> PullRequests:chose pull requests
+          PostViewTabs --> EditPermission:switch to privilages tab
+          Article --> PostViewTabs
+          CommentThread --> PostViewTabs
+          RevisionHistory --> PostViewTabs
+          IssueView --> PostViewTabs
+          PullRequests --> PostViewTabs
+          EditPermission --> PostViewTabs
+          EditPost --> PostViewTabs
+          Article --> Article:jump to section
+          CommentThread --> CommentThread:jump to page
+          state CommentThread {
+            
+            [*] --> CommentCollapsed
+            CommentCollapsed --> CommentExpanded:expand CommentThread
+            CommentExpanded --> CommentCollapsed:collapse CommentThread
+          }
+          state PullRequests {
+            [*] --> PullRequestsList
+            state PullRequestsList {
+              [*] --> PRL
+                PRL --> PRLFiltered: apply filters and/or sorts
+                PRLFiltered --> PRL: disable filters and sorts
+                PRL --> PRL: move to page
+                PRLFiltered --> PRLFiltered: move to page
+            }
+            PullRequestsList --> PREdit: Create PullRequests
+            PREdit --> PullRequestsList: Confirm create 
+            PREdit --> PullRequestsList: back
+            PullRequestsList --> PRView: view PullRequest
+            PRView --> PullRequestsList: back
+            PRView --> PullRequestsList: author approves
+            PRView --> PREdit: author changes PullRequest
+            PREdit --> PullRequestsList: author confirm edit
+            state PREdit{
+              [*] --> PREditor
+              PREditor --> PRPreview: preview rendered page
+              PRPreview --> PREditor: back to editor tab
+            }
+            state PRView {
+              [*] --> PRPost
+              PRPost --> PRChanges : view changes
+              PRChanges --> PRPost : view commit post & comments
+            }
+          }
+        }
+        state PostSide {
+          
+          [*] --> PostSideOpen
+          PostSideOpen --> PostSideClosed:collapse sidebar
+          PostSideClosed --> PostSideOpen:expand sidebar
+        }
+      }
+      state IssueView {
+        IssueList --> Issue: view Issue
+        IssueList --> UserProfile: view Issue author
+        IssueList --> IssueListFiltered: filter or sort issues
+
+        IssueListFiltered --> Issue: view Issue
+        IssueListFiltered --> UserProfile: view Issue author
+        IssueListFiltered --> IssueList: disable applied filters and sorts
+        
+        Issue --> UserProfile: view commenter profile
+        Issue --> Article: jump to referenced section
+      }
+    }
+    state NavbarRegion {
+      
+      [*] --> NotifMenuClosed
+      NotifMenuClosed --> NotifMenuOpen:enable dropdown
+      NotifMenuOpen --> NotifMenuClosed:disable dropdown
+    }
+  }
+  [*] --> UI
+  PostSide --> EditPost:author edits
+  PostSide --> PullRequests:author edits
+  PostSide --> IssueView:author edits
+  HomeFeed --> ExternalSite:view cited sources
+  PostView --> Report:report post
+  PostView --> ExternalSite:view cited sources
+  PostView --> UserProfile:view profile
+  Article --> ExternalSite:view cited sources
+  Article --> Filtered:view tagged posts
+  Article --> UserProfile:view author profile
+  CommentThread --> UserProfile:view commenter profile
+  Issue --> ExternalSite: view cited sources
+  NavbarRegion --> HomeFeed:HomeFeed
+  NavbarRegion --> NewPost:create post
+  NavbarRegion --> UserProfile:view profile
+  NavbarRegion --> Settings:open settings
+  note right of NavbarRegion 
+  Navbar is persistent.
+            Its actions function as global transitions.
+  end note
