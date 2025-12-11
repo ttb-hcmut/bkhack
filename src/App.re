@@ -452,30 +452,12 @@ module Dashboard = {
 						<span>{string("verified")}</span>
 					</div>
 					<div className="activities">
-						<div>
-							<span>
-								{string("c")}
-							</span>
-							<span>
-								{React.int(12)}
-							</span>
-						</div>
-						<div>
-							<span>
-								{string("i")}
-							</span>
-							<span>
-								{React.int(12)}
-							</span>
-						</div>
-						<div>
-							<span>
-								{string("p")}
-							</span>
-							<span>
-								{React.int(12)}
-							</span>
-						</div>
+						<span className="comments">
+							{React.int(12)}
+						</span>
+						<span className="pullrequests">
+							{React.int(12)}
+						</span>
 					</div>
 					<div className="last-activity">
 						<span className="verb">{string("commented")}</span>

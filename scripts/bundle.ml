@@ -6,6 +6,8 @@ let dist__resetcss cwd = Path.(dist cwd / "reset.css")
 let dist__debugcss cwd = Path.(dist cwd / "debug.css")
 let dist__assets cwd = Path.(dist cwd / "assets")
 let dist__assets__logosvg cwd = Path.(dist__assets cwd / "logo.svg")
+let dist__assets__icon__pullrequestvioletsvg cwd = Path.(dist__assets cwd / "icon.pullrequest.violet.svg")
+let dist__assets__icon__commentlightbluesvg cwd = Path.(dist__assets cwd / "icon.comment.light-blue.svg")
 let dist__item cwd = Path.(dist cwd / "item")
 let dist__item__indexhtml cwd = Path.(dist__item cwd / "index.html")
 
@@ -55,6 +57,12 @@ let () =
     ( Fiber.fork ~sw @@ fun () ->
       Path.symlink ~link_to:"../../public/assets/logo.svg"
         (dist__assets__logosvg cwd) );
+    ( Fiber.fork ~sw @@ fun () ->
+      Path.symlink ~link_to:"../../public/assets/icon.pullrequest.violet.svg"
+        (dist__assets__icon__pullrequestvioletsvg cwd) );
+    ( Fiber.fork ~sw @@ fun () ->
+      Path.symlink ~link_to:"../../public/assets/icon.comment.light-blue.svg"
+        (dist__assets__icon__commentlightbluesvg cwd) );
   );
   ( Fiber.fork ~sw @@ fun () ->
     Path.mkdir ~perm:0o700 (dist__item cwd);

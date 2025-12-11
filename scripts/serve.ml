@@ -6,6 +6,8 @@ let dist__resetcss cwd = Path.(dist cwd / "reset.css")
 let dist__debugcss cwd = Path.(dist cwd / "debug.css")
 let dist__assets cwd = Path.(dist cwd / "assets")
 let dist__assets__logosvg cwd = Path.(dist__assets cwd / "logo.svg")
+let dist__assets__icon__pullrequestvioletsvg cwd = Path.(dist__assets cwd / "icon.pullrequest.violet.svg")
+let dist__assets__icon__commentlightbluesvg cwd = Path.(dist__assets cwd / "icon.comment.light-blue.svg")
 let dist__item cwd = Path.(dist cwd / "item")
 let dist__item__indexhtml cwd = Path.(dist__item cwd / "index.html")
 
@@ -15,6 +17,8 @@ let public__resetcss cwd = Path.(public cwd / "reset.css")
 let public__debugcss cwd = Path.(public cwd / "debug.css")
 let public__assets cwd = Path.(public cwd / "assets")
 let public__assets__logosvg cwd = Path.(public__assets cwd / "logo.svg")
+let public__assets__icon__pullrequestvioletsvg cwd = Path.(public__assets cwd / "icon.pullrequest.violet.svg")
+let public__assets__icon__commentlightbluesvg cwd = Path.(public__assets cwd / "icon.comment.light-blue.svg")
 let public__item cwd = Path.(public cwd / "item")
 let public__item__indexhtml cwd = Path.(public__item cwd / "index.html")
 
@@ -71,6 +75,12 @@ let () =
     ( Fiber.fork ~sw @@ fun () ->
       physlink ~link_to:(public__assets__logosvg cwd)
         (dist__assets__logosvg cwd) );
+    ( Fiber.fork ~sw @@ fun () ->
+      physlink ~link_to:(public__assets__icon__pullrequestvioletsvg cwd)
+        (dist__assets__icon__pullrequestvioletsvg cwd) );
+    ( Fiber.fork ~sw @@ fun () ->
+      physlink ~link_to:(public__assets__icon__commentlightbluesvg cwd)
+        (dist__assets__icon__commentlightbluesvg cwd) );
   );
   ( Fiber.fork ~sw @@ fun () ->
     Path.mkdir ~perm:0o700 (dist__item cwd);

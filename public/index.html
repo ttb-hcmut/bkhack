@@ -393,12 +393,52 @@ html {
 	font-family: var(--font-mono);
 }
 
-#root > main > ol > li .activities > div:not(:first-child) {
+#root > main > ol > li .activities > * {
+	display: inline-flex;
+}
+
+#root > main > ol > li .activities > :not(:first-child) {
 	margin-left: var(--space-c);
 }
 
-#root > main > ol > li .activities > div > span:first-child::after {
-	content: ":";
+#root > main > ol > li .activities > .comments::before {
+	content: " ";
+	display: inline-block;
+	background-image: url("/assets/icon.comment.light-blue.svg");
+	background-size: 1em 1em;
+	width: 1em;
+	height: 1em;
+	margin-right: 4px;
+}
+
+@media (display-mode: minimal-ui) {
+	#root > main > ol > li .activities > .comments::before {
+		content: "c:";
+		background-image: none;
+		width: auto;
+		height: auto;
+		margin-right: 0;
+	}
+}
+
+#root > main > ol > li .activities > .pullrequests::before {
+	content: " ";
+	display: inline-block;
+	background-image: url("/assets/icon.pullrequest.violet.svg");
+	background-size: 1em 1em;
+	width: 1em;
+	height: 1em;
+	margin-right: 4px;
+}
+
+@media (display-mode: minimal-ui) {
+	#root > main > ol > li .activities > .pullrequests::before {
+		content: "p:";
+		background-image: none;
+		width: auto;
+		height: auto;
+		margin-right: 0;
+	}
 }
 
 #root > main > ol > li .last-activity {
