@@ -1,3 +1,5 @@
+open Melange__containers.Fun
+
 module Post = {
 	type t =
 		{ author: string
