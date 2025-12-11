@@ -1,0 +1,21 @@
+html {
+	--dark-a: #10101A;
+	--dark-b: #1e1e2e;
+	--dark-c: #313244;
+	--dark-d: #6c7086;
+	--light-a: #ffffff;
+	--light-b: #cdd6f4;
+	--light-blue: #89b4fa;
+	--cyan: #1488db;
+	--cyan-50: #1488BB7D;
+	/* --space-a: 0.5cm; */
+	--space-a: calc(2.5 * 0.25rem /* 5.6px */);
+	--space-c: calc(1.5 * 0.25rem /* 5.6px */);
+	--space-d: calc(4 * 0.25rem /* 5.6px */);
+	/* tailwind start */
+	--text-xs: 0.75rem /* 12px */;
+	--text-sm: 0.875rem /* 14px */;
+	--text-base: 1rem /* 16px */;
+	/* tailwind end */
+	--font-mono: "Liberation Mono";
+}

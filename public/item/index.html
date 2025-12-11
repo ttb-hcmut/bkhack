@@ -1,5 +1,66 @@
+<!DOCTYPE html>
 <html>
-	<body>
-		hi
-	</body>
+  <head>
+    <meta charset="utf-8" />
+    <title>BKHack</title>
+		<style>
+@import "/styles/debug.css";
+@import "/styles/reset.css";
+@import "/styles/variables.css";
+
+#root {
+	background-color: var(--dark-a);
+	min-height: 100vh;
+	padding-bottom: var(--space-a);
+}
+
+#root > header {
+	background-color: var(--dark-b);
+	border-color: oklab(61.0324% -.0598051 -.144428 / .2);
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	position: sticky;
+	top: 0px;
+	padding: var(--space-a);
+	display: flex;
+	flex-direction: row;
+}
+
+#root > header > :not(:first-child) {
+	margin-left: var(--space-a);
+}
+
+#root > header .logo {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin-left: var(--space-a);
+}
+
+#root > header .logo > img {
+	height: 32px;
+}
+
+#root > header .logo > .title {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	display: none;
+}
+
+#root > .innerbody > nav {
+	display: flex;
+	flex-direction: row;
+}
+
+#root > .innerbody > nav button.selected {
+	border: solid 1px yellow;
+}
+
+		</style>
+    <script type="module" src="index.js"></script>
+	</head>
+  <body>
+    <div id="root"></div>
+  </body>
 </html>

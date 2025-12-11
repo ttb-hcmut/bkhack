@@ -2,25 +2,29 @@ open Eio
 
 let dist cwd = Path.(cwd / "dist__serve")
 let dist__indexhtml cwd = Path.(dist cwd / "index.html")
-let dist__resetcss cwd = Path.(dist cwd / "reset.css")
-let dist__debugcss cwd = Path.(dist cwd / "debug.css")
 let dist__assets cwd = Path.(dist cwd / "assets")
 let dist__assets__logosvg cwd = Path.(dist__assets cwd / "logo.svg")
 let dist__assets__icon__pullrequestvioletsvg cwd = Path.(dist__assets cwd / "icon.pullrequest.violet.svg")
 let dist__assets__icon__commentlightbluesvg cwd = Path.(dist__assets cwd / "icon.comment.light-blue.svg")
 let dist__item cwd = Path.(dist cwd / "item")
 let dist__item__indexhtml cwd = Path.(dist__item cwd / "index.html")
+let dist__styles cwd = Path.(dist cwd / "styles")
+let dist__styles__resetcss cwd = Path.(dist__styles cwd / "reset.css")
+let dist__styles__debugcss cwd = Path.(dist__styles cwd / "debug.css")
+let dist__styles__variablescss cwd = Path.(dist__styles cwd / "variables.css")
 
 let public cwd = Path.(cwd / "public")
 let public__indexhtml cwd = Path.(public cwd / "index.html")
-let public__resetcss cwd = Path.(public cwd / "reset.css")
-let public__debugcss cwd = Path.(public cwd / "debug.css")
 let public__assets cwd = Path.(public cwd / "assets")
 let public__assets__logosvg cwd = Path.(public__assets cwd / "logo.svg")
 let public__assets__icon__pullrequestvioletsvg cwd = Path.(public__assets cwd / "icon.pullrequest.violet.svg")
 let public__assets__icon__commentlightbluesvg cwd = Path.(public__assets cwd / "icon.comment.light-blue.svg")
 let public__item cwd = Path.(public cwd / "item")
 let public__item__indexhtml cwd = Path.(public__item cwd / "index.html")
+let public__styles cwd = Path.(public cwd / "styles")
+let public__styles__resetcss cwd = Path.(public__styles cwd / "reset.css")
+let public__styles__debugcss cwd = Path.(public__styles cwd / "debug.css")
+let public__styles__variablescss cwd = Path.(public__styles cwd / "variables.css")
 
 let log cwd = Path.(cwd / "log")
 
@@ -62,12 +66,6 @@ let () =
     ( Fiber.fork ~sw @@ fun () ->
       physlink ~link_to:(public__indexhtml cwd)
         (dist__indexhtml cwd) );
-    ( Fiber.fork ~sw @@ fun () ->
-      physlink ~link_to:(public__resetcss cwd)
-        (dist__resetcss cwd) );
-    ( Fiber.fork ~sw @@ fun () ->
-      physlink ~link_to:(public__debugcss cwd)
-        (dist__debugcss cwd) );
   );
   ( Fiber.fork ~sw @@ fun () ->
     Path.mkdir ~perm:0o700 (dist__assets cwd);
@@ -99,5 +97,17 @@ let () =
     ( Fiber.fork ~sw @@ fun () ->
       physlink ~link_to:(public__item__indexhtml cwd)
         (dist__item__indexhtml cwd) );
+  );
+  ( Fiber.fork ~sw @@ fun () ->
+    Path.mkdir ~perm:0o700 (dist__styles cwd);
+    Switch.run @@ fun sw ->
+    ( Fiber.fork ~sw @@ fun () ->
+      physlink ~link_to:(public__styles__resetcss cwd)
+        (dist__styles__resetcss cwd) );
+    ( Fiber.fork ~sw @@ fun () ->
+      physlink ~link_to:(public__styles__debugcss cwd)
+        (dist__styles__debugcss cwd) );
+    ( Fiber.fork ~sw @@ fun () ->
+      physlink ~link_to:(public__styles__variablescss cwd)
+        (dist__styles__variablescss cwd) );
   )
-
