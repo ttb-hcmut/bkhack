@@ -12,6 +12,8 @@ nix-shell
 
 Assume you've successfully entered nix shell
 
+> After this, if you have never run opam initialization, you must run at least once, with `opam init`
+
 Prepare
 
 ```sh
