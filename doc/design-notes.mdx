@@ -1,3 +1,11 @@
+# Reduced motions
+
+The UI components of BKHack exhibits animations such as fading in / out of colors when hover. These animations take a transition duration of 300ms. Animations provide a modern, natural feel to our application. However, due to accessibility reasons, it's not always preferrable to have animations; things should be instantaneously snappy sometimes.
+
+For CSS, all rules that define `transition`-related properties must have their duals when `@media (prefers-reduced-motion)`
+
+> This was motivated when one of the developers (kinten)'s desktop environment (GNOME) uses reduced motion
+
 # Multi-page bundling
 
 Web applications adopt one of these paradigms:
@@ -20,7 +28,9 @@ For example, (TBA)
 
 The final encoding is enabled by the `data-tileset` attribute at the root element. To render the site in its initial encoding form, open the Inspector and unset `data-tileset` to anything other than the value `gui`.
 
-> Our limited build system is what motivated this multiple-encoding workflow in the first place!
+> Our limited build system is what motivated this two-encoding workflow in the first place!
+
+There are various techniques for implementing this two-encoding workflow. At its core is the decoupling of static assets from HTML. Conventionally you would declare assets in HTML or React JSX as img or svg elements. For our workflow, assets are declared in CSS. For CSS rules, you can embed images as background images of elements or pseudo-elements.
 
 # Some notes on bundling and asset management
 
