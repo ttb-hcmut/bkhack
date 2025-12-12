@@ -46,7 +46,7 @@ module Decode = {
 	};
 };
 
-let string = x => React.string(T.__(x));
+let string = React.string;
 
 module Teaser = {
 	[@react.component]
@@ -81,7 +81,7 @@ module Home = {
 	[@react.component]
 	let make = () => {
 		<>
-			<Header />
+			<Component__header />
 		</>
 	}
 };
@@ -90,7 +90,7 @@ module About = {
 	[@react.component]
 	let make = () => {
 		<>
-			<Header />
+			<Component__header />
 			<hgroup>
 				<h1>{string("About us")}</h1>
 				<p>{string("by Le Nguyen Gia Bao")}</p>
@@ -191,7 +191,7 @@ module Promotion_list = {
 	[@react.component]
 	let make = () => {
 		<>
-			<Header />
+			<Component__header />
 			<div className="mainpad promotion_list">
 				<h1>{string("Projects")}</h1>
 				<p>{string("Know a bit of programming? Contribute to ttb-hcmut projects on GitHub! For more details e.g how to PR or report issues, visit our wiki.")}</p>
@@ -226,7 +226,7 @@ module Project_frontpage__bachkhoatyp = {
 		let url = ReasonReactRouter.useUrl();
 		let next = s => "/" ++ (url.path |> String.concat("/")) ++ "/" ++ s;
 		<>
-		<Header />
+		<Component__header />
 		<div className="mainpad project_frontpage">
 			<header>
 				<img className="logo" />
@@ -308,7 +308,7 @@ module Thread = {
 			None
 		});
     <>
-			<Header />
+			<Component__header />
 			{ switch (threadData) {
 			| None => React.null
 			| Some(threadData) =>
@@ -482,7 +482,7 @@ module Dashboard = {
 		];
 		<>
 			<header>
-				<Header />
+				<Component__header />
 			</header>
 			<nav>
 				<header>

@@ -44,7 +44,7 @@ let () =
         [ "webpack"
         ; "--config"; "build_aux/webpack_preprocessor.js"
         ; "--mode"; "production"
-        ; "--entry"; Buildlib.Output.src "App"
+        ; "--entry"; Buildlib.Output.src "Page__app"
         ; "--output-path"; Path.native_exn @@ dist cwd
         ; "--output-filename"; "index.js"]
     );
@@ -75,7 +75,7 @@ let () =
         [ "webpack"
         ; "--config"; "build_aux/webpack_preprocessor.js"
         ; "--mode"; "production"
-        ; "--entry"; Buildlib.Output.src "Item"
+        ; "--entry"; Buildlib.Output.src "Page__item"
         ; "--output-path"; Path.native_exn @@ dist__item cwd
         ; "--output-filename"; "index.js"]
     );

@@ -43,7 +43,7 @@ let () =
         [ "webpack"; "watch"
         ; "--config"; "build_aux/webpack_preprocessor.js"
         ; "--mode"; "development"
-        ; "--entry"; Buildlib.Output.src "App"
+        ; "--entry"; Buildlib.Output.src "Page__app"
         ; "--output-path"; Path.native_exn dist
         ; "--output-filename"; "index.js"]
     );
@@ -65,7 +65,7 @@ let () =
           [ "webpack"; "watch"
           ; "--config"; "build_aux/webpack_preprocessor.js"
           ; "--mode"; "development"
-          ; "--entry"; Buildlib.Output.src "Item"
+          ; "--entry"; Buildlib.Output.src "Page__item"
           ; "--output-path"; Path.native_exn dist__item
           ; "--output-filename"; "index.js"]
       );

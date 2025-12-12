@@ -98,7 +98,7 @@ Understanding these complexities is essential for algorithm selection and optimi
 		});
 		<>
 			<header>
-				<Header />
+				<Component__header />
 			</header>
 			<div className=Printf.sprintf("innerbody %s", id)>
 				<nav>
