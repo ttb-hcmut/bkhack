@@ -6,10 +6,26 @@ end
 module Path = struct
   open Eio
 
-  let physlink process_mgr ~link_to file =
+  let physlink ~sw process_mgr ~link_to file =
+    Fiber.fork ~sw @@ fun () ->
     Process.run
       process_mgr
       ["ln"; Path.native_exn link_to; Path.native_exn file]
+
+  let mkdir ~sw ?(perm = 0o700) dirname filename f =
+    Fiber.fork ~sw @@ fun () ->
+    let newpath = Path.(dirname / filename) in
+    Path.mkdir ~perm newpath;
+    Switch.run @@ fun sw ->
+    f sw newpath
+
+  exception Directory_doesnt_exist of string
+
+  let getdir dirname filename f =
+    let newpath = Path.(dirname / filename) in
+    if not @@ Path.is_directory newpath then raise @@ Directory_doesnt_exist (Path.native_exn newpath);
+    f newpath
+
 end
 
 module Pnpm = struct

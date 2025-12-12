@@ -6,7 +6,10 @@ html {
 	--light-a: #ffffff;
 	--light-b: #cdd6f4;
 	--light-blue: #89b4fa;
+	--light-blue-20: oklab(76.642% -.0195548 -.109614 / .2);
+	--light-blue-30: oklab(76.642% -.0195548 -.109614 / .3);
 	--cyan: #1488db;
+	--cyan-30: oklab(61.0324% -.0598051 -.144428 / .3);
 	--cyan-50: #1488BB7D;
 	/* --space-a: 0.5cm; */
 	--space-a: calc(2.5 * 0.25rem /* 5.6px */);

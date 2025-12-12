@@ -102,18 +102,18 @@ Understanding these complexities is essential for algorithm selection and optimi
 			</header>
 			<div className=Printf.sprintf("innerbody %s", id)>
 				<nav>
-					<button onClick={_ => setCurrentTab(_ => `Article)} className={currentTab == `Article ? "selected" : ""}>
+					<button onClick={_ => setCurrentTab(_ => `Article)} className={"article " ++ (currentTab == `Article ? "selected" : "")}>
 						<label>{React.string("article")}</label>
 					</button>
-					<button onClick={_ => setCurrentTab(_ => `Discussion)} className={currentTab == `Discussion ? "selected" : ""}>
+					<button onClick={_ => setCurrentTab(_ => `Discussion)} className={"discussions " ++ (currentTab == `Discussion ? "selected" : "")}>
 						<label>{React.string("discussions")}</label>
 						<data className="count">{React.int(24)}</data>
 					</button>
-					<button onClick={_ => setCurrentTab(_ => `Pullrequest)} className={currentTab == `Pullrequest ? "selected" : ""}>
+					<button onClick={_ => setCurrentTab(_ => `Pullrequest)} className={"pullrequests " ++ (currentTab == `Pullrequest ? "selected" : "")}>
 						<label>{React.string("pull-requests")}</label>
 						<data className="count">{React.int(Array.length(pullrequests))}</data>
 					</button>
-					<button onClick={_ => setCurrentTab(_ => `Log)} className={currentTab == `Log ? "selected" : ""}>
+					<button onClick={_ => setCurrentTab(_ => `Log)} className={"log " ++ (currentTab == `Log ? "selected" : "")}>
 						<label>{React.string("git-log")}</label>
 					</button>
 				</nav>
