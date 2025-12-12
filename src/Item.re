@@ -9,16 +9,22 @@ let to_string = x => switch (x) {
 
 module ArticleHeader = {
 	[@react.component]
-	let make = (~tags, ~pullrequests) => {
+	let make = (~tags) => {
 		<>
-			<div className="counter">{React.int(330)}</div>
+			<div className="counter">
+				<button className="up">
+					{React.string("up")}
+				</button>
+				<span>{React.int(330)}</span>
+				<button className="down">
+					{React.string("down")}
+				</button>
+			</div>
 			<h1>{React.string("Seven Implementations of Incremental")}</h1>
 			<ul className="tags">{tags |> Array.map(x => <li key=x><span className="tag">{React.string(x)}</span></li>) |> React.array}</ul>
 			<div className="author">
+				<span>{React.string("nddung")}</span>
 				<div className="created-from"></div>
-			</div>
-			<div className="activities">
-				<span className="pullrequests">{React.int(pullrequests)}</span>
 			</div>
 			<div className="actions">
 				<button>{React.string("watch")}</button>
@@ -31,13 +37,23 @@ module ArticleHeader = {
 
 module ArticleBody = {
 	[@react.component]
-	let make = () => {
+	let make = (~headings, ~article_body) => {
 		<>
 			<nav className="toc">
 				<ol>
+					{headings |> Array.map(x => {
+						let (level, title, id) = x;
+						<li key=id>
+							<a href=Printf.sprintf("#%s", id)>
+								<span>{React.string(level)}</span>
+								<span>{React.string(title)}</span>
+							</a>
+						</li>
+					}) |> React.array}
 				</ol>
 			</nav>
 			<main className="markdown">
+				{React.string(article_body)}
 			</main>
 		</>
 	}
@@ -64,6 +80,15 @@ module App = {
 		let (currentTab, setCurrentTab) = React.useState(() => `Article);
 		let tags = [| "Algorithm", "Rust" |];
 		let pullrequests = [| "", "" |];
+		let headings = [|
+			("1", "Overview", "overview"),
+			("1.1", "Related works", "related-works"),
+		|];
+		let article_body = "
+In computer science, graph algorithm complexity analysis is the study of the computational resources required to solve problems on graph data structures. This article provides a comprehensive examination of time complexity for fundamental graph algorithms, including breadth-first search (BFS), depth-first search (DFS), Dijkstra's algorithm, and the Floyd-Warshall algorithm.
+
+Understanding these complexities is essential for algorithm selection and optimization in practical applications ranging from network routing to social network analysis.
+		";
 		let id = React.useMemo1(() => to_string(currentTab), [|currentTab|]);
 		let url = ReasonReactRouter.useUrl();
 		React.useEffect0(() => {
@@ -81,10 +106,12 @@ module App = {
 						<label>{React.string("article")}</label>
 					</button>
 					<button onClick={_ => setCurrentTab(_ => `Discussion)} className={currentTab == `Discussion ? "selected" : ""}>
-						<label>{React.string("discussion")}</label>
+						<label>{React.string("discussions")}</label>
+						<data className="count">{React.int(24)}</data>
 					</button>
 					<button onClick={_ => setCurrentTab(_ => `Pullrequest)} className={currentTab == `Pullrequest ? "selected" : ""}>
-						<label>{React.string("pull-request")}</label>
+						<label>{React.string("pull-requests")}</label>
+						<data className="count">{React.int(Array.length(pullrequests))}</data>
 					</button>
 					<button onClick={_ => setCurrentTab(_ => `Log)} className={currentTab == `Log ? "selected" : ""}>
 						<label>{React.string("git-log")}</label>
@@ -93,8 +120,8 @@ module App = {
 				{ switch (currentTab) {
 				| `Article =>
 					<>
-						<header><ArticleHeader tags pullrequests=Array.length(pullrequests) /></header>
-						<div className="innerbody"><ArticleBody /></div>
+						<header><ArticleHeader tags /></header>
+						<div className="innerbody"><ArticleBody headings article_body /></div>
 					</>
 				| `Discussion =>
 					<>
