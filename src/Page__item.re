@@ -1,10 +1,10 @@
 open Melange__containers.Fun
 
 let to_string = x => switch (x) {
-	| `Article => "article"
-	| `Discussion => "discussion"
-	| `Pullrequest => "pullrequest"
-	| `Log => "log"
+| `Article => "article"
+| `Discussion => "discussion"
+| `Pullrequest => "pullrequest"
+| `Log => "log"
 }
 
 module ArticleHeader = {
