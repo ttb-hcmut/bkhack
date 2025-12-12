@@ -12,3 +12,25 @@ body {
 select, ::picker(select) {
 	appearance: base-select;
 }
+
+ol, ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+button {
+	background: unset;
+	border: unset;
+}
+
+a {
+	text-decoration: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-size: 1em;
+	font-weight: normal;
+	padding: 0;
+	margin: 0;
+}
