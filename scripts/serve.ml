@@ -42,7 +42,9 @@ let () =
       P.getdir public "assets" @@ fun public__assets ->
       physlink ~sw ~link_to:Path.(public__assets / "logo.svg") Path.(dist__assets / "logo.svg");
       physlink ~sw ~link_to:Path.(public__assets / "icon.pullrequest.violet.svg") Path.(dist__assets / "icon.pullrequest.violet.svg");
+      physlink ~sw ~link_to:Path.(public__assets / "icon.pullrequest.green.svg") Path.(dist__assets / "icon.pullrequest.green.svg");
       physlink ~sw ~link_to:Path.(public__assets / "icon.comment.light-blue.svg") Path.(dist__assets / "icon.comment.light-blue.svg");
+      physlink ~sw ~link_to:Path.(public__assets / "icon.document.cyan.svg") Path.(dist__assets / "icon.document.cyan.svg");
     );
     ( P.mkdir ~sw dist "item" @@ fun sw dist__item ->
       P.getdir public "item" @@ fun public__item ->

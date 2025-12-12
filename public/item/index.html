@@ -70,7 +70,7 @@ html {
 #root[data-tileset="gui"] > .innerbody > nav button.article > label::before {
 	content: " ";
 	display: inline-block;
-	background-image: url("/assets/icon.comment.light-blue.svg");
+	background-image: url("/assets/icon.document.cyan.svg");
 	background-size: 1em 1em;
 	width: 1em;
 	height: 1em;
@@ -81,6 +81,16 @@ html {
 	content: " ";
 	display: inline-block;
 	background-image: url("/assets/icon.comment.light-blue.svg");
+	background-size: 1em 1em;
+	width: 1em;
+	height: 1em;
+	margin-right: var(--space-c);
+}
+
+#root[data-tileset="gui"] > .innerbody > nav button.pullrequests > label::before {
+	content: " ";
+	display: inline-block;
+	background-image: url("/assets/icon.pullrequest.green.svg");
 	background-size: 1em 1em;
 	width: 1em;
 	height: 1em;
@@ -113,10 +123,38 @@ html {
 	filter: grayscale(0%);
 }
 
+#root[data-tileset="gui"] > .innerbody > nav button.article > label::before {
+	filter: grayscale(100%) brightness(70%);
+}
+
+#root[data-tileset="gui"] > .innerbody > nav button.article:hover > label::before {
+	filter: grayscale(100%) brightness(140%);
+}
+
+#root[data-tileset="gui"] > .innerbody > nav button.article.selected > label::before {
+	filter: grayscale(0%);
+}
+
 #root > .innerbody > nav button.selected {
+	color: green;
+	outline: solid 1px green;
+}
+
+#root > .innerbody > nav button.article.selected {
+	color: var(--cyan);
+	outline: solid 1px var(--cyan);
+}
+
+#root > .innerbody > nav button.discussions.selected {
 	color: var(--light-blue);
 	outline: solid 1px var(--light-blue);
 }
+
+#root > .innerbody > nav button.pullrequests.selected {
+	color: var(--green);
+	outline: solid 1px var(--green);
+}
+
 
 #root > .innerbody > nav button > data.count {
 	font-size: var(--text-xs);
@@ -125,6 +163,12 @@ html {
 	color: var(--light-blue);
 	padding: 0.1rem 0.3rem;
 	margin-left: var(--space-c);
+}
+
+#root > .innerbody > nav button.pullrequests > data.count {
+	outline: solid 1px var(--green-30);
+	background-color: var(--green-10);
+	color: var(--green);
 }
 
 #root > .innerbody > nav button > data.count::before {
