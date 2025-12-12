@@ -9,9 +9,11 @@ let mkdir ~sw ?(perm = 0o700) dirname filename f =
   Switch.run @@ fun sw ->
   f sw newpath
 
+exception Directory_doesnt_exist of string
+
 let getdir dirname filename f =
   let newpath = Path.(dirname / filename) in
-  assert (Path.is_directory newpath);
+  if not @@ Path.is_directory newpath then raise @@ Directory_doesnt_exist (Path.native_exn newpath);
   f newpath
 
 let () =
