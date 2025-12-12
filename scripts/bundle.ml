@@ -2,8 +2,6 @@ open Eio
 
 let dist cwd = Path.(cwd / "dist")
 let dist__indexhtml cwd = Path.(dist cwd / "index.html")
-let dist__resetcss cwd = Path.(dist cwd / "reset.css")
-let dist__debugcss cwd = Path.(dist cwd / "debug.css")
 let dist__assets cwd = Path.(dist cwd / "assets")
 let dist__assets__logosvg cwd = Path.(dist__assets cwd / "logo.svg")
 let dist__assets__icon__pullrequestvioletsvg cwd = Path.(dist__assets cwd / "icon.pullrequest.violet.svg")
