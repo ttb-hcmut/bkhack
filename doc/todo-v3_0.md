@@ -9,3 +9,4 @@
 - [ ] subscription, watch thread, notifications
 - [ ] custom dialog input components
 - [ ] controversial detection
+- [ ] keyboard navigation
