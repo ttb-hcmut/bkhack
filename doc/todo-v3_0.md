@@ -10,3 +10,5 @@
 - [ ] custom dialog input components
 - [ ] controversial detection
 - [ ] keyboard navigation
+- [ ] windows dev support
+- [ ] port RE to reasonml
