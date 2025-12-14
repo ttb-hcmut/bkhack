@@ -2,8 +2,8 @@ open Melange__containers.Fun
 
 let to_string = x => switch (x) {
 | `Article => "article"
-| `Discussion => "discussion"
-| `Pullrequest => "pullrequest"
+| `Discussion => "discussions"
+| `Pullrequest => "pullrequests"
 | `Log => "log"
 }
 
@@ -59,6 +59,55 @@ module ArticleBody = {
 	}
 }
 
+module DiscussionHint = {
+	[@react.component]
+	let make = () => {
+		<>
+			<div className="logo" />
+			<h1>{React.string("discussions")}</h1>
+			<div className="sub">
+				<span className="command">{React.string("discuss --thread=main")}</span>
+				<span className="summary">
+					<data className="comments">{React.int(13)}</data>
+					<data className="karma">{React.int(364)}</data>
+				</span>
+			</div>
+			<button className="action">{React.string("new comment")}</button>
+		</>
+	}
+}
+
+module DiscussionFilter = {
+	[@react.component]
+	let make = () => {
+		<>
+		</>
+	}
+}
+
+module DiscussionBody = {
+	[@react.component]
+	let make = (~comments) => {
+		<>
+			<ol>
+				{comments |> Array.map(x => {
+					let (id, level, authorname, content) = x;
+					<li key=id className=Printf.sprintf("level-%d", level)>
+						<article>
+							<header>
+								<span className="author">{React.string(authorname)}</span>
+							</header>
+							<div className="content">
+								{React.string(content)}
+							</div>
+						</article>
+					</li>
+				}) |> React.array}
+			</ol>
+		</>
+	}
+}
+
 module Re = {
 	include Js.Re
 	let exec = (pattern, str) => exec(~str, pattern)
@@ -80,6 +129,10 @@ module App = {
 		let (currentTab, setCurrentTab) = React.useState(() => `Article);
 		let tags = [| "Algorithm", "Rust" |];
 		let pullrequests = [| "", "" |];
+		let comments = [|
+			("a", 0, "kinten108101", "Test 1"),
+			("b", 1, "nl_kdan", "Test 2")
+		|];
 		let headings = [|
 			("1", "Overview", "overview"),
 			("1.1", "Related works", "related-works"),
@@ -114,7 +167,7 @@ Understanding these complexities is essential for algorithm selection and optimi
 						<data className="count">{React.int(Array.length(pullrequests))}</data>
 					</button>
 					<button onClick={_ => setCurrentTab(_ => `Log)} className={"log " ++ (currentTab == `Log ? "selected" : "")}>
-						<label>{React.string("git-log")}</label>
+						<label>{React.string("history")}</label>
 					</button>
 				</nav>
 				{ switch (currentTab) {
@@ -125,8 +178,13 @@ Understanding these complexities is essential for algorithm selection and optimi
 					</>
 				| `Discussion =>
 					<>
-						<header></header>
-						<main></main>
+						<header>
+							<DiscussionHint />
+							<nav>
+								<DiscussionFilter />
+							</nav>
+						</header>
+						<main><DiscussionBody comments /></main>
 					</>
 				| `Pullrequest =>
 					<>

@@ -8,6 +8,7 @@ let dist__assets__icon__pullrequestvioletsvg cwd = Path.(dist__assets cwd / "ico
 let dist__assets__icon__pullrequestgreensvg cwd = Path.(dist__assets cwd / "icon.pullrequest.green.svg")
 let dist__assets__icon__commentlightbluesvg cwd = Path.(dist__assets cwd / "icon.comment.light-blue.svg")
 let dist__assets__icon__documentcyansvg cwd = Path.(dist__assets cwd / "icon.document.cyan.svg")
+let dist__assets__icon__timebackvioletsvg cwd = Path.(dist__assets cwd / "icon.timeback.violet.svg")
 let dist__item cwd = Path.(dist cwd / "item")
 let dist__item__indexhtml cwd = Path.(dist__item cwd / "index.html")
 let dist__styles cwd = Path.(dist cwd / "styles")
@@ -70,6 +71,9 @@ let () =
     ( Fiber.fork ~sw @@ fun () ->
       Path.symlink ~link_to:"../../public/assets/icon.document.cyan.svg"
         (dist__assets__icon__documentcyansvg cwd) );
+    ( Fiber.fork ~sw @@ fun () ->
+      Path.symlink ~link_to:"../../public/assets/icon.timeback.violet.svg"
+        (dist__assets__icon__timebackvioletsvg cwd) );
   );
   ( Fiber.fork ~sw @@ fun () ->
     Path.mkdir ~perm:0o700 (dist__item cwd);

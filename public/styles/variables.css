@@ -14,6 +14,7 @@ html {
 	--green: #a6e3a1;
 	--green-10: oklab(85.7704% -.0869061 .0661681 / .1);
 	--green-30: oklab(85.7704% -.0869061 .0661681 / .3);
+	--violet: #cba6f7;
 	/* --space-a: 0.5cm; */
 	--space-a: calc(2.5 * 0.25rem /* 5.6px */);
 	--space-c: calc(1.5 * 0.25rem /* 5.6px */);
@@ -24,4 +25,14 @@ html {
 	--text-base: 1rem /* 16px */;
 	/* tailwind end */
 	--font-mono: "Liberation Mono";
+}
+
+html {
+	--background-sidebar: var(--dark-a);
+}
+
+@media (prefers-color-scheme: light) {
+	html {
+		--background-sidebar: var(--light-a);
+	}
 }

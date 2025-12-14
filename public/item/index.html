@@ -42,6 +42,10 @@ html {
 	height: 2rem;
 }
 
+#root > .innerbody.discussions {
+	background-color: var(--dark-b);
+}
+
 #root > .innerbody > nav button {
 	height: 100%;
 	color: var(--dark-d);
@@ -91,6 +95,16 @@ html {
 	content: " ";
 	display: inline-block;
 	background-image: url("/assets/icon.pullrequest.green.svg");
+	background-size: 1em 1em;
+	width: 1em;
+	height: 1em;
+	margin-right: var(--space-c);
+}
+
+#root[data-tileset="gui"] > .innerbody > nav button.log > label::before {
+	content: " ";
+	display: inline-block;
+	background-image: url("/assets/icon.timeback.violet.svg");
 	background-size: 1em 1em;
 	width: 1em;
 	height: 1em;
@@ -155,6 +169,10 @@ html {
 	outline: solid 1px var(--green);
 }
 
+#root > .innerbody > nav button.log.selected {
+	color: var(--violet);
+	outline: solid 1px var(--violet);
+}
 
 #root > .innerbody > nav button > data.count {
 	font-size: var(--text-xs);
@@ -268,6 +286,38 @@ html {
 	border: solid 1px oklab(61.0324% -.0598051 -.144428 / .2);
 	background-color: var(--dark-a);
 	padding: var(--space-a);
+}
+
+#root > .innerbody.discussions > header {
+	background-color: var(--dark-b);
+}
+
+#root > .innerbody.discussions > header {
+	display: grid;
+	grid-template-columns: 4rem min-content minmax(0,1fr);
+	grid-template-rows: min-content min-content min-content;
+}
+
+#root > .innerbody.discussions > header > :first-child {
+	grid-row: 1 / 3;
+	grid-column: 1 / 2;
+}
+
+#root > .innerbody.discussions > header > :last-child {
+	grid-row: 3 / 4 /* -2 / -1 */;
+	grid-column: 1 / -1;
+}
+
+#root[data-tileset="gui"] > .innerbody.discussions > header > .logo {
+	background-image: url("/assets/icon.comment.light-blue.svg");
+	background-size: 1em 1em;
+	width: 1em;
+	height: 1em;
+}
+
+#root > .innerbody.discussions > main {
+	border-top: solid 1px var(--dark-c);
+	background-color: var(--dark-a);
 }
 
 		</style>
