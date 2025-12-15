@@ -1,0 +1,8 @@
+.command::before {
+	content: "$ ";
+}
+
+.command {
+	font-family: var(--font-mono);
+}
+

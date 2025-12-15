@@ -8,6 +8,7 @@
 @import "/styles/reset.css";
 @import "/styles/variables.css";
 @import "/styles/components/headerbar.css";
+@import "/styles/components/command.css";
 
 html {
 	font-size: var(--text-base);
@@ -294,18 +295,94 @@ html {
 
 #root > .innerbody.discussions > header {
 	display: grid;
-	grid-template-columns: 4rem min-content minmax(0,1fr);
+	grid-template-columns: 2.5rem minmax(0,1fr) min-content;
 	grid-template-rows: min-content min-content min-content;
+	padding: var(--space-a);
+	/* row-gap: var(--space-e); */
+}
+
+#root > .innerbody.discussions > header > h1 {
+	justify-self: start;
+	align-self: center;
+}
+
+#root > .innerbody.discussions > header > .sub {
+	font-size: var(--text-xs);
+}
+
+#root > .innerbody.discussions > header > .sub > :not(:first-child) {
+	border-left: solid 1px var(--dark-c);
+	padding-left: var(--space-a);
+	margin-left: var(--space-a);
+}
+
+#root > .innerbody.discussions > header > .sub > .command {
+	color: var(--dark-d);
+}
+
+#root > .innerbody.discussions > header > .sub > .summary {
+	font-family: var(--font-mono);
+	color: var(--dark-d);
+}
+
+#root > .innerbody.discussions > header > .sub > .summary > :not(:first-child) {
+	margin-left: 1em;
+}
+
+#root > .innerbody.discussions > header > .sub > .summary > .comments {
+	color: var(--cyan);
+}
+
+#root > .innerbody.discussions > header > .sub > .summary > .comments::after {
+	content: " comments";
+}
+
+#root > .innerbody.discussions > header > .sub > .summary > .karma::before {
+	content: "+";
+}
+
+#root > .innerbody.discussions > header > .sub > .summary > .karma::after {
+	content: " karma";
 }
 
 #root > .innerbody.discussions > header > :first-child {
 	grid-row: 1 / 3;
 	grid-column: 1 / 2;
+	justify-self: center;
+	align-self: center;
+}
+
+#root > .innerbody.discussions > header > :nth-child(2) {
+	grid-row: 1 / 2;
+	grid-column: 2 / 3;
+}
+
+#root > .innerbody.discussions > header > :nth-child(3) {
+	grid-row: 2 / 3;
+	grid-column: 2 / 3;
+}
+
+#root > .innerbody.discussions > header > :nth-child(4) {
+	grid-row: 1 / 3;
+	grid-column: 3 / 4;
 }
 
 #root > .innerbody.discussions > header > :last-child {
 	grid-row: 3 / 4 /* -2 / -1 */;
 	grid-column: 1 / -1;
+}
+
+#root > .innerbody.discussions > header > h1 {
+	color: var(--light-b);
+	font-family: var(--font-mono);
+	font-size: var(--text-sm);
+}
+
+#root > .innerbody.discussions > header > nav {
+	margin-top: var(--space-a);
+	background-color: var(--dark-a);
+	border: solid 1px var(--dark-c);
+	padding: var(--space-a);
 }
 
 #root[data-tileset="gui"] > .innerbody.discussions > header > .logo {
@@ -318,6 +395,69 @@ html {
 #root > .innerbody.discussions > main {
 	border-top: solid 1px var(--dark-c);
 	background-color: var(--dark-a);
+	padding-top: var(--space-a);
+	padding-bottom: var(--space-a);
+}
+
+#root > .innerbody.discussions > main > ol > li:not(:first-child) {
+	margin-top: var(--space-a);
+}
+
+#root > .innerbody.discussions > main > ol > li > article {
+	margin-left: var(--space-a);
+	margin-right: var(--space-a);
+	border: solid 1px var(--dark-c);
+	display: grid;
+	grid-template-columns: 3rem minmax(0,1fr);
+	grid-template-rows: min-content min-content min-content;
+	background-color: var(--dark-b);
+}
+
+#root > .innerbody.discussions > main > ol > li > article > header {
+	padding: var(--space-c);
+	grid-row: 1 / 2;
+	grid-column: 1 / -1;
+	border-bottom: solid 1px var(--dark-c);
+}
+
+#root > .innerbody.discussions > main > ol > li > article > .content {
+	grid-row: 2 / 3;
+	grid-column: 2 / -1;
+}
+
+#root > .innerbody.discussions > main > ol > li > article > .counter {
+	grid-row: 2 / 3;
+	grid-column: 1 / 2;
+}
+
+#root > .innerbody.discussions > main > ol > li.level-1 > article {
+	margin-left: calc(var(--space-a) + 1rem);
+}
+
+#root > .innerbody.discussions > main > ol > li.level-2 > article {
+	margin-left: calc(var(--space-a) + 2rem);
+}
+
+#root > .innerbody.discussions > main > ol > li.level-3 > article {
+	margin-left: calc(var(--space-a) + 3rem);
+}
+
+#root > .innerbody.discussions > main > ol > li.level-4 > article {
+	margin-left: calc(var(--space-a) + 4rem);
+}
+
+#root > .innerbody.discussions > main > ol > li > article > header {
+	background-color: var(--dark-a);
+}
+
+#root > .innerbody.discussions > main > ol > li > article > .content {
+}
+
+#root > .innerbody.article > *.only:not(.article),
+#root > .innerbody.discussions > *.only:not(.discussions),
+#root > .innerbody.pullrequests > *.only:not(.pullrequests),
+#root > .innerbody.log > *.only:not(.log) {
+	display: none;
 }
 
 		</style>

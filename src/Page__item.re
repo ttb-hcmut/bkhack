@@ -68,8 +68,8 @@ module DiscussionHint = {
 			<div className="sub">
 				<span className="command">{React.string("discuss --thread=main")}</span>
 				<span className="summary">
-					<data className="comments">{React.int(13)}</data>
-					<data className="karma">{React.int(364)}</data>
+					<data className="comments" value=Int.to_string(13)>{React.int(13)}</data>
+					<data className="karma" value=Int.to_string(364)>{React.int(364)}</data>
 				</span>
 			</div>
 			<button className="action">{React.string("new comment")}</button>
@@ -81,6 +81,7 @@ module DiscussionFilter = {
 	[@react.component]
 	let make = () => {
 		<>
+			<input />
 		</>
 	}
 }
@@ -99,6 +100,9 @@ module DiscussionBody = {
 							</header>
 							<div className="content">
 								{React.string(content)}
+							</div>
+							<div className="counter">
+								<data>{React.int(41)}</data>
 							</div>
 						</article>
 					</li>
@@ -170,33 +174,19 @@ Understanding these complexities is essential for algorithm selection and optimi
 						<label>{React.string("history")}</label>
 					</button>
 				</nav>
-				{ switch (currentTab) {
-				| `Article =>
 					<>
-						<header><ArticleHeader tags /></header>
-						<div className="innerbody"><ArticleBody headings article_body /></div>
+						<header className=Printf.sprintf("only %s", to_string(`Article))><ArticleHeader tags /></header>
+						<div className=Printf.sprintf("innerbody only %s", to_string(`Article))><ArticleBody headings article_body /></div>
 					</>
-				| `Discussion =>
 					<>
-						<header>
+						<header className=Printf.sprintf("only %s", to_string(`Discussion))>
 							<DiscussionHint />
 							<nav>
 								<DiscussionFilter />
 							</nav>
 						</header>
-						<main><DiscussionBody comments /></main>
+						<main className=Printf.sprintf("only %s", to_string(`Discussion))><DiscussionBody comments /></main>
 					</>
-				| `Pullrequest =>
-					<>
-						<header></header>
-						<main></main>
-					</>
-				| `Log =>
-					<>
-						<header></header>
-						<main></main>
-					</>
-				}}
 			</div>
 		</>
 	}
