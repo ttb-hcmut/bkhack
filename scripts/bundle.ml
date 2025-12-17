@@ -15,6 +15,7 @@ let dist__styles cwd = Path.(dist cwd / "styles")
 let dist__styles__resetcss cwd = Path.(dist__styles cwd / "reset.css")
 let dist__styles__debugcss cwd = Path.(dist__styles cwd / "debug.css")
 let dist__styles__variablescss cwd = Path.(dist__styles cwd / "variables.css")
+let dist__styles__widgetvariablescss cwd = Path.(dist__styles cwd / "widget-variables.css")
 let dist__styles__components cwd = Path.(dist__styles cwd / "components")
 let dist__styles__components__commandcss cwd = Path.(dist__styles__components cwd / "command.css")
 let dist__styles__components__headerbarcss cwd = Path.(dist__styles__components cwd / "headerbar.css")
@@ -106,6 +107,9 @@ let () =
     ( Fiber.fork ~sw @@ fun () ->
       Path.symlink ~link_to:"../../public/styles/variables.css"
         (dist__styles__variablescss cwd) );
+    ( Fiber.fork ~sw @@ fun () ->
+      Path.symlink ~link_to:"../../public/styles/widget-variables.css"
+        (dist__styles__widgetvariablescss cwd) );
     ( Fiber.fork ~sw @@ fun () ->
       Path.mkdir ~perm:0o700 (dist__styles__components cwd);
       Switch.run @@ fun sw ->

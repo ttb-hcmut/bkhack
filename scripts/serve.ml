@@ -67,6 +67,7 @@ let () =
       physlink ~sw ~link_to:Path.(public__styles / "reset.css") Path.(dist__styles / "reset.css");
       physlink ~sw ~link_to:Path.(public__styles / "debug.css") Path.(dist__styles / "debug.css");
       physlink ~sw ~link_to:Path.(public__styles / "variables.css") Path.(dist__styles / "variables.css");
+      physlink ~sw ~link_to:Path.(public__styles / "widget-variables.css") Path.(dist__styles / "widget-variables.css");
       ( P.mkdir ~sw dist__styles "components" @@ fun sw dist__styles__components ->
         P.getdir public__styles "components" @@ fun public__styles__components ->
         physlink ~sw ~link_to:Path.(public__styles__components / "command.css") Path.(dist__styles__components / "command.css");
