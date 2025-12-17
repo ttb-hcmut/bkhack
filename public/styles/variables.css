@@ -29,11 +29,26 @@ html {
 }
 
 html {
-	--background-sidebar: var(--dark-a);
-}
-
-@media (prefers-color-scheme: light) {
-	html {
-		--background-sidebar: var(--light-a);
-	}
+	--global-bg: var(--dark-a);
+	--card-fg: var(--light-b);
+	--card-fg-highlighted: var(--light-a);
+	--card-fg-aux: var(--dark-d);
+	--card-fg-accent-0: var(--cyan);
+	--card-fg-accent-1: var(--light-blue);
+	--card-fg-accent-1-20: var(--light-blue-20);
+	--card-fg-accent-1-30: var(--light-blue-30);
+	--card-fg-accent-1-40: var(--cyan-30);
+	--card-fg-accent-2: var(--green);
+	--card-fg-accent-2-10: var(--green-10);
+	--card-fg-accent-2-30: var(--green-30);
+	--card-fg-accent-3: var(--violet);
+	--card-fg-suggestive: var(--cyan);
+	--card-fg-suggestive-halftransparentlol: var(--cyan-50);
+	--card-bg: var(--dark-b);
+	--card-bg-translucent: var(--dark-a);
+	--card-border: var(--dark-c);
+	/* stupid */
+	--card-fg-highlighted-dimmer: var(--light-b);
+	--card-fg-unhighlighted: var(--dark-d);
+	--card-border-20: oklab(61.0324% -.0598051 -.144428 / .2);
 }

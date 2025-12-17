@@ -16,7 +16,7 @@ html {
 }
 
 #root {
-	background-color: var(--dark-a);
+	background-color: var(--global-bg);
 	min-height: 100vh;
 	padding-bottom: var(--space-a);
 }
@@ -25,31 +25,29 @@ html {
 	margin-top: var(--space-a);
 	margin-left: var(--space-a);
 	margin-right: var(--space-a);
-	border-left: 1px solid var(--dark-c);
-	border-right: 1px solid var(--dark-c);
-	border-bottom: 1px solid var(--dark-c);
+	border-left: 1px solid var(--card-border);
+	border-right: 1px solid var(--card-border);
+	border-bottom: 1px solid var(--card-border);
 	border-radius: 0.5rem 0.5rem 0 0;
 }
 
 #root > .innerbody > nav {
-	background-color: var(--dark-a);
+	background-color: var(--card-bg-translucent);
 	display: flex;
 	flex-direction: row;
 	border-radius: 0.5rem;
-	border-top: 1px solid var(--dark-c);
-	border-bottom: 1px solid var(--dark-c);
-	/* border-left: 1px solid var(--dark-c); */
-	/* border-right: 1px solid var(--dark-c); */
+	border-top: 1px solid var(--card-border);
+	border-bottom: 1px solid var(--card-border);
 	height: 2rem;
 }
 
 #root > .innerbody.discussions {
-	background-color: var(--dark-b);
+	background-color: var(--card-bg);
 }
 
 #root > .innerbody > nav button {
 	height: 100%;
-	color: var(--dark-d);
+	color: var(--card-fg-unhighlighted);
 	border-radius: 0.5rem;
 	font-family: var(--font-mono);
 	font-size: var(--text-sm);
@@ -69,7 +67,7 @@ html {
 }
 
 #root > .innerbody > nav button:hover:not(.selected) > label {
-	color: var(--light-b);
+	color: var(--card-fg-highlighted-dimmer);
 }
 
 #root[data-tileset="gui"] > .innerbody > nav button.article > label::before {
@@ -156,38 +154,41 @@ html {
 }
 
 #root > .innerbody > nav button.article.selected {
-	color: var(--cyan);
-	outline: solid 1px var(--cyan);
+	color: var(--card-fg-accent-0);
+	outline: solid 1px var(--card-fg-accent-0);
 }
 
 #root > .innerbody > nav button.discussions.selected {
-	color: var(--light-blue);
-	outline: solid 1px var(--light-blue);
+	color: var(--card-fg-accent-1);
+	outline: solid 1px var(--card-fg-accent-1);
 }
 
 #root > .innerbody > nav button.pullrequests.selected {
-	color: var(--green);
-	outline: solid 1px var(--green);
+	color: var(--card-fg-accent-2);
+	outline: solid 1px var(--card-fg-accent-2);
 }
 
 #root > .innerbody > nav button.log.selected {
-	color: var(--violet);
-	outline: solid 1px var(--violet);
+	color: var(--card-fg-accent-3);
+	outline: solid 1px var(--card-fg-accent-3);
 }
 
 #root > .innerbody > nav button > data.count {
 	font-size: var(--text-xs);
-	outline: solid 1px var(--cyan-30);
-	background-color: var(--light-blue-30);
-	color: var(--light-blue);
 	padding: 0.1rem 0.3rem;
 	margin-left: var(--space-c);
 }
 
+#root > .innerbody > nav button.discussions > data.count {
+	outline: solid 1px var(--card-fg-accent-1-40);
+	background-color: var(--card-fg-accent-1-30);
+	color: var(--card-fg-accent-1);
+}
+
 #root > .innerbody > nav button.pullrequests > data.count {
-	outline: solid 1px var(--green-30);
-	background-color: var(--green-10);
-	color: var(--green);
+	outline: solid 1px var(--card-fg-accent-2-30);
+	background-color: var(--card-fg-accent-2-10);
+	color: var(--card-fg-accent-2);
 }
 
 #root > .innerbody > nav button > data.count::before {
@@ -199,7 +200,7 @@ html {
 }
 
 #root > .innerbody.article > header {
-	background-color: var(--dark-a);
+	background-color: var(--card-bg-translucent);
 	display: grid;
 	grid-template-columns: 3rem minmax(0,1fr) 3rem;
 	grid-template-rows: min-content min-content min-content;
@@ -222,9 +223,9 @@ html {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: var(--light-b);
+	color: var(--card-fg);
 	flex-direction: column;
-	border-right: solid 1px var(--dark-c);
+	border-right: solid 1px var(--card-border);
 }
 
 #root > .innerbody.article > header > .counter > button.up {
@@ -240,7 +241,7 @@ html {
 #root > .innerbody.article > header > h1 {
 	font-size: var(--text-base);
 	font-weight: normal;
-	color: var(--light-b);
+	color: var(--card-fg);
 }
 
 #root > .innerbody.article > header > ul.tags {
@@ -255,9 +256,9 @@ html {
 #root > .innerbody.article > header > ul.tags > li > span {
 	font-size: var(--text-xs);
 	font-family: var(--font-mono);
-	border: solid 1px var(--light-blue-30);
-	background-color: var(--light-blue-20);
-	color: var(--light-blue);
+	border: solid 1px var(--card-fg-accent-1-30);
+	background-color: var(--card-fg-accent-1-20);
+	color: var(--card-fg-accent-1);
 	padding-left: 0.3rem;
 	padding-right: 0.3rem;
 	border-radius: 9999px;
@@ -279,18 +280,18 @@ html {
 
 #root > .innerbody.article > .innerbody {
 	padding: var(--space-a);
-	background-color: var(--dark-b);
-	border-top: solid 1px var(--dark-c);
+	background-color: var(--card-bg);
+	border-top: solid 1px var(--card-border);
 }
 
 #root > .innerbody.article > .innerbody > nav.toc {
 	border: solid 1px oklab(61.0324% -.0598051 -.144428 / .2);
-	background-color: var(--dark-a);
+	background-color: var(--card-bg-translucent);
 	padding: var(--space-a);
 }
 
 #root > .innerbody.discussions > header {
-	background-color: var(--dark-b);
+	background-color: var(--card-bg);
 }
 
 #root > .innerbody.discussions > header {
@@ -298,7 +299,6 @@ html {
 	grid-template-columns: 2.5rem minmax(0,1fr) min-content;
 	grid-template-rows: min-content min-content min-content;
 	padding: var(--space-a);
-	/* row-gap: var(--space-e); */
 }
 
 #root > .innerbody.discussions > header > h1 {
@@ -311,18 +311,18 @@ html {
 }
 
 #root > .innerbody.discussions > header > .sub > :not(:first-child) {
-	border-left: solid 1px var(--dark-c);
+	border-left: solid 1px var(--card-border);
 	padding-left: var(--space-a);
 	margin-left: var(--space-a);
 }
 
 #root > .innerbody.discussions > header > .sub > .command {
-	color: var(--dark-d);
+	color: var(--card-fg-aux);
 }
 
 #root > .innerbody.discussions > header > .sub > .summary {
 	font-family: var(--font-mono);
-	color: var(--dark-d);
+	color: var(--card-fg-aux);
 }
 
 #root > .innerbody.discussions > header > .sub > .summary > :not(:first-child) {
@@ -373,15 +373,15 @@ html {
 }
 
 #root > .innerbody.discussions > header > h1 {
-	color: var(--light-b);
+	color: var(--card-fg);
 	font-family: var(--font-mono);
 	font-size: var(--text-sm);
 }
 
 #root > .innerbody.discussions > header > nav {
 	margin-top: var(--space-a);
-	background-color: var(--dark-a);
-	border: solid 1px var(--dark-c);
+	background-color: var(--card-bg-translucent);
+	border: solid 1px var(--card-border);
 	padding: var(--space-a);
 }
 
@@ -393,8 +393,8 @@ html {
 }
 
 #root > .innerbody.discussions > main {
-	border-top: solid 1px var(--dark-c);
-	background-color: var(--dark-a);
+	border-top: solid 1px var(--card-border);
+	background-color: var(--card-bg-translucent);
 	padding-top: var(--space-a);
 	padding-bottom: var(--space-a);
 }
@@ -406,18 +406,18 @@ html {
 #root > .innerbody.discussions > main > ol > li > article {
 	margin-left: var(--space-a);
 	margin-right: var(--space-a);
-	border: solid 1px var(--dark-c);
+	border: solid 1px var(--card-border);
 	display: grid;
 	grid-template-columns: 3rem minmax(0,1fr);
 	grid-template-rows: min-content min-content min-content;
-	background-color: var(--dark-b);
+	background-color: var(--card-bg);
 }
 
 #root > .innerbody.discussions > main > ol > li > article > header {
 	padding: var(--space-c);
 	grid-row: 1 / 2;
 	grid-column: 1 / -1;
-	border-bottom: solid 1px var(--dark-c);
+	border-bottom: solid 1px var(--card-border);
 }
 
 #root > .innerbody.discussions > main > ol > li > article > .content {
@@ -447,7 +447,7 @@ html {
 }
 
 #root > .innerbody.discussions > main > ol > li > article > header {
-	background-color: var(--dark-a);
+	background-color: var(--card-bg-translucent);
 }
 
 #root > .innerbody.discussions > main > ol > li > article > .content {

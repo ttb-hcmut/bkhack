@@ -1,8 +1,8 @@
 @import "/styles/variables.css";
 
 #root > header {
-	background-color: var(--dark-b);
-	border-color: oklab(61.0324% -.0598051 -.144428 / .2);
+	background-color: var(--card-bg);
+	border-color: var(--card-border-20);
 	border-bottom-width: 1px;
 	border-bottom-style: solid;
 	position: sticky;

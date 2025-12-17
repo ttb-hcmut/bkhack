@@ -164,12 +164,12 @@ html {
 }
 
 .has-left-indicator {
-	border-left: solid 1px var(--light-blue);
+	border-left: solid 1px var(--card-fg-accent-1);
 	padding-left: var(--space-a);
 }
 
 #root {
-	background-color: var(--dark-a);
+	background-color: var(--global-bg);
 	min-height: 100vh;
 	padding-bottom: var(--space-a);
 }
@@ -181,8 +181,8 @@ html {
 #root > nav {
 	margin-left: var(--space-a);
 	margin-right: var(--space-a);
-	background-color: var(--dark-b);
-	border: solid 1px var(--dark-c);
+	background-color: var(--card-bg);
+	border: solid 1px var(--card-border);
 }
 
 #root > nav > header {
@@ -209,7 +209,7 @@ html {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	color: var(--cyan);
+	color: var(--card-fg-suggestive);
 }
 
 #root[data-tileset="gui"] > nav > header > .logo > svg {
@@ -223,17 +223,17 @@ html {
 	font-family: var(--font-mono);
 	font-size: var(--text-sm);
 	font-weight: normal;
-	color: var(--light-b);
+	color: var(--card-fg);
 }
 
 #root > nav > header > .sub {
-	color: var(--dark-d);
+	color: var(--card-fg-aux);
 	font-size: var(--text-xs);
 }
 
 #root > nav > form {
-	background-color: var(--dark-a);
-	border-top: solid 1px var(--dark-c);
+	background-color: var(--card-bg-translucent);
+	border-top: solid 1px var(--card-border);
 	padding: var(--space-a);
 }
 
@@ -259,8 +259,8 @@ html {
 }
 
 #root > main > ol > li {
-	background-color: var(--dark-b);
-	border: solid 1px var(--dark-c);
+	background-color: var(--card-bg-translucent);
+	border: solid 1px var(--card-border);
 	grid-column: 1 / -1;
 	display: grid;
 	grid-template-columns: subgrid;
@@ -288,7 +288,7 @@ html {
 	align-items: center;
 	margin-right: var(--space-a);
 	font-size: var(--text-sm);
-	color: var(--light-b);
+	color: var(--card-fg);
 }
 
 #root > main > ol > li > header {
@@ -297,7 +297,7 @@ html {
 }
 
 #root > main > ol > li > header > a {
-	color: var(--light-b);
+	color: var(--card-fg);
 	text-decoration: none;
 }
 
@@ -328,23 +328,23 @@ html {
 #root > main > ol > li > footer > *:not(:first-child) {
 	margin-left: var(--space-c);
 	padding-left: var(--space-c);
-	border-left: solid 1px var(--dark-c);
+	border-left: solid 1px var(--card-border);
 }
 
 #root > main > ol > li .tagline {
-	color: var(--light-blue);
+	color: var(--card-fg-accent-1);
 	font-family: var(--font-mono); /* FIXME(kinten): we already rely on span.tag to set mono font. but for some reasons that isnt enough, the font will be mono but baseline is wrong. had to also set mono font here to get correct baseline */
 }
 
 #root > main > ol > li .status {
-	color: var(--light-blue);
+	color: var(--card-fg-accent-1);
 	font-family: var(--font-mono);
 }
 
 #root > main > ol > li .activities {
 	display: flex;
 	flex-direction: row;
-	color: var(--light-b);
+	color: var(--card-fg);
 	font-family: var(--font-mono);
 }
 
@@ -392,15 +392,15 @@ html {
 }
 
 #root > main > ol > li .last-activity > .verb {
-	color: var(--cyan);
+	color: var(--card-fg-suggestive);
 }
 
 #root > main > ol > li .last-activity > .agent {
-	color: var(--light-blue);
+	color: var(--card-fg-accent-1);
 }
 
 #root > main > ol > li .last-activity > .time {
-	color: var(--dark-d);
+	color: var(--card-fg-aux);
 }
 
 #root > main > ol > li .last-activity > .theme {
@@ -413,12 +413,12 @@ html {
 
 #root > main > ol > li .created-from {
 	font-family: var(--font-mono);
-	color: var(--dark-d);
+	color: var(--card-fg-aux);
 }
 
 #root > main > ol > li .ref {
 	font-family: var(--font-mono);
-	color: var(--light-blue);
+	color: var(--card-fg-accent-1);
 }
 
 #root > main > ol > li .ref > ::before {
@@ -426,11 +426,11 @@ html {
 }
 
 #root > main > ol > li:hover {
-	border: solid 1px var(--cyan-50);
+	border: solid 1px var(--card-fg-suggestive-halftransparentlol);
 }
 
 #root > main > ol > li:hover > header > a {
-	color: var(--light-a);
+	color: var(--card-fg-highlighted);
 }
 
 #root > aside {
@@ -443,8 +443,8 @@ html {
 }
 
 #root > aside > section {
-	background-color: var(--dark-b);
-	border: solid 1px var(--dark-c);
+	background-color: var(--card-bg);
+	border: solid 1px var(--card-border);
 	border-radius: 0.5cm;
 	padding: var(--space-a);
 }
@@ -465,8 +465,8 @@ html {
 	margin-left: var(--space-a);
 	margin-right: var(--space-a);
 	padding: var(--space-a);
-	background-color: var(--dark-b);
-	border: solid 1px var(--dark-c);
+	background-color: var(--card-bg);
+	border: solid 1px var(--card-border);
 }
 
 span.tag::before {
@@ -479,7 +479,7 @@ span.tag {
 
 form.dashboard-filter {
 	/* debug start */ height: 50px; /* debug end */
-	background-color: var(--dark-b);
+	background-color: var(--card-bg);
 }
 
 @media (min-width: 64rem) {
