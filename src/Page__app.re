@@ -404,6 +404,259 @@ module Filter = {
 }
 
 module Dashboard = {
+
+	// sidebar stuff
+	module DashboardSideBar = {
+
+		module SideBarNotes = {
+
+			[@react.component]
+			let make = () => {
+				// placeholder
+				let placeholder = [
+					"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed convallis quis sapien pellentesque viverra. Donec efficitur eleifend tortor eget pulvinar.",
+					"Fibonacci heap practical considerations",
+					"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed convallis quis sapien pellentesque viverra. Donec efficitur eleifend tortor eget pulvinar."
+				];
+				let (noteList,setNoteList) = React.useState(()=>[]);
+  				let (expanded, setExpanded) = React.useState(() => false);
+
+				React.useEffect0(() => {
+					// fetch notes here
+					setNoteList(_ => placeholder);
+
+					None;
+				});
+				
+					// Some implementation to add a new note
+				let createNewNote =  _ => ();
+
+
+				// return element
+				<div id="sidebar-notes">
+					<header> {string("My Notes")} </header>
+					{
+						if (List.length(noteList)>2)
+						{	
+							<button onClick={ _ => setExpanded( _ => !expanded ) }>
+							<span className="vert">{string( expanded ? ">":"<")}</span> 
+							{ string( expanded ? "Shrink" : "Expand" ) }
+							</button>
+						}
+						else
+						{ <> </>}
+					}
+					{
+						if (List.length(noteList) <=0 )
+						{
+							<div>{string("You have no notes yet!")}</div>
+						}
+						else
+						{
+							<ul>
+							{
+								noteList
+								|> List.take(expanded?10:2)
+								|> List.mapi((index,item) => <li key=string_of_int(index) className={expanded?"":"truncated"}> {string(item)} </li>)
+								|> Array.of_list
+								|> React.array
+							}
+							</ul>
+						}
+					}
+					<div>
+						<button onClick={createNewNote}>{string("+ Add note")}</button>
+					</div>
+				</div>
+			}
+		};
+		
+		module SideBarFilters = {
+
+			[@react.component]
+			let make = () => {
+				// placeholder filter list
+				let placeholder = [
+					(0,"Unseen"),
+					(1,"Subscribed"),
+					(2,"Modified"),
+					(3,"Verified")
+				];
+				let (filterList,setFilterList) = React.useState(()=>[])
+				let (activeFilters, setActiveFilters) = React.useState(()=>[]);
+				
+				React.useEffect0(() => {
+					// fetch notes here
+					setFilterList(_ => placeholder);
+
+					None;
+				});
+
+				let isActive = (id) => List.mem(id,activeFilters);
+
+				let toggleActive = (id:int) => {
+					if (List.mem(id,activeFilters))
+					{
+						setActiveFilters(_=>List.filter(x => x != id, activeFilters));
+					}
+					else
+					{
+						setActiveFilters(_=>[id,...activeFilters]);
+					}
+					// send filter data to refresh the feed here (usecontext?)
+				};
+
+				// return element
+				<div id="sidebar-filters">
+					<header> {string("Quick Filters")} </header>
+					{
+								filterList
+								|> List.map(((id,name)) =>
+									<div onClick={_=>toggleActive(id)} key=string_of_int(id)>
+										<input id=string_of_int(id) type_="checkbox" 
+											checked={isActive(id)}
+											onChange={_=>toggleActive(id)}/>
+										<label htmlFor=string_of_int(id)>
+										{string(name)}
+										</label>
+									</div>)
+								|> Array.of_list
+								|> React.array
+					}
+				</div>
+			}
+		};
+		
+		module SideBarTags = {
+
+			[@react.component]
+			let make = () => {
+				// placeholder hot tags list
+				let placeholder = [
+					(0,"AI"),
+					(1,"IOT"),
+					(2,"Quantum"),
+					(3,"Security")
+				];
+				let (tagList,setTagList) = React.useState(()=>[])
+				let (activeTag, setActiveTag) = React.useState(()=>None);
+				
+				React.useEffect0(() => {
+					// fetch tags here
+					setTagList(_ => placeholder);
+
+					None;
+				});
+
+				let selectTag = (id:int) =>
+				{
+					setActiveTag(_=>Some(id));
+
+					// send tag data to refresh the feed here (usecontext?)
+				};
+
+				// return element
+				<div id="sidebar-tags">
+					<header> {string("Popular Tags")} </header>
+					{
+								tagList
+								|> List.map(((id,name)) =>
+									<button onClick={_=>selectTag(id)} className={activeTag==Some(id)?"active":""} key=string_of_int(id)>
+										{string(name)}
+									</button>)
+								|> Array.of_list
+								|> React.array
+					}
+				</div>
+			}
+		};
+		
+		module SideBarActivities = {
+
+			[@react.component]
+			let make = () => {
+				let (activities,setActivities) = React.useState(()=>[]);
+				
+				// placeholder timestamp generators (you'd just fetch the timestamp string when fetching)
+				let timeAgo = (ms: int): string => {
+					let now =
+						Js.Date.make()
+						|> Js.Date.getTime
+						|> int_of_float;
+
+					let diffMs = now - ms;
+
+					let seconds = diffMs / 1000;
+					let minutes = seconds / 60;
+					let hours = minutes / 60;
+					let days = hours / 24;
+
+					if (seconds < 10) {
+						"just now"
+					} else if (seconds < 60) {
+						string_of_int(seconds) ++ "s ago"
+					} else if (minutes < 60) {
+						string_of_int(minutes) ++ "m ago"
+					} else if (hours < 24) {
+						string_of_int(hours) ++ "h ago"
+					} else {
+						string_of_int(days) ++ "d ago"
+					};
+				};
+				// placeholder hot tags list
+				let placeholder = [ //(activity_id,activity_type, author, content, timestamp)
+					(0, "commented","@dr.kim","This is a great resource on getting started with llms",timeAgo(69420)),
+					(1, "opened issue","@prof.wilson","Link nolonger points to the paper",timeAgo(69420)),
+					(2, "merged PR","@tran.phu","Breakthrough in quantum computing",timeAgo(69420)),
+				];
+
+				React.useEffect0(() => {
+					// fetch activities here
+					setActivities(_ => placeholder);
+
+					None;
+				});
+
+				// return element
+				<div id="sidebar-activities">
+					<header> {string("Recent Activities")} </header>
+					<ul>
+					{
+								activities
+								|> List.map(((activity_id,activity_type, author, content, timestamp)) =>
+									<li key=string_of_int(activity_id)>
+										<a href={"/notification/"++string_of_int(activity_id)}>
+										<div className="activity">
+											<span className="agent">{string(author++" ")}</span>
+											<span className="verb">{string(activity_type++" ")}</span>
+											<span className="content">{string(content++" ")}</span>
+										</div>
+										<div className="time">
+											{string(timestamp)}
+										</div>
+										</a>
+									</li>)
+								|> Array.of_list
+								|> React.array
+					}
+					</ul>
+				</div>
+			}
+		};
+
+		[@react.component]
+		let make = () => {
+			<>
+				<SideBarNotes/>
+				<SideBarFilters/>
+				<SideBarTags/>
+				<SideBarActivities/>
+				<div>{string("my stats")}</div>
+				<div>{string("admin panel")}</div>
+			</>
+		}
+	}
+
 	module Card = {
 		[@react.component]
 		let make = (~rank, ~title) => {
@@ -446,8 +699,8 @@ module Dashboard = {
 		}
 	}
 
-  [@react.component]
-  let make = () => {
+	[@react.component]
+	let make = () => {
 		let testitems =
 		[
 			(198, "Reconciling Abstractions with High Performance"
@@ -480,6 +733,9 @@ module Dashboard = {
 			(820, "Neural Network in Assembly"
 			)
 		];
+
+		let (showSideBar, setShowSideBar) = React.useState(()=> true);
+
 		<>
 			<header>
 				<Component__header />
@@ -505,22 +761,14 @@ module Dashboard = {
 				|> Array.of_list |> React.array
 			}
 			</ol></main>
-			<aside>
-				<section>
-					<h2>{string("my notes")}</h2>
-					<button>{string("new note")}</button>
-				</section>
-				<section>
-					<h2>{string("search")}</h2>
-				</section>
-				<section>
-					<h2>{string("quick filters")}</h2>
-				</section>
-			</aside>
 			<footer role="navigation">
 				<button>{string("prev")}</button>
 				<button>{string("next")}</button>
 			</footer>
+			<button className="sidebar-show" onClick={_ => setShowSideBar(_ => !showSideBar)}>{string(showSideBar ? "> Hide Sidebar" : "< Show Sidebar")}</button>
+			<aside className={showSideBar ? "active" : ""}>
+				<DashboardSideBar/>
+			</aside>
 		</>
 	}
 };
@@ -551,10 +799,7 @@ module App = {
 		switch (url.path) {
 		| [] =>
 			<Dashboard />
-		| ["about"] => <About />
-		| ["projects"] => <Promotion_list />
-		| ["projects", "~bachkhoa-typ", ...paths] => <Project_frontpage__bachkhoatyp paths />
-		| _ => <UnknownPage />
+			| _ => <UnknownPage />
 		}
 	}
 };
