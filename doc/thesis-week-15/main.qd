@@ -1,0 +1,102 @@
+.docname {Final Report}
+.doctype {slides}
+.autopagebreak maxdepth:{2}
+.include {bachkhoa.qd}
+
+```org
+TODO(kinten) organize all lecture notes
+TODO(kinten) bach khoa template
+TODO(kinten+khang) no chapter numbering
+```
+
+# BKHack: a developer-oriented social news website for HCMUT <!-- NOTE: kinten -->
+
+Special project report
+
+Ho Chi Minh University of Technology
+
+29/12/2025
+
+Lecturer: Dr. Truong Tuan Anh
+
+Group DAGD1-514
+
+.tableofcontents
+
+## About
+
+- Computer-science, developer-oriented from aesthetics to UX
+- Content integrity focused, GitHub-inspired PR system 
+
+## Motivation
+
+## Goals
+
+## Scope
+
+- Stakeholders
+
+# Related works <!-- NOTE: khang -->
+
+## Hackernews
+
+## Lobsters
+
+## LMS Forums
+
+# Analysis <!-- NOTE: kinten -->
+
+## Stakeholders
+
+## Functional requirements
+
+## Non-functional requirements
+
+# Design <!-- NOTE: hgt -->
+
+## Use case
+
+- Overview
+
+- Diagram 1
+- Table 1
+
+- Diagram 2
+- Table 2
+
+- Diagram 3
+- Table 3
+
+## System architecture
+
+### Tier diagram
+
+## Front-end
+
+### MVC
+
+### Module diagrams
+
+## Back-end
+
+## ERD
+
+## Other
+
+### User interface
+
+# Realization <!-- NOTE: khang -->
+
+## Technologies
+
+## Other
+
+### Design system
+
+# Timeline <!-- NOTE: kinten -->
+
+## Break down tasks
+
+## Schedule tasks
+
+# Thank you!
