@@ -94,16 +94,49 @@ Develop a computer science social news website
 
 ## Use case
 
-- Overview
+<<<
 
-- Diagram 1
-- Table 1
+![](./assets/diagrams/UML-usecase-article_lifecycle.svg)
 
-- Diagram 2
-- Table 2
+<<<
 
-- Diagram 3
-- Table 3
+![](./assets/diagrams/UML-usecase-auth&acc.svg)
+
+<<<
+
+![](./assets/diagrams/UML-usecase-content_consumption.svg)
+
+<<<
+
+![](./assets/diagrams/UML-usecase-discussions.svg)
+
+<<<
+
+![](./assets/diagrams/UML-usecase-issues.svg)
+
+<<<
+
+![](./assets/diagrams/UML-usecase-mod&admin.svg)
+
+<<<
+
+![](./assets/diagrams/UML-usecase-notes.svg)
+
+<<<
+
+![](./assets/diagrams/UML-usecase-pr.svg)
+
+<<<
+
+### Create pull request
+
+![](./assets_/usecasetable1.png)
+
+<<<
+
+.row alignment:{center}
+	.container margin:{-2cm 0cm 0cm 0cm}
+		![](./assets_/usecasetable2.png)
 
 ## System architecture
 
@@ -146,9 +179,6 @@ Develop a computer science social news website
 	.container margin:{-2cm 0cm 0cm 0cm}
 		!(500x800)[](./assets/diagrams/PRState.png)
 
-
-## Back-end
-
 ## ERD
 
 (in next page)
@@ -157,11 +187,23 @@ Develop a computer science social news website
 
 ![](./assets/diagrams/erd.svg)
 
-## Other
+<<<
+
+## User interface prototypes
+
+(in next pages)
 
 <<<
 
-### User interface
+### Home
+
+![](./assets/bruhhack/main.png)
+
+<<<
+
+### Post
+
+![](./assets/bruhhack/article.png)
 
 # Realization <!-- NOTE: khang -->
 
