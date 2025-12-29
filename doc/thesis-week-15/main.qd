@@ -77,6 +77,10 @@ Group DAGD1-514
 
 ## System architecture
 
+- Service-oriented architecture (SOA)
+
+<<<
+
 ### Tier diagram
 
 ## Front-end
@@ -97,8 +101,33 @@ Group DAGD1-514
 
 ## Technologies
 
-- Reason & React
-- Elixir
+- Front-end: Reason & React
+- Back-end: Elixir
+- Front-end Hosting: Firebase
+- Back-end Hosting: Render; Google Cloud
+- Database: Firestore
+
+<<<
+
+### Inline markup
+
+Writing layout markup in same place as application code
+
+```reason
+let makeComponent = () => {
+	let message = "hi";
+	<div className="label">
+		{message}
+	</div>
+}
+```
+
+<<<
+
+### Self-documentation
+
+- Incentivize writing documentations
+- Possibly subjective
 
 ## Other
 
