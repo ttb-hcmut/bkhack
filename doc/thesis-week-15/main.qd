@@ -94,6 +94,15 @@ Develop a computer science social news website
 
 ## Use case
 
+1. Article lifecycle
+2. Authentication & account
+3. Content consumption
+4. Discussions
+5. Issues
+6. Pull requests
+7. Moderation
+8. Notes
+
 <<<
 
 ![](./assets/diagrams/UML-usecase-article_lifecycle.svg)
