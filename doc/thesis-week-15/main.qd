@@ -91,7 +91,9 @@ Group DAGD1-514
 
 ### Module view ("use" diagram)
 
-![](./assets/diagrams/UML-module_view.svg)
+.row alignment:{center}
+	.container margin:{-1cm 0cm 0cm 0cm}
+		![](./assets/diagrams/UML-module_view.svg)
 
 <<<
 
@@ -103,10 +105,24 @@ Group DAGD1-514
 
 ### Pull request states
 
+(in next page)
+
+<<<
+
+.row alignment:{center}
+	.container margin:{-2cm 0cm 0cm 0cm}
+		!(500x800)[](./assets/diagrams/PRState.png)
+
 
 ## Back-end
 
 ## ERD
+
+(in next page)
+
+<<<
+
+![](./assets/diagrams/erd.svg)
 
 ## Other
 
