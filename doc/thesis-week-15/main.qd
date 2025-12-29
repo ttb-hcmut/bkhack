@@ -85,9 +85,24 @@ Group DAGD1-514
 
 ## Front-end
 
-### MVC
+- Model-view-controller (MVC)
 
-### Module diagrams
+<<<
+
+### Module view ("use" diagram)
+
+![](./assets/diagrams/UML-module_view.svg)
+
+<<<
+
+### Sitemap
+
+![](./assets/diagrams/UML-sitemap.svg)
+
+<<<
+
+### Pull request states
+
 
 ## Back-end
 
