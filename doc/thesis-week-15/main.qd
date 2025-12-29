@@ -9,26 +9,24 @@ TODO(kinten) bach khoa template
 TODO(kinten+khang) no chapter numbering
 ```
 
-# BKHack: a developer-oriented social news website for HCMUT <!-- NOTE: kinten -->
+# BKHack
 
-Special project report
+A developer-oriented social news website for HCMUT <!-- NOTE: kinten -->
 
-Ho Chi Minh University of Technology
+.row alignment:{center} gap:{1cm}
+	.container
+		!(100x100)[](./assets_/hcmut.png)
 
-29/12/2025
+	.container
+		!(_x100)[](./assets/bkhack-logo-withbg.png)
+
+Special project report - Ho Chi Minh University of Technology - 29/12/2025
 
 Lecturer: Dr. Truong Tuan Anh
 
-Group DAGD1-514
+Group: DAGD1-514
 
 .tableofcontents
-
-## About
-
-- Computer-science, developer-oriented from aesthetics to UX
-- Content integrity focused, GitHub-inspired PR system 
-
-![](./assets/bkhack-logo-withbg.png)
 
 ## Motivation
 
@@ -41,11 +39,20 @@ Develop a computer science social news website
 
 - Sharing
 - Learn and discover new stuff
-- Fact-checked (pull request system)
+- Fact-checked
+
+## About
+
+- Computer-science, developer-oriented from aesthetics to UX
+- Content integrity focused, GitHub-inspired PR system 
+
+![](./assets/bkhack-logo-withbg.png)
 
 ## Scope
 
-- Stakeholders
+- Website / web platform
+- In HCMUT
+- Main stakeholders: students and lecturers
 
 # Related works <!-- NOTE: khang -->
 
@@ -101,10 +108,13 @@ Develop a computer science social news website
 ## System architecture
 
 - Service-oriented architecture (SOA)
+- (in next page)
 
 <<<
 
-### Tier diagram
+.row alignment:{center}
+	.container margin:{-2cm 0cm 0cm 0cm}
+		![](./assets/diagrams/system-arch.drawio.svg)
 
 ## Front-end
 
