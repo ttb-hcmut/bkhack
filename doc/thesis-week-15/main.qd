@@ -3,12 +3,6 @@
 .autopagebreak maxdepth:{2}
 .include {bachkhoa.qd}
 
-```org
-TODO(kinten) organize all lecture notes
-TODO(kinten) bach khoa template
-TODO(kinten+khang) no chapter numbering
-```
-
 # BKHack
 
 A developer-oriented social news website for HCMUT <!-- NOTE: kinten -->
@@ -70,9 +64,15 @@ Develop a computer science social news website
 
 # Analysis <!-- NOTE: hgt -->
 
-## Stakeholders
+## Actors / stakeholders
+
+- User students
+- User lecturers: additional tags
+- Admin
 
 ## Functional requirements
+
+![](./assets_/functional0.png)
 
 ## Non-functional requirements
 
