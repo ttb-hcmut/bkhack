@@ -1,0 +1,69 @@
+@startchen
+/'left to right direction'/
+relationship Merge <<identifying>> {
+}
+
+entity PULL_REQUEST <<weak>> {
+    id <<key>>
+    title
+    pr_comments <<multi>>
+}
+entity USER_ACCOUNT {
+    username <<key>>
+}
+relationship Maintain {
+}
+
+relationship Raise {
+}
+
+entity ISSUE {
+    id <<key>>
+    title
+    issue_comments <<multi>>
+}
+
+entity COMMENT {
+    id <<key>>
+    commentid <<key>>
+    content
+}
+
+relationship About {
+}
+
+relationship Has {
+}
+relationship Post {
+    comment_creation_date
+}
+
+
+
+entity POST {
+    id <<key>>
+    commits <<multi>>
+}
+
+relationship Enact <<identifying>> {
+}
+
+
+POST -1- About
+POST -1- Has
+POST =N= Maintain
+POST -N- Merge
+
+About =N= ISSUE
+Has =N= COMMENT
+Maintain -1- USER_ACCOUNT
+Merge -1- PULL_REQUEST
+
+ISSUE =N= Raise
+ISSUE -1- Enact
+COMMENT =N= Post
+USER_ACCOUNT -1- Raise
+USER_ACCOUNT -1- Post
+PULL_REQUEST -1- Enact
+
+@endchen

@@ -1,0 +1,35 @@
+@startuml
+folder Images
+package "Application code"{
+    folder Pages
+    folder Components
+    folder Model
+    folder Utils
+    folder Controllers
+    "Pages" --> "Components":uses
+    "Pages" --> "Utils":uses
+    "Pages" --> "Model":uses
+    "Pages" --> "Controllers":uses
+    "Components" --> "Utils":uses
+    "Components" --> "Controllers":uses
+    "Controllers" --> "Model":uses
+}
+folder HTML
+package "Style"{
+    folder sPages [
+        Pages]
+    folder sComponents [
+        Components]
+    folder sVariable [
+        Variable]
+    "sPages" --> "sComponents":uses
+    "sPages" --> "sVariable":uses
+    "sComponents" --> "sVariable":uses
+}
+folder Tests
+"Tests" --> "Application code" :uses
+"HTML" --> "Images" :uses
+"HTML" --> "Style" :uses
+"HTML" --> "Application code" :uses
+
+@enduml

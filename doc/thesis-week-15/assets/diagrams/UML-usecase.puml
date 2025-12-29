@@ -1,0 +1,153 @@
+@startuml
+rectangle "Authentication & accounts"{
+    usecase uc01 as "Sign up"
+    usecase uc02 as "Log in"
+    usecase uc03 as "Log out"
+    usecase uc04 as "View profile"
+    usecase uc05 as "Edit profile & preferences"
+}
+actor u as "User"
+left to right direction
+u .. uc01
+u .. uc02
+u .. uc03
+u .. uc04
+u .. uc05
+@enduml
+
+
+
+@startuml
+rectangle "Content consumption"{
+    usecase uc06 as "View article"
+    usecase uc07 as "Browse feed"
+    usecase uc08 as "Filter and search content"
+    usecase uc09 as "Rate content"
+}
+actor u as "User"
+left to right direction
+u .. uc06
+u .. uc07
+u .. uc08
+u .. uc09
+@enduml
+
+
+
+@startuml
+rectangle "Article lifecycle"{
+    usecase uc10 as "Create article"
+    usecase uc11 as "Edit article"
+    usecase uc12 as "View revision history"
+    usecase uc13 as "View diff"
+    usecase uc14 as "Revert article version"
+    usecase uc15 as "Change article visibility"
+    usecase uc16 as "Modify editorial permissions"
+}
+actor u as "User"
+actor o as "Post Owner"
+actor a as "System Admin"
+left to right direction
+u .. uc10
+u .. uc12
+u .. uc13
+o --|> u
+o .. uc11
+o .. uc14
+o .. uc15
+o .. uc16
+a .. uc14
+a .. uc15
+a .. uc16
+@enduml
+
+
+
+@startuml
+rectangle "Discussions"{
+    usecase uc17 as "Add comment"
+    usecase uc18 as "Browse discussion"
+    usecase uc19 as "Reference article section"
+}
+actor u as "User"
+left to right direction
+u .. uc17
+u .. uc18
+u .. uc19
+@enduml
+
+
+
+@startuml
+rectangle "Issues"{
+    usecase uc20 as "Create issue"
+    usecase uc21 as "View issue"
+    usecase uc22 as "Close issue"
+}
+actor u as "User"
+actor o as "Post Owner"
+actor r as "Reviewer"
+actor a as "System Admin"
+left to right direction
+u .. uc21
+r --|> u
+r .. uc20
+o --|> u
+o .. uc22
+uc22 .. a
+@enduml
+
+
+
+@startuml
+rectangle "Pull requests"{
+    usecase uc23 as "Create pull request"
+    usecase uc24 as "View pull request"
+    usecase uc25 as "Merge pull request"
+    usecase uc26 as "Close pull request"
+}
+actor u as "User"
+actor o as "Post Owner"
+actor c as "Contributer"
+actor a as "System Admin"
+left to right direction
+u .. uc24
+o --|> u
+o .. uc25
+o .. uc26
+c --|> u
+c .. uc23
+a .. uc25
+a .. uc26
+@enduml
+
+
+
+@startuml
+rectangle "Notes"{
+    usecase uc27 as "Create note"
+    usecase uc28 as "Edit or delete note"
+}
+actor u as "User"
+left to right direction
+u .. uc27
+u .. uc28
+@enduml
+
+
+
+@startuml
+rectangle "Moderation & administration"{
+    usecase uc29 as "Flag content"
+    usecase uc30 as "Moderate content"
+    usecase uc31 as "Manage users"
+    usecase uc32 as "Manage tags and taxonomies"
+}
+actor u as "User"
+actor a as "System Admin"
+left to right direction
+u .. uc29
+a .. uc30
+a .. uc31
+a .. uc32
+@enduml

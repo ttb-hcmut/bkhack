@@ -1,0 +1,26 @@
+@startuml
+/'skinparam handwritten true'/
+skinparam componentStyle rectangle
+left to right direction
+[CSS User-agent \n (Arc themes, GNOME\nWeb Custom JS/CSS,\nTampermonkey extension\nfor Chrome and Firefox)] as 5
+[The light mode encoding] as 4
+[The final (graphical) encoding] as 3
+[Reduced-motion encoding] as 2
+[The initial encoding] as 1
+[CSS reset] as 0
+
+note " " as b
+/'0 -[hidden]down- 1'/
+/'1 -[hidden]down- 2'/
+/'2 -[hidden]down- 3'/
+/'3 -[hidden]down- 4'/
+/'4 -[hidden]down- 5'/
+5 -[hidden]- b
+4 -[hidden]- b
+3 -[hidden]- b
+2 -[hidden]- b
+1 -[hidden]- b
+0 -[hidden]- b
+
+remove b
+@enduml
