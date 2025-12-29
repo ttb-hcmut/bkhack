@@ -60,7 +60,21 @@ Group DAGD1-514
 
 ## Non-functional requirements
 
+- Performance
+- Reliability and availability
+- Security
+- Usability and accessibility
+- Maintainability and accessibility
+- Documentation and DX
+- Community and ethics
+
 # Design <!-- NOTE: hgt -->
+
+## Design goals
+
+1. How to direct users to act courteously via UX?
+2. How to write clean maintainable code with high performance?
+3. How to minimize layering in architecture?
 
 ## Use case
 
@@ -126,6 +140,8 @@ Group DAGD1-514
 
 ## Other
 
+<<<
+
 ### User interface
 
 # Realization <!-- NOTE: khang -->
@@ -169,7 +185,7 @@ let makeComponent = () => {
 ## Break down tasks
 
 - Based on use cases
-- Based on crosscutting / infra
+- Based on crosscutting / infra / nonfunctional
 
 <<<
 
