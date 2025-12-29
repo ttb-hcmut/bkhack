@@ -137,6 +137,25 @@ let makeComponent = () => {
 
 ## Break down tasks
 
+- Based on use cases
+- Based on crosscutting / infra
+
+<<<
+
+![](./assets_/phase_1.png)
+
+<<<
+
+![](./assets_/phase_2.png)
+
+<<<
+
+![](./assets_/phase_3.png)
+
+<<<
+
+![](./assets_/phase_crosscutting.png)
+
 ## Schedule tasks
 
 - 4 months
