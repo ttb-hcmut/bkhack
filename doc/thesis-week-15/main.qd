@@ -35,6 +35,30 @@ Develop a computer science social news website
 - Learn and discover new stuff
 - Fact-checked
 
+## Survey
+
+What content are you interested in the most?
+
+![](./assets/survey/Q1.svg)
+
+<<<
+
+How do you usually discover topics you'd explored in-depth (rabbit holes/deep dives)?
+
+![](./assets/survey/Q2.svg)
+
+<<<
+
+What makes a piece of news or information credible to you?
+
+![](./assets/survey/Q3.svg)
+
+<<<
+
+What is the most important aspect of a community platform?
+
+![](./assets/survey/Q4.svg)
+
 ## About
 
 - Computer-science, developer-oriented from aesthetics to UX
@@ -125,7 +149,7 @@ Develop a computer science social news website
 
 <<<
 
-![](./assets/diagrams/UML-usecase-mod&admin.svg)
+![](./assets/diagrams/UML-usecase-pr.svg)
 
 <<<
 
@@ -133,7 +157,7 @@ Develop a computer science social news website
 
 <<<
 
-![](./assets/diagrams/UML-usecase-pr.svg)
+![](./assets/diagrams/UML-usecase-mod&admin.svg)
 
 <<<
 
@@ -145,7 +169,7 @@ Develop a computer science social news website
 
 .row alignment:{center}
 	.container margin:{-2cm 0cm 0cm 0cm}
-		![](./assets_/usecasetable2.png)
+		!(500x_)[](./assets_/usecasetable2.png)
 
 ## System architecture
 
@@ -168,7 +192,7 @@ Develop a computer science social news website
 
 .row alignment:{center}
 	.container margin:{-1cm 0cm 0cm 0cm}
-		![](./assets/diagrams/UML-module_view.svg)
+		!(500x_)[](./assets/diagrams/UML-module_view.svg)
 
 <<<
 
@@ -186,7 +210,7 @@ Develop a computer science social news website
 
 .row alignment:{center}
 	.container margin:{-2cm 0cm 0cm 0cm}
-		!(500x800)[](./assets/diagrams/PRState.png)
+		!(400x_)[](./assets/diagrams/PRState.png)
 
 ## ERD
 
