@@ -12,3 +12,5 @@
 - [ ] keyboard navigation
 - [ ] windows dev support
 - [ ] port RE to reasonml
+- [ ] custom mermaid renderer
+- [ ] custom plantuml renderer
