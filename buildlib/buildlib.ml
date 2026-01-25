@@ -8,6 +8,12 @@ module Output = struct
     "./_build/default/src/output/src/" ^ x ^ ".js"
 end
 
+let fix_base_path =
+  let f gr = Re.Group.get gr 1 in
+  Re.replace ~all:false ~f Re.(compile @@
+    seq [str (Sys.getcwd ()); char '/'; group (any |> rep1)]
+  )
+
 module Path = struct
   open Eio
 
@@ -16,6 +22,13 @@ module Path = struct
     Process.run
       process_mgr
       ["ln"; Path.native_exn link_to; Path.native_exn file]
+
+  let symlink ~sw ~link_to file =
+    Fiber.fork ~sw @@ fun () ->
+    let link_to =
+      let x = fix_base_path @@ P.native_exn link_to in
+      Sys.getcwd () ^ "/" ^ x in
+    Path.symlink ~link_to file
 
   let mkdir ~sw ?(perm = 0o700) dirname filename f =
     Fiber.fork ~sw @@ fun () ->
