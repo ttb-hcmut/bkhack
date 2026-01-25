@@ -63,8 +63,8 @@ let morphism_static ~sw~procm public_dir dist_dir () =
     ~link_to:P.(public_dir / path_it)
 
 (** [Serve] will run a series of [morphism]s (some are persistent
-    while some are not) to finally arrive at an output at
-    [dist_dir].
+    while some are not) on the repository to finally arrive at an
+    output at [dist_dir].
 
     TODO(kinten) provides guide
 
