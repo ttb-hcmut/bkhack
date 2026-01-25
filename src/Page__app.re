@@ -1,3 +1,4 @@
+[@page "/"]
 module Post = {
 	type t =
 		{ author: string

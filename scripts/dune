@@ -3,5 +3,6 @@
  (name bundle))
 
 (executable
- (libraries eio eio_main buildlib)
+ (libraries eio eio_main buildlib
+            cmdliner re containers)
  (name serve))

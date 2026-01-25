@@ -1,3 +1,4 @@
+[@Bkhack.page "/item"]
 open Melange__containers.Fun
 
 let to_string = x => switch (x) {
