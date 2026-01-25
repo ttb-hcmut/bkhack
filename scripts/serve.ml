@@ -62,7 +62,16 @@ let morphism_static ~sw~procm public_dir dist_dir () =
     P.(dist_dir / path_it)
     ~link_to:P.(public_dir / path_it)
 
-let () =
+(** [Serve] will run a series of [morphism]s (some are persistent
+    while some are not) to finally arrive at an output at
+    [dist_dir].
+
+    TODO(kinten) provides guide
+
+    @raise Missing_mapping_entry_for(pagefile) when a Reason page
+    file did not specify a required `[@Bkhack.page s]` attribute.
+    Refer to the guide for more details. *)
+let main__ () =
   Eio_main.run @@ fun env ->
   let procm, clock, cwd =
     Stdenv.process_mgr env, Stdenv.clock env, Stdenv.cwd env in
@@ -72,3 +81,7 @@ let () =
   pv_morphism~sw~procm dist_dir;
   morphism_jspages~sw~procm~clock~cwd src_dir dist_dir log_dir;
   morphism_static~sw~procm public_dir dist_dir ()
+
+let () =
+  if !Sys.interactive then () else
+  main__ ()
