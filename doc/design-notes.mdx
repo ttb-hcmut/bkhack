@@ -52,3 +52,13 @@ It'd be nice to have a Reason abstraction for importing static assets. Currently
 3. The final (graphical) encoding (see [^icon])
 4. The light mode encoding
 5. CSS User-agent (Arc themes, GNOME Web Custom JS/CSS, Tampermonkey extension for Chrome and Firefox)
+
+# Build system and file attributes
+
+For our current build system, our philosophy is to distribute configurations as much as possible. Avoid the phenomenon where we need a bunch of centralized `.rc` files or `jsconfig` files or a dictionary in a script file, etc.
+
+We need to inform the build system that for a Reason page file $ x $ there is a mapping to a JavaScript bundle $ y $ at a url $ y' $. In early versions, I (kinten) tested using a dictionary placed in the script file to define this mapping. In newer versions, I have decided to utilized Reason's infile floating attributes [^attributes]. This is a native way to provide decorator-like metadata to a file / module unit.
+
+[^attributes]: https://ocaml.org/manual/5.3/attributes.html
+
+> One of the most definitive use cases of floating attributes! The OCamldoc system also support floating attributes for manipulating system.
