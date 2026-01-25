@@ -82,8 +82,7 @@ let main__ () =
   morphism_jspages~sw~procm~clock~cwd src_dir dist_dir log_dir;
   morphism_static~sw~procm public_dir dist_dir ()
 
-let __toplevel_don't_autorun__ =
+(** autorun except in toplevel / interactive mode *)
+let () =
   if !Sys.interactive then () else
   main__ ()
-
-let () = __toplevel_don't_autorun__
