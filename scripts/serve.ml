@@ -35,7 +35,7 @@ let morphism_jspages~sw~procm~clock~cwd src_dir dist_dir log_dir =
     try P.(dist_dir / B.file_grep_attrib attrib_name refile')
     with Not_found -> raise @@ Missing_mapping_entry_for refile in
   B.output__sync~clock jsfile';
-  B.compile_jsfile~procm~clock out_dir log_dir jsfile'
+  B.compile_jsfile~procm~clock ~watch:true out_dir log_dir jsfile'
 
 (** a [morphism] for linking static-content files from public dir
     (and other sources) to dist dir *)

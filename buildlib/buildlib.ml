@@ -64,16 +64,17 @@ let is_page' src_dir =
   is_page %> Option.map (
     fun (`fname x, y) -> `fpath P.(src_dir / x), `fname x, y )
 
-let compile_jsfile~procm~clock out_dir log_dir entry =
+let compile_jsfile~procm~clock ?(watch = false) out_dir log_dir entry =
   let mkdirs x =
     let exists_ok = true and perm = 0o700 in
     Path.mkdirs ~exists_ok ~perm x in
   mkdirs out_dir;
   mkdirs log_dir;
   Path.with_open_out P.(log_dir / (idgen' clock ^ ".stdout")) ~create:(`Exclusive 0o700) @@ fun stdout ->
-  Pnpm.Process.run procm ~stdout
-    [ "webpack"; "watch"
-    ; "--config"; "build_aux/webpack_preprocessor.js"
+  Pnpm.Process.run procm ~stdout @@
+    [ "webpack" ] @
+    (if watch then ["watch"] else []) @
+    [ "--config"; "build_aux/webpack_preprocessor.js"
     ; "--mode"; "development"
     ; "--entry"; Path.native_exn entry
     ; "--output-path"; Path.native_exn out_dir
