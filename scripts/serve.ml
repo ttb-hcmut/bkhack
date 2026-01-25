@@ -53,8 +53,6 @@ let morphism_static ~sw~procm public_dir dist_dir () =
   let cleantree () =
     let missing_ok = true in
     Path.rmtree ~missing_ok dist_dir in
-  Fiber.fork ~sw @@ fun () ->
-  Switch.run @@ fun sw ->
   cleantree ();
   [] |> iter ~ondir:iter_ondir @@ fun fpath_at_public ->
   let path_it = String.concat "/" fpath_at_public in
