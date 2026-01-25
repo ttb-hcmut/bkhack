@@ -39,7 +39,7 @@ let morphism_jspages~sw~procm~clock~cwd src_dir dist_dir log_dir =
 
 (** a [morphism] for linking static-content files from public dir
     (and other sources) to dist dir *)
-let morphism_static ~sw~procm public_dir dist_dir () =
+let morphism_static~sw~procm public_dir dist_dir () =
   let rec iter f ~ondir (rootdir: string list) =
     let items = Path.read_dir P.(public_dir / String.concat "/" rootdir) in
     ondir @@ String.concat "/" rootdir;
