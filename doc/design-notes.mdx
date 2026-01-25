@@ -57,7 +57,12 @@ It'd be nice to have a Reason abstraction for importing static assets. Currently
 
 For our current build system, our philosophy is to distribute configurations as much as possible. Avoid the phenomenon where we need a bunch of centralized `.rc` files or `jsconfig` files or a dictionary in a script file, etc.
 
-We need to inform the build system that for a Reason page file $ x $ there is a mapping to a JavaScript bundle $ y $ at a url $ y' $. In early versions, I (kinten) tested using a dictionary placed in the script file to define this mapping. In newer versions, I have decided to utilized Reason's infile floating attributes [^attributes]. This is a native way to provide decorator-like metadata to a file / module unit.
+We need to inform the build system that for a Reason page file $ x $ there is a mapping to a JavaScript bundle $ y $ at a url $ y' $. In early versions, I (kinten) tested using a dictionary placed in the script file to define this mapping. In newer versions, I have decided to utilized Reason's infile floating attributes [^attributes] in each Reason page file. This is a native way to provide decorator-like metadata to a file / module unit.
+
+```reason
+[@Bkhack.page "/item"]
+// rest of file
+```
 
 [^attributes]: https://ocaml.org/manual/5.3/attributes.html
 
