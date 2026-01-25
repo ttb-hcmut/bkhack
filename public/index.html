@@ -436,8 +436,31 @@ html {
 
 #root > aside {
 	display: none;
-	margin-top: var(--space-a);
+	position:absolute;
+	top:45px;
+	right:0;
+	width:80vw;
+	background-color: var(--dark-a);
+	border: 2px solid var(--dark-c);
+	padding:1rem;
+	margin:0;
 }
+
+#root > aside > *{
+	background-color: var(--dark-b);
+	color: var(--light-a);
+	border: 1px solid var(--dark-c);
+	padding:1rem;
+}
+
+#root > aside.active {
+	display: block;
+}
+#root > aside>*>header{
+	font-weight: bold;
+	font-size: 1.25rem;
+}
+
 
 #root > aside h2 {
 	margin: 0;
@@ -470,6 +493,109 @@ html {
 	border: solid 1px var(--card-border);
 }
 
+/* sidebar stuff */
+button.sidebar-show{
+	position: fixed;
+	right: -6rem;
+	top:45px;
+	background-color: var(--dark-c);
+	color:rgba(0,0,0,0);
+	border: 1px solid var(--dark-d);
+	padding:1rem;
+	z-index: 9;
+	transition: right 0.2s, color 0.2s;
+}
+button.sidebar-show:hover{
+	right: 0;
+	color: var(--light-a);
+	cursor:pointer;
+}
+
+#sidebar-notes button{
+	color:var(--light-b);
+}
+#sidebar-notes button:hover{
+	color:var(--light-a);
+	cursor:pointer;
+}
+#sidebar-notes .vert{
+	writing-mode:vertical-rl;
+}
+
+#sidebar-notes li{
+	background-color: var(--dark-c);
+	padding:0.5rem;
+	margin:0.25rem;
+}
+.truncated {
+  white-space: nowrap;       /* Keep text on a single line */
+  overflow: hidden;          /* Hide overflow */
+  text-overflow: ellipsis;   /* Show "…" */   /* Optional: break long words */
+}
+
+#sidebar-filters>div:has(input){
+	color:var(--light-b);
+	background-color:var(--dark-c);
+	padding:0.5rem;
+	margin:0.25rem;
+}
+#sidebar-filters>div:hover{
+	box-shadow: 0 1px 0 var(--dark-d);
+	cursor:pointer;
+}
+#sidebar-filters>div:has(input:checked){
+	box-shadow: 0 1px 0 var(--light-b);
+	color: var(--light-a)
+}
+
+
+#sidebar-tags button{
+	color:var(--light-b);
+	background-color:var(--dark-c);
+	padding:0.5rem;
+	margin:0.25rem;
+}
+#sidebar-tags button:hover{
+	box-shadow: 0 1px 0 var(--dark-d);
+	cursor:pointer;
+}
+#sidebar-tags button.active{
+	box-shadow: 0 1px 0 var(--light-b);
+	color: var(--light-a)
+}
+
+#sidebar-activities .activity{
+	color: var(--light-b);
+	white-space: nowrap;     
+	overflow: hidden;        
+	text-overflow: ellipsis; 
+}
+#sidebar-activities li{
+	background-color: var(--dark-c);
+	margin:0.2rem;
+	padding:0.5rem; 
+}
+#sidebar-activities li:hover{
+	box-shadow: 0 1px 0 var(--dark-d);
+	cursor:pointer;
+}
+#sidebar-activities .activity > .content{
+	color: var(--light-b);
+	white-space: nowrap;     
+	overflow: hidden;        
+	text-overflow: ellipsis; 
+}
+#sidebar-activities .activity > .verb {
+	color: var(--cyan);
+}
+#sidebar-activities .activity > .agent {
+	color: var(--light-blue);
+}
+#sidebar-activities .time {
+	color: var(--dark-d);
+}
+/* end sidebar stuff */
+
 span.tag::before {
 	content: "#";
 }
@@ -486,7 +612,7 @@ form.dashboard-filter {
 @media (min-width: 64rem) {
 	:root {
 		/* NOTE(kinten): make sure to manually sync these values */
-		--grid-1: minmax(0,1fr) calc(64rem - 300px) 400px  minmax(0,1fr);
+		--grid-1: minmax(0,1fr) 60% 30% minmax(0,1fr);
 		--offset: calc((100vw - (64rem - 300px + 400px - 2 * var(--space-a))) / 2);
 	}
 
@@ -496,20 +622,37 @@ form.dashboard-filter {
 		grid-template-columns: var(--grid-1);
 	}
 
-	#root > * {
+	#root:has(aside) > *:not(aside):not(header) {
+		grid-column: 2 / 4;
+	}
+
+	#root:has(aside.active) > *:not(aside):not(header) {
 		grid-column: 2 / 3;
 	}
 
 	#root > header {
 		grid-column: 1 / -1;
 		padding-left: var(--offset);
+		padding-right: var(--offset);
 	}
-
+	
 	#root > aside {
+		display: none !important;
+		padding:0;
+		background-color: unset;
+		border: unset;
+	}
+	#root > aside.active {
+		width:auto;
+		position:static;
 		display: block !important;
 		grid-column: 3 / 4;
 		grid-row: 2 / 4;
 	}
+	#root > aside > *{
+		padding:1rem;
+	}
+	
 }
 		</style>
 		<script>
