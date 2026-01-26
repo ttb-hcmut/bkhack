@@ -3,7 +3,7 @@
 - [ ] multi page serving with melange
 - [ ] storybook integration with melange
 - [ ] sh parser
-- [ ] light mode
+- [ ] (kinten) light mode
 - [ ] homogeneous (OCaml?) build system. B0?
 - [ ] markdown parsing
 - [ ] subscription, watch thread, notifications
@@ -14,3 +14,7 @@
 - [ ] port RE to reasonml
 - [ ] custom mermaid renderer
 - [ ] custom plantuml renderer
+- [ ] remake logo svg
+- [ ] (hgt) storybook design system
+
+- [ ] (hgt) headerbar
