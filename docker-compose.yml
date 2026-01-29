@@ -1,0 +1,16 @@
+services:
+  bkhack:
+    image: nixos/nix
+    container_name: bkhack-shell
+    tty: true 
+    stdin_open: true
+    working_dir: /bkhack
+    ports:
+      - "8080:8080"
+      - "5000:5000"
+    volumes:
+      - .:/bkhack
+    restart: unless-stopped
+    cmd:
+    
+
