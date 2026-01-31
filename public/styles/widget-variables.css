@@ -1,26 +1,91 @@
 @import "/styles/variables.css";
 
-html {
-	--global-bg: var(--dark-a);
-	--card-fg: var(--light-b);
-	--card-fg-highlighted: var(--light-a);
-	--card-fg-aux: var(--dark-d);
-	--card-fg-accent-0: var(--cyan);
-	--card-fg-accent-1: var(--light-blue);
-	--card-fg-accent-1-20: var(--light-blue-20);
-	--card-fg-accent-1-30: var(--light-blue-30);
-	--card-fg-accent-1-40: var(--cyan-30);
-	--card-fg-accent-2: var(--green);
-	--card-fg-accent-2-10: var(--green-10);
-	--card-fg-accent-2-30: var(--green-30);
-	--card-fg-accent-3: var(--violet);
-	--card-fg-suggestive: var(--cyan);
-	--card-fg-suggestive-halftransparentlol: var(--cyan-50);
-	--card-bg: var(--dark-b);
-	--card-bg-translucent: var(--dark-a);
-	--card-border: var(--dark-c);
-	/* stupid */
-	--card-fg-highlighted-dimmer: var(--light-b);
-	--card-fg-unhighlighted: var(--dark-d);
-	--card-border-20: oklab(61.0324% -.0598051 -.144428 / .2);
+:root {
+	/* General */
+	--background: var(--ctp-base);
+	--foreground: var(--ctp-text);
+
+	--card: var(--ctp-mantle);
+	--card-foreground: var(--ctp-text);
+
+	--popover: var(--ctp-mantle);
+	--popover-foreground: var(--ctp-text);
+
+	--primary: var(--sig-blue);
+	--primary-foreground: #ffffff;
+
+	--secondary: var(--ctp-surface0);
+	--secondary-foreground: var(--ctp-text);
+
+	--muted: var(--ctp-surface0);
+	--muted-foreground: var(--ctp-overlay0);
+
+	/* Semantic */
+	--accent: var(--ctp-surface1);
+	--accent-foreground: var(--ctp-text);
+
+	--destructive: var(--ctp-red);
+	--destructive-foreground: var(--ctp-base);
+
+	--success: var(--ctp-green);
+	--success-foreground: var(--ctp-base);
+
+	--warning: var(--ctp-yellow);
+	--warning-foreground: var(--ctp-base);
+
+	--info: var(--ctp-sky);
+	--info-foreground: var(--ctp-base);
+
+	/* Borders and dividers */
+	--border: var(--ctp-surface0);
+
+	/* Input fields */
+	--input: var(--ctp-crust);
+	--input-background: var(--ctp-crust);
+
+	/* Switch/toggle backgrounds */
+	--switch-background: var(--ctp-surface0);
+
+	/* Focus rings */
+	--ring: var(--sig-blue);
+
+	/* Chart colors */
+	--chart-1: var(--sig-blue);
+	--chart-2: var(--ctp-teal);
+	--chart-3: var(--ctp-green);
+	--chart-4: var(--ctp-mauve);
+	--chart-5: var(--ctp-peach);
+
+	/* Sidebar-specific */
+	--sidebar: var(--ctp-mantle);
+	--sidebar-foreground: var(--ctp-text);
+	--sidebar-primary: var(--sig-blue);
+	--sidebar-primary-foreground: #ffffff;
+	--sidebar-accent: var(--ctp-surface0);
+	--sidebar-accent-foreground: var(--ctp-text);
+	--sidebar-border: var(--ctp-surface0);
+	--sidebar-ring: var(--sig-blue);
+
+	/* old */
+	--global-bg: var(--ctp-base);
+	--card-fg: var(--ctp-text);
+	--card-fg-highlighted: var(--ctp-text);
+	--card-fg-aux: var(--ctp-overlay0);
+	--card-fg-accent-0: var(--sig-blue);
+	--card-fg-accent-1: var(--ctp-sapphire);
+	--card-fg-accent-1-20: oklab(from var(--ctp-sapphire) l a b / 0.2);
+	--card-fg-accent-1-30: oklab(from var(--ctp-sapphire) l a b / 0.3);
+	--card-fg-accent-1-40: oklab(from var(--sig-blue) l a b / 0.3);
+	--card-fg-accent-2: var(--ctp-green);
+	--card-fg-accent-2-10: oklab(from var(--ctp-green) l a b / 0.1);
+	--card-fg-accent-2-30: oklab(from var(--ctp-green) l a b / 0.3);
+	--card-fg-accent-3: var(--ctp-mauve);
+	--card-fg-suggestive: var(--sig-blue);
+	--card-fg-suggestive-halftransparentlol: oklab(from var(--sig-blue) l a b / 0.5);
+	--card-bg: var(--ctp-mantle);
+	--card-bg-translucent: var(--ctp-crust);
+	--card-border: var(--ctp-surface0);
+	--card-fg-highlighted-dimmer: var(--ctp-subtext1);
+	--card-fg-unhighlighted: var(--ctp-overlay0);
+	--card-border-20: oklab(from var(--sig-blue) l a b / 0.2);
 }
