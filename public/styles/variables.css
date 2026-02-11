@@ -16,14 +16,37 @@ html {
 	--green-30: oklab(85.7704% -.0869061 .0661681 / .3);
 	--violet: #cba6f7;
 	/* --space-a: 0.5cm; */
-	--space-a: calc(2.5 * 0.25rem /* 5.6px */);
-	--space-c: calc(1.5 * 0.25rem /* 5.6px */);
-	--space-d: calc(4 * 0.25rem /* 5.6px */);
-	--space-e: calc(0.25 * 0.25rem /* 5.6px */);
+	--space-a: calc(2.5 * 0.25rem); /* 5.6px */
+	--space-c: calc(1.5 * 0.25rem); /* 5.6px */
+	--space-d: calc(4 * 0.25rem); /* 5.6px */
+	--space-e: calc(0.25 * 0.25rem); /* 5.6px */
 	/* tailwind start */
 	--text-xs: 0.75rem /* 12px */;
 	--text-sm: 0.875rem /* 14px */;
 	--text-base: 1rem /* 16px */;
 	/* tailwind end */
 	--font-mono: "Liberation Mono";
+
+	/* rainbow */
+	/* --oklch-magenta:	oklch(0.6933 0.1529 360);
+	--oklch-violet: 	oklch(0.6933 0.1529 300);
+	--oklch-blue: 		oklch(0.6933 0.1529 270);
+	--oklch-miku: 		oklch(0.6933 0.1529 210);
+	--oklch-green: 		oklch(0.6933 0.1529 150);
+	--oklch-lime: 		oklch(0.6933 0.1529 120);
+	--oklch-yellow: 	oklch(0.6933 0.1529 90);
+	--oklch-orange: 	oklch(0.6933 0.1529 60);
+	--oklch-red: 		oklch(0.6933 0.1529 30); */
+
+	--hsl-magenta:		hsl(300 100% 60%);
+	--hsl-purple:		hsl(270 100% 60%);
+	--hsl-blue:			hsl(240 100% 60%);
+	--hsl-teal:			hsl(210 100% 60%);
+	--hsl-miku:			hsl(180 100% 60%);
+	--hsl-jade:			hsl(150 100% 60%);
+	--hsl-green:		hsl(120 100% 60%);
+	--hsl-lime:			hsl(90  100% 60%);
+	--hsl-yellow:		hsl(60  100% 60%);
+	--hsl-orange:		hsl(30  100% 60%);
+	--hsl-red:			hsl(0 	 100% 60%);
 }

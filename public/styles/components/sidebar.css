@@ -1,0 +1,374 @@
+@import "/styles/variables.css";
+
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+#root > aside *{
+	color: var(--light-b);
+}
+
+#root > aside > section{
+	padding: var(--space-a);
+	background-color: var(--card-bg);
+	border: solid 1px color-mix(in hsl, var(--hsl-yellow), gray 50%);
+	border-radius: 0.5cm;
+	display: grid;
+	gap: var(--space-a);
+	grid-template-columns: auto;
+	
+	grid-auto-columns: minmax(0, 1fr);
+}
+#root > aside > section > header{
+	display: grid;
+	place-items: center start;
+	font-weight: bold;
+}
+/* 
+#root > aside > section > .expand:active{
+	background-color: var(--dark-a);
+} */
+#root > aside > section > .expand > span{
+    display: inline-block; 
+	transform:rotate(0deg);
+	transition-property: transform;
+	transition-duration: 0.2s;
+	color: var(--dark-d);
+	height:min-content;
+}
+#root > aside > section > .expand > span.expanded{
+    display: inline-block; 
+	transform:rotate(90deg);
+}
+#root > aside > section > .expand{
+	padding: var(--space-a);
+	width: 2rem;
+	height: 2rem;
+  	/* justify-self: end; */
+	/* grid-column: 2/3;
+	grid-row: 1/2; */
+	border-radius: 0.25cm;
+}
+#root > aside > section > .expand:hover{
+	cursor: pointer;
+	background-color: var(--dark-c);
+}
+
+/* notes */
+#root > aside > section#sidebar-notes{
+	border: solid 1px color-mix(in hsl, var(--hsl-yellow), gray 50%);
+}
+#root > aside > section#sidebar-notes > header{
+	/* font-weight: bold; */
+	grid-column: 1/2;
+	grid-row: 1/2;
+	color: color-mix(in hsl, var(--hsl-yellow), gray 50%);
+}
+#root > aside > section#sidebar-notes > .expand{
+	/* padding: var(--space-a); */
+	/* width: 2rem;
+	aspect-ratio: 1; */
+  	justify-self: end;
+	grid-column: 2/3;
+	grid-row: 1/2;
+}
+/* #root > aside > section#sidebar-notes > .expand:hover{
+	cursor: pointer;
+	background-color: var(--dark-c);
+	border-radius: 0.25cm;
+} */
+/* #root > aside > section#sidebar-notes > .expand:active{
+	background-color: var(--dark-a);
+}
+#root > aside > section#sidebar-notes > .expand > span{
+    display: inline-block; 
+	transform:rotate(0deg);
+	transition-property: transform;
+	transition-duration: 0.2s;
+	color: var(--dark-d);
+} */
+/* #root > aside > section#sidebar-notes > .expand > span.expanded{
+    display: inline-block; 
+	transform:rotate(90deg);
+} */
+#root > aside > section#sidebar-notes > ul{
+	grid-column: 1/3;
+	grid-row: 2/3;
+	display:grid;
+	gap: var(--space-a);
+}
+#root > aside > section#sidebar-notes > ul > li{
+	border-left: 2px solid color-mix(in hsl, var(--hsl-yellow), gray 50%);
+	padding: 0 var(--space-a);
+}
+.truncated {
+	white-space: nowrap;       
+	min-width: 0;
+	overflow: hidden;          
+	text-overflow: ellipsis;   
+}
+#root > aside > section#sidebar-notes > .addnote{
+	grid-column: 1/3;
+	grid-row: 3/4;
+	color: var(--dark-d);
+  	justify-self: end;
+	/* padding:var(--space-a); */
+}
+#root > aside > section#sidebar-notes > .addnote:hover{
+	color: var(--light-a);
+	cursor: pointer;
+}
+
+/* search */
+#root > aside > section#sidebar-search{
+	border: solid 1px color-mix(in hsl, var(--hsl-teal), gray 50%);
+}
+#root > aside > section#sidebar-search > header{
+	grid-column: 1/2;
+	grid-row: 1/2;
+	color: color-mix(in hsl, var(--hsl-teal), gray 50%);
+}
+#root > aside > section#sidebar-search > .searchbar{
+	grid-column: 1/3;
+	grid-row: 2/3;
+	background-color: var(--dark-a);
+	border-radius: 0.25cm;
+	border: 0;
+	padding: var(--space-a);
+}
+#root > aside > section#sidebar-search > .submitSearch{
+  	justify-self: end;
+	grid-column: 2/3;
+	grid-row: 3/4;
+	background-color: color-mix(in hsl, var(--hsl-teal), gray 50%);
+	color:var(--light-b);
+	border-radius: 0.25cm;
+	padding: var(--space-a);
+}
+#root > aside > section#sidebar-search > .submitSearch:hover{
+	cursor: pointer;
+}
+#root > aside > section#sidebar-search > .expand{
+	display: grid;
+	grid-auto-flow: column;
+	gap: var(--space-a);
+	width: unset;
+	height:100%;
+  	justify-self: start;
+	grid-column: 1/2;
+	grid-row: 3/4;
+}
+#root > aside > section#sidebar-search > .expand > div{
+	color:	color-mix(in hsl, var(--hsl-teal), gray 50%);
+}
+#root > aside > section#sidebar-search > .expand:has(.expanded){
+	background-color: var(--dark-c);
+	grid-row: 3/5;
+}
+#root > aside > section#sidebar-search > .filter-list{
+	display: none;
+  	grid-template-columns: repeat(auto-fill, minmax(5rem, 1fr));
+	place-items: center;
+	/* grid-auto-flow: column; */
+	gap: var(--space-a);
+	background-color: var(--dark-c);
+	padding: var(--space-a);
+	border-radius: 0.25cm;
+}
+#root > aside > section#sidebar-search > .filter-list.expanded{
+	display: grid;
+	grid-column: 1/3;
+	grid-row: 4/5;
+}
+#root > aside > section#sidebar-search > .filter-list > li{
+	padding: var(--space-c);
+	border-radius: 0.25cm;
+
+}
+#root > aside > section#sidebar-search > .filter-list > li:hover{
+	cursor:pointer;
+	background-color: var(--dark-b);
+}
+#root > aside > section#sidebar-search > .filter-list > li:has(button.active){
+	background-color: color-mix(in hsl, var(--hsl-teal), gray 50%);
+}
+
+/* trending tags */
+#root > aside > section#sidebar-trendingtags{
+	border: solid 1px color-mix(in hsl, var(--hsl-purple), gray 50%);
+}
+#root > aside > section#sidebar-trendingtags > header{
+	grid-column: 1/2;
+	grid-row: 1/2;
+	color: color-mix(in hsl, var(--hsl-purple), gray 50%);
+}
+#root > aside > section#sidebar-trendingtags > .tag-list{
+	grid-column: 1/3;
+	grid-row: 2/3;
+
+	display: block;
+  	/* grid-template-columns: repeat(auto-fill, minmax(5rem, 1fr)); */
+	/* place-items: center; */
+	/* grid-auto-flow: column; */
+	/* gap: var(--space-a);
+	background-color: var(--dark-c);
+	padding: var(--space-a);
+	border-radius: 0.25cm; */
+}
+#root > aside > section#sidebar-trendingtags > .tag-list {
+  	display: flex;
+	flex-wrap: wrap;
+	flex-direction: row;
+	gap: var(--space-a);
+}
+#root > aside > section#sidebar-trendingtags > .tag-list > li{
+	width: max-content;
+	padding: var(--space-c);
+	background-color: var(--dark-c);
+	border-radius: 0.25cm;
+	display: grid;
+	place-items: center start;
+	
+}
+#root > aside > section#sidebar-trendingtags > .tag-list > li:hover{
+	cursor:pointer;
+	background-color: var(--dark-a);
+}
+
+#root > aside > section#sidebar-trendingtags > .tag-list > li.c0 {
+	border: 1px solid  color-mix(in hsl, var(--hsl-magent), gray 50%);
+	color: color-mix(in hsl, var(--hsl-magent), gray 50%);
+}
+#root > aside > section#sidebar-trendingtags > .tag-list > li.c1 {
+	border: 1px solid  color-mix(in hsl, var(--hsl-purple), gray 50%);
+	color: color-mix(in hsl, var(--hsl-purple), gray 50%);
+}
+#root > aside > section#sidebar-trendingtags > .tag-list > li.c2 {
+	border: 1px solid  color-mix(in hsl, var(--hsl-blue), gray 50%);
+	color: color-mix(in hsl, var(--hsl-blue), gray 50%);
+}
+#root > aside > section#sidebar-trendingtags > .tag-list > li.c3 {
+	border: 1px solid  color-mix(in hsl, var(--hsl-teal), gray 50%);
+	color: color-mix(in hsl, var(--hsl-teal), gray 50%);
+}
+#root > aside > section#sidebar-trendingtags > .tag-list > li.c4 {
+	border: 1px solid  color-mix(in hsl, var(--hsl-miku), gray 50%);
+	color: color-mix(in hsl, var(--hsl-miku), gray 50%);
+}
+#root > aside > section#sidebar-trendingtags > .tag-list > li.c5 {
+	border: 1px solid  color-mix(in hsl, var(--hsl-jade), gray 50%);
+	color: color-mix(in hsl, var(--hsl-jade), gray 50%);
+}
+#root > aside > section#sidebar-trendingtags > .tag-list > li.c6 {
+	border: 1px solid  color-mix(in hsl, var(--hsl-green), gray 50%);
+	color: color-mix(in hsl, var(--hsl-green), gray 50%);
+}
+#root > aside > section#sidebar-trendingtags > .tag-list > li.c7 {
+	border: 1px solid  color-mix(in hsl, var(--hsl-lime), gray 50%);
+	color: color-mix(in hsl, var(--hsl-lime), gray 50%);
+}
+#root > aside > section#sidebar-trendingtags > .tag-list > li.c8 {
+	border: 1px solid  color-mix(in hsl, var(--hsl-yellow), gray 50%);
+	color: color-mix(in hsl, var(--hsl-yellow), gray 50%);
+}
+#root > aside > section#sidebar-trendingtags > .tag-list > li.c9 {
+	border: 1px solid  color-mix(in hsl, var(--hsl-orange), gray 50%);
+	color: color-mix(in hsl, var(--hsl-orange), gray 50%);
+}
+#root > aside > section#sidebar-trendingtags > .tag-list > li.c10{
+	border: 1px solid  color-mix(in hsl, var(--hsl-red), gray 50%);
+	color: color-mix(in hsl, var(--hsl-red), gray 50%);
+}
+
+#root > aside > section#sidebar-trendingtags > .tag-list > li > button {
+	color: inherit;
+}
+
+/* activities */
+#root > aside > section#sidebar-recent-activities{
+	border: solid 1px color-mix(in hsl, var(--hsl-orange), gray 50%);
+}
+#root > aside > section#sidebar-recent-activities > header{
+	/* font-weight: bold; */
+	grid-column: 1/2;
+	grid-row: 1/2;
+	color: color-mix(in hsl, var(--hsl-orange), gray 50%);
+}
+#root > aside > section#sidebar-recent-activities > .see-more{
+	/* padding: var(--space-a); */
+	/* width: 2rem;
+	aspect-ratio: 1; */
+	color: var(--dark-d);
+  	justify-self: end;
+	grid-column: 2/3;
+	grid-row: 1/2;
+}
+#root > aside > section#sidebar-recent-activities > .see-more:hover{
+	cursor: pointer;
+	background-color: var(--dark-c);
+	border-radius: 0.25cm;
+}
+/* #root > aside > section#sidebar-recent-activities > .expand:active{
+	background-color: var(--dark-a);
+}
+#root > aside > section#sidebar-recent-activities > .expand > span{
+    display: inline-block; 
+	transform:rotate(0deg);
+	transition-property: transform;
+	transition-duration: 0.2s;
+	color: var(--dark-d);
+} */
+/* #root > aside > section#sidebar-recent-activities > .expand > span.expanded{
+    display: inline-block; 
+	transform:rotate(90deg);
+} */
+#root > aside > section#sidebar-recent-activities > ul{
+	grid-column: 1/3;
+	grid-row: 2/3;
+	display:grid;
+	gap: var(--space-a);
+}
+#root > aside > section#sidebar-recent-activities > ul > li{
+	border-left: 2px solid color-mix(in hsl, var(--hsl-orange), gray 50%);
+	padding: 0 var(--space-a);
+	display: grid;
+	gap: 0 var(--space-c);
+	grid-template-columns: auto;
+}
+#root > aside > section#sidebar-recent-activities > ul > li:hover{
+	cursor: pointer;
+	background-color: var(--dark-c);
+}
+#root > aside > section#sidebar-recent-activities > ul > li > :not(.time){
+	grid-row: 1/2;
+}
+#root > aside > section#sidebar-recent-activities > ul > li > .agent{
+	color: var(--light-blue);
+}
+#root > aside > section#sidebar-recent-activities > ul > li > .content{
+	color: var(--dark-d);
+}
+#root > aside > section#sidebar-recent-activities > ul > li > .time{
+	grid-row: 2/3;
+	font-size: small;
+	color: var(--dark-d);
+}
+#root > aside > section#sidebar-recent-activities > .addnote{
+	grid-column: 1/3;
+	grid-row: 3/4;
+	color: var(--dark-d);
+  	justify-self: end;
+	/* padding:var(--space-a); */
+}
+#root > aside > section#sidebar-recent-activities > .addnote:hover{
+	color: var(--light-a);
+	cursor: pointer;
+}

@@ -481,17 +481,19 @@ module Dashboard = {
 			(820, "Neural Network in Assembly"
 			)
 		];
+		let (sidebarState, setSidebarState) = React.useState( _ => "state0");
+
 		<>
 			<header>
 				<Component__header />
 			</header>
-			<nav>
+			<nav className=sidebarState>
 				<header>
 					<HintPanel />
 				</header>
 				<Filter />
 			</nav>
-			<main><ol>
+			<main className=sidebarState><ol>
 			{ testitems
 				|> List.map(((rank, title)) => {
 					<li
@@ -506,22 +508,28 @@ module Dashboard = {
 				|> Array.of_list |> React.array
 			}
 			</ol></main>
-			<aside>
-				<section>
-					<h2>{string("my notes")}</h2>
-					<button>{string("new note")}</button>
-				</section>
-				<section>
-					<h2>{string("search")}</h2>
-				</section>
-				<section>
-					<h2>{string("quick filters")}</h2>
-				</section>
-			</aside>
-			<footer role="navigation">
+			<footer role="navigation" className=sidebarState>
 				<button>{string("prev")}</button>
 				<button>{string("next")}</button>
 			</footer>
+
+			<button 
+				className={"show-hide-sidebar " ++ sidebarState}
+				onClick={_=>{
+					if (sidebarState == "state0")
+					{
+						setSidebarState(_ => "state1");
+					}
+					else
+					{
+						setSidebarState(_ => "state0");
+					}
+				}}
+				>
+			</button>
+			<aside className=sidebarState>
+				<Component__sidebar />
+			</aside>
 		</>
 	}
 };
