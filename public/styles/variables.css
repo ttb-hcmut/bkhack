@@ -1,4 +1,4 @@
-@custom-variant dark (&:is(.dark *));
+/* @custom-variant dark (&:is(.dark *)); */
 
 :root {
 	/*===== Common CSS =====*/
@@ -75,7 +75,8 @@
 	--ctp-lavender: #7287fd;
 }
 
-.dark {
+@media (prefers-color-scheme: dark) {
+:root {
 
 	/* Catppuccin Mocha (Dark Theme) - Surface Colors */
 	--ctp-base: #11111b;
@@ -105,4 +106,5 @@
 	--ctp-sky: #89dceb;
 	--ctp-sapphire: #74c7ec;
 	--ctp-lavender: #b4befe;
+}
 }
