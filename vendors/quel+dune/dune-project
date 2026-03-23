@@ -1,0 +1,11 @@
+(lang dune 3.16)
+
+(using melange 0.1)
+
+(name quel)
+
+(generate_opam_files true)
+
+(package
+ (depends ocaml)
+ (name quel))
