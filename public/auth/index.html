@@ -55,7 +55,7 @@ html {
     justify-self: center;
     color: var(--ctp-subtext1)
 }
-#root > .main-container{
+#root > main{
 	border: 2px solid var(--ctp-mantle);
 	border-radius: var(--radius);
 	background-color: var(--ctp-crust);
@@ -67,17 +67,17 @@ html {
     gap: var(--space-a);
 
 }
-.main-container > form{
+main > form{
     display:grid;
     grid-column:1/3;
 	margin: var(--space-a);
 	gap: var(--space-a);
 }
-.main-container > form > label{
+main > form > label{
     align-self:end;
     justify-self:start;
 }
-.main-container > form > input{
+main > form > input{
     justify-self:center;
     font-size: var(--text-base);
     font-family: inherit;
@@ -88,11 +88,11 @@ html {
     justify-self:stretch;
 	padding: var(--space-a);
 }
-/* .main-container > form > input:focus{
+/* main > form > input:focus{
     border:0;
     background-color: red;
 } */
-.main-container > form > input::placeholder{
+main > form > input::placeholder{
     font-size: var(--text-base);
     font-family: inherit;
     color: color-mix(in srgb, var(--ctp-text), transparent 50%);
@@ -100,10 +100,10 @@ html {
 .error{
     color: var(--ctp-red);
     padding: var(--space-a);
-	background-color: var(--ctp-rosewater);
+	background-color: color-mix(in srgb, var(--ctp-red), transparent 80%);
 	border: 2px solid var(--ctp-red);
 }
-.main-container > form > button{
+main > form > button{
     justify-self:stretch;
 	padding: var(--space-a);
     color: white;
@@ -112,49 +112,54 @@ html {
 	background-color: var(--sig-blue);
 	border-radius: var(--radius);
 }
-.main-container > form > button:active{
+main > form > button:active{
 	background-color: color-mix(in srgb, var(--sig-blue), transparent 50%);
 }
 
-.main-container > span{
+main > span{
     grid-column:1/3;
     height:2px;
     background-color: var(--ctp-mantle)
 }
-.main-container > a{
+main > a{
     justify-self:center;
     font-size: var(--text-sm);
     color: var(--ctp-subtext1);
 }
-.main-container > a:hover{
+main > a:hover{
     text-decoration:underline;
 }
-.main-container > a:active{
+main > a:active{
 	color: color-mix(in srgb, var(--ctp-subtext1), transparent 50%);
 }
 
-.main-container > form > button:disabled{
+main > form > button:disabled{
 	background-color: transparent;
 }
-.main-container.register > form > ul{
+main.register > form > ul{
     background-color: var(--ctp-mantle);
     border-radius: var(--radius);
 	padding: var(--space-a);
     font-size: var(--text-sm);
     color: var(--ctp-subtext1);
 }
-.main-container.register > form > ul > li.invalid{
+main.register > form > ul > li.invalid{
     color: var(--ctp-red);
     text-decoration:underline;
 }
+main.register > form > ul > li.invalid > span{
+    text-decoration:none;
+    opacity:0;
+}
 
 
-#root > .footer{
+
+/* #root > .footer{
     background-color: #ff0000;
     grid-row: 4/5;
     grid-column: 2/3;
 
-}
+} */
 
 		</style>
     <script type="module" src="index.js"></script>

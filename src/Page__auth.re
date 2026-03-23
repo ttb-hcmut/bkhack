@@ -56,7 +56,7 @@ module Login = {
             }
         };
         <>
-        <main className="main-container login">
+        <main className="login">
             <form>
                 <label htmlFor="username">{React.string("username:")}</label>
                 <input type_="username" id="username" placeholder="mrbombastic . . ."
@@ -118,7 +118,7 @@ module Register = {
             }
         };
         <>
-        <div className="main-container register">
+        <main className="register">
             <form>
                 <label htmlFor="email">{React.string("email:")}</label>
                 <input type_="email" id="email" placeholder="em@in.em . . ."
@@ -133,11 +133,11 @@ module Register = {
                 value=formPassword onChange={e => setFormPassword(_ => Obj.magic(e)##target##value)}/>
                 
                 <ul>
-                    <li className={emailish}>{React.string("- email must be valid")}</li>
-                    <li className={namefull}>{React.string("- username must not be empty")}</li>
-                    <li className={namechar}>{React.string("- username must contain only lowercase letters a-z or numbers 0-9")}</li>
-                    <li>{React.string("- username must be unique")}</li>
-                    <li className={passlong}>{React.string("- password must be 8 characters or longer")}</li>
+                    <li className={emailish}>{React.string("-")} <span>{React.string(" ")}</span> {React.string("email must be valid")}</li>
+                    <li className={namefull}>{React.string("-")} <span>{React.string(" ")}</span> {React.string("username must not be empty")}</li>
+                    <li className={namechar}>{React.string("-")} <span>{React.string(" ")}</span> {React.string("username must contain only lowercase letters a-z or numbers 0-9")}</li>
+                    <li                     >{React.string("-")} <span>{React.string(" ")}</span> {React.string("username must be unique")}</li>
+                    <li className={passlong}>{React.string("-")} <span>{React.string(" ")}</span> {React.string("password must be 8 characters or longer")}</li>
                 </ul>
 
                 <div className="error" hidden={String.length(errorMsg)==0}>
@@ -150,7 +150,7 @@ module Register = {
             <span/>
             <a href="?action=login">{React.string("already have an account?")}</a>
 
-        </div>
+        </main>
         </>
 
     }
@@ -218,7 +218,7 @@ module Forgot = {
         }, [|formCode|]);
 
         <>
-        <div className="main-container forgot">
+        <main className="forgot">
             <form>
                 <label htmlFor="email">{React.string("email:")}</label>
                 <input type_="email" id="email" placeholder="em@in.em . . ."
@@ -262,10 +262,9 @@ module Forgot = {
                 </form>
             }
             <span/>
-            <a href="?action=forgot">{React.string("forgot password?")}</a>
-            <a href="?action=register">{React.string("register an account?")}</a>
+            <a href="?action=login">{React.string("remembered password?")}</a>
 
-        </div>
+        </main>
         </>
 
     }
