@@ -156,25 +156,21 @@ module Register = {
     }
 }
 
-module Countdown = {
-  [@val] external setInterval: (unit => unit, int) => float = "setInterval";
-  [@val] external clearInterval: float => unit = "clearInterval";
-
-  let start = (~setCount, ()) => {
-    let id = ref(0.0);
-    id := setInterval(() => {
-      setCount(c => {
-        if (c <= 1) {
-          clearInterval(id^);
-          0;
-        } else {
-          c - 1;
-        };
-      });
-    }, 1000);
-
-    () => clearInterval(id^);
-  };
+module Countdown = { 
+    let start = (~setCount,~id:React.ref(Js.Global.intervalId),()) => {
+        id.current = Js.Global.setInterval(~f = () => {
+            setCount(c => {
+                if (c <= 1) {
+                    Js.Global.clearInterval(id.current);
+                    0;
+                } else {
+                    c - 1;
+                };
+            });
+        }, 1000);
+            
+        () => Js.Global.clearInterval(id.current)
+    };
 };
 module Forgot = {
 	[@react.component]
@@ -182,6 +178,8 @@ module Forgot = {
         
         let (errorMsg,setErrorMsg)=React.useState(_ => "");
         
+        
+        let id: React.ref(Js.Global.intervalId) = React.useRef(Obj.magic(0));
         let (timeleft,setTimeleft)=React.useState(_ => 0);
         let timeleftCleanup = React.useRef(() => ());
 
@@ -199,7 +197,7 @@ module Forgot = {
                     setErrorMsg(_=>"");
                     Js.log("sent code to email "++ formEmail);
                     setTimeleft(_=>30);
-                    timeleftCleanup.current = Countdown.start(~setCount=setTimeleft, ());
+                    timeleftCleanup.current = Countdown.start(~setCount = setTimeleft,~id = id,());
 
             }
         };
