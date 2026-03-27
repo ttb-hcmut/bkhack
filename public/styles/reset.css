@@ -2,11 +2,15 @@ html {
 	height: 100vh;
 	margin: 0;
 	padding: 0;
+	font-size: var(--font-size);
+	font-family: system-ui;
 }
 
 body {
 	margin: 0;
 	padding: 0;
+	background-color: var(--background);
+	color: var(--foreground);
 }
 
 select, ::picker(select) {
@@ -22,6 +26,7 @@ ol, ul {
 button {
 	background: unset;
 	border: unset;
+	cursor: pointer;
 }
 
 a {
@@ -37,4 +42,50 @@ h1, h2, h3, h4, h5, h6 {
 	margin: 0;
 	margin-block: 0;
 	margin-block-start: 0;
+}
+
+/* Hide default checkbox and number input styling */
+input[type="checkbox"] {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	background-color: var(--input-background);
+	border: 1px solid var(--border);
+	border-radius: 4px;
+	cursor: pointer;
+	position: relative;
+	transition: all 0.2s;
+}
+
+input[type="checkbox"]:checked {
+	background-color: var(--primary);
+	border-color: var(--primary);
+}
+
+input[type="checkbox"]:checked::after {
+	content: "✓";
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	color: white;
+	font-size: 10px;
+	font-weight: bold;
+}
+
+input[type="checkbox"]:focus {
+	outline: 2px solid var(--ring);
+	outline-offset: 2px;
+}
+
+/* Hide number input spinners */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+input[type="number"] {
+	-moz-appearance: textfield;
+	appearance: textfield;
 }

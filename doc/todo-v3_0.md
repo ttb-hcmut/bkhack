@@ -14,7 +14,7 @@
 - [ ] port RE to reasonml
 - [ ] custom mermaid renderer
 - [ ] custom plantuml renderer
-- [ ] remake logo svg
-- [ ] (hgt) storybook design system
+- [ ] (hgt) recheck css condition
+- [ ] (hgt) storybook design system (WIP)
 
-- [ ] (hgt) headerbar
+- [ ] (hgt) headerbar (WIP)

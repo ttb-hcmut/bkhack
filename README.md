@@ -4,6 +4,8 @@ A social news website oriented towards computer science, for HCMUT
 
 ## How to develop
 
+### Nix shell
+
 Start nix shell
 
 ```sh
@@ -28,6 +30,15 @@ pnpm dev
 ```
 
 Voila!
+
+### Nix shell from Docker
+
+```sh
+docker-compose up -d
+docker exec -it bkhack bash
+```
+
+The rest, follows the *Nix shell* section.
 
 ## Try it out
 

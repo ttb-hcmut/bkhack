@@ -1,4 +1,4 @@
-[@Bkhack.page "/item"]
+ [@page "/item"]
 open Melange__containers.Fun
 
 let to_string = x => switch (x) {
@@ -6,6 +6,7 @@ let to_string = x => switch (x) {
 | `Discussion => "discussions"
 | `Pullrequest => "pullrequests"
 | `Log => "log"
+| `Edit => "edit"
 }
 
 module ArticleHeader = {
@@ -113,6 +114,41 @@ module DiscussionBody = {
 	}
 }
 
+module PullrequestsHint = {
+	[@react.component]
+	let make = () => {
+		<>
+			<div className="logo" />
+			<h1>{React.string("pull requests")}</h1>
+			<div className="sub">
+				<span className="command">{React.string("pr --list")}</span>
+				<span className="summary">
+					<data className="pr-open" value=Int.to_string(13)>{React.int(13)}</data>
+					<data className="pr-closed" value=Int.to_string(364)>{React.int(364)}</data>
+				</span>
+			</div>
+			<button className="action">{React.string("new pr")}</button>
+		</>
+	}
+}
+
+module PullrequestsFilter = {
+	[@react.component]
+	let make = () => {
+		<>
+			<input />
+		</>
+	}
+}
+
+module PullrequestsBody = {
+	[@react.component]
+	let make = () => {
+		<>
+		</>
+	}
+}
+
 module Re = {
 	include Js.Re
 	let exec = (pattern, str) => exec(~str, pattern)
@@ -174,6 +210,9 @@ Understanding these complexities is essential for algorithm selection and optimi
 					<button onClick={_ => setCurrentTab(_ => `Log)} className={"log " ++ (currentTab == `Log ? "selected" : "")}>
 						<label>{React.string("history")}</label>
 					</button>
+					<button onClick={_ => setCurrentTab(_ => `Edit)} className={"edit " ++ (currentTab == `Edit ? "selected" : "")}>
+						<label>{React.string("editor")}</label>
+					</button>
 				</nav>
 					<>
 						<header className=Printf.sprintf("only %s", to_string(`Article))><ArticleHeader tags /></header>
@@ -187,6 +226,15 @@ Understanding these complexities is essential for algorithm selection and optimi
 							</nav>
 						</header>
 						<main className=Printf.sprintf("only %s", to_string(`Discussion))><DiscussionBody comments /></main>
+					</>
+					<>
+						<header className=Printf.sprintf("only %s", to_string(`Pullrequest))>
+							<PullrequestsHint />
+							<nav>
+								<PullrequestsFilter />
+							</nav>
+						</header>
+						<main className=Printf.sprintf("only %s", to_string(`Pullrequest))><PullrequestsBody /></main>
 					</>
 			</div>
 		</>
