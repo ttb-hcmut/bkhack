@@ -253,7 +253,7 @@ let make = () => {
             <section id="sidebar-recent-activities">
                 <header> {React.string("Recent Activities")} </header>
                 
-                <button className="see-more" onClick={_ => seeMoreActivities()}>{React.string("See More")}</button>
+                <button className="see-more" onClick={_ => seeMoreActivities()}>{React.string("All activities")}</button>
             
                 <ul>
                 {
