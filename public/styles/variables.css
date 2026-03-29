@@ -73,6 +73,20 @@
 	--ctp-sky: #04a5e5;
 	--ctp-sapphire: #209fb5;
 	--ctp-lavender: #7287fd;
+
+
+    
+	--hsl-magenta:		hsl(300 100% 60%);
+	--hsl-purple:		hsl(270 100% 60%);
+	--hsl-blue:			hsl(240 100% 60%);
+	--hsl-teal:			hsl(210 100% 60%);
+	--hsl-miku:			hsl(180 100% 60%);
+	--hsl-jade:			hsl(150 100% 60%);
+	--hsl-green:		hsl(120 100% 60%);
+	--hsl-lime:			hsl(90  100% 60%);
+	--hsl-yellow:		hsl(60  100% 60%);
+	--hsl-orange:		hsl(30  100% 60%);
+	--hsl-red:			hsl(0 	 100% 60%);
 }
 
 @media (prefers-color-scheme: dark) {

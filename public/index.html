@@ -9,6 +9,7 @@
 @import "/styles/variables.css";
 @import "/styles/widget-variables.css";
 @import "/styles/components/headerbar.css";
+@import "/styles/components/sidebar.css";
 @import "/styles/components/command.css";
 
 .mainpad {
@@ -180,8 +181,8 @@ html {
 }
 
 #root > nav {
-	margin-left: var(--space-a);
-	margin-right: var(--space-a);
+	/* margin-left: var(--space-a);
+	margin-right: var(--space-a); */
 	background-color: var(--card-bg);
 	border: solid 1px var(--card-border);
 }
@@ -243,8 +244,8 @@ html {
 }
 
 #root > main {
-	margin-left: var(--space-a);
-	margin-right: var(--space-a);
+	/* margin-left: var(--space-a);
+	margin-right: var(--space-a); */
 }
 
 #root > main > ol {
@@ -435,8 +436,12 @@ html {
 }
 
 #root > aside {
-	display: none;
-	margin-top: var(--space-a);
+	display:none;
+	width: 80vw;
+	height: calc(100vh - 6rem - var(--space-a));
+	/* margin-top: var(--space-a); */
+	left: 50%;
+	transform: translate(-50%, 0%);
 }
 
 #root > aside h2 {
@@ -463,8 +468,8 @@ html {
 }
 
 #root > footer {
-	margin-left: var(--space-a);
-	margin-right: var(--space-a);
+	/* margin-left: var(--space-a);
+	margin-right: var(--space-a); */
 	padding: var(--space-a);
 	background-color: var(--card-bg);
 	border: solid 1px var(--card-border);
@@ -483,10 +488,25 @@ form.dashboard-filter {
 	background-color: var(--card-bg);
 }
 
+
+#root > .show-hide-sidebar{
+	position: fixed;
+	top:3rem;
+	right:1rem;
+	padding: var(--space-a);
+	background-color: var(--card-bg);
+	border: solid 1px var(--card-border);
+	border-radius: 0.5cm;
+	padding: var(--space-a);
+	color: var(--light-b);
+	transition-property: border-radius, background-color;
+	transition-duration: 0.2s;
+}
+
 @media (min-width: 64rem) {
 	:root {
 		/* NOTE(kinten): make sure to manually sync these values */
-		--grid-1: minmax(0,1fr) calc(64rem - 300px) 400px  minmax(0,1fr);
+		--grid-1: minmax(0,1fr) minmax(0,calc(64rem - 300px)) minmax(0,400px)  minmax(0,1fr);
 		--offset: calc((100vw - (64rem - 300px + 400px - 2 * var(--space-a))) / 2);
 	}
 
@@ -494,22 +514,130 @@ form.dashboard-filter {
 		display: grid;
 		grid-auto-rows: max-content;
 		grid-template-columns: var(--grid-1);
+		gap: var(--space-a);
 	}
 
-	#root > * {
+	/* #root > * {
 		grid-column: 2 / 3;
-	}
+	} */
 
 	#root > header {
 		grid-column: 1 / -1;
 		padding-left: var(--offset);
+		padding-right: var(--offset);
 	}
-
+	#root > nav {
+		grid-column: 2 / 3;
+		grid-row: 2 / 4;
+	}
+	#root > main {
+		grid-column: 2 / 3;
+		grid-row: 4 / 5;
+	}
+	#root > footer{
+		grid-column: 2 / 3;
+		grid-row: 5 / auto;
+	}
 	#root > aside {
 		display: block !important;
 		grid-column: 3 / 4;
-		grid-row: 2 / 4;
+		grid-row: 3 / 7;
+		width: unset;
+		height: unset;
+		margin-top: unset;
+		left: unset;
+		transform: unset;
 	}
+	#root > .show-hide-sidebar{
+		position: unset;
+		grid-column: 3 / 4;
+		grid-row: 2 / 3;
+		padding: var(--space-a);
+  		justify-self: end;
+		background-color: var(--card-bg);
+		border: solid 1px var(--card-border);
+		border-radius: 0.5cm;
+		padding: var(--space-a);
+	}
+}
+	
+
+	/* Show hide sidebar system */
+	
+/* if mobile state1 => show, state0 => hide */
+
+@media (max-width: 64rem) {
+	#root > .show-hide-sidebar.state1::after{
+		content: "Hide Sidebar";
+	}
+	body:has(.state1){
+		overflow:hidden;
+	}
+	#root:has(.state1) > *:not(aside):not(.show-hide-sidebar){
+		filter: brightness(50%);
+		pointer-events: none;     /* block clicks */
+		user-select: none;
+	}
+	/* TODO: figure out how to make the track of the scrollbar
+			 invisible but the thumb visible */
+	#root > aside.state1{
+		display: block;
+		position: fixed;
+		overflow-y: auto;
+		/* height: 80vh;*/
+		top: 6rem;
+	}
+	#root > .show-hide-sidebar.state0::after{
+		content: "Show Sidebar";
+	}
+}
+	/* if desktop state0 => show, state1 => hide */
+	@media (min-width: 64rem) {
+
+	/* #root > * {
+		grid-column: 2 / 3;
+	} */
+
+	#root > nav.state0 {
+		grid-column: 2 / 3;
+	}
+	#root > main.state0 {
+		grid-column: 2 / 3;
+	}
+	#root > footer.state0 {
+		grid-column: 2 / 3;
+	}
+	#root > .show-hide-sidebar.state0::after{
+		content: "Hide Sidebar";
+	}
+	#root > aside.state0 {
+		display: block !important;
+		grid-column: 3 / 4;
+	}
+
+	#root > nav.state1 {
+		grid-column: 2 / 4;
+	}
+	#root > main.state1 {
+		grid-column: 2 / 4;
+	}
+	#root > footer.state1 {
+		grid-column: 2 / 4;
+	}
+	#root > .show-hide-sidebar.state1::after{
+		content: "Show Sidebar";
+	}
+	#root > .show-hide-sidebar.state1{
+		background-color: var(--card-bg-translucent);
+		border-radius: 0;
+		color: var(--light-b);
+	}
+	#root > aside.state1 {
+		display: none !important;
+		grid-column: 3 / 4;
+	}
+	
+
 }
 		</style>
 		<script>
