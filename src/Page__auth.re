@@ -35,9 +35,8 @@ module Login = {
         let (formUsername, setFormUsername) = React.useState(_ => "");
         let (formPassword, setFormPassword) = React.useState(_ => "");
 
-
-        let handleSubmit = e => {
-            let _ = Obj.magic(e)##preventDefault();
+        let handleSubmit =(event) => {
+            React.Event.Synthetic.preventDefault(event);
             if (String.length(formUsername) <= 0)
             {
                 setErrorMsg(_ => "username field empty");
@@ -60,10 +59,10 @@ module Login = {
             <form>
                 <label htmlFor="username">{React.string("username:")}</label>
                 <input type_="username" id="username" placeholder="mrbombastic . . ."
-                value=formUsername onChange={e => setFormUsername(_ => Obj.magic(e)##target##value)}/>
+                value=formUsername onChange={e => setFormUsername(_ => React.Event.Form.target(e)##value)}/>
                 <label htmlFor="password">{React.string("password:")}</label>
                 <input type_="password" id="password" placeholder="tellmefantastic . . ."
-                value=formPassword onChange={e => setFormPassword(_ => Obj.magic(e)##target##value)}/>
+                value=formPassword onChange={e => setFormPassword(_ => React.Event.Form.target(e)##value)}/>
                 
                 <div className="error" hidden={String.length(errorMsg)==0}>
                     <b>{React.string("ERROR:")}</b>
@@ -91,6 +90,7 @@ module Register = {
         let (formEmail, setFormEmail) = React.useState(_ => "");
         let (formUsername, setFormUsername) = React.useState(_ => "");
         let (formPassword, setFormPassword) = React.useState(_ => "");
+        let (formRePassword, setFormRePassword) = React.useState(_ => "");
 
         React.useEffect0(() => {
             None
@@ -100,10 +100,11 @@ module Register = {
         let namefull = String.length(formUsername) > 0 ? "" : "invalid";
         let namechar = Js.Re.test(~str = formUsername,Js.Re.fromString("^[a-z0-9]*$"))?"":"invalid";
         let passlong = String.length(formPassword) >= 8 ? "" : "invalid";
+        let repasseq = formPassword == formRePassword? "" : "invalid"
 
-        let handleSubmit = e => {
-            let _ = Obj.magic(e)##preventDefault();
-            if (emailish != "" || namefull != "" || namechar != "" || passlong != "")
+        let handleSubmit =(event) => {
+            React.Event.Synthetic.preventDefault(event);
+            if (emailish != "" || namefull != "" || namechar != "" || passlong != ""|| repasseq != "")
             {
                 setErrorMsg(_ => "please fulfill the requirements highlighted in red");
             }
@@ -122,15 +123,19 @@ module Register = {
             <form>
                 <label htmlFor="email">{React.string("email:")}</label>
                 <input type_="email" id="email" placeholder="em@in.em . . ."
-                value=formEmail onChange={e => setFormEmail(_ => Obj.magic(e)##target##value)}/>
+                value=formEmail onChange={e => setFormEmail(_ =>React.Event.Form.target(e)##value)}/>
                 
                 <label htmlFor="username">{React.string("username:")}</label>
                 <input type_="username" id="username" placeholder="mynameiseminem . . ."
-                value=formUsername onChange={e => setFormUsername(_ => Obj.magic(e)##target##value)}/>
+                value=formUsername onChange={e => setFormUsername(_ => React.Event.Form.target(e)##value)}/>
         
                 <label htmlFor="password">{React.string("password:")}</label>
                 <input type_="password" id="password" placeholder="somethinghardtoguess . . ."
-                value=formPassword onChange={e => setFormPassword(_ => Obj.magic(e)##target##value)}/>
+                value=formPassword onChange={e => setFormPassword(_ => React.Event.Form.target(e)##value)}/>
+
+                <label htmlFor="repassword">{React.string("retype password:")}</label>
+                <input type_="password" id="repassword" placeholder="somethinghardtoguess . . ."
+                value=formRePassword onChange={e => setFormRePassword(_ => React.Event.Form.target(e)##value)}/>
                 
                 <ul>
                     <li className={emailish}>{React.string("-")} <span>{React.string(" ")}</span> {React.string("email must be valid")}</li>
@@ -138,6 +143,7 @@ module Register = {
                     <li className={namechar}>{React.string("-")} <span>{React.string(" ")}</span> {React.string("username must contain only lowercase letters a-z or numbers 0-9")}</li>
                     <li                     >{React.string("-")} <span>{React.string(" ")}</span> {React.string("username must be unique")}</li>
                     <li className={passlong}>{React.string("-")} <span>{React.string(" ")}</span> {React.string("password must be 8 characters or longer")}</li>
+                    <li className={repasseq}>{React.string("-")} <span>{React.string(" ")}</span> {React.string("retyped password must match password")}</li>
                 </ul>
 
                 <div className="error" hidden={String.length(errorMsg)==0}>
@@ -157,29 +163,35 @@ module Register = {
 }
 
 module Countdown = { 
-    let start = (~setCount,~id:React.ref(Js.Global.intervalId),()) => {
-        id.current = Js.Global.setInterval(~f = () => {
+    let start = (~setCount,~id:React.ref(option(Js.Global.intervalId)),()) => {
+        id.current = Some(Js.Global.setInterval(~f = () => {
             setCount(c => {
                 if (c <= 1) {
-                    Js.Global.clearInterval(id.current);
+                    switch(id.current){
+                        | Some(intervalId) => Js.Global.clearInterval(intervalId)
+                        | _ => ()
+                    };
                     0;
                 } else {
                     c - 1;
                 };
             });
-        }, 1000);
+        }, 1000));
             
-        () => Js.Global.clearInterval(id.current)
+        switch(id.current){
+            | Some(intervalId) =>
+            () => Js.Global.clearInterval(intervalId)
+            | _ => () => ()
+        };
     };
 };
+
 module Forgot = {
 	[@react.component]
 	let make = () => {
-        
         let (errorMsg,setErrorMsg)=React.useState(_ => "");
         
-        
-        let id: React.ref(Js.Global.intervalId) = React.useRef(Obj.magic(0));
+        let id: React.ref(option(Js.Global.intervalId)) = React.useRef(None);
         let (timeleft,setTimeleft)=React.useState(_ => 0);
         let timeleftCleanup = React.useRef(() => ());
 
@@ -188,8 +200,8 @@ module Forgot = {
         
         let emailish = Js.Re.test(~str = formEmail,Js.Re.fromString("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"));
         
-        let sendCode = e => {
-            let _ = Obj.magic(e)##preventDefault();
+        let sendCode = (event) => {
+            let _ =  React.Event.Synthetic.preventDefault(event);
             switch (emailish,timeleft==0) {
                 | (false,_) => setErrorMsg(_=>"invalid email")
                 | (_,false) => setErrorMsg(_=>"please wait before resending the code")
@@ -206,6 +218,7 @@ module Forgot = {
             Js.log("submitting: ");
             Js.log(formEmail);
             Js.log(formCode);
+            ReasonReactRouter.push("?action=reset&ticket=6969");
         };
 
         React.useEffect1(() => {
@@ -220,7 +233,7 @@ module Forgot = {
             <form>
                 <label htmlFor="email">{React.string("email:")}</label>
                 <input type_="email" id="email" placeholder="em@in.em . . ."
-                value=formEmail onChange={e => setFormEmail(_ => Obj.magic(e)##target##value)}
+                value=formEmail onChange={e => setFormEmail(_ => React.Event.Form.target(e)##value)}
                 disabled={timeleft!=0}/>
                 
                 <div className="error" hidden={String.length(errorMsg)==0}>
@@ -243,15 +256,14 @@ module Forgot = {
                 timeleft==0?
                 React.null
                 :
-                <form onSubmit={
-                    e => {
-                        let _ = Obj.magic(e)##preventDefault();
-                        ();
+                <form autoComplete="off" onSubmit={
+                    event => {
+                        React.Event.Synthetic.preventDefault(event);
                     }}>
                     <label htmlFor="code">{React.string("code:")}</label>
-                    <input type_="password" inputMode="numeric" maxLength=6 id="code" placeholder="check the above email for a code"
+                    <input type_="password" autoComplete="new-password" inputMode="numeric" maxLength=6 id="code" placeholder="check the above email for a code"
                     value=formCode onChange={e => {
-                        let value: string = Obj.magic(e)##target##value;
+                        let value: string = React.Event.Form.target(e)##value;
                         if (Js.Re.test(Js.Re.fromString("^[0-9]{0,6}$"),~str= value)) {
                             setFormCode(_ => value);
                         };
@@ -269,17 +281,90 @@ module Forgot = {
 }
 
 
+module Reset = {
+	[@react.component]
+	let make = () => {
+        let (errorMsg,setErrorMsg)=React.useState(_ => "");
+
+        let (formPassword, setFormPassword) = React.useState(_ => "");
+        let (formRePassword, setFormRePassword) = React.useState(_ => "");
+
+        let ticketParam= ReasonReactRouter.useUrl().search 
+        let resetTicket= React.useRef("");
+
+        React.useEffect0(() => {
+            switch( ticketParam
+                -> parseQueryParams
+                -> Js.Dict.get("ticket"))
+            {
+                | Some(ticket) => resetTicket.current = ticket
+                | _ => resetTicket.current = ""
+                // TODO: maybe redirect to login page if no ticket or invalid ticket instead
+            }
+            None
+		});
+
+        let passlong = String.length(formPassword) >= 8 ? "" : "invalid";
+        let repasseq = formPassword == formRePassword? "" : "invalid"
+
+        let handleSubmit =(event) => {
+            React.Event.Synthetic.preventDefault(event);
+            if (passlong != ""|| repasseq != "")
+            {
+                setErrorMsg(_ => "please fulfill the requirements highlighted in red");
+            }
+            else
+            {
+                //TODO: actually send data to back end
+                setErrorMsg(_ => "");
+                Js.log("Sending form data:");
+                Js.log("password: " ++ formPassword);
+                Js.log("resetTicket: " ++ resetTicket.current);
+                ReasonReactRouter.push("?login");
+            }
+        };
+        <>
+        <main className="register">
+            <form>
+                <label htmlFor="password">{React.string("password:")}</label>
+                <input type_="password" id="password" placeholder="somethinghardtoguess . . ."
+                value=formPassword onChange={e => setFormPassword(_ => React.Event.Form.target(e)##value)}/>
+
+                <label htmlFor="repassword">{React.string("retype password:")}</label>
+                <input type_="password" id="repassword" placeholder="somethinghardtoguess . . ."
+                value=formRePassword onChange={e => setFormRePassword(_ => React.Event.Form.target(e)##value)}/>
+                
+                <ul>
+                    <li className={passlong}>{React.string("-")} <span>{React.string(" ")}</span> {React.string("password must be 8 characters or longer")}</li>
+                    <li className={repasseq}>{React.string("-")} <span>{React.string(" ")}</span> {React.string("retyped password must match password")}</li>
+                </ul>
+
+                <div className="error" hidden={String.length(errorMsg)==0}>
+                    <b>{React.string("ERROR:")}</b>
+                    <p>{React.string(errorMsg)}</p>
+                </div>
+                
+                <button type_="submit" onClick=handleSubmit>{React.string("reset password")}</button>
+            </form>
+            <span/>
+            <a href="?action=login">{React.string("already have an account?")}</a>
+
+        </main>
+        </>
+
+    }
+}
+
 module App = {
 	[@react.component]
 	let make = () => {
         let search = ReasonReactRouter.useUrl().search;
         let params = parseQueryParams(search);
 
-        // Get a specific param
         let action = switch (Js.Dict.get(params, "action")) {
             | Some(id) => id
             | None => "login"
-            }; // option<string>
+        };
 		<>
             <a className="logo" href="/" />
             <p>{React.string("$ ssh user@bkhack.wiki")}</p>
@@ -288,6 +373,7 @@ module App = {
                     | "login" => <Login/>
                     | "register" => <Register/>
                     | "forgot" => <Forgot/>
+                    | "reset" => <Reset/>
                     | _ => <Login/>
                 } 
             }
