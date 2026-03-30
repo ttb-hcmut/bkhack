@@ -1,5 +1,4 @@
- [@page "/item"]
-open Melange__containers.Fun
+[@page "/item"]
 
 let to_string = x => switch (x) {
 | `Article => "article"
@@ -149,21 +148,6 @@ module PullrequestsBody = {
 	}
 }
 
-module Re = {
-	include Js.Re
-	let exec = (pattern, str) => exec(~str, pattern)
-}
-
-let get_item_id = {
-	let pattern = Re.fromString("id=(.+)");
-	Re.exec(pattern)
-	%> Option.get
-	%> Re.captures
-	%> (x => Array.get(x, 1))
-	%> Js.Nullable.toOption
-	%> Option.get
-}
-
 module App = {
 	[@react.component]
 	let make = () => {
@@ -186,7 +170,7 @@ Understanding these complexities is essential for algorithm selection and optimi
 		let id = React.useMemo1(() => to_string(currentTab), [|currentTab|]);
 		let url = ReasonReactRouter.useUrl();
 		React.useEffect0(() => {
-			let id = get_item_id(url.search);
+			let id = Util.parseQueryParams(url.search) -> Js.Dict.get("id");
 			Js.Console.log(id);
 			None
 		});
