@@ -1,19 +1,5 @@
 [@Bkhack.page "/auth"]
 
-let parseQueryParams = (search: string) => {
-	let params = Js.Dict.empty();
-	Js.String.split(~sep="&", search)
-	|> Js.Array.forEach(~f = pair => {
-		let parts = Js.String.split(~sep="=", pair);
-		if (Js.Array.length(parts) == 2) {
-			let key = Js.Array.unsafe_get(parts, 0) |> Js.Global.decodeURIComponent;
-			let value = Js.Array.unsafe_get(parts, 1) |> Js.Global.decodeURIComponent;
-			Js.Dict.set(params, key, value);
-		}
-	});
-	params
-};
-
 module Login = {
 	[@react.component]
 	let make = () => {
@@ -277,7 +263,7 @@ module Reset = {
 
 		React.useEffect0(() => {
 			switch( ticketParam
-					-> parseQueryParams
+					-> Util.parseQueryParams
 					-> Js.Dict.get("ticket") )
 			{
 				| Some(ticket) => resetTicket.current = ticket
@@ -342,7 +328,7 @@ module App = {
 	[@react.component]
 	let make = () => {
 		let search = ReasonReactRouter.useUrl().search;
-		let params = parseQueryParams(search);
+		let params = Util.parseQueryParams(search);
 
 		let action = switch (Js.Dict.get(params, "action")) {
 			| Some(id) => id
