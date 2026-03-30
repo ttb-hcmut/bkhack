@@ -15,17 +15,6 @@ let parseQueryParams = (search: string): Js.Dict.t<string> => {
     );
     params
 };
-// x |> f(a) |> g(b)
-// g(b,f(a,x))
-
-// x ||> f(a) ||> g(b)
-// g(b,f(a,x))
-
-// x -> f(a) -> g(b)
-// g(f(x,a),b)
-
-// x %> f(a) %> g(b)
-// g(f(x,a),b)
 
 module Login = {
 	[@react.component]
