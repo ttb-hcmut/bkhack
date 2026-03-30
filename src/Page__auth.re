@@ -43,24 +43,24 @@ module Login = {
 		};
 		<>
 		<main className="login">
-				<form>
-						<label htmlFor="username">{React.string("username:")}</label>
-						<input type_="username" id="username" placeholder="mrbombastic . . ."
-						value=formUsername onChange={e => setFormUsername(_ => React.Event.Form.target(e)##value)}/>
-						<label htmlFor="password">{React.string("password:")}</label>
-						<input type_="password" id="password" placeholder="tellmefantastic . . ."
-						value=formPassword onChange={e => setFormPassword(_ => React.Event.Form.target(e)##value)}/>
-						
-						<div className="error" hidden={String.length(errorMsg)==0}>
-								<b>{React.string("ERROR:")}</b>
-								<p>{React.string(errorMsg)}</p>
-						</div>
-						
-						<button type_="submit" onClick=handleSubmit>{React.string("log in")}</button>
-				</form>
-				<span/>
-				<a href="?action=forgot">{React.string("forgot password?")}</a>
-				<a href="?action=register">{React.string("register an account?")}</a>
+			<form>
+				<label htmlFor="username">{React.string("username:")}</label>
+				<input type_="username" id="username" placeholder="mrbombastic . . ."
+				value=formUsername onChange={e => setFormUsername(_ => React.Event.Form.target(e)##value)}/>
+				<label htmlFor="password">{React.string("password:")}</label>
+				<input type_="password" id="password" placeholder="tellmefantastic . . ."
+				value=formPassword onChange={e => setFormPassword(_ => React.Event.Form.target(e)##value)}/>
+				
+				<div className="error" hidden={String.length(errorMsg)==0}>
+					<b>{React.string("ERROR:")}</b>
+					<p>{React.string(errorMsg)}</p>
+				</div>
+				
+				<button type_="submit" onClick=handleSubmit>{React.string("log in")}</button>
+			</form>
+			<span/>
+			<a href="?action=forgot">{React.string("forgot password?")}</a>
+			<a href="?action=register">{React.string("register an account?")}</a>
 
 		</main>
 		</>
@@ -241,17 +241,17 @@ module Forgot = {
 				React.null
 				:
 				<form autoComplete="off" onSubmit={
-						event => {
-								React.Event.Synthetic.preventDefault(event);
-						}}>
-						<label htmlFor="code">{React.string("code:")}</label>
-						<input type_="password" autoComplete="new-password" inputMode="numeric" maxLength=6 id="code" placeholder="check the above email for a code"
-						value=formCode onChange={e => {
-								let value: string = React.Event.Form.target(e)##value;
-								if (Js.Re.test(Js.Re.fromString("^[0-9]{0,6}$"),~str= value)) {
-										setFormCode(_ => value);
-								};
-						}}/>
+					event => {
+						React.Event.Synthetic.preventDefault(event);
+					}}>
+					<label htmlFor="code">{React.string("code:")}</label>
+					<input type_="password" autoComplete="new-password" inputMode="numeric" maxLength=6 id="code" placeholder="check the above email for a code"
+					value=formCode onChange={e => {
+						let value: string = React.Event.Form.target(e)##value;
+						if (Js.Re.test(Js.Re.fromString("^[0-9]{0,6}$"),~str= value)) {
+								setFormCode(_ => value);
+						};
+					}}/>
 						
 				</form>
 			}
