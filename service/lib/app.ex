@@ -1,9 +1,46 @@
+defmodule Data do
+  use Ecto.Repo, otp_app: :bkhack, adapter: Ecto.Adapters.SQLite3
+end
+
+defmodule User do
+  use Ecto.Schema
+
+  schema "users" do
+    # field :id, :integer
+    field :name
+  end
+
+  import Ecto.Changeset
+
+  def changeset(user, params \\ %{}) do
+    user
+    |> cast(params, [:id, :name])
+    |> validate_required([:id, :name])
+  end
+
+end
+
 defmodule App do
   require Logger
   use Plug.Router
 
   plug :match
   plug :dispatch
+
+  import Ecto.Query
+
+  get "/api/test/users" do
+    query = from u in User, select: u
+    xs = Data.all(query)
+    lol = xs |> Enum.map(fn it -> [id: it.id, name: it.name] end)
+    {:ok, sh} = JSON.encode(lol)
+    conn
+    |> put_resp_header("Access-Control-Allow-Origin", "*")
+    |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+    |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+    |> put_resp_content_type("application/json")
+    |> send_resp(200, sh)
+  end
 
   get "/api/test-item" do
     Logger.info "GET test-item"
@@ -44,6 +81,7 @@ defmodule App do
   end
 
   def start do
+    App.Supervisor.start_link(:ok)
     {:ok, _} = Plug.Cowboy.http(__MODULE__, [], port: 5000)
     Logger.info "running server!"
   end
@@ -51,5 +89,23 @@ defmodule App do
   def stop do
     :ok = Plug.Cowboy.shutdown(__MODULE__.HTTP)
     Logger.info "stopped server"
+  end
+
+end
+
+defmodule App.Supervisor do
+  use Supervisor
+
+  def start_link(args) do
+    Supervisor.start_link(__MODULE__, args, name: __MODULE__)
+  end
+
+  @impl true
+  def init(_init_arg) do
+    children = [
+      Data
+    ]
+
+    Supervisor.init(children, strategy: :one_for_one)
   end
 end
