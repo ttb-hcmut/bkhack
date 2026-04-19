@@ -5,3 +5,7 @@ let ( >>= ) = (x, f) => x |> then_(f)
 and ( >!= ) = (x, f) => x |> catch(f)
 
 and return  = resolve
+
+and ( let* ) = (x, f) => x |> then_(f)
+
+and ( let! ) = (x, f) => x |> catch(f)
