@@ -27,7 +27,6 @@ module Login = {
 				Js.log("password: " ++ formPassword);
 			}
 		};
-		<>
 		<main className="login">
 			<form>
 				<label htmlFor="username">{React.string("username:")}</label>
@@ -49,7 +48,6 @@ module Login = {
 			<a href="?action=register">{React.string("register an account?")}</a>
 
 		</main>
-		</>
 	}
 }
 
@@ -90,7 +88,6 @@ module Register = {
 				Js.log("password: " ++ formPassword);
 			}
 		};
-		<>
 		<main className="register">
 			<form>
 				<label htmlFor="email">{React.string("email:")}</label>
@@ -129,7 +126,6 @@ module Register = {
 			<a href="?action=login">{React.string("already have an account?")}</a>
 
 		</main>
-		</>
 	}
 }
 
@@ -197,8 +193,6 @@ module Forgot = {
 			};
 			None;
 		}, [|formCode|]);
-
-		<>
 		<main className="forgot">
 			<form>
 				<label htmlFor="email">{React.string("email:")}</label>
@@ -244,8 +238,6 @@ module Forgot = {
 			<span/>
 			<a href="?action=login">{React.string("remembered password?")}</a>
 		</main>
-		</>
-
 	}
 }
 
@@ -292,7 +284,6 @@ module Reset = {
 				ReasonReactRouter.push("?login");
 			}
 		};
-		<>
 		<main className="register">
 			<form>
 				<label htmlFor="password">{React.string("password:")}</label>
@@ -317,10 +308,7 @@ module Reset = {
 			</form>
 			<span/>
 			<a href="?action=login">{React.string("already have an account?")}</a>
-
 		</main>
-		</>
-
     }
 }
 
@@ -334,7 +322,7 @@ module App = {
 			| Some(id) => id
 			| None => "login"
 		};
-		<>
+    <>
 		<a className="logo" href="/" />
 		<p>{React.string("$ ssh user@bkhack.wiki")}</p>
 		{
@@ -346,7 +334,7 @@ module App = {
 				| _ => <Login/>
 			} 
 		}
-		</>
+    </>
 	}
 }
 

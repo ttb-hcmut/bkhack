@@ -404,7 +404,34 @@ html {
 	margin-top: var(--space-a);
 }
 
-#root > .innerbody.discussions > main > ol > li > article {
+.comments {
+  /* border: 2px solid white; */
+  display: grid;
+  grid-template-columns: min-content auto;
+  grid-template-rows: repeat(auto);
+}
+.comments > .content {
+  grid-column: 1/3;
+  grid-row: 1/2;
+}
+.comments > .show-replies {
+  grid-column: 1/3;
+  grid-row: 2/3;
+  color: white;
+  width: max-content;
+}
+.comments  > .spacer {
+  width: var(--space-a);
+  grid-column: 1/2;
+  grid-row: 3/4;
+  border-left: 2px solid white;
+}
+.comments > .replies {
+  grid-column: 2/3;
+  grid-row: 3/4;
+}
+
+/* #root > .innerbody.discussions > main > ol > li > article {
 	margin-left: var(--space-a);
 	margin-right: var(--space-a);
 	border: solid 1px var(--card-border);
@@ -452,7 +479,7 @@ html {
 }
 
 #root > .innerbody.discussions > main > ol > li > article > .content {
-}
+} */
 
 #root > .innerbody.article > *.only:not(.article),
 #root > .innerbody.discussions > *.only:not(.discussions),

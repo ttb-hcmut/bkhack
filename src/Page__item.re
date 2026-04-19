@@ -82,35 +82,134 @@ module DiscussionHint = {
 module DiscussionFilter = {
 	[@react.component]
 	let make = () => {
-		<>
-			<input />
-		</>
+    <input />
 	}
 }
 
 module DiscussionBody = {
+
+  module rec Comments: {
+    [@react.component]
+    let make: (~cid: string, ~content: string) => React.element;
+  } = {
+      [@react.component]
+      let make = (~cid: string, ~content: string) => {
+        let (replies,setReplies) = React.useState(() => [||]);
+        let (showRep, setShowRep) = React.useState(() => false);
+        // opening concept: Js.Promise.()
+        let open Fetch_syntax;
+        let fetchReplies = () => {
+          Fetch.fetch(Env.backend ++ "/api/comment?limit=10&offset=0&parent=" ++ cid)
+          >>= Fetch.Response.json
+          >>= (json => {
+              Js.log(json);
+              return(json)
+            })
+          >>= (undecoded => {
+            let arrayOfJson = undecoded 
+              |> Js.Json.decodeArray
+              |> Option.value(~default=[||]);
+            return(arrayOfJson);
+            })
+          >>= (aoj => {
+            let arrayOfDict = aoj
+            |> Array.map(x => {
+              x
+              |> Js.Json.decodeObject
+            |> (thing) => switch(thing) {
+              | Some(dict) => dict
+              | None => Js.Dict.empty()};
+            });
+            return(arrayOfDict);
+            })
+          >>= (aod => {
+            let newArrayOfDictNoJson = aod
+            |> Array.map(doj => {
+              let newDictNoJson = Js.Dict.empty()
+              doj
+              |> Js.Dict.entries
+              |> Array.iter(((key, value)) =>
+                switch (Js.Json.decodeString(value)) {
+                | Some(s) => Js.Dict.set(newDictNoJson, key, s)
+                | None =>
+                  switch (Js.Json.decodeNumber(value)) {
+                  | Some(n) => Js.Dict.set(newDictNoJson, key, string_of_float(n))
+                  | None => Js.Dict.set(newDictNoJson, key, "unknown")
+                  }
+                }
+              );
+              newDictNoJson
+            });
+            return(newArrayOfDictNoJson);
+          })
+        };
+        let revealReplies = () => {
+          let open Fetch_syntax;
+          if (Array.length(replies) == 0){
+            fetchReplies()
+            >>= (aod => {
+              setReplies(x=>Array.append(x,aod));
+              Js.Promise.resolve(None)
+            })
+            >>= (err => {
+                Js.log(err);
+                return(Js.Json.null)
+              })
+            |> ignore;
+          };
+          setShowRep(s => !s);
+        };
+
+        <li key={"comment"++cid} className="comments">
+          <div className="content">{React.string(content)}</div>
+          <button className="show-replies"
+          onClick={ _e => revealReplies() }>
+            {React.string((showRep?"Hide":"Show") ++ " replies")}
+          </button>
+          
+          <span className="spacer" hidden={!showRep}/>
+          <ol className="replies" hidden={!showRep}>
+          {
+            replies
+            |>Array.map(x => {
+              let cid = switch (Js.Dict.get(x,"id")) {
+                | Some(v) => v 
+                | None => "67"
+                }
+              let content = switch (Js.Dict.get(x,"content")) {
+                | Some(v) => v 
+                | None => "no content"
+                };
+                <Comments key=cid cid content />
+              })
+            |>React.array
+          }
+          </ol>
+        </li>
+      }
+    };
 	[@react.component]
-	let make = (~comments) => {
-		<>
-			<ol>
-				{comments |> Array.map(x => {
-					let (id, level, authorname, content) = x;
-					<li key=id className=Printf.sprintf("level-%d", level)>
-						<article>
-							<header>
-								<span className="author">{React.string(authorname)}</span>
-							</header>
-							<div className="content">
-								{React.string(content)}
-							</div>
-							<div className="counter">
-								<data>{React.int(41)}</data>
-							</div>
-						</article>
-					</li>
-				}) |> React.array}
-			</ol>
-		</>
+	let make = (~post) => {
+
+    <ol>
+      <Comments key=post cid=post content="parent"/>
+      // {comments |> Array.map(x => {
+      //   let (id, level, authorname, content) = x;
+      //   <li key=id className=Printf.sprintf("level-%d", level)>
+      //     <article>
+      //       <header>
+      //         <span className="author">{React.string(authorname)}</span>
+      //       </header>
+      //       <div className="content">
+      //         {React.string(content)}
+      //       </div>
+      //       <div className="counter">
+      //         <data>{React.int(41)}</data>
+      //       </div>
+      //     </article>
+      //   </li>
+      // }) |> React.array}
+    </ol>
 	}
 }
 
@@ -135,9 +234,7 @@ module PullrequestsHint = {
 module PullrequestsFilter = {
 	[@react.component]
 	let make = () => {
-		<>
-			<input />
-		</>
+    <input />
 	}
 }
 
@@ -170,14 +267,15 @@ module App = {
 		let (currentTab, setCurrentTab) = React.useState(() => `Article);
 		let tags = [| "Algorithm", "Rust" |];
 		let pullrequests = [| "", "" |];
-		let comments = [|
-			("a", 0, "kinten108101", "Test 1"),
-			("b", 1, "nl_kdan", "Test 2")
-		|];
+		// let comments = [|
+		// 	("a", 0, "kinten108101", "Test 1"),
+		// 	("b", 1, "nl_kdan", "Test 2")
+		// |];
 		let headings = [|
 			("1", "Overview", "overview"),
 			("1.1", "Related works", "related-works"),
 		|];
+    let post = "1"
 		let article_body = "
 In computer science, graph algorithm complexity analysis is the study of the computational resources required to solve problems on graph data structures. This article provides a comprehensive examination of time complexity for fundamental graph algorithms, including breadth-first search (BFS), depth-first search (DFS), Dijkstra's algorithm, and the Floyd-Warshall algorithm.
 
@@ -185,6 +283,9 @@ Understanding these complexities is essential for algorithm selection and optimi
 		";
 		let id = React.useMemo1(() => to_string(currentTab), [|currentTab|]);
 		let url = ReasonReactRouter.useUrl();
+
+    
+
 		React.useEffect0(() => {
 			let id = get_item_id(url.search);
 			Js.Console.log(id);
@@ -225,7 +326,7 @@ Understanding these complexities is essential for algorithm selection and optimi
 								<DiscussionFilter />
 							</nav>
 						</header>
-						<main className=Printf.sprintf("only %s", to_string(`Discussion))><DiscussionBody comments /></main>
+						<main className=Printf.sprintf("only %s", to_string(`Discussion))><DiscussionBody post /></main>
 					</>
 					<>
 						<header className=Printf.sprintf("only %s", to_string(`Pullrequest))>
