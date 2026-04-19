@@ -324,7 +324,7 @@ module App = {
 		};
     <>
 		<a className="logo" href="/" />
-		<p>{React.string("$ ssh user@bkhack.wiki")}</p>
+		<p><span className="command">{React.string("ssh user@bkhack.wiki")}</span></p>
 		{
 			switch (action) {
 				| "login" => <Login/>
