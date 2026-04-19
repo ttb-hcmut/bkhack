@@ -99,33 +99,18 @@ module DiscussionBody = {
         // opening concept: Js.Promise.()
         let open Fetch_syntax;
         let fetchReplies = () => {
-          Fetch.fetch(Env.backend ++ "/api/comment?limit=10&offset=0&parent=" ++ cid)
-          >>= Fetch.Response.json
-          >>= (json => {
-              Js.log(json);
-              return(json)
-            })
-          >>= (undecoded => {
-            let arrayOfJson = undecoded 
-              |> Js.Json.decodeArray
-              |> Option.value(~default=[||]);
-            return(arrayOfJson);
-            })
-          >>= (aoj => {
-            let arrayOfDict = aoj
+          let* json = Fetch.fetch(Env.backend ++ "/api/comment?limit=10&offset=0&parent=" ++ cid) >>= Fetch.Response.json;
+          Js.log(json);
+          let arrayOfJson = json |> Js.Json.decodeArray |> Option.value(~default=[||]);
+          let arrayOfDict = arrayOfJson
             |> Array.map(x => {
               x
               |> Js.Json.decodeObject
-            |> (thing) => switch(thing) {
-              | Some(dict) => dict
-              | None => Js.Dict.empty()};
+              |> Option.value(~default=Js.Dict.empty())
             });
-            return(arrayOfDict);
-            })
-          >>= (aod => {
-            let newArrayOfDictNoJson = aod
+          let newArrayOfDictNoJson = arrayOfDict
             |> Array.map(doj => {
-              let newDictNoJson = Js.Dict.empty()
+              let newDictNoJson = Js.Dict.empty();
               doj
               |> Js.Dict.entries
               |> Array.iter(((key, value)) =>
@@ -140,8 +125,7 @@ module DiscussionBody = {
               );
               newDictNoJson
             });
-            return(newArrayOfDictNoJson);
-          })
+          return(newArrayOfDictNoJson)
         };
         let revealReplies = () => {
           let open Fetch_syntax;
