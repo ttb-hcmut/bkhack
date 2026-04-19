@@ -86,14 +86,42 @@ module DiscussionFilter = {
 	}
 }
 
-module DiscussionBody = {
 
+module DiscussionBody = {
+  let decodeJson = (json) => {
+    let open Fetch_syntax;
+    json
+    >>= (j => {
+      Js.log(j);
+      return(j)
+    })
+    >>= (undecoded => {
+    let arrayOfDict = undecoded 
+      |> Js.Json.decodeArray
+      |> Option.value(~default=[||])
+      |> Array.map(x => {
+        let newDictNoJson = Js.Dict.empty();
+        x
+        |> Js.Json.decodeObject
+        |> Option.value(~default=Js.Dict.empty())
+        |> Js.Dict.entries
+        |> Array.iter(((key, value)) =>
+          switch (Js.Json.decodeString(value)) {
+          | Some(s) => Js.Dict.set(newDictNoJson, key, s)
+          | None => ()
+          }
+        );
+        newDictNoJson
+      })
+      return(arrayOfDict)
+    })
+  };
   module rec Comments: {
     [@react.component]
-    let make: (~cid: string, ~content: string) => React.element;
+    let make: (~cid: string, ~content: string, ~autoExpand: int) => React.element;
   } = {
       [@react.component]
-      let make = (~cid: string, ~content: string) => {
+      let make = (~cid: string, ~content: string, ~autoExpand: int) => {
         let (replies,setReplies) = React.useState(() => [||]);
         let (showRep, setShowRep) = React.useState(() => false);
         let (showMore, setShowMore) = React.useState(() => true);
@@ -106,30 +134,7 @@ module DiscussionBody = {
             ++ "&offset=" ++ string_of_int(Array.length(replies))
             ++ "&parent=" ++ cid)
           >>= Fetch.Response.json
-          >>= (json => {
-              Js.log(json);
-              return(json)
-            })
-          >>= (undecoded => {
-            let arrayOfDict = undecoded 
-              |> Js.Json.decodeArray
-              |> Option.value(~default=[||])
-              |> Array.map(x => {
-                let newDictNoJson = Js.Dict.empty();
-                x
-                |> Js.Json.decodeObject
-                |> Option.value(~default=Js.Dict.empty())
-                |> Js.Dict.entries
-                |> Array.iter(((key, value)) =>
-                  switch (Js.Json.decodeString(value)) {
-                  | Some(s) => Js.Dict.set(newDictNoJson, key, s)
-                  | None => ()
-                  }
-                );
-                newDictNoJson
-              })
-              return(arrayOfDict)
-            })
+          |> decodeJson
           >>= (aod => {
             setReplies( x => Array.append(x,aod));
             setShowMore( _ => Array.length(aod) < limit ? false : true);
@@ -148,7 +153,12 @@ module DiscussionBody = {
           };
           setShowRep(s => !s);
         };
-
+        React.useEffect0(()=>{
+          if (autoExpand > 0){
+            revealReplies();
+          }
+          None
+        });
         <li key={"comment"++cid} className="comments">
           <div className="content">{React.string(content)}</div>
           <button className="show-replies"
@@ -169,7 +179,7 @@ module DiscussionBody = {
                 | Some(v) => v 
                 | None => "no content"
                 };
-                <Comments key=cid cid content />
+                <Comments key=cid cid content autoExpand={autoExpand == 0 ? 0 : autoExpand-1}/>
               })
             |>React.array
           }
@@ -184,9 +194,61 @@ module DiscussionBody = {
     };
 	[@react.component]
 	let make = (~post) => {
+    let (comments,setComments) = React.useState(() => [||]);
+    let (showMore, setShowMore) = React.useState(() => true);
+    let limit = 3;
+    let aExpand = 3;
+    // opening concept: Js.Promise.()
+    let fetchComments = () => {
+      let open Fetch_syntax;
+      Fetch.fetch(Env.backend ++ "/api/comment"
+        ++ "?limit="  ++ string_of_int(limit)
+        ++ "&offset=" ++ string_of_int(Array.length(comments))
+        ++ "&parent=" ++ post)
+      >>= Fetch.Response.json
+      |> decodeJson
+      >>= (aod => {
+        setComments( x => Array.append(x,aod));
+        setShowMore( _ => Array.length(aod) < limit ? false : true);
+        Js.Promise.resolve(aod)
+      })
+      >!= (err => {
+          Js.log(err);
+          setShowMore( _ => false);
+          return([||])
+        })
+      |> ignore;
+    };
+    
+    React.useEffect0( () => {
+      fetchComments();
+      None
+    });
 
-    <ol>
-      <Comments key=post cid=post content="parent"/>
+
+    <>
+      <ol>
+      {
+        comments
+        |>Array.map(x => {
+          let cid = switch (Js.Dict.get(x,"id")) {
+            | Some(v) => v 
+            | None => "67"
+            }
+          let content = switch (Js.Dict.get(x,"content")) {
+            | Some(v) => v 
+            | None => "no content"
+            };
+            <Comments key=cid cid content autoExpand=aExpand />
+          })
+        |>React.array
+      }
+      </ol>
+      <button className="more-replies"
+      onClick={ _ => fetchComments() }
+      hidden={!showMore}>
+        {React.string("More replies")}
+      </button>
       // {comments |> Array.map(x => {
       //   let (id, level, authorname, content) = x;
       //   <li key=id className=Printf.sprintf("level-%d", level)>
@@ -203,7 +265,7 @@ module DiscussionBody = {
       //     </article>
       //   </li>
       // }) |> React.array}
-    </ol>
+    </>
 	}
 }
 
