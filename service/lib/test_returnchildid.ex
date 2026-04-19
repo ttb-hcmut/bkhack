@@ -1,6 +1,6 @@
 defmodule ReturnChildID do
   def getChildID(parent\\"0",offset\\0,limit\\10) do
-    Enum.map((offset)..min(offset+limit,9), fn x -> parent <> Integer.to_string(x) end)
+    Enum.map((offset)..min(offset+limit-1,9), fn x -> parent <> Integer.to_string(x) end)
     |>Enum.to_list()
     |>IO.inspect()
   end

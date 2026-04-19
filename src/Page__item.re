@@ -96,50 +96,55 @@ module DiscussionBody = {
       let make = (~cid: string, ~content: string) => {
         let (replies,setReplies) = React.useState(() => [||]);
         let (showRep, setShowRep) = React.useState(() => false);
+        let (showMore, setShowMore) = React.useState(() => true);
+        let limit = 3;
         // opening concept: Js.Promise.()
-        let open Fetch_syntax;
         let fetchReplies = () => {
-          let* json = Fetch.fetch(Env.backend ++ "/api/comment?limit=10&offset=0&parent=" ++ cid) >>= Fetch.Response.json;
-          Js.log(json);
-          let arrayOfJson = json |> Js.Json.decodeArray |> Option.value(~default=[||]);
-          let arrayOfDict = arrayOfJson
-            |> Array.map(x => {
-              x
-              |> Js.Json.decodeObject
-              |> Option.value(~default=Js.Dict.empty())
-            });
-          let newArrayOfDictNoJson = arrayOfDict
-            |> Array.map(doj => {
-              let newDictNoJson = Js.Dict.empty();
-              doj
-              |> Js.Dict.entries
-              |> Array.iter(((key, value)) =>
-                switch (Js.Json.decodeString(value)) {
-                | Some(s) => Js.Dict.set(newDictNoJson, key, s)
-                | None =>
-                  switch (Js.Json.decodeNumber(value)) {
-                  | Some(n) => Js.Dict.set(newDictNoJson, key, string_of_float(n))
-                  | None => Js.Dict.set(newDictNoJson, key, "unknown")
+          let open Fetch_syntax;
+          Fetch.fetch(Env.backend ++ "/api/comment"
+            ++ "?limit="  ++ string_of_int(limit)
+            ++ "&offset=" ++ string_of_int(Array.length(replies))
+            ++ "&parent=" ++ cid)
+          >>= Fetch.Response.json
+          >>= (json => {
+              Js.log(json);
+              return(json)
+            })
+          >>= (undecoded => {
+            let arrayOfDict = undecoded 
+              |> Js.Json.decodeArray
+              |> Option.value(~default=[||])
+              |> Array.map(x => {
+                let newDictNoJson = Js.Dict.empty();
+                x
+                |> Js.Json.decodeObject
+                |> Option.value(~default=Js.Dict.empty())
+                |> Js.Dict.entries
+                |> Array.iter(((key, value)) =>
+                  switch (Js.Json.decodeString(value)) {
+                  | Some(s) => Js.Dict.set(newDictNoJson, key, s)
+                  | None => ()
                   }
-                }
-              );
-              newDictNoJson
-            });
-          return(newArrayOfDictNoJson)
+                );
+                newDictNoJson
+              })
+              return(arrayOfDict)
+            })
+          >>= (aod => {
+            setReplies( x => Array.append(x,aod));
+            setShowMore( _ => Array.length(aod) < limit ? false : true);
+            Js.Promise.resolve(aod)
+          })
+          >!= (err => {
+              Js.log(err);
+              setShowMore( _ => false);
+              return([||])
+            })
+          |> ignore;
         };
         let revealReplies = () => {
-          let open Fetch_syntax;
-          if (Array.length(replies) == 0){
-            fetchReplies()
-            >>= (aod => {
-              setReplies(x=>Array.append(x,aod));
-              Js.Promise.resolve(None)
-            })
-            >>= (err => {
-                Js.log(err);
-                return(Js.Json.null)
-              })
-            |> ignore;
+          if (Array.length(replies) == 0 && showMore){
+            fetchReplies();
           };
           setShowRep(s => !s);
         };
@@ -147,7 +152,7 @@ module DiscussionBody = {
         <li key={"comment"++cid} className="comments">
           <div className="content">{React.string(content)}</div>
           <button className="show-replies"
-          onClick={ _e => revealReplies() }>
+          onClick={ _ => revealReplies() }>
             {React.string((showRep?"Hide":"Show") ++ " replies")}
           </button>
           
@@ -169,6 +174,11 @@ module DiscussionBody = {
             |>React.array
           }
           </ol>
+          <button className="more-replies"
+          onClick={ _ => fetchReplies() }
+          hidden={!showRep || !showMore}>
+            {React.string("More replies")}
+          </button>
         </li>
       }
     };
