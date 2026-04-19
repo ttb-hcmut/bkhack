@@ -13,6 +13,7 @@ defmodule BKHack.Mix do
     [
       {:ecto_sql, "~> 3.0"},
       {:ecto_sqlite3, "~> 0.17"},
+      {:mongodb_ecto, "~> 2.1.1"},
       {:postgrex, ">= 0.0.0"},
       {:cowboy, "~> 2.6"},
       {:plug, "~> 1.7"},

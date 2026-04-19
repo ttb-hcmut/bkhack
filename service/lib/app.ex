@@ -1,28 +1,33 @@
-defmodule Data do
+defmodule Data0 do
   use Ecto.Repo, otp_app: :bkhack, adapter: Ecto.Adapters.SQLite3
 end
 
-defmodule User do
-  use Ecto.Schema
+defmodule Data1 do
+  use Ecto.Repo, otp_app: :bkhack, adapter: Mongo.Ecto
+end
+
+defmodule User
+  do use Ecto.Schema
+  @primary_key false
 
   schema "users" do
-    # field :id, :integer
+    field :user_id, :integer
     field :name
   end
 
-  import Ecto.Changeset
-
   def changeset(user, params \\ %{}) do
+    import Ecto.Changeset
     user
-    |> cast(params, [:id, :name])
-    |> validate_required([:id, :name])
+    |> cast(params, [:user_id, :name])
+    |> validate_required([:user_id, :name])
   end
 
 end
 
-defmodule App do
+
+defmodule App
+  do use Plug.Router
   require Logger
-  use Plug.Router
 
   plug :match
   plug :dispatch
@@ -31,8 +36,8 @@ defmodule App do
 
   get "/api/test/users" do
     query = from u in User, select: u
-    xs = Data.all(query)
-    lol = xs |> Enum.map(fn it -> [id: it.id, name: it.name] end)
+    xs = Data0.all(query)
+    lol = xs |> Enum.map(fn it -> [user_id: it.user_id, name: it.name] end)
     {:ok, sh} = JSON.encode(lol)
     conn
     |> put_resp_header("Access-Control-Allow-Origin", "*")
@@ -103,7 +108,8 @@ defmodule App.Supervisor do
   @impl true
   def init(_init_arg) do
     children = [
-      Data
+      Data0,
+      Data1
     ]
 
     Supervisor.init(children, strategy: :one_for_one)
