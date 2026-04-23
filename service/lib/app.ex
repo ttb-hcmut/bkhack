@@ -28,11 +28,28 @@ end
 defmodule App
   do use Plug.Router
   require Logger
+  require Db
+  require ReturnChildID
+  use Plug.Router
 
   plug :match
+  plug :fetch_query_params
   plug :dispatch
 
-  import Ecto.Query
+  get "/api/comment" do
+    Logger.info "GET comment"
+    parent = Map.get(conn.params,"parent","0")
+    offset = String.to_integer(Map.get(conn.params,"offset","0"))
+    limit = String.to_integer(Map.get(conn.params,"limit","10"))
+    data = ReturnChildID.getChildComments(parent, offset, limit)
+    {:ok, sh} = JSON.encode(data)
+    conn
+    # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+    |> put_resp_header("Access-Control-Allow-Origin", "*")
+    |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+    |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+    |> put_resp_content_type("application/json")
+    |> send_resp(200, sh)
 
   post "/api/test/raw" do
     Logger.info conn
@@ -41,6 +58,7 @@ defmodule App
     lol = xs
     {:ok, sh} = JSON.encode(lol)
     conn
+    # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
     |> put_resp_header("Access-Control-Allow-Origin", "*")
     |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
     |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
@@ -48,7 +66,22 @@ defmodule App
     |> send_resp(200, sh)
   end
 
+  get "/api/test" do
+    Logger.info "GET test"
+    data = [
+      message: "icle",
+    ]
+    {:ok, sh} = JSON.encode(data)
+    conn
+    # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+    |> put_resp_header("Access-Control-Allow-Origin", "*")
+    |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+    |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+    |> put_resp_content_type("application/json")
+    |> send_resp(200, sh)
+  
   get "/api/test/users" do
+    import Ecto.Query
     query = from u in User, select: u
     xs = Data0.all(query)
     lol = xs |> Enum.map(fn it -> [user_id: it.user_id, name: it.name] end)

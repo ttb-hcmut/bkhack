@@ -81,35 +81,190 @@ module DiscussionHint = {
 module DiscussionFilter = {
 	[@react.component]
 	let make = () => {
-		<>
-			<input />
-		</>
+    <input />
 	}
 }
 
+
 module DiscussionBody = {
+  let decodeJson = (json) => {
+    let open Fetch_syntax;
+    json
+    >>= (j => {
+      Js.log(j);
+      return(j)
+    })
+    >>= (undecoded => {
+    let arrayOfDict = undecoded 
+      |> Js.Json.decodeArray
+      |> Option.value(~default=[||])
+      |> Array.map(x => {
+        let newDictNoJson = Js.Dict.empty();
+        x
+        |> Js.Json.decodeObject
+        |> Option.value(~default=Js.Dict.empty())
+        |> Js.Dict.entries
+        |> Array.iter(((key, value)) =>
+          switch (Js.Json.decodeString(value)) {
+          | Some(s) => Js.Dict.set(newDictNoJson, key, s)
+          | None => ()
+          }
+        );
+        newDictNoJson
+      })
+      return(arrayOfDict)
+    })
+  };
+  module rec Comments: {
+    [@react.component]
+    let make: (~cid: string, ~content: string, ~autoExpand: int) => React.element;
+  } = {
+      [@react.component]
+      let make = (~cid: string, ~content: string, ~autoExpand: int) => {
+        let (replies,setReplies) = React.useState(() => [||]);
+        let (showRep, setShowRep) = React.useState(() => false);
+        let (showMore, setShowMore) = React.useState(() => true);
+        let limit = 3;
+        // opening concept: Js.Promise.()
+        let fetchReplies = () => {
+          let open Fetch_syntax;
+          Fetch.fetch(Env.backend ++ "/api/comment"
+            ++ "?limit="  ++ string_of_int(limit)
+            ++ "&offset=" ++ string_of_int(Array.length(replies))
+            ++ "&parent=" ++ cid)
+          >>= Fetch.Response.json
+          |> decodeJson
+          >>= (aod => {
+            setReplies( x => Array.append(x,aod));
+            setShowMore( _ => Array.length(aod) < limit ? false : true);
+            Js.Promise.resolve(aod)
+          })
+          >!= (err => {
+              Js.log(err);
+              setShowMore( _ => false);
+              return([||])
+            })
+          |> ignore;
+        };
+        let revealReplies = () => {
+          if (Array.length(replies) == 0 && showMore){
+            fetchReplies();
+          };
+          setShowRep(s => !s);
+        };
+        React.useEffect0(()=>{
+          if (autoExpand > 0){
+            revealReplies();
+          }
+          None
+        });
+        <li key={"comment"++cid} className="comments">
+          <div className="content">{React.string(content)}</div>
+          <button className="show-replies"
+          onClick={ _ => revealReplies() }>
+            {React.string((showRep?"Hide":"Show") ++ " replies")}
+          </button>
+          
+          <span className="spacer" hidden={!showRep}/>
+          <ol className="replies" hidden={!showRep}>
+          {
+            replies
+            |>Array.map(x => {
+              let cid = switch (Js.Dict.get(x,"id")) {
+                | Some(v) => v 
+                | None => "67"
+                }
+              let content = switch (Js.Dict.get(x,"content")) {
+                | Some(v) => v 
+                | None => "no content"
+                };
+                <Comments key=cid cid content autoExpand={autoExpand == 0 ? 0 : autoExpand-1}/>
+              })
+            |>React.array
+          }
+          </ol>
+          <button className="more-replies"
+          onClick={ _ => fetchReplies() }
+          hidden={!showRep || !showMore}>
+            {React.string("More replies")}
+          </button>
+        </li>
+      }
+    };
 	[@react.component]
-	let make = (~comments) => {
-		<>
-			<ol>
-				{comments |> Array.map(x => {
-					let (id, level, authorname, content) = x;
-					<li key=id className=Printf.sprintf("level-%d", level)>
-						<article>
-							<header>
-								<span className="author">{React.string(authorname)}</span>
-							</header>
-							<div className="content">
-								{React.string(content)}
-							</div>
-							<div className="counter">
-								<data>{React.int(41)}</data>
-							</div>
-						</article>
-					</li>
-				}) |> React.array}
-			</ol>
-		</>
+	let make = (~post) => {
+    let (comments,setComments) = React.useState(() => [||]);
+    let (showMore, setShowMore) = React.useState(() => true);
+    let limit = 3;
+    let aExpand = 3;
+    // opening concept: Js.Promise.()
+    let fetchComments = () => {
+      let open Fetch_syntax;
+      Fetch.fetch(Env.backend ++ "/api/comment"
+        ++ "?limit="  ++ string_of_int(limit)
+        ++ "&offset=" ++ string_of_int(Array.length(comments))
+        ++ "&parent=" ++ post)
+      >>= Fetch.Response.json
+      |> decodeJson
+      >>= (aod => {
+        setComments( x => Array.append(x,aod));
+        setShowMore( _ => Array.length(aod) < limit ? false : true);
+        Js.Promise.resolve(aod)
+      })
+      >!= (err => {
+          Js.log(err);
+          setShowMore( _ => false);
+          return([||])
+        })
+      |> ignore;
+    };
+    
+    React.useEffect0( () => {
+      fetchComments();
+      None
+    });
+
+
+    <>
+      <ol>
+      {
+        comments
+        |>Array.map(x => {
+          let cid = switch (Js.Dict.get(x,"id")) {
+            | Some(v) => v 
+            | None => "67"
+            }
+          let content = switch (Js.Dict.get(x,"content")) {
+            | Some(v) => v 
+            | None => "no content"
+            };
+            <Comments key=cid cid content autoExpand=aExpand />
+          })
+        |>React.array
+      }
+      </ol>
+      <button className="more-replies"
+      onClick={ _ => fetchComments() }
+      hidden={!showMore}>
+        {React.string("More replies")}
+      </button>
+      // {comments |> Array.map(x => {
+      //   let (id, level, authorname, content) = x;
+      //   <li key=id className=Printf.sprintf("level-%d", level)>
+      //     <article>
+      //       <header>
+      //         <span className="author">{React.string(authorname)}</span>
+      //       </header>
+      //       <div className="content">
+      //         {React.string(content)}
+      //       </div>
+      //       <div className="counter">
+      //         <data>{React.int(41)}</data>
+      //       </div>
+      //     </article>
+      //   </li>
+      // }) |> React.array}
+    </>
 	}
 }
 
@@ -134,9 +289,7 @@ module PullrequestsHint = {
 module PullrequestsFilter = {
 	[@react.component]
 	let make = () => {
-		<>
-			<input />
-		</>
+    <input />
 	}
 }
 
@@ -163,14 +316,15 @@ module App = {
 		let (currentTab, setCurrentTab) = React.useState(() => `Article);
 		let tags = [| "Algorithm", "Rust" |];
 		let pullrequests = [| "", "" |];
-		let comments = [|
-			("a", 0, "kinten108101", "Test 1"),
-			("b", 1, "nl_kdan", "Test 2")
-		|];
+		// let comments = [|
+		// 	("a", 0, "kinten108101", "Test 1"),
+		// 	("b", 1, "nl_kdan", "Test 2")
+		// |];
 		let headings = [|
 			("1", "Overview", "overview"),
 			("1.1", "Related works", "related-works"),
 		|];
+    let post = "1"
 		let article_body = "
 In computer science, graph algorithm complexity analysis is the study of the computational resources required to solve problems on graph data structures. This article provides a comprehensive examination of time complexity for fundamental graph algorithms, including breadth-first search (BFS), depth-first search (DFS), Dijkstra's algorithm, and the Floyd-Warshall algorithm.
 
@@ -178,6 +332,9 @@ Understanding these complexities is essential for algorithm selection and optimi
 		";
 		let id = React.useMemo1(() => to_string(currentTab), [|currentTab|]);
 		let url = ReasonReactRouter.useUrl();
+
+    
+
 		React.useEffect0(() => {
 			let module Data = Data0(Experimental.GenSQL);
 			let open Fetch;
@@ -228,7 +385,7 @@ Understanding these complexities is essential for algorithm selection and optimi
 								<DiscussionFilter />
 							</nav>
 						</header>
-						<main className=Printf.sprintf("only %s", to_string(`Discussion))><DiscussionBody comments /></main>
+						<main className=Printf.sprintf("only %s", to_string(`Discussion))><DiscussionBody post /></main>
 					</>
 					<>
 						<header className=Printf.sprintf("only %s", to_string(`Pullrequest))>
