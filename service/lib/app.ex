@@ -34,6 +34,20 @@ defmodule App
 
   import Ecto.Query
 
+  post "/api/test/raw" do
+    Logger.info conn
+    r = Ecto.Adapters.SQL.query!(Data0, conn.query_params["query"], [])
+    xs = r.rows
+    lol = xs
+    {:ok, sh} = JSON.encode(lol)
+    conn
+    |> put_resp_header("Access-Control-Allow-Origin", "*")
+    |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+    |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+    |> put_resp_content_type("application/json")
+    |> send_resp(200, sh)
+  end
+
   get "/api/test/users" do
     query = from u in User, select: u
     xs = Data0.all(query)

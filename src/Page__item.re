@@ -148,6 +148,15 @@ module PullrequestsBody = {
 	}
 }
 
+module Data0(S: Experimental.S) = {
+	open S;
+	let prs = table @@ ("pullrequests", prs());
+	let f = post_id => observe @@ () =>
+		foreach(() => prs) @@ o =>
+		where(Pull_request.post_id(o) =@ string(post_id)) @@ () =>
+		yield(o);
+}
+
 module App = {
 	[@react.component]
 	let make = () => {
@@ -170,8 +179,18 @@ Understanding these complexities is essential for algorithm selection and optimi
 		let id = React.useMemo1(() => to_string(currentTab), [|currentTab|]);
 		let url = ReasonReactRouter.useUrl();
 		React.useEffect0(() => {
-			let id = Util.parseQueryParams(url.search) -> Js.Dict.get("id");
-			Js.Console.log(id);
+			let module Data = Data0(Experimental.GenSQL);
+			let open Fetch;
+			let open Fetch_syntax;
+			// Js.Console.log(Data.f);
+			let id = Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id"));
+			ignore({
+				let* res = fetchWithInit(Env.backend ++ "/api/test/raw?query=" ++ Data.f(id),
+					RequestInit.make(~method_=Post, ()));
+				let* dict = Response.json(res);
+				Js.Console.log(dict);
+				return(())
+			});
 			None
 		});
 		<>
