@@ -50,6 +50,7 @@ defmodule App
     |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
     |> put_resp_content_type("application/json")
     |> send_resp(200, sh)
+  end
 
   post "/api/test/raw" do
     Logger.info conn
