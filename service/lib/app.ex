@@ -30,7 +30,6 @@ defmodule App
   require Logger
   require Db
   require ReturnChildID
-  use Plug.Router
 
   plug :match
   plug :fetch_query_params
@@ -80,6 +79,7 @@ defmodule App
     |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
     |> put_resp_content_type("application/json")
     |> send_resp(200, sh)
+  end
   
   get "/api/test/users" do
     import Ecto.Query
@@ -144,7 +144,7 @@ defmodule App
     Logger.info "stopped server"
   end
 
-end
+  end
 
 defmodule App.Supervisor do
   use Supervisor
