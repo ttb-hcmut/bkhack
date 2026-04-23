@@ -1,1 +1,8 @@
+/** [parseQueryParams(search)] will parse the search term / query
+		section of the URI into a {Js.dict}
+	
+	- When using [ReasonReact], [search] can be obtained via
+		[ReasonReactRouter.useUrl().search];
+	- When using [Js], search can be obtained via
+ */
 let parseQueryParams : string => Js.dict(string)
