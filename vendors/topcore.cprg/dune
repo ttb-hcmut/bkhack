@@ -1,0 +1,4 @@
+(library
+ (modes melange)
+ (public_name topcore-cprg)
+ (name cprg))
