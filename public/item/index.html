@@ -127,23 +127,47 @@ html {
 }
 
 #root[data-tileset="gui"] > .innerbody > nav button > label::before {
-	filter: grayscale(100%) brightness(50%);
+	filter: grayscale(100%) brightness(100%);
 }
 
 #root[data-tileset="gui"] > .innerbody > nav button:hover > label::before {
-	filter: grayscale(100%) brightness(120%);
+	filter: grayscale(100%) brightness(50%);
 }
 
 #root[data-tileset="gui"] > .innerbody > nav button.selected > label::before {
-	filter: grayscale(0%);
+	filter: grayscale(0%) brightness(80%);
+}
+
+@media (prefers-color-scheme: dark) {
+	#root[data-tileset="gui"] > .innerbody > nav button > label::before {
+		filter: grayscale(100%) brightness(50%);
+	}
+
+	#root[data-tileset="gui"] > .innerbody > nav button:hover > label::before {
+		filter: grayscale(100%) brightness(120%);
+	}
+
+	#root[data-tileset="gui"] > .innerbody > nav button.selected > label::before {
+		filter: grayscale(0%) brightness(100%);
+	}
 }
 
 #root[data-tileset="gui"] > .innerbody > nav button.article > label::before {
-	filter: grayscale(100%) brightness(70%);
+	filter: grayscale(100%) brightness(140%);
 }
 
 #root[data-tileset="gui"] > .innerbody > nav button.article:hover > label::before {
-	filter: grayscale(100%) brightness(140%);
+	filter: grayscale(100%) brightness(70%);
+}
+
+@media (prefers-color-scheme: dark) {
+	#root[data-tileset="gui"] > .innerbody > nav button.article > label::before {
+		filter: grayscale(100%) brightness(70%);
+	}
+
+	#root[data-tileset="gui"] > .innerbody > nav button.article:hover > label::before {
+		filter: grayscale(100%) brightness(140%);
+	}
 }
 
 #root[data-tileset="gui"] > .innerbody > nav button.article.selected > label::before {
