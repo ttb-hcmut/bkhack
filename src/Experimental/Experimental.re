@@ -29,3 +29,4 @@ module type S = {
 };
 
 module GenSQL = GenSQL;
+module Fetch = Exprm__fetch;

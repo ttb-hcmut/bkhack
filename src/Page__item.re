@@ -1,4 +1,5 @@
 [@page "/item"]
+open Melange__containers.Fun
 
 let to_string = x => switch (x) {
 | `Article => "article"
@@ -295,27 +296,33 @@ module PullrequestsFilter = {
 
 module PullrequestsBody = {
 	[@react.component]
-	let make = () => {
-		<>
-		</>
+	let make = (~pullrequests) => {
+		<ul>
+			{pullrequests |> Array.map(x => {
+				let (_id, _post_id, title) = x;
+				<li>
+					<span>{React.string(title)}</span>
+				</li>
+			}) |> React.array}
+		</ul>
 	}
 }
 
-module Data0(S: Experimental.S) = {
+module Data0(S: { include Experimental.S; let tgt_post_id : string }) = {
 	open S;
 	let prs = table @@ ("pullrequests", prs());
-	let f = post_id => observe @@ () =>
+	let q = observe @@ () =>
 		foreach(() => prs) @@ o =>
-		where(Pull_request.post_id(o) =@ string(post_id)) @@ () =>
-		yield(o);
+		where(Pull_request.post_id(o) =@ string(tgt_post_id)) @@ () =>
+		yield(o)
 }
 
 module App = {
 	[@react.component]
 	let make = () => {
 		let (currentTab, setCurrentTab) = React.useState(() => `Article);
+		let (pullrequests, setPrs) = React.useState(() => [||]);
 		let tags = [| "Algorithm", "Rust" |];
-		let pullrequests = [| "", "" |];
 		// let comments = [|
 		// 	("a", 0, "kinten108101", "Test 1"),
 		// 	("b", 1, "nl_kdan", "Test 2")
@@ -333,21 +340,20 @@ Understanding these complexities is essential for algorithm selection and optimi
 		let id = React.useMemo1(() => to_string(currentTab), [|currentTab|]);
 		let url = ReasonReactRouter.useUrl();
 
-    
-
 		React.useEffect0(() => {
-			let module Data = Data0(Experimental.GenSQL);
-			let open Fetch;
-			let open Fetch_syntax;
-			// Js.Console.log(Data.f);
 			let id = Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id"));
-			ignore({
-				let* res = fetchWithInit(Env.backend ++ "/api/test/raw?query=" ++ Data.f(id),
-					RequestInit.make(~method_=Post, ()));
-				let* dict = Response.json(res);
-				Js.Console.log(dict);
+			let module Data = Data0({ include Experimental.GenSQL; let tgt_post_id = id });
+			ignore(Fetch_syntax.({
+				let open Fetch;
+				let* res = Experimental.Fetch.all(module Data)(module Env);
+				let  row = fun | ([id, post_id, title, ...[]]) => (Option.get(Js.Json.decodeNumber(id)), Option.get(Js.Json.decodeNumber(post_id)), Option.get(Js.Json.decodeString(title))) | _ => failwith("no");
+				let parse = {
+					let per_row = row % Array.to_list % Option.get % Js.Json.decodeArray;
+					return % Array.map(per_row) % Option.get % Js.Json.decodeArray };
+				let* dict = Response.json(res) >>= parse;
+				setPrs(_ => dict);
 				return(())
-			});
+			}));
 			None
 		});
 		<>
@@ -394,7 +400,7 @@ Understanding these complexities is essential for algorithm selection and optimi
 								<PullrequestsFilter />
 							</nav>
 						</header>
-						<main className=Printf.sprintf("only %s", to_string(`Pullrequest))><PullrequestsBody /></main>
+						<main className=Printf.sprintf("only %s", to_string(`Pullrequest))><PullrequestsBody pullrequests /></main>
 					</>
 			</div>
 		</>
