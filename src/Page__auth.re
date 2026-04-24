@@ -241,7 +241,6 @@ module Forgot = {
 	}
 }
 
-
 module Reset = {
 	[@react.component]
 	let make = () => {

@@ -1,0 +1,4 @@
+(library
+ (modes melange)
+ (name bkhack__react)
+ (libraries bkhack__fetch reason-react))

@@ -24,7 +24,6 @@ defmodule User
 
 end
 
-
 defmodule App
   do use Plug.Router
   require Logger

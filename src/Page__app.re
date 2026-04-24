@@ -1,4 +1,6 @@
 [@page "/"]
+open Bkhack
+
 module Post = {
 	type t =
 		{ author: string
@@ -271,7 +273,7 @@ module Thread = {
 		React.useEffect0(() => {
 			print_endline(item_id);
 			open Fetch;
-			open Fetch_syntax;
+			open Fetch.Syntax;
 			fetchWithInit(
 				Env.backend ++ "/api/test-item",
 				RequestInit.make(

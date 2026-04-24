@@ -1,0 +1,4 @@
+(library
+ (modes melange)
+ (libraries melange-fetch)
+ (name bkhack__fetch))

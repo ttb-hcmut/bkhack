@@ -1,4 +1,4 @@
 (library
  (modes melange)
- (name experimental)
- (libraries melange-fetch quel))
+ (name bkhack__experimental)
+ (libraries bkhack__fetch quel))

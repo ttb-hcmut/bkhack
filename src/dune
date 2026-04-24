@@ -17,7 +17,7 @@
  ; Dune will look into those dependencies and generate rules with JavaScript targets
  ; for the modules in those libraries as well.
  ; Caveat: the libraries need to be specified with `(modes melange)`.
- (libraries reason-react melange-fetch melange-json melange__containers quel experimental)
+ (libraries bkhack melange-json melange__containers quel bkhack__experimental topcore-cprg)
 
 
  ; Uncomment the following to copy the generated JavaScript files inside the source tree
@@ -32,3 +32,9 @@
  ; Change to (module_systems es6 commonjs) if you want to generate both
  ; https://melange.re/v2.0.0/build-system/#commonjs-or-es6-modules
  (module_systems es6))
+ 
+(library
+ (modes melange)
+ (libraries bkhack__experimental bkhack__fetch bkhack__react)
+ (modules ())
+ (name bkhack))

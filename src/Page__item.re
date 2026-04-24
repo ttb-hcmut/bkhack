@@ -1,13 +1,13 @@
 [@page "/item"]
 open Melange__containers.Fun
+open Bkhack
 
-let to_string = x => switch (x) {
+let to_string = fun
 | `Article => "article"
 | `Discussion => "discussions"
 | `Pullrequest => "pullrequests"
 | `Log => "log"
 | `Edit => "edit"
-}
 
 module ArticleHeader = {
 	[@react.component]
@@ -89,7 +89,7 @@ module DiscussionFilter = {
 
 module DiscussionBody = {
   let decodeJson = (json) => {
-    let open Fetch_syntax;
+    let open Fetch.Syntax;
     json
     >>= (undecoded => {
     let arrayOfDict = undecoded 
@@ -196,7 +196,7 @@ module DiscussionBody = {
     let aExpand = 3;
     // opening concept: Js.Promise.()
     let fetchComments = () => {
-      let open Fetch_syntax;
+      let open Fetch.Syntax;
       Fetch.fetch(Env.backend ++ "/api/comment"
         ++ "?limit="  ++ string_of_int(limit)
         ++ "&offset=" ++ string_of_int(Array.length(comments))
@@ -220,7 +220,6 @@ module DiscussionBody = {
       fetchComments();
       None
     });
-
 
     <>
       <ol>
@@ -286,7 +285,7 @@ module PullrequestsHint = {
 module PullrequestsFilter = {
 	[@react.component]
 	let make = () => {
-    <input />
+		<input />
 	}
 }
 
@@ -304,13 +303,17 @@ module PullrequestsBody = {
 	}
 }
 
-module Data0(S: { include Experimental.S; let tgt_post_id : string }) = {
-	open S;
-	let prs = table @@ ("pullrequests", prs());
-	let q = observe @@ () =>
-		foreach(() => prs) @@ o =>
+module At_repo_0(S : {
+	include Experimental.S;
+	let tgt_post_id : string }) =
+{
+	open S
+	let rec q' = () =>
+		foreach(prs') @@ o =>
 		where(Pull_request.post_id(o) =@ string(tgt_post_id)) @@ () =>
 		yield(o)
+	and prs' = () => table @@ ("pullrequests", prs())
+	let q = observe(q')
 }
 
 module App = {
@@ -319,10 +322,6 @@ module App = {
 		let (currentTab, setCurrentTab) = React.useState(() => `Article);
 		let (pullrequests, setPrs) = React.useState(() => [||]);
 		let tags = [| "Algorithm", "Rust" |];
-		// let comments = [|
-		// 	("a", 0, "kinten108101", "Test 1"),
-		// 	("b", 1, "nl_kdan", "Test 2")
-		// |];
 		let headings = [|
 			("1", "Overview", "overview"),
 			("1.1", "Related works", "related-works"),
@@ -335,23 +334,19 @@ Understanding these complexities is essential for algorithm selection and optimi
 		";
 		let id = React.useMemo1(() => to_string(currentTab), [|currentTab|]);
 		let url = ReasonReactRouter.useUrl();
-
-		React.useEffect0(() => {
+		let module X = Experimental;
+		React.useEffect0(Effect.async @@ () => Fetch.Syntax.({
 			let id = Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id"));
-			let module Data = Data0({ include Experimental.GenSQL; let tgt_post_id = id });
-			ignore(Fetch_syntax.({
-				let open Fetch;
-				let* res = Experimental.Fetch.all(module Data)(module Env);
-				let  row = fun | ([id, post_id, title, ...[]]) => (Option.get(Js.Json.decodeNumber(id)), Option.get(Js.Json.decodeNumber(post_id)), Option.get(Js.Json.decodeString(title))) | _ => failwith("no");
-				let parse = {
-					let per_row = row % Array.to_list % Option.get % Js.Json.decodeArray;
-					return % Array.map(per_row) % Option.get % Js.Json.decodeArray };
-				let* dict = Response.json(res) >>= parse;
-				setPrs(_ => dict);
-				return(())
-			}));
-			None
-		});
+			let* res = X.Fetch.all(module At_repo_0(
+				{ include X.GenSQL; let tgt_post_id = id }))(module Env);
+			let  row = fun | ([id, post_id, title, ...[]]) => (Option.get(Js.Json.decodeNumber(id)), Option.get(Js.Json.decodeNumber(post_id)), Option.get(Js.Json.decodeString(title))) | _ => failwith("no");
+			let parse = {
+				let per_row = row % Array.to_list % Option.get % Js.Json.decodeArray;
+				return % Array.map(per_row) % Option.get % Js.Json.decodeArray };
+			let* dict = Fetch.Response.json(res) >>= parse;
+			setPrs(_ => dict);
+			return @@ ()
+		}));
 		<>
 			<header>
 				<Component__header />
