@@ -91,10 +91,6 @@ module DiscussionBody = {
   let decodeJson = (json) => {
     let open Fetch_syntax;
     json
-    >>= (j => {
-      Js.log(j);
-      return(j)
-    })
     >>= (undecoded => {
     let arrayOfDict = undecoded 
       |> Js.Json.decodeArray
