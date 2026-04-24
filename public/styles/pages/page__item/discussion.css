@@ -1,0 +1,149 @@
+#root > main.discussions {
+	background-color: var(--ctp-mantle);
+}
+
+#root > main.discussions > header {
+	background-color: var(--ctp-mantle);
+}
+
+#root > main.discussions > header {
+	display: grid;
+	grid-template-columns: min-content minmax(0,1fr) min-content;
+	padding: var(--space-a);
+	gap: var(--space-a);
+}
+
+#root > main.discussions > header > h1 {
+	justify-self: start;
+	align-self: center;
+}
+
+#root > main.discussions > header > .sub {
+	font-size: var(--text-xs);
+}
+
+#root > main.discussions > header > .sub > :not(:first-child) {
+	border-left: solid 1px var(--card-border);
+	padding-left: var(--space-a);
+	margin-left: var(--space-a);
+}
+
+#root > main.discussions > header > .sub > .command {
+	color: var(--card-fg-aux);
+}
+
+#root > main.discussions > header > .sub > .summary {
+	font-family: var(--font-mono);
+	color: var(--card-fg-aux);
+}
+
+#root > main.discussions > header > .sub > .summary > :not(:first-child) {
+	margin-left: 1em;
+}
+
+#root > main.discussions > header > .sub > .summary > .comments {
+	color: var(--cyan);
+}
+
+#root > main.discussions > header > .sub > .summary > .comments::after {
+	content: " comments";
+}
+
+#root > main.discussions > header > .sub > .summary > .karma::before {
+	content: "+";
+}
+
+#root > main.discussions > header > .sub > .summary > .karma::after {
+	content: " karma";
+}
+
+#root > main.discussions > header > :first-child {
+	grid-row: 1 / 3;
+	grid-column: 1 / 2;
+	justify-self: center;
+	align-self: center;
+}
+
+#root > main.discussions > header > :nth-child(2) {
+	grid-row: 1 / 2;
+	grid-column: 2 / 3;
+}
+
+#root > main.discussions > header > :nth-child(3) {
+	grid-row: 2 / 3;
+	grid-column: 2 / 3;
+}
+
+#root > main.discussions > header > :nth-child(4) {
+	grid-row: 1 / 3;
+	grid-column: 3 / 4;
+}
+
+#root > main.discussions > header > :last-child {
+	grid-row: 3 / 4 /* -2 / -1 */;
+	grid-column: 1 / -1;
+}
+
+#root > main.discussions > header > h1 {
+	color: var(--ctp-mantle);
+	font-family: var(--font-mono);
+	font-size: var(--text-sm);
+}
+
+#root > main.discussions > header > nav {
+	margin-top: var(--space-a);
+	background-color: var(--ctp-crust);
+	border: solid 1px var(--card-border);
+	padding: var(--space-a);
+}
+
+#root[data-tileset="gui"] > main.discussions > header > .logo {
+	background-image: url("/assets/icon.comment.light-blue.svg");
+	background-size: 1em 1em;
+	width: 1em;
+	height: 1em;
+}
+
+#root > main.discussions > main {
+	border-top: solid 1px var(--card-border);
+	background-color: var(--ctp-crust);
+	padding-top: var(--space-a);
+	padding-bottom: var(--space-a);
+}
+
+#root > main.discussions > main > ol > li:not(:first-child) {
+	margin-top: var(--space-a);
+}
+
+.comments {
+  /* border: 2px solid white; */
+  display: grid;
+  grid-template-columns: min-content auto;
+  grid-template-rows: repeat(auto);
+}
+.comments > .content {
+  grid-column: 1/3;
+  grid-row: 1/2;
+}
+.comments > .show-replies {
+  grid-column: 1/3;
+  grid-row: 2/3;
+  color: white;
+  width: max-content;
+}
+.comments > .more-replies {
+  grid-column: 1/3;
+  grid-row: 4/5;
+  color: white;
+  width: max-content;
+}
+.comments  > .spacer {
+  width: var(--space-a);
+  grid-column: 1/2;
+  grid-row: 3/4;
+  border-left: 2px solid white;
+}
+.comments > .replies {
+  grid-column: 2/3;
+  grid-row: 3/4;
+}
