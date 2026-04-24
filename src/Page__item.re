@@ -114,80 +114,80 @@ module DiscussionBody = {
   };
   module rec Comments: {
     [@react.component]
-    let make: (~cid: string, ~content: string, ~autoExpand: int) => React.element;
-  } = {
-      [@react.component]
-      let make = (~cid: string, ~content: string, ~autoExpand: int) => {
-        let (replies,setReplies) = React.useState(() => [||]);
-        let (showRep, setShowRep) = React.useState(() => false);
-        let (showMore, setShowMore) = React.useState(() => true);
-        let limit = 3;
-        // opening concept: Js.Promise.()
-        let fetchReplies = () => {
-          let open Fetch_syntax;
-          Fetch.fetch(Env.backend ++ "/api/comment"
-            ++ "?limit="  ++ string_of_int(limit)
-            ++ "&offset=" ++ string_of_int(Array.length(replies))
-            ++ "&parent=" ++ cid)
-          >>= Fetch.Response.json
-          |> decodeJson
-          >>= (aod => {
-            setReplies( x => Array.append(x,aod));
-            setShowMore( _ => Array.length(aod) < limit ? false : true);
-            Js.Promise.resolve(aod)
-          })
-          >!= (err => {
-              Js.log(err);
-              setShowMore( _ => false);
-              return([||])
-            })
-          |> ignore;
-        };
-        let revealReplies = () => {
-          if (Array.length(replies) == 0 && showMore){
-            fetchReplies();
-          };
-          setShowRep(s => !s);
-        };
-        React.useEffect0(()=>{
-          if (autoExpand > 0){
-            revealReplies();
-          }
-          None
-        });
-        <li key={"comment"++cid} className="comments">
-          <div className="content">{React.string(content)}</div>
-          <button className="show-replies"
-          onClick={ _ => revealReplies() }>
-            {React.string((showRep?"Hide":"Show") ++ " replies")}
-          </button>
-          
-          <span className="spacer" hidden={!showRep}/>
-          <ol className="replies" hidden={!showRep}>
-          {
-            replies
-            |>Array.map(x => {
-              let cid = switch (Js.Dict.get(x,"id")) {
-                | Some(v) => v 
-                | None => "67"
-                }
-              let content = switch (Js.Dict.get(x,"content")) {
-                | Some(v) => v 
-                | None => "no content"
-                };
-                <Comments key=cid cid content autoExpand={autoExpand == 0 ? 0 : autoExpand-1}/>
-              })
-            |>React.array
-          }
-          </ol>
-          <button className="more-replies"
-          onClick={ _ => fetchReplies() }
-          hidden={!showRep || !showMore}>
-            {React.string("More replies")}
-          </button>
-        </li>
-      }
-    };
+		let make: (~cid: string, ~content: string, ~autoExpand: int) => React.element; } =
+	{
+		[@react.component]
+		let make = (~cid, ~content, ~autoExpand) => {
+			let (replies,setReplies) = React.useState(() => [||]);
+			let (showRep, setShowRep) = React.useState(() => false);
+			let (showMore, setShowMore) = React.useState(() => true);
+			let limit = 3;
+			// opening concept: Js.Promise.()
+			let fetchReplies = () => {
+				let open Fetch.Syntax;
+				Fetch.fetch(Env.backend ++ "/api/comment"
+					++ "?limit="  ++ string_of_int(limit)
+					++ "&offset=" ++ string_of_int(Array.length(replies))
+					++ "&parent=" ++ cid)
+				>>= Fetch.Response.json
+				|> decodeJson
+				>>= (aod => {
+					setReplies( x => Array.append(x,aod));
+					setShowMore( _ => Array.length(aod) < limit ? false : true);
+					Js.Promise.resolve(aod)
+				})
+				>!= (err => {
+						Js.log(err);
+						setShowMore( _ => false);
+						return([||])
+					})
+				|> ignore;
+			};
+			let revealReplies = () => {
+				if (Array.length(replies) == 0 && showMore){
+					fetchReplies();
+				};
+				setShowRep(s => !s);
+			};
+			React.useEffect0(()=>{
+				if (autoExpand > 0){
+					revealReplies();
+				}
+				None
+			});
+			<li key={"comment"++cid} className="comments">
+				<div className="content">{React.string(content)}</div>
+				<button className="show-replies"
+				onClick={ _ => revealReplies() }>
+					{React.string((showRep?"Hide":"Show") ++ " replies")}
+				</button>
+				
+				<span className="spacer" hidden={!showRep}/>
+				<ol className="replies" hidden={!showRep}>
+				{
+					replies
+					|>Array.map(x => {
+						let cid = switch (Js.Dict.get(x,"id")) {
+							| Some(v) => v 
+							| None => "67"
+							}
+						let content = switch (Js.Dict.get(x,"content")) {
+							| Some(v) => v 
+							| None => "no content"
+							};
+							<Comments key=cid cid content autoExpand={autoExpand == 0 ? 0 : autoExpand-1}/>
+						})
+					|>React.array
+				}
+				</ol>
+				<button className="more-replies"
+				onClick={ _ => fetchReplies() }
+				hidden={!showRep || !showMore}>
+					{React.string("More replies")}
+				</button>
+			</li>
+		}
+	};
 	[@react.component]
 	let make = (~post) => {
     let (comments,setComments) = React.useState(() => [||]);

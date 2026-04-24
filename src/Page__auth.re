@@ -3,7 +3,7 @@
 module Login = {
 	[@react.component]
 	let make = () => {
-		let (errorMsg,setErrorMsg)=React.useState(_ => "");
+		let (errorMsg,setErrorMsg) = React.useState(_ => "");
 
 		let (formUsername, setFormUsername) = React.useState(_ => "");
 		let (formPassword, setFormPassword) = React.useState(_ => "");
@@ -52,7 +52,6 @@ module Login = {
 }
 
 module Register = {
-	include Js.Re
 	[@react.component]
 	let make = () => {
 		let (errorMsg,setErrorMsg)=React.useState(_ => "");
@@ -156,16 +155,16 @@ module Countdown = {
 module Forgot = {
 	[@react.component]
 	let make = () => {
-		let (errorMsg,setErrorMsg)=React.useState(_ => "");
+		let (errorMsg,setErrorMsg) = React.useState(_ => "");
 		
-		let id: React.ref(option(Js.Global.intervalId)) = React.useRef(None);
-		let (timeleft,setTimeleft)=React.useState(_ => 0);
+		let id = React.useRef(None);
+		let (timeleft,setTimeleft) = React.useState(_ => 0);
 		let timeleftCleanup = React.useRef(() => ());
 
 		let (formEmail, setFormEmail) = React.useState(_ => "");
 		let (formCode, setFormCode) = React.useState(_ => "");
 		
-		let emailish = Js.Re.test(~str = formEmail,Js.Re.fromString("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"));
+		let emailish = Js.Re.test(~str = formEmail, Js.Re.fromString("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"));
 		
 		let sendCode = (event) => {
 			React.Event.Synthetic.preventDefault(event);
@@ -258,7 +257,7 @@ module Reset = {
 					-> Js.Dict.get("ticket") )
 			{
 				| Some(ticket) => resetTicket.current = ticket
-				| _ => resetTicket.current = ""
+				| None => resetTicket.current = ""
 				// TODO(khang): maybe redirect to login page if no ticket or invalid ticket instead
 			}
 			None
@@ -347,6 +346,8 @@ module ReactDOM0 = {
 		}
 }
 
-let element = ReactDOM0.querySelector("#root");
-let root = ReactDOM.Client.createRoot(element);
-ReactDOM.Client.render(root, <App />);
+let () = {
+	let element = ReactDOM0.querySelector("#root");
+	let root = ReactDOM.Client.createRoot(element);
+	ReactDOM.Client.render(root, <App />)
+}
