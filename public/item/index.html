@@ -130,6 +130,11 @@ html {
 	filter: grayscale(100%) brightness(100%);
 }
 
+/* FIXME(kinten) */
+#root[data-tileset="gui"] > .innerbody > nav button.pullrequests > label::before {
+	filter: grayscale(100%) brightness(85%);
+}
+
 #root[data-tileset="gui"] > .innerbody > nav button:hover > label::before {
 	filter: grayscale(100%) brightness(50%);
 }
@@ -141,6 +146,11 @@ html {
 @media (prefers-color-scheme: dark) {
 	#root[data-tileset="gui"] > .innerbody > nav button > label::before {
 		filter: grayscale(100%) brightness(50%);
+	}
+
+	/* FIXME(kinten) */
+	#root[data-tileset="gui"] > .innerbody > nav button.pullrequests > label::before {
+		filter: grayscale(100%) brightness(45%);
 	}
 
 	#root[data-tileset="gui"] > .innerbody > nav button:hover > label::before {
