@@ -30,6 +30,12 @@ html {
 	border-right: 1px solid var(--card-border);
 	border-bottom: 1px solid var(--card-border);
 	border-radius: 0.5rem 0.5rem 0 0;
+	background-color: var(--card-bg-translucent);
+}
+
+#root > .innerbody.discussions,
+#root > .innerbody.pullrequests {
+	background-color: var(--card-bg);
 }
 
 #root > .innerbody > nav {
@@ -40,10 +46,6 @@ html {
 	border-top: 1px solid var(--card-border);
 	border-bottom: 1px solid var(--card-border);
 	height: 2rem;
-}
-
-#root > .innerbody.discussions {
-	background-color: var(--card-bg);
 }
 
 #root > .innerbody > nav button {
@@ -57,7 +59,8 @@ html {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
-	justify-content: center;
+	justify-content: start;
+	cursor: initial;
 }
 
 #root > .innerbody > nav button > label {
