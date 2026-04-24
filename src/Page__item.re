@@ -9,17 +9,43 @@ let to_string = x => switch (x) {
 | `Edit => "edit"
 }
 
+module ItemNav = {
+  [@react.component]
+  let make = (~currentTab,~setCurrentTab,~prCount) => {
+    <>
+    <button onClick={_ => setCurrentTab(_ => `Article)} className={"article " ++ (currentTab == `Article ? "selected" : "")}>
+      <label>{React.string("article")}</label>
+    </button>
+    <button onClick={_ => setCurrentTab(_ => `Discussion)} className={"discussions " ++ (currentTab == `Discussion ? "selected" : "")}>
+      <label>{React.string("discussions")}</label>
+      <data className="count">{React.int(24)}</data>
+    </button>
+    <button onClick={_ => setCurrentTab(_ => `Pullrequest)} className={"pullrequests " ++ (currentTab == `Pullrequest ? "selected" : "")}>
+      <label>{React.string("pull-requests")}</label>
+      <data className="count">{React.int(prCount)}</data>
+    </button>
+    <button onClick={_ => setCurrentTab(_ => `Log)} className={"log " ++ (currentTab == `Log ? "selected" : "")}>
+      <label>{React.string("history")}</label>
+    </button>
+    <button onClick={_ => setCurrentTab(_ => `Edit)} className={"edit " ++ (currentTab == `Edit ? "selected" : "")}>
+      <label>{React.string("editor")}</label>
+    </button>
+    </>
+  }
+}
+
+
 module ArticleHeader = {
 	[@react.component]
 	let make = (~tags) => {
 		<>
 			<div className="counter">
 				<button className="up">
-					{React.string("up")}
+					{React.string(">")}
 				</button>
 				<span>{React.int(330)}</span>
 				<button className="down">
-					{React.string("down")}
+					{React.string("<")}
 				</button>
 			</div>
 			<h1>{React.string("Seven Implementations of Incremental")}</h1>
@@ -335,6 +361,7 @@ Understanding these complexities is essential for algorithm selection and optimi
 		";
 		let id = React.useMemo1(() => to_string(currentTab), [|currentTab|]);
 		let url = ReasonReactRouter.useUrl();
+		let (sidebarState, setSidebarState) = React.useState( _ => "state0");
 
 		React.useEffect0(() => {
 			let id = Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id"));
@@ -356,26 +383,12 @@ Understanding these complexities is essential for algorithm selection and optimi
 			<header>
 				<Component__header />
 			</header>
-			<div className=Printf.sprintf("innerbody %s", id)>
-				<nav>
-					<button onClick={_ => setCurrentTab(_ => `Article)} className={"article " ++ (currentTab == `Article ? "selected" : "")}>
-						<label>{React.string("article")}</label>
-					</button>
-					<button onClick={_ => setCurrentTab(_ => `Discussion)} className={"discussions " ++ (currentTab == `Discussion ? "selected" : "")}>
-						<label>{React.string("discussions")}</label>
-						<data className="count">{React.int(24)}</data>
-					</button>
-					<button onClick={_ => setCurrentTab(_ => `Pullrequest)} className={"pullrequests " ++ (currentTab == `Pullrequest ? "selected" : "")}>
-						<label>{React.string("pull-requests")}</label>
-						<data className="count">{React.int(Array.length(pullrequests))}</data>
-					</button>
-					<button onClick={_ => setCurrentTab(_ => `Log)} className={"log " ++ (currentTab == `Log ? "selected" : "")}>
-						<label>{React.string("history")}</label>
-					</button>
-					<button onClick={_ => setCurrentTab(_ => `Edit)} className={"edit " ++ (currentTab == `Edit ? "selected" : "")}>
-						<label>{React.string("editor")}</label>
-					</button>
-				</nav>
+
+      <nav className=sidebarState>
+        <ItemNav currentTab setCurrentTab prCount=Array.length(pullrequests)/>
+      </nav>
+
+			<main className={sidebarState ++ " " ++ id}>
 					<>
 						<header className=Printf.sprintf("only %s", to_string(`Article))><ArticleHeader tags /></header>
 						<div className=Printf.sprintf("innerbody only %s", to_string(`Article))><ArticleBody headings article_body /></div>
@@ -398,7 +411,32 @@ Understanding these complexities is essential for algorithm selection and optimi
 						</header>
 						<main className=Printf.sprintf("only %s", to_string(`Pullrequest))><PullrequestsBody pullrequests /></main>
 					</>
-			</div>
+			</main>
+
+      
+			// <footer role="navigation" className=sidebarState>
+			// 	<button>{React.string("prev")}</button>
+			// 	<button>{React.string("next")}</button>
+			// </footer>
+
+			<button 
+				className={"show-hide-sidebar " ++ sidebarState}
+				onClick={_=>{
+					if (sidebarState == "state0")
+					{
+						setSidebarState(_ => "state1");
+					}
+					else
+					{
+						setSidebarState(_ => "state0");
+					}
+				}}
+				>
+			</button>
+			<aside className=sidebarState>
+				<Component__sidebar />
+			</aside>
+			
 		</>
 	}
 }

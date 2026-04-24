@@ -435,38 +435,6 @@ html {
 	color: var(--card-fg-highlighted);
 }
 
-#root > aside {
-	display:none;
-	width: 80vw;
-	height: calc(100vh - 6rem - var(--space-a));
-	/* margin-top: var(--space-a); */
-	left: 50%;
-	transform: translate(-50%, 0%);
-}
-
-#root > aside h2 {
-	margin: 0;
-}
-
-#root > aside > section {
-	background-color: var(--card-bg);
-	border: solid 1px var(--card-border);
-	border-radius: 0.5cm;
-	padding: var(--space-a);
-}
-
-#root > aside > *:not(:first-child) {
-	margin-top: var(--space-a);
-}
-
-#root > aside > * > h2::before {
-	content: "[";
-}
-
-#root > aside > * > h2::after {
-	content: "]";
-}
-
 #root > footer {
 	/* margin-left: var(--space-a);
 	margin-right: var(--space-a); */
@@ -489,19 +457,6 @@ form.dashboard-filter {
 }
 
 
-#root > .show-hide-sidebar{
-	position: fixed;
-	top:3rem;
-	right:1rem;
-	padding: var(--space-a);
-	background-color: var(--card-bg);
-	border: solid 1px var(--card-border);
-	border-radius: 0.5cm;
-	padding: var(--space-a);
-	color: var(--light-b);
-	transition-property: border-radius, background-color;
-	transition-duration: 0.2s;
-}
 
 @media (min-width: 64rem) {
 	:root {
@@ -553,10 +508,10 @@ form.dashboard-filter {
 		grid-column: 3 / 4;
 		grid-row: 2 / 3;
 		padding: var(--space-a);
-  		justify-self: end;
+    justify-self: end;
 		background-color: var(--card-bg);
 		border: solid 1px var(--card-border);
-		border-radius: 0.5cm;
+		border-radius: var(--radius);
 		padding: var(--space-a);
 	}
 }
