@@ -133,14 +133,25 @@ defmodule App
   end
 
   def start do
-    App.Supervisor.start_link(:ok)
-    {:ok, _} = Plug.Cowboy.http(__MODULE__, [], port: 5000)
-    Logger.info "running server!"
+    if File.exists? "lock" do
+      {:error, :already_running, msg: "server is already running"}
+    else
+      {:ok, pid} = App.Supervisor.start_link(:ok)
+      {:ok, lock} = File.open("lock", [:write])
+      :ok = IO.write(lock, :erlang.pid_to_list(pid))
+      :ok = File.close(lock)
+      {:ok, _} = Plug.Cowboy.http(__MODULE__, [], port: 5000)
+      {:ok, msg: "running server"}
+    end
   end
 
-  def stop do
+  def stop() do
+    {:ok, pid} = File.read("lock")
+    # NOTE(kinten): reference https://stackoverflow.com/questions/70102293/transform-process-id-pid-in-elixir-to-tuple-or-string-parse-pid-to-other#70105854
+    pid = pid |> String.to_charlist |> :erlang.list_to_pid
     :ok = Plug.Cowboy.shutdown(__MODULE__.HTTP)
-    Logger.info "stopped server"
+    :ok = File.rm "lock"
+    {:ok, msg: "stopped server"}
   end
 
   end
@@ -161,4 +172,50 @@ defmodule App.Supervisor do
 
     Supervisor.init(children, strategy: :one_for_one)
   end
+end
+
+defmodule App.Book do
+  use GenServer
+
+  def start do
+    if File.exists? "lock-book" do
+      {:error, :already_running, msg: "server book is already running"}
+    else
+      {:ok, pid} = __MODULE__.start_link []
+      {:ok, lock} = File.open "lock-book", [:write]
+      :ok = IO.write(lock, :erlang.pid_to_list(pid))
+      :ok = File.close(lock)
+      {:ok, msg: "running server book"}
+    end
+  end
+
+  def stop do
+    {:ok, pid} = File.read "lock-book"
+    # NOTE(kinten): reference https://stackoverflow.com/questions/70102293/transform-process-id-pid-in-elixir-to-tuple-or-string-parse-pid-to-other#70105854
+    pid = pid |> String.to_charlist |> :erlang.list_to_pid
+    true = Process.exit pid, :normal
+    :ok = File.rm "lock-book"
+    {:ok, msg: "stopped server book"}
+  end
+
+  def start_link(args) do
+    GenServer.start_link(__MODULE__, args)
+  end
+
+  @impl true
+  def init(_state) do
+    Process.flag(:trap_exit, true)
+    x = Task.async(fn ->
+      System.shell "/home/kinten/s/bkhack/service/bin/livebook.AppImage 2>log-livebook"
+    end)
+    {:ok, x}
+  end
+
+  @impl true
+  def terminate(:normal, x) do
+    _ = Task.shutdown(x)
+    _ = System.shell "fuser -k 32123/tcp 2>/dev/null"
+    :normal
+  end
+
 end

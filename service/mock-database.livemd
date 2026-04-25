@@ -1,0 +1,27 @@
+# Mock database (sqlite3)
+
+```elixir
+Mix.install([
+  {:kino_db, "~> 0.4.0"},
+  {:exqlite, "~> 0.23.0"}
+])
+```
+
+## Setup
+
+<!-- livebook:{"attrs":"eyJkYXRhYmFzZV9wYXRoIjoiL2hvbWUva2ludGVuL3MvYmtoYWNrL3NlcnZpY2UvZGIiLCJ0eXBlIjoic3FsaXRlIiwidmFyaWFibGUiOiJjb25uIn0","chunks":null,"kind":"Elixir.KinoDB.ConnectionCell","livebook_object":"smart_cell"} -->
+
+```elixir
+opts = [database: "/home/kinten/s/bkhack/service/db"]
+{:ok, conn} = Kino.start_child({Exqlite, opts})
+```
+
+<!-- livebook:{"attrs":"eyJjYWNoZV9xdWVyeSI6dHJ1ZSwiY29ubmVjdGlvbiI6eyJ0eXBlIjoic3FsaXRlIiwidmFyaWFibGUiOiJjb25uIn0sInF1ZXJ5IjoiU0VMRUNUICogRlJPTSBzcWxpdGVfbWFzdGVyIFdIRVJFIHR5cGU9J3RhYmxlJyIsInJlc3VsdF92YXJpYWJsZSI6InJlc3VsdCIsInRpbWVvdXQiOm51bGx9","chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+
+```elixir
+result = Exqlite.query!(conn, ~S"SELECT * FROM sqlite_master WHERE type='table'", [])
+```
+
+```elixir
+
+```
