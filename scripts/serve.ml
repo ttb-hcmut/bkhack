@@ -1,11 +1,7 @@
 open Eio
 module Pnpm = Buildlib.Pnpm
-module P =
-  struct
-  include Path
-  end
+module P = Path
 module B = Buildlib
-
 
 exception Missing_mapping_entry_for of string
 
