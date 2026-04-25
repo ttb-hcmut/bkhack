@@ -8,7 +8,7 @@ module type S = {
   /** {1 Input / output records} */
 
 	let user : repr(int) => repr(string) => repr(user);
-	let pr : repr(string) => repr(string) => repr(string) => repr(pr);
+	let pr : repr(int) => repr(int) => repr(int) => repr(string) => repr(string) => repr(pr);
 
 	/** {1 Projections} */
 
@@ -18,9 +18,11 @@ module type S = {
 	};
 
 	module Pull_request : {
-		let id : repr(pr) => repr(string);
-		let post_id : repr(pr) => repr(string);
+		let id : repr(pr) => repr(int);
+		let post : repr(pr) => repr(int);
+		let contributor : repr(pr) => repr(int);
 		let title : repr(pr) => repr(string);
+		let description : repr(pr) => repr(string);
 	};
 
 	/** {1 Data sources} */

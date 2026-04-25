@@ -8,7 +8,10 @@ module type Env = {
 
 module Fetch = Bkhack__fetch;
 
-let all = (module Data : Data, module Env : Env) => Fetch.({
-	fetchWithInit(Env.backend ++ "/api/test/raw?query=" ++ Data.q,
-		RequestInit.make(~method_=Post, ()))
+let all = (module Data : Data, module Env : Env) => Fetch.Syntax.({
+	let open Fetch;
+	let* resp = fetchWithInit(Env.backend ++ "/api/test/raw?query=" ++ Data.q,
+		RequestInit.make(~method_=Post, ()));
+	let* data = Fetch.Response.json(resp);
+	return @@ data
 })

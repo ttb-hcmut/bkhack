@@ -4,7 +4,7 @@ include Quel_sql.GenSQL;
 type user and pr;
 
 let user = (id, name) => record @@ ("user_id" %: id) %* (row1 ("name" %: name))
-and pr = (id, post_id, title) => record @@ ("pr_id" %: id) %* ("post_id" %: post_id) %* (row1 ("title" %: title));
+and pr = (id, post_id, contributor, title, description) => record @@ ("pr_id" %: id) %* ("post_id" %: post_id) %* ("contributor_id" %: contributor) %* (row1 ("title" %: title) %* ("description" %: description));
 
 /** {1 projections} */
 
@@ -15,8 +15,10 @@ module User = {
 
 module Pull_request = {
 	let id = r => r %. "pr_id"
-	and post_id = r => r %. "post_id"
-	and title = r => r %. "title";
+	and post = r => r %. "post_id"
+	and contributor = r => r %. "contributor_id"
+	and title = r => r %. "title"
+	and description = r => r %. "description";
 };
 
 /** {1 data sources} */

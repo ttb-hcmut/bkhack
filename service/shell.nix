@@ -9,5 +9,8 @@ let
 in
 	nixpkgs.mkShell {
 		packages = pkgs;
+		shellHook = ''
+			alias iex='iex --erl "-kernel shell_history enabled"'
+		'';
 	}
 

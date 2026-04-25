@@ -1,4 +1,4 @@
-# Mock database (sqlite3)
+# Mock database
 
 ```elixir
 Mix.install([
@@ -23,5 +23,128 @@ result = Exqlite.query!(conn, ~S"SELECT * FROM sqlite_master WHERE type='table'"
 ```
 
 ```elixir
+result2 = Exqlite.query!(conn, ~S"drop table if exists pullrequests", [])
+result2 = Exqlite.query!(conn, ~S"drop table if exists comments", [])
+result2 = Exqlite.query!(conn, ~S"drop table if exists posts", [])
+result2 = Exqlite.query!(conn, ~S"drop table if exists users", [])
+```
 
+### Relational tables
+
+Note:
+
+* All string types should be of length at least 255 e.g. `varchar(255)`.
+* DDL statements should be laxed i.e. do only if (not) exists
+
+```elixir
+result3 =
+  Exqlite.query!(
+    conn,
+    ~S"""
+    create table if not exists users (
+      user_id integer primary key,
+      name varchar(255) not null
+    )
+    """,
+    []
+  )
+result3 =
+  Exqlite.query!(
+    conn,
+    ~S"""
+    create table if not exists posts (
+      post_id integer primary key,
+      post_title varchar(255) not null,
+      creator_id integer not null,
+      foreign key (creator_id) references users(user_id)
+    )
+    """,
+    []
+  )
+result5 =
+  Exqlite.query!(
+    conn,
+    ~S"""
+    create table if not exists pullrequests (
+      pr_id integer primary key,
+      post_id integer not null,
+      contributor_id integer not null,
+      title varchar(255) not null,
+      description varchar(1024) not null,
+      foreign key (post_id) references posts(post_id),
+      foreign key (contributor_id) references users(user_id)
+    )
+    """,
+    []
+  )
+result3 =
+  Exqlite.query!(
+    conn,
+    ~S"""
+    create table if not exists comments (
+      comment_id integer primary key,
+      parent_id integer unique,
+      content varchar(255) not null,
+      commenter_id integer,
+      foreign key (commenter_id) references users(user_id),
+      foreign key (parent_id) references comments(comment_id)
+    )
+    """,
+    []
+  )
+```
+
+### Scenario
+
+```elixir
+result2 = Exqlite.query!(conn, ~S"delete from comments", [])
+result2 = Exqlite.query!(conn, ~S"delete from pullrequests", [])
+result2 = Exqlite.query!(conn, ~S"delete from posts", [])
+result2 = Exqlite.query!(conn, ~S"delete from users", [])
+```
+
+```elixir
+result3 =
+  Exqlite.query!(
+    conn,
+    ~S"""
+    insert into users values (0, 'yminsky_fan')
+    """,
+    []
+  )
+result3 =
+  Exqlite.query!(
+    conn,
+    ~S"""
+    insert into posts values (77, 'Seven Implementations of Incremental', 0)
+    """,
+    []
+  )
+result3 =
+  Exqlite.query!(
+    conn,
+    ~S"""
+    insert into pullrequests values (6, 77, 0, 'Original post edits', 'Sau ngày 9/3/2016, admin bên Jane Street blog có chỉnh nội dung blog ngầm. Mấy này không ảnh hưởng đến integrity của post nhưng mình vẫn nên bump ref cho chính xác.')
+    """,
+    []
+  )
+result3 =
+  Exqlite.query!(
+    conn,
+    ~S"""
+    insert into pullrequests values (7, 77, 0, 'Giới thiệu về FRP cho người học mới', 'Post có thể cải thiện thêm bằng cách thêm phần giới thiệu kiến thức. Này mình không có opinion, nhưng OP có thể tham khảo ở đây: https://blog.janestreet.com/breaking-down-frp/')
+    """,
+    []
+  )
+```
+
+<!-- livebook:{"attrs":"eyJjYWNoZV9xdWVyeSI6dHJ1ZSwiY29ubmVjdGlvbiI6eyJ0eXBlIjoic3FsaXRlIiwidmFyaWFibGUiOiJjb25uIn0sInF1ZXJ5Ijoic2VsZWN0IHVzZXJzLm5hbWUsIHBvc3RzLnBvc3RfdGl0bGUsIHB1bGxyZXF1ZXN0cy5kZXNjcmlwdGlvbiBmcm9tIHVzZXJzLCBwb3N0cywgcHVsbHJlcXVlc3RzIHdoZXJlIHVzZXJzLm5hbWUgPSAneW1pbnNreV9mYW4nIiwicmVzdWx0X3ZhcmlhYmxlIjoicmVzdWx0NSIsInRpbWVvdXQiOm51bGx9","chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+
+```elixir
+result5 =
+  Exqlite.query!(
+    conn,
+    ~S"select users.name, posts.post_title, pullrequests.description from users, posts, pullrequests where users.name = 'yminsky_fan'",
+    []
+  )
 ```

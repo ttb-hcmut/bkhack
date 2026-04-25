@@ -319,9 +319,12 @@ module PullrequestsBody = {
 	let make = (~pullrequests) => {
 		<ul>
 			{pullrequests |> Array.map(x => {
-				let (_id, _post_id, title) = x;
-				<li>
+				let ((id, _post_id, _contributor_id, title, _desc), contributor_name) = x;
+				<li className="pull-request-row">
+					<button></button>
+					<span className="id">{React.int(id)}</span>
 					<span>{React.string(title)}</span>
+					<span>{React.string(contributor_name)}</span>
 				</li>
 			}) |> React.array}
 		</ul>
@@ -330,14 +333,27 @@ module PullrequestsBody = {
 
 module At_repo_0(S : {
 	include Experimental.S;
-	let tgt_post_id : string }) =
+	let tgt_post_id : int }) =
 {
 	open S
 	let rec q' = () =>
 		foreach(prs') @@ o =>
-		where(Pull_request.post_id(o) =@ string(tgt_post_id)) @@ () =>
+		where(Pull_request.post(o) =% int(tgt_post_id)) @@ () =>
 		yield(o)
 	and prs' = () => table @@ ("pullrequests", prs())
+	let q = observe(q')
+}
+
+module At_repo_1(S : {
+	include Experimental.S;
+	let tgt_user_id : int }) =
+{
+	open S
+	let rec q' = () =>
+		foreach(users') @@ o =>
+		where(User.id(o) =% int(tgt_user_id)) @@ () =>
+		yield @@ o
+	and users' = () => table @@ ("users", users())
 	let q = observe(q')
 }
 
@@ -361,15 +377,27 @@ Understanding these complexities is essential for algorithm selection and optimi
 		let url = ReasonReactRouter.useUrl();
 		let (sidebarState, setSidebarState) = React.useState( _ => "state0");
 		let module X = Experimental;
+		let join = ((_, _, contributor_id, _, _) as it) => Fetch.Syntax.({
+			let* user_info = X.Fetch.all(module At_repo_1(
+				{ include X.GenSQL; let tgt_user_id = contributor_id }))(module Env);
+			let row = fun | ([user_id, name, ...[]]) =>
+				( Float.to_int(Option.get(Js.Json.decodeNumber(user_id))), Option.get(Js.Json.decodeString(name)) ) | _ => failwith("no");
+			let pars = {
+				let per_row = row % Array.to_list % Option.get % Js.Json.decodeArray;
+				Array.map(per_row) % Option.get % Js.Json.decodeArray };
+			let (_, name) = pars(user_info)[0];
+			return @@ (it, name)
+		});
 		React.useEffect0(Effect.async @@ () => Fetch.Syntax.({
 			let id = Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id"));
 			let* res = X.Fetch.all(module At_repo_0(
-				{ include X.GenSQL; let tgt_post_id = id }))(module Env);
-			let  row = fun | ([id, post_id, title, ...[]]) => (Option.get(Js.Json.decodeNumber(id)), Option.get(Js.Json.decodeNumber(post_id)), Option.get(Js.Json.decodeString(title))) | _ => failwith("no");
-			let parse = {
+				{ include X.GenSQL; let tgt_post_id = int_of_string(id) }))(module Env);
+			let  row = fun | ([id, post_id, contributor, title, description, ...[]]) =>
+				( Float.to_int(Option.get(Js.Json.decodeNumber(id))), Float.to_int(Option.get(Js.Json.decodeNumber(post_id))), Float.to_int(Option.get(Js.Json.decodeNumber(contributor))), Option.get(Js.Json.decodeString(title)), Option.get(Js.Json.decodeString(description)) ) | _ => failwith("no");
+			let pars = {
 				let per_row = row % Array.to_list % Option.get % Js.Json.decodeArray;
-				return % Array.map(per_row) % Option.get % Js.Json.decodeArray };
-			let* dict = Fetch.Response.json(res) >>= parse;
+				Array.map(per_row) % Option.get % Js.Json.decodeArray };
+			let* dict = Js.Promise.all @@ Array.map(join) @@ pars @@ res;
 			setPrs(_ => dict);
 			return @@ ()
 		}));
