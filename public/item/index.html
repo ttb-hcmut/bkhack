@@ -39,18 +39,25 @@ html {
 	border-radius: var(--radius);
 	border-top: 1px solid var(--card-border);
 	border-bottom: 1px solid var(--card-border);
-	height: max-content;
+	height: 2rem;
+  margin-top: var(--radius);
+	margin-left: var(--space-a);
+	margin-right: var(--space-a);
+	border-radius: 0.5rem 0.5rem 0 0;
+	border-top: 1px solid var(--card-border);
+	border-left: 1px solid var(--card-border);
+	border-right: 1px solid var(--card-border);
+	background-color: var(--card-bg-translucent);
 }
 
 #root > main {
-	margin-top: calc(-1 * (var(--radius)));
-  padding-top: var(--radius);
-	/* margin-left: var(--space-a);
-	margin-right: var(--space-a); */
+	margin-left: var(--space-a);
+	margin-right: var(--space-a);
+  padding-bottom: var(--radius);
+	border-radius: 0 0 0.5rem 0.5rem;
 	border-left: 1px solid var(--card-border);
 	border-right: 1px solid var(--card-border);
 	border-bottom: 1px solid var(--card-border);
-	border-radius: 0.5rem 0.5rem 0 0;
 	background-color: var(--card-bg-translucent);
 }
 
@@ -145,7 +152,8 @@ html {
 #root > main.article > *.only:not(.article),
 #root > main.discussions > *.only:not(.discussions),
 #root > main.pullrequests > *.only:not(.pullrequests),
-#root > main.log > *.only:not(.log) {
+#root > main.log > *.only:not(.log),
+#root > main.edit > *.only:not(.edit) {
 	display: none;
 }
 
@@ -175,9 +183,11 @@ html {
 	#root > nav {
 		grid-column: 2 / 3;
 		grid-row: 2 / 3;
+		margin: 0;
 	}
 	#root > main {
-	  margin-top: calc(-1 * (var(--radius) + var(--space-a)));
+		margin: 0;
+	  margin-top: calc(-1 * var(--space-a));
 		grid-column: 2 / 3;
 		grid-row: 3 / 4;
 	}
@@ -206,6 +216,10 @@ html {
 }
 	
 
+#root .show-hide-sidebar {
+	height: 2rem;
+}
+
 	/* Show hide sidebar system */
 	
 /* if mobile state1 => show, state0 => hide */
@@ -215,10 +229,10 @@ html {
 		content: "Hide Sidebar";
 	}
 	body:has(.state1){
-		overflow:hidden;
+		overflow: hidden;
 	}
 	#root:has(.state1) > *:not(aside):not(.show-hide-sidebar){
-		filter: brightness(50%);
+		/* filter: brightness(50%); */
 		pointer-events: none;     /* block clicks */
 		user-select: none;
 	}
@@ -235,8 +249,8 @@ html {
 		content: "Show Sidebar";
 	}
 }
-	/* if desktop state0 => show, state1 => hide */
-	@media (min-width: 64rem) {
+/* if desktop state0 => show, state1 => hide */
+@media (min-width: 64rem) {
 
 	/* #root > * {
 		grid-column: 2 / 3;

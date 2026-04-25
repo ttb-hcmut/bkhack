@@ -1,14 +1,27 @@
+
+#root > nav {
+	background-color: var(--card-bg-translucent);
+	display: flex;
+	flex-direction: row;
+	border-radius: 0.5rem;
+	border-top: 1px solid var(--card-border);
+	border-bottom: 1px solid var(--card-border);
+	height: 2rem;
+}
+
 #root > nav button {
 	height: 100%;
 	color: var(--card-fg-unhighlighted);
 	border-radius: 0.5rem;
 	font-family: var(--font-mono);
 	font-size: var(--text-sm);
-  padding: var(--space-a);
+	padding-left: var(--space-a);
+	padding-right: var(--space-a);
 	display: flex;
 	flex-direction: row;
 	align-items: center;
-	justify-content: center;
+	justify-content: start;
+	cursor: initial;
 }
 
 #root > nav button > label {
@@ -16,9 +29,10 @@
 	flex-direction: row;
 	align-items: center;
 	justify-content: center;
+	white-space: nowrap;
 }
 
-#root >  nav button:hover:not(.selected) > label {
+#root > nav button:hover:not(.selected) > label {
 	color: var(--card-fg-highlighted-dimmer);
 }
 
@@ -77,23 +91,57 @@
 }
 
 #root[data-tileset="gui"] > nav button > label::before {
-	filter: grayscale(100%) brightness(50%);
+	filter: grayscale(100%) brightness(100%);
+}
+
+/* FIXME(kinten) */
+#root[data-tileset="gui"] > nav button.pullrequests > label::before {
+	filter: grayscale(100%) brightness(85%);
 }
 
 #root[data-tileset="gui"] > nav button:hover > label::before {
-	filter: grayscale(100%) brightness(120%);
+	filter: grayscale(100%) brightness(50%);
 }
 
 #root[data-tileset="gui"] > nav button.selected > label::before {
-	filter: grayscale(0%);
+	filter: grayscale(0%) brightness(80%);
+}
+
+@media (prefers-color-scheme: dark) {
+	#root[data-tileset="gui"] > nav button > label::before {
+		filter: grayscale(100%) brightness(50%);
+	}
+
+	/* FIXME(kinten) */
+	#root[data-tileset="gui"] > nav button.pullrequests > label::before {
+		filter: grayscale(100%) brightness(45%);
+	}
+
+	#root[data-tileset="gui"] > nav button:hover > label::before {
+		filter: grayscale(100%) brightness(120%);
+	}
+
+	#root[data-tileset="gui"] > nav button.selected > label::before {
+		filter: grayscale(0%) brightness(100%);
+	}
 }
 
 #root[data-tileset="gui"] > nav button.article > label::before {
-	filter: grayscale(100%) brightness(70%);
+	filter: grayscale(100%) brightness(140%);
 }
 
 #root[data-tileset="gui"] > nav button.article:hover > label::before {
-	filter: grayscale(100%) brightness(140%);
+	filter: grayscale(100%) brightness(70%);
+}
+
+@media (prefers-color-scheme: dark) {
+	#root[data-tileset="gui"] > nav button.article > label::before {
+		filter: grayscale(100%) brightness(70%);
+	}
+
+	#root[data-tileset="gui"] > nav button.article:hover > label::before {
+		filter: grayscale(100%) brightness(140%);
+	}
 }
 
 #root[data-tileset="gui"] > nav button.article.selected > label::before {

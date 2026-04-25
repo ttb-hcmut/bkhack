@@ -1,16 +1,8 @@
-#root > main.discussions {
-	background-color: var(--ctp-mantle);
-}
-
-#root > main.discussions > header {
-	background-color: var(--ctp-mantle);
-}
-
 #root > main.discussions > header {
 	display: grid;
-	grid-template-columns: min-content minmax(0,1fr) min-content;
+	grid-template-columns: 2.5rem minmax(0,1fr) min-content;
+	grid-template-rows: min-content min-content min-content;
 	padding: var(--space-a);
-	gap: var(--space-a);
 }
 
 #root > main.discussions > header > h1 {
@@ -85,14 +77,14 @@
 }
 
 #root > main.discussions > header > h1 {
-	color: var(--ctp-mantle);
+	color: var(--card-fg);
 	font-family: var(--font-mono);
 	font-size: var(--text-sm);
 }
 
 #root > main.discussions > header > nav {
 	margin-top: var(--space-a);
-	background-color: var(--ctp-crust);
+	background-color: var(--card-bg-translucent);
 	border: solid 1px var(--card-border);
 	padding: var(--space-a);
 }
@@ -106,7 +98,7 @@
 
 #root > main.discussions > main {
 	border-top: solid 1px var(--card-border);
-	background-color: var(--ctp-crust);
+	background-color: var(--card-bg-translucent);
 	padding-top: var(--space-a);
 	padding-bottom: var(--space-a);
 }

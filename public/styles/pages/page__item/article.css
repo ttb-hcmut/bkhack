@@ -27,7 +27,6 @@
   color: var(--ctp-text);
   width: unset;
   height: unset;
-  transform: rotate(-90deg);
   align-content: center;
   text-align: center;
 }
