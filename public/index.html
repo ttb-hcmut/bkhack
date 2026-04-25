@@ -187,6 +187,21 @@ html {
 	border: solid 1px var(--card-border);
 }
 
+#root > nav {
+	margin-left: var(--space-a);
+	margin-right: var(--space-a);
+}
+
+#root > main {
+	margin-left: var(--space-a);
+	margin-right: var(--space-a);
+}
+
+#root > footer {
+	margin-left: var(--space-a);
+	margin-right: var(--space-a);
+}
+
 #root > nav > header {
 	display: grid;
 	grid-template-columns: minmax(0,1fr);
@@ -469,7 +484,22 @@ form.dashboard-filter {
 		display: grid;
 		grid-auto-rows: max-content;
 		grid-template-columns: var(--grid-1);
-		gap: var(--space-a);
+		column-gap: var(--space-a);
+	}
+
+	#root > nav {
+		margin-left: 0;
+		margin-right: 0;
+	}
+
+	#root > main {
+		margin-left: 0;
+		margin-right: 0;
+	}
+
+	#root > footer {
+		margin-left: 0;
+		margin-right: 0;
 	}
 
 	/* #root > * {

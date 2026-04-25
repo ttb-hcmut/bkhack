@@ -27,6 +27,7 @@
 #root > main.discussions > header > .sub > .summary {
 	font-family: var(--font-mono);
 	color: var(--card-fg-aux);
+	display: inline flex;
 }
 
 #root > main.discussions > header > .sub > .summary > :not(:first-child) {
