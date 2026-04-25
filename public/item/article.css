@@ -1,8 +1,4 @@
-#root > main.article {
-  background-color: var(--ctp-mantle);
-}
 #root > main.article > header {
-	background-color: var(--ctp-mantle);
 	display: grid;
 	grid-template-columns: min-content minmax(0,1fr) min-content;
 	grid-template-rows: min-content min-content min-content;
