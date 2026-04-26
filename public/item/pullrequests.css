@@ -99,3 +99,73 @@
 	width: 1em;
 	height: 1em;
 }
+
+#root > main.pullrequests > main {
+	border-top: solid 1px var(--card-border);
+	background-color: var(--card-bg-translucent);
+}
+
+ul:has(li.pull-request-row) {
+	display: grid;
+	grid-template-columns: 3rem max-content minmax(0,1fr) max-content;
+	column-gap: var(--space-c);
+	grid-auto-rows: max-content;
+	padding-top: var(--space-a);
+	padding-left: var(--space-a);
+	padding-right: var(--space-a);
+}
+
+ul li.pull-request-row {
+	grid-column: 1 / -1;
+	display: grid;
+	grid-template-columns: subgrid;
+	background-color: var(--card-bg);
+	border: solid 1px var(--card-border);
+	font-family: var(--font-mono);
+	font-size: var(--text-sm);
+	padding-top: var(--space-c);
+	padding-bottom: var(--space-c);
+	padding-left: var(--space-c);
+	padding-right: var(--space-c);
+}
+
+ul li.pull-request-row > button:first-child {
+	content: "expand";
+}
+
+li.pull-request-row:not(:first-child) {
+	margin-top: 6px;
+}
+
+li.pull-request-row > .id {
+	color: var(--card-fg-aux);
+}
+
+li.pull-request-row > .id::before {
+	content: "#";
+}
+
+li.pull-request-row > .contributor::before {
+	content: "@";
+}
+
+ul li.pull-request-row > .expanded-content {
+	grid-column: 2 / -1;
+	display: none;
+}
+
+ul li.pull-request-row.expanded {
+
+}
+
+ul li.pull-request-row.expanded > :not(button):not(.expanded-content) {
+	display: none;
+}
+
+ul li.pull-request-row.expanded > .expanded-content {
+	display: block grid;
+	grid-template-rows: max-content max-content max-content max-content max-content;
+}
+
+ul li.pull-request-row.expanded > .expanded-content {
+}

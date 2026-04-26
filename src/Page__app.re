@@ -1,4 +1,5 @@
 [@page "/"]
+open Melange__containers.Fun
 open Bkhack
 
 module Post = {
@@ -409,13 +410,13 @@ module Filter = {
 module Dashboard = {
 	module Card = {
 		[@react.component]
-		let make = (~rank, ~title) => {
+		let make = (~post_id, ~rank, ~title) => {
 			<>
 				<div className="counter">
 					<span>{React.int(rank)}</span>
 				</div>
 				<header>
-					<a href="item/?id=lol">{string(title)}</a>
+					<a href={"item/?id="++string_of_int(post_id)}>{string(title)}</a>
 				</header>
 				<footer>
 					<div className="has-left-indicator tagline">
@@ -449,42 +450,42 @@ module Dashboard = {
 		}
 	}
 
+	module At_repo_0'(S : Experimental.S) =
+	{
+		open S
+		let rec q' = () =>
+			foreach(posts') @@ o =>
+			yield(o)
+		and posts' = () => table @@ ("posts", posts())
+		let q = observe(q')
+	}
+
+	module At_repo_0(S : Experimental.S) =
+	{
+		include At_repo_0'(S)
+		module Json = Js.Json
+
+		type t = array((int, string, int));
+
+		let  row = [@warning "-8"] fun | [|id, title, creator|] =>
+			( Float.to_int(Json.decodeNumberExn(id)), Json.decodeStringExn(title), Float.to_int(Json.decodeNumberExn(creator)) );
+
+		let json = {
+			let per_row = row % Json.decodeArrayExn;
+			Array.map(per_row) % Json.decodeArrayExn
+		}
+	}
+
   [@react.component]
   let make = () => {
-		let testitems =
-		[
-			(198, "Reconciling Abstractions with High Performance"
-			)
-		,
-			(342, "Algebra-driven Design"
-			)
-		,
-			(034, "Reverse-engineer a PDF"
-			)
-		,
-			(012, "Haskell School of Music"
-			)
-		,
-			(123, "Compilers: Principles, Techniques, and Tools"
-			)
-		,
-			(139, "Tsoding: I wrote an Emacs plugin"
-			)
-		,
-			(752, "Why OCaml"
-			)
-		,
-			(711, "Seven Implementations of Incremental"
-			)
-		,
-			(812, "Attention is not all you need"
-			)
-		,
-			(820, "Neural Network in Assembly"
-			)
-		];
+		let (items, setItems) = React.useState(() => [||]);
 		let (sidebarState, setSidebarState) = React.useState( _ => "state0");
-
+		let module X = Experimental;
+		React.useEffect0(Effect.async @@ () => Fetch.Syntax.({
+			let* posts = X.Fetch.all(module At_repo_0(X.GenSQL))(module Env);
+			setItems(_ => posts)
+			return(())
+		}));
 		<>
 			<header>
 				<Component__header />
@@ -495,29 +496,27 @@ module Dashboard = {
 				</header>
 				<Filter />
 			</nav>
-
-
-      
 			<main className=sidebarState><ol>
-			{ testitems
-				|> List.map(((rank, title)) => {
+			{ items
+				|> Array.map(((post_id, title, _creator)) => {
+					let rank = 9;
 					<li
 						key=title
 					>
 						<Card
 							rank
 							title
+							post_id
 						/>
 					</li>
 				})
-				|> Array.of_list |> React.array
+				|> React.array
 			}
 			</ol></main>
 			<footer role="navigation" className=sidebarState>
 				<button>{string("prev")}</button>
 				<button>{string("next")}</button>
 			</footer>
-
 			<button 
 				className={"show-hide-sidebar " ++ sidebarState}
 				onClick={_=>{

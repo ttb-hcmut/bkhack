@@ -4,11 +4,12 @@ open Quel_sym;
 [@alert development("Free querying of data is not fit for production environment.")]
 module type S = {
   include SymanticsL;
-  type user and pr;
+  type user and post and pr;
 
   /** {1 Input / output records} */
 
 	let user : repr(int) => repr(string) => repr(user);
+	let post : repr(int) => repr(string) => repr(int) => repr(post);
 	let pr : repr(int) => repr(int) => repr(int) => repr(string) => repr(string) => repr(pr);
 
 	/** {1 Projections} */
@@ -16,6 +17,12 @@ module type S = {
 	module User : {
 		let id : repr(user) => repr(int);
 		let name : repr(user) => repr(string);
+	};
+
+	module Post : {
+		let id : repr(post) => repr(int);
+		let title : repr(post) => repr(string);
+		let creator : repr(post) => repr(int);
 	};
 
 	module Pull_request : {
@@ -28,7 +35,9 @@ module type S = {
 
 	/** {1 Data sources} */
 
-	let users : unit => list(user) let prs : unit => list(pr);
+	let users : unit => list(user);
+	let posts : unit => list(post);
+	let prs : unit => list(pr);
 };
 
 module GenSQL = GenSQL;

@@ -36,7 +36,8 @@ module ItemNav = {
 
 module ArticleHeader = {
 	[@react.component]
-	let make = (~tags) => {
+	let make = (~tags, ~info) => {
+		let (_id, title, creator_name) = info;
 		<>
 			<div className="counter">
 				<button className="up">
@@ -47,10 +48,10 @@ module ArticleHeader = {
 					{React.string("down")}
 				</button>
 			</div>
-			<h1>{React.string("Seven Implementations of Incremental")}</h1>
+			<h1>{React.string(title)}</h1>
 			<ul className="tags">{tags |> Array.map(x => <li key=x><span className="tag">{React.string(x)}</span></li>) |> React.array}</ul>
 			<div className="author">
-				<span>{React.string("nddung")}</span>
+				<span>{React.string(creator_name)}</span>
 				<div className="created-from"></div>
 			</div>
 			<div className="actions">
@@ -61,6 +62,8 @@ module ArticleHeader = {
 		</>
 	}
 }
+
+let make_html_obj : string => Js.t({ .. __html : string }) = [%mel.raw "function (s) { return { __html : s }; }"]
 
 module ArticleBody = {
 	[@react.component]
@@ -80,7 +83,7 @@ module ArticleBody = {
 				</ol>
 			</nav>
 			<main className="markdown">
-				{React.string(article_body)}
+				<div dangerouslySetInnerHTML={make_html_obj @@ article_body} />
 			</main>
 		</>
 	}
@@ -300,15 +303,21 @@ module PullrequestsFilter = {
 
 module PullrequestsBody = {
 	[@react.component]
-	let make = (~pullrequests) => {
+	let make = (~pullrequests, ~prsExpand, ~expand_this) => {
 		<ul>
 			{pullrequests |> Array.map(x => {
 				let ((id, _post_id, _contributor_id, title, _desc), contributor_name) = x;
-				<li className="pull-request-row">
-					<button></button>
+				let is_expanded = List.assoc_opt(id, prsExpand) |> Option.value(~default=false);
+				<li key=string_of_int(id) className=("pull-request-row " ++ (is_expanded ? "expanded" : " "))>
+					<button onClick={_ => expand_this(id)}></button>
 					<span className="id">{React.int(id)}</span>
-					<span>{React.string(title)}</span>
-					<span>{React.string(contributor_name)}</span>
+					<span className="title">{React.string(title)}</span>
+					<span className="contributor">{React.string(contributor_name)}</span>
+					<div className="expanded-content">
+						<span className="id">{React.int(id)}</span>
+						<span className="title">{React.string(title)}</span>
+						<span className="contributor">{React.string(contributor_name)}</span>
+					</div>
 				</li>
 			}) |> React.array}
 		</ul>
@@ -328,22 +337,22 @@ module At_repo_0'(S : {
 	let q = observe(q')
 }
 
-[@alert experimental("Automatic query data demarshalling is WIP, it is currently manual.")]
 module At_repo_0(S : {
 	include Experimental.S;
 	let tgt_post_id : int }) =
 {
 	include At_repo_0'(S)
+	module Json = Js.Json
 
 	type t = array((int, int, int, string, string));
 
-	let  row = fun | ([id, post_id, contributor, title, description, ...[]]) =>
-		( Float.to_int(Option.get(Js.Json.decodeNumber(id))), Float.to_int(Option.get(Js.Json.decodeNumber(post_id))), Float.to_int(Option.get(Js.Json.decodeNumber(contributor))), Option.get(Js.Json.decodeString(title)), Option.get(Js.Json.decodeString(description)) ) | _ => failwith("no");
+	let  row = [@warning "-8"] fun | [|id, post_id, contributor, title, description|] =>
+		( Float.to_int(Json.decodeNumberExn(id)), Float.to_int(Json.decodeNumberExn(post_id)), Float.to_int(Json.decodeNumberExn(contributor)), Json.decodeStringExn(title), Json.decodeStringExn(description) );
 
-	let json = ({
-		let per_row = row % Array.to_list % Option.get % Js.Json.decodeArray;
-		Array.map(per_row) % Option.get % Js.Json.decodeArray
-	})
+	let json = {
+		let per_row = row % Json.decodeArrayExn;
+		Array.map(per_row) % Json.decodeArrayExn
+	}
 }
 
 module At_repo_1'(S : {
@@ -359,23 +368,62 @@ module At_repo_1'(S : {
 	let q = observe(q')
 }
 
-[@alert experimental("Automatic query data demarshalling is WIP, it is currently manual.")]
 module At_repo_1(S : {
 	include Experimental.S;
 	let tgt_user_id : int }) =
 {
 	include At_repo_1'(S)
+	module Json = Js.Json
 
 	type t = array((int, string))
 
-	let row  = fun | ([user_id, name, ...[]]) =>
-		( Float.to_int(Option.get(Js.Json.decodeNumber(user_id))), Option.get(Js.Json.decodeString(name)) ) | _ => failwith("no");
+	let row  = [@warning "-8"] fun | [|user_id, name|] =>
+		( Float.to_int(Json.decodeNumberExn(user_id)), Json.decodeStringExn(name) );
 
 	let json = {
-		let per_row = row % Array.to_list % Option.get % Js.Json.decodeArray;
-		Array.map(per_row) % Option.get % Js.Json.decodeArray
+		let per_row = row % Json.decodeArrayExn;
+		Array.map(per_row) % Json.decodeArrayExn
 	}
 }
+
+module At_repo_2'(S : {
+	include Experimental.S;
+	let tgt_post_id : int }) =
+{
+	open S
+	let rec q' = () =>
+		foreach(posts') @@ o =>
+		where(Post.id(o) =% int(tgt_post_id)) @@ () =>
+		yield(o)
+	and posts' = () => table @@ ("posts", posts())
+	let q = observe(q')
+}
+
+module At_repo_2(S : {
+	include Experimental.S;
+	let tgt_post_id : int }) =
+{
+	include At_repo_2'(S)
+	module Json = Js.Json
+
+	type t = array((int, string, int));
+
+	let  row = [@warning "-8"] fun | [|id, title, creator|] =>
+		( Float.to_int(Json.decodeNumberExn(id)), Json.decodeStringExn(title), Float.to_int(Json.decodeNumberExn(creator)) );
+
+	let json = {
+		let per_row = row % Json.decodeArrayExn;
+		Array.map(per_row) % Json.decodeArrayExn
+	}
+}
+
+let example = 
+"In computer science, graph algorithm complexity analysis is the study of the computational resources required to solve problems on graph data structures. This article provides a comprehensive examination of time complexity for fundamental graph algorithms, including breadth-first search (BFS), depth-first search (DFS), Dijkstra's algorithm, and the Floyd-Warshall algorithm.
+
+## Test Heading
+
+Understanding these complexities is essential for algorithm selection and optimization in practical applications ranging from network routing to social network analysis.
+"
 
 module App = {
 	[@react.component]
@@ -383,17 +431,30 @@ module App = {
 		let (prsExpand, setPrsExpand) = React.useState(() => []);
 		let (currentTab, setCurrentTab) = React.useState(() => `Article);
 		let (pullrequests, setPrs) = React.useState(() => [||]);
+		let (postInfo, setPostInfo) = React.useState(() => None);
 		let tags = [| "Algorithm", "Rust" |];
-		let headings = [|
-			("1", "Overview", "overview"),
-			("1.1", "Related works", "related-works"),
-		|];
     let post = "1"
-		let article_body = "
-In computer science, graph algorithm complexity analysis is the study of the computational resources required to solve problems on graph data structures. This article provides a comprehensive examination of time complexity for fundamental graph algorithms, including breadth-first search (BFS), depth-first search (DFS), Dijkstra's algorithm, and the Floyd-Warshall algorithm.
-
-Understanding these complexities is essential for algorithm selection and optimization in practical applications ranging from network routing to social network analysis.
-		";
+		// Js.Console.log(a);
+		let renderer = React.useMemo0(() => Melange__cmarkit.Cmarkit_html.renderer(~safe=false, ()));
+		let (headings, article_body) = React.useMemo1(() => {
+			open Melange__cmarkit; open Cmarkit;
+			try ({
+				let skel = example |> Doc.of_string(~strict=false);
+				let block = Doc.block(skel) 
+				let rec s = { fun
+					| Block.Block_Heading((t, _)) => {
+						[@warning "-8"] let (level, Inline.Text((textcontent, _))) = Block.Heading.((level(t), inline(t)));
+						[(Int.to_string(level), textcontent, textcontent)] }
+					| Block.Blocks((xs, _)) => xs |> List.map(s) |> List.flatten
+					| _ => []
+				};
+				let headings = s(block) |> Array.of_list;
+				(headings, Melange__cmarkit.Cmarkit_renderer.doc_to_string(renderer, skel))
+			}) {
+				| Invalid_argument(msg) => { Js.Console.error("rendering error: '" ++ msg ++ "'"); failwith("something bad happened") }
+				| Js.Exn.Error(x) => { Js.Console.error("js error: '" ++ Option.value(~default="", Js.Exn.message(x)) ++ "'"); failwith("sdf") }
+			}
+		}, [|renderer|]);
 		let id = React.useMemo1(() => to_string(currentTab), [|currentTab|]);
 		let url = ReasonReactRouter.useUrl();
 		let (sidebarState, setSidebarState) = React.useState( _ => "state0");
@@ -409,9 +470,33 @@ Understanding these complexities is essential for algorithm selection and optimi
 			let* prs = X.Fetch.all(module At_repo_0(
 				{ include X.GenSQL; let tgt_post_id = int_of_string(id) }))(module Env);
 			let* dict = Js.Promise.all @@ Array.map(join) @@ prs;
-			setPrs(_ => dict);
-			return @@ ()
+			return @@ ignore @@ setPrs(_ => dict);
 		}));
+		React.useEffect0(Effect.async @@ () => Fetch.Syntax.({
+			let post_id = Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id"));
+			let* posts = X.Fetch.all(module At_repo_2(
+				{ include X.GenSQL; let tgt_post_id = int_of_string(post_id) }))(module Env);
+			let (_, post_title, creator_id) = posts[0];
+			let* users = X.Fetch.all(module At_repo_1(
+				{ include X.GenSQL; let tgt_user_id = creator_id }))(module Env);
+			let (_, creator_name) = users[0];
+			return @@ ignore @@ setPostInfo(_ => Some((post_id, post_title, creator_name)))
+		}));
+		let on_prs_update_expand = React.useMemo1(((), id) => {
+			switch (List.assoc(id, prsExpand)) {
+			| v => {
+				let newv = !v;
+				let newdict = List.cons((id, newv), List.remove_assoc(id, prsExpand));
+				setPrsExpand(_ => newdict)
+			}
+			| exception Not_found => {
+				let newdict = List.cons((id, true), prsExpand);
+				setPrsExpand(_ => newdict)
+			}
+			}; ()
+		}, [|prsExpand|]);
+		let show = (x, f) => switch (x) { | Some(info) => f(info) | None => { <> </> } };
+		show(postInfo) @@ postInfo =>
 		<>
 			<header>
 				<Component__header />
@@ -420,28 +505,28 @@ Understanding these complexities is essential for algorithm selection and optimi
 				<ItemNav currentTab setCurrentTab prCount=Array.length(pullrequests)/>
 			</nav>
 			<main className={sidebarState ++ " " ++ id}>
-					<>
-						<header className=Printf.sprintf("only %s", to_string(`Article))><ArticleHeader tags /></header>
-						<div className=Printf.sprintf("innerbody only %s", to_string(`Article))><ArticleBody headings article_body /></div>
-					</>
-					<>
-						<header className=Printf.sprintf("only %s", to_string(`Discussion))>
-							<DiscussionHint />
-							<nav>
-								<DiscussionFilter />
-							</nav>
-						</header>
-						<main className=Printf.sprintf("only %s", to_string(`Discussion))><DiscussionBody post /></main>
-					</>
-					<>
-						<header className=Printf.sprintf("only %s", to_string(`Pullrequest))>
-							<PullrequestsHint />
-							<nav>
-								<PullrequestsFilter />
-							</nav>
-						</header>
-						<main className=Printf.sprintf("only %s", to_string(`Pullrequest))><PullrequestsBody pullrequests /></main>
-					</>
+				<>
+					<header className=Printf.sprintf("only %s", to_string(`Article))><ArticleHeader tags info=postInfo /></header>
+					<div className=Printf.sprintf("innerbody only %s", to_string(`Article))><ArticleBody headings article_body /></div>
+				</>
+				<>
+					<header className=Printf.sprintf("only %s", to_string(`Discussion))>
+						<DiscussionHint />
+						<nav>
+							<DiscussionFilter />
+						</nav>
+					</header>
+					<main className=Printf.sprintf("only %s", to_string(`Discussion))><DiscussionBody post /></main>
+				</>
+				<>
+					<header className=Printf.sprintf("only %s", to_string(`Pullrequest))>
+						<PullrequestsHint />
+						<nav>
+							<PullrequestsFilter />
+						</nav>
+					</header>
+					<main className=Printf.sprintf("only %s", to_string(`Pullrequest))><PullrequestsBody pullrequests prsExpand expand_this=on_prs_update_expand /></main>
+				</>
 			</main>
 			<button 
 				className={"show-hide-sidebar " ++ sidebarState}

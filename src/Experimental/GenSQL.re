@@ -1,9 +1,10 @@
 open Quel;
 include Quel_sql.GenSQL;
 
-type user and pr;
+type user and post and pr;
 
 let user = (id, name) => record @@ ("user_id" %: id) %* (row1 ("name" %: name))
+let post = (id, title, creator) => record @@ ("post_id" %: id) %* (row1 ("post_title" %: title) %* ("creator_id" %: creator))
 and pr = (id, post_id, contributor, title, description) => record @@ ("pr_id" %: id) %* ("post_id" %: post_id) %* ("contributor_id" %: contributor) %* (row1 ("title" %: title) %* ("description" %: description));
 
 /** {1 projections} */
@@ -11,6 +12,12 @@ and pr = (id, post_id, contributor, title, description) => record @@ ("pr_id" %:
 module User = {
 	let id = r => r %. "user_id"
 	and name = r => r %. "name";
+};
+
+module Post = {
+	let id = r => r %. "post_id"
+	and title = r => r %. "post_title"
+	and creator = r => r %. "creator_id"
 };
 
 module Pull_request = {
@@ -23,4 +30,4 @@ module Pull_request = {
 
 /** {1 data sources} */
 
-let users = () => [] and prs = () => []
+let users = () => [] and posts = () => [] and prs = () => []
