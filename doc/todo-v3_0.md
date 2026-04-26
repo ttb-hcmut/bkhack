@@ -3,9 +3,9 @@
 - [ ] multi page serving with melange
 - [ ] storybook integration with melange
 - [ ] sh parser
-- [ ] (kinten) light mode
+- [x] (kinten+hgt) light mode
 - [ ] homogeneous (OCaml?) build system. B0?
-- [ ] markdown parsing
+- [ ] (hgt) markdown parsing
 - [ ] subscription, watch thread, notifications
 - [ ] custom dialog input components
 - [ ] controversial detection
@@ -18,3 +18,7 @@
 - [ ] (hgt) storybook design system (WIP)
 
 - [ ] (hgt) headerbar (WIP)
+- [ ] Use testing framework Rely
+- [ ] Prepare Storybook as browser ui testing framework
+- [ ] Use jaredly/redoc or sth similar to generate source-based documentations
+- [ ] Project Reason Native has Pastel, Refmterr
