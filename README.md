@@ -1,6 +1,7 @@
-# BKHack
+BKHack
+======
 
-A social news website oriented towards computer science, for HCMUT
+Abstract, heterogeneous full-stack application
 
 ## How to develop
 
