@@ -4,3 +4,6 @@
 [submodule "vendors/angstrom/angstrom"]
 	path = vendors/angstrom/angstrom
 	url = git@github.com:inhabitedtype/angstrom.git
+[submodule "vendors/cmarkit+dune/cmarkit"]
+	path = vendors/cmarkit+dune/cmarkit
+	url = git@github.com:kinten108101/cmarkit.git
