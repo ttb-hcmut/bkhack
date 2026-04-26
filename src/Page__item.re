@@ -37,7 +37,7 @@ module ItemNav = {
 module ArticleHeader = {
 	[@react.component]
 	let make = (~tags, ~info) => {
-		let (_id, title, creator_name) = info;
+		let (_id, title, creator_name, _) = info;
 		<>
 			<div className="counter">
 				<button className="up">
@@ -406,10 +406,10 @@ module At_repo_2(S : {
 	include At_repo_2'(S)
 	module Json = Js.Json
 
-	type t = array((int, string, int));
+	type t = array((int, string, int, string));
 
-	let  row = [@warning "-8"] fun | [|id, title, creator|] =>
-		( Float.to_int(Json.decodeNumberExn(id)), Json.decodeStringExn(title), Float.to_int(Json.decodeNumberExn(creator)) );
+	let  row = [@warning "-8"] fun | [|id, title, creator, text|] =>
+		( Float.to_int(Json.decodeNumberExn(id)), Json.decodeStringExn(title), Float.to_int(Json.decodeNumberExn(creator)), Json.decodeStringExn(text) );
 
 	let json = {
 		let per_row = row % Json.decodeArrayExn;
@@ -436,10 +436,11 @@ module App = {
     let post = "1"
 		// Js.Console.log(a);
 		let renderer = React.useMemo0(() => Melange__cmarkit.Cmarkit_html.renderer(~safe=false, ()));
-		let (headings, article_body) = React.useMemo1(() => {
+		let art = React.useMemo2(() => {
 			open Melange__cmarkit; open Cmarkit;
+			postInfo |> Option.map @@ ((_, _, _, text) as postInfo) =>
 			try ({
-				let skel = example |> Doc.of_string(~strict=false);
+				let skel = text |> Doc.of_string(~strict=false);
 				let block = Doc.block(skel) 
 				let rec s = { fun
 					| Block.Block_Heading((t, _)) => {
@@ -449,12 +450,12 @@ module App = {
 					| _ => []
 				};
 				let headings = s(block) |> Array.of_list;
-				(headings, Melange__cmarkit.Cmarkit_renderer.doc_to_string(renderer, skel))
+				(postInfo, headings, Melange__cmarkit.Cmarkit_renderer.doc_to_string(renderer, skel))
 			}) {
 				| Invalid_argument(msg) => { Js.Console.error("rendering error: '" ++ msg ++ "'"); failwith("something bad happened") }
 				| Js.Exn.Error(x) => { Js.Console.error("js error: '" ++ Option.value(~default="", Js.Exn.message(x)) ++ "'"); failwith("sdf") }
 			}
-		}, [|renderer|]);
+		}, (renderer, postInfo));
 		let id = React.useMemo1(() => to_string(currentTab), [|currentTab|]);
 		let url = ReasonReactRouter.useUrl();
 		let (sidebarState, setSidebarState) = React.useState( _ => "state0");
@@ -476,11 +477,11 @@ module App = {
 			let post_id = Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id"));
 			let* posts = X.Fetch.all(module At_repo_2(
 				{ include X.GenSQL; let tgt_post_id = int_of_string(post_id) }))(module Env);
-			let (_, post_title, creator_id) = posts[0];
+			let (_, post_title, creator_id, post_text) = posts[0];
 			let* users = X.Fetch.all(module At_repo_1(
 				{ include X.GenSQL; let tgt_user_id = creator_id }))(module Env);
 			let (_, creator_name) = users[0];
-			return @@ ignore @@ setPostInfo(_ => Some((post_id, post_title, creator_name)))
+			return @@ ignore @@ setPostInfo(_ => Some((post_id, post_title, creator_name, post_text)))
 		}));
 		let on_prs_update_expand = React.useMemo1(((), id) => {
 			switch (List.assoc(id, prsExpand)) {
@@ -496,7 +497,7 @@ module App = {
 			}; ()
 		}, [|prsExpand|]);
 		let show = (x, f) => switch (x) { | Some(info) => f(info) | None => { <> </> } };
-		show(postInfo) @@ postInfo =>
+		show(art) @@ ((postInfo, headings, article_body)) =>
 		<>
 			<header>
 				<Component__header />

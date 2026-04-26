@@ -56,6 +56,7 @@ result3 =
       post_id integer primary key,
       post_title varchar(255) not null,
       creator_id integer not null,
+      post_text varchar(2048) not null,
       foreign key (creator_id) references users(user_id)
     )
     """,
@@ -116,7 +117,7 @@ result3 =
   Exqlite.query!(
     conn,
     ~S"""
-    insert into posts values (77, 'Seven Implementations of Incremental', 0)
+    insert into posts values (77, 'Seven Implementations of Incremental', 0, 'Video from Jane Street Tech Talk\n\nIncremental là một thư viện FRP (functional reactive programming) dùng để viết hàm tính toán tích hợp đạo hàm ‌và giải tích tự động. Anh em nào đam mê Giải tích 1 2, và thích code React, và thích đại số trừu tượng, thì có thể tham khảo.\n\n# FRP là gì?\n\nTBA')
     """,
     []
   )

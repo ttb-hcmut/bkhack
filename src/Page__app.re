@@ -465,10 +465,10 @@ module Dashboard = {
 		include At_repo_0'(S)
 		module Json = Js.Json
 
-		type t = array((int, string, int));
+		type t = array((int, string, int, string));
 
-		let  row = [@warning "-8"] fun | [|id, title, creator|] =>
-			( Float.to_int(Json.decodeNumberExn(id)), Json.decodeStringExn(title), Float.to_int(Json.decodeNumberExn(creator)) );
+		let  row = [@warning "-8"] fun | [|id, title, creator, text|] =>
+			( Float.to_int(Json.decodeNumberExn(id)), Json.decodeStringExn(title), Float.to_int(Json.decodeNumberExn(creator)), Json.decodeStringExn(text) );
 
 		let json = {
 			let per_row = row % Json.decodeArrayExn;
@@ -498,7 +498,7 @@ module Dashboard = {
 			</nav>
 			<main className=sidebarState><ol>
 			{ items
-				|> Array.map(((post_id, title, _creator)) => {
+				|> Array.map(((post_id, title, _creator, _)) => {
 					let rank = 9;
 					<li
 						key=title

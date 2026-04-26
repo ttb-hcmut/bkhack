@@ -9,7 +9,7 @@ module type S = {
   /** {1 Input / output records} */
 
 	let user : repr(int) => repr(string) => repr(user);
-	let post : repr(int) => repr(string) => repr(int) => repr(post);
+	let post : repr(int) => repr(string) => repr(int) => repr(string) => repr(post);
 	let pr : repr(int) => repr(int) => repr(int) => repr(string) => repr(string) => repr(pr);
 
 	/** {1 Projections} */
@@ -23,6 +23,7 @@ module type S = {
 		let id : repr(post) => repr(int);
 		let title : repr(post) => repr(string);
 		let creator : repr(post) => repr(int);
+		let text : repr(post) => repr(string);
 	};
 
 	module Pull_request : {
