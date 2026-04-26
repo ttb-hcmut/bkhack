@@ -269,22 +269,6 @@ module DiscussionBody = {
       hidden={!showMore}>
         {React.string("More replies")}
       </button>
-      // {comments |> Array.map(x => {
-      //   let (id, level, authorname, content) = x;
-      //   <li key=id className=Printf.sprintf("level-%d", level)>
-      //     <article>
-      //       <header>
-      //         <span className="author">{React.string(authorname)}</span>
-      //       </header>
-      //       <div className="content">
-      //         {React.string(content)}
-      //       </div>
-      //       <div className="counter">
-      //         <data>{React.int(41)}</data>
-      //       </div>
-      //     </article>
-      //   </li>
-      // }) |> React.array}
     </>
 	}
 }
