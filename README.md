@@ -1,7 +1,6 @@
-BKHack
+bkhack
 ======
-
-Abstract, heterogeneous full-stack application
+*Abstract, heterogeneous full-stack application*
 
 ## How to develop
 
