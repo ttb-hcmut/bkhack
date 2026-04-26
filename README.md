@@ -4,7 +4,7 @@ bkhack
 
 ## How to develop
 
-### Nix shell
+### Nix shell (courtesy of Tuong)
 
 Start nix shell
 
@@ -31,7 +31,7 @@ pnpm dev
 
 Voila!
 
-### Nix shell from Docker
+### Nix shell from Docker (courtesy of Tung)
 
 ```sh
 docker-compose up -d
