@@ -331,7 +331,7 @@ module PullrequestsBody = {
 	}
 }
 
-module At_repo_0(S : {
+module At_repo_0'(S : {
 	include Experimental.S;
 	let tgt_post_id : int }) =
 {
@@ -344,7 +344,25 @@ module At_repo_0(S : {
 	let q = observe(q')
 }
 
-module At_repo_1(S : {
+[@alert experimental("Automatic query data demarshalling is WIP, it is currently manual.")]
+module At_repo_0(S : {
+	include Experimental.S;
+	let tgt_post_id : int }) =
+{
+	include At_repo_0'(S)
+
+	type t = array((int, int, int, string, string));
+
+	let  row = fun | ([id, post_id, contributor, title, description, ...[]]) =>
+		( Float.to_int(Option.get(Js.Json.decodeNumber(id))), Float.to_int(Option.get(Js.Json.decodeNumber(post_id))), Float.to_int(Option.get(Js.Json.decodeNumber(contributor))), Option.get(Js.Json.decodeString(title)), Option.get(Js.Json.decodeString(description)) ) | _ => failwith("no");
+
+	let json = ({
+		let per_row = row % Array.to_list % Option.get % Js.Json.decodeArray;
+		Array.map(per_row) % Option.get % Js.Json.decodeArray
+	})
+}
+
+module At_repo_1'(S : {
 	include Experimental.S;
 	let tgt_user_id : int }) =
 {
@@ -357,9 +375,28 @@ module At_repo_1(S : {
 	let q = observe(q')
 }
 
+[@alert experimental("Automatic query data demarshalling is WIP, it is currently manual.")]
+module At_repo_1(S : {
+	include Experimental.S;
+	let tgt_user_id : int }) =
+{
+	include At_repo_1'(S)
+
+	type t = array((int, string))
+
+	let row  = fun | ([user_id, name, ...[]]) =>
+		( Float.to_int(Option.get(Js.Json.decodeNumber(user_id))), Option.get(Js.Json.decodeString(name)) ) | _ => failwith("no");
+
+	let json = {
+		let per_row = row % Array.to_list % Option.get % Js.Json.decodeArray;
+		Array.map(per_row) % Option.get % Js.Json.decodeArray
+	}
+}
+
 module App = {
 	[@react.component]
 	let make = () => {
+		let (prsExpand, setPrsExpand) = React.useState(() => []);
 		let (currentTab, setCurrentTab) = React.useState(() => `Article);
 		let (pullrequests, setPrs) = React.useState(() => [||]);
 		let tags = [| "Algorithm", "Rust" |];
@@ -380,24 +417,14 @@ Understanding these complexities is essential for algorithm selection and optimi
 		let join = ((_, _, contributor_id, _, _) as it) => Fetch.Syntax.({
 			let* user_info = X.Fetch.all(module At_repo_1(
 				{ include X.GenSQL; let tgt_user_id = contributor_id }))(module Env);
-			let row = fun | ([user_id, name, ...[]]) =>
-				( Float.to_int(Option.get(Js.Json.decodeNumber(user_id))), Option.get(Js.Json.decodeString(name)) ) | _ => failwith("no");
-			let pars = {
-				let per_row = row % Array.to_list % Option.get % Js.Json.decodeArray;
-				Array.map(per_row) % Option.get % Js.Json.decodeArray };
-			let (_, name) = pars(user_info)[0];
+			let (_, name) = user_info[0];
 			return @@ (it, name)
 		});
 		React.useEffect0(Effect.async @@ () => Fetch.Syntax.({
 			let id = Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id"));
-			let* res = X.Fetch.all(module At_repo_0(
+			let* prs = X.Fetch.all(module At_repo_0(
 				{ include X.GenSQL; let tgt_post_id = int_of_string(id) }))(module Env);
-			let  row = fun | ([id, post_id, contributor, title, description, ...[]]) =>
-				( Float.to_int(Option.get(Js.Json.decodeNumber(id))), Float.to_int(Option.get(Js.Json.decodeNumber(post_id))), Float.to_int(Option.get(Js.Json.decodeNumber(contributor))), Option.get(Js.Json.decodeString(title)), Option.get(Js.Json.decodeString(description)) ) | _ => failwith("no");
-			let pars = {
-				let per_row = row % Array.to_list % Option.get % Js.Json.decodeArray;
-				Array.map(per_row) % Option.get % Js.Json.decodeArray };
-			let* dict = Js.Promise.all @@ Array.map(join) @@ pars @@ res;
+			let* dict = Js.Promise.all @@ Array.map(join) @@ prs;
 			setPrs(_ => dict);
 			return @@ ()
 		}));

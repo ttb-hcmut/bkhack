@@ -1,6 +1,7 @@
 open Quel;
 open Quel_sym;
 
+[@alert development("Free querying of data is not fit for production environment.")]
 module type S = {
   include SymanticsL;
   type user and pr;
