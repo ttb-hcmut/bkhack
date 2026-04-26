@@ -44,7 +44,7 @@
 #root > main.article > header > h1 {
 	font-size: var(--text-base);
 	font-weight: normal;
-	color: var(--ctp-mantle);
+	color: var(--card-fg);
 }
 
 #root > main.article > header > ul.tags {
