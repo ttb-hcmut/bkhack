@@ -3,7 +3,10 @@ During development, it's sometimes useful to perform direct data binding. No alg
 |                  | SQL | NoSQL (mongodb) | NoSQL (firestore) |
 |------------------|-----|-----------------|-------------------|
 | gateway api      | y   | y               | n[^ecto-firestore]|
-| free sql         | n   | n               | n                 |
-| free sql direct  | n   | n               | n                 |
+| free sql         | y   | n               | n                 |
+| api direct       | n   | n               | y                 |
+| free sql direct  | n   | n               | n[^firesql]       |
 
 [^ecto-firestore]: For Elixir, a firestore binding elixir-firestore exists. But our framework is not just vanilla Elixir, it is *Elixir Ecto*. All DBMS bindings should be uniformly Ecto.
+
+[^firesql]: There's an NPM package FireSQL which we had hope would be to do this - translating SQL expression to Firestore commands or something like Firestore Structured Query. Unfortunately, the package seems to be outdated, evident by the fact that it was expecting an object-oriented API of firestore documents but today firestore documents API is function-based.
