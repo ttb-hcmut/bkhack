@@ -2,6 +2,8 @@ During development, it's sometimes useful to perform direct data binding. No alg
 
 |                  | SQL | NoSQL (mongodb) | NoSQL (firestore) |
 |------------------|-----|-----------------|-------------------|
-| gateway api      | y   | y               | n                 |
+| gateway api      | y   | y               | n[^ecto-firestore]|
 | free sql         | n   | n               | n                 |
 | free sql direct  | n   | n               | n                 |
+
+[^ecto-firestore]: For Elixir, a firestore binding elixir-firestore exists. But our framework is not just vanilla Elixir, it is *Elixir Ecto*. All DBMS bindings should be uniformly Ecto.
