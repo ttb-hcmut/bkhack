@@ -36,6 +36,7 @@ defmodule App
 
   get "/api/comment" do
     Logger.info "GET comment"
+    before = System.monotonic_time(:millisecond)
     parent = Map.get(conn.params,"parent","0")
     offset = String.to_integer(Map.get(conn.params,"offset","0"))
     limit = String.to_integer(Map.get(conn.params,"limit","10"))
@@ -48,6 +49,8 @@ defmodule App
     |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
     |> put_resp_content_type("application/json")
     |> send_resp(200, sh)
+
+    IO.puts(System.monotonic_time(:millisecond) - before)
   end
 
   post "/api/test/free" do
@@ -79,7 +82,7 @@ defmodule App
     |> put_resp_content_type("application/json")
     |> send_resp(200, sh)
   end
-  
+
   get "/api/test/users" do
     import Ecto.Query
     query = from u in User, select: u
@@ -166,8 +169,8 @@ defmodule App.Supervisor do
   @impl true
   def init(_init_arg) do
     children = [
-      Data0,
-      Data1
+      # Data0,
+      # Data1
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

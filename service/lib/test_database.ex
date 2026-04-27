@@ -58,6 +58,7 @@ defmodule Db do
       }
     end
     # Theres a reason I'm not writing an SQL language from scratch
+    post_list
     |> Enum.filter(fn i ->
       if(fid != nil, do: i[:id] == fid, else: true)
       &&

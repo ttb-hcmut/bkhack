@@ -1,12 +1,14 @@
-
 #root > nav {
-	background-color: var(--card-bg-translucent);
+	/* background-color: var(--card-bg-translucent);
 	display: flex;
 	flex-direction: row;
 	border-radius: 0.5rem;
 	border-top: 1px solid var(--card-border);
 	border-bottom: 1px solid var(--card-border);
-	height: 2rem;
+	height: 2rem; */
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
 }
 
 #root > nav button {

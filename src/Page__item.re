@@ -167,86 +167,170 @@ module DiscussionBody = {
   };
   module rec Comments: {
     [@react.component]
-		let make: (~cid: string, ~content: string, ~autoExpand: int) => React.element; } =
-	{
-		[@react.component]
-		let make = (~cid, ~content, ~autoExpand) => {
-			let (replies,setReplies) = React.useState(() => [||]);
-			let (showRep, setShowRep) = React.useState(() => false);
-			let (showMore, setShowMore) = React.useState(() => true);
-			let limit = 3;
-			// opening concept: Js.Promise.()
-			let fetchReplies = () => {
-				let open Fetch__syntax;
-				Fetch.fetch(Env.backend ++ "/api/comment"
-					++ "?limit="  ++ string_of_int(limit)
-					++ "&offset=" ++ string_of_int(Array.length(replies))
-					++ "&parent=" ++ cid)
-				>>= Fetch.Response.json
-				|> decodeJson
-				>>= (aod => {
-					setReplies( x => Array.append(x,aod));
-					setShowMore( _ => Array.length(aod) < limit ? false : true);
-					Js.Promise.resolve(aod)
-				})
-				>!= (err => {
-						Js.log(err);
-						setShowMore( _ => false);
-						return([||])
-					})
-				|> ignore;
-			};
-			let revealReplies = () => {
-				if (Array.length(replies) == 0 && showMore){
-					fetchReplies();
-				};
-				setShowRep(s => !s);
-			};
-			React.useEffect0(()=>{
-				if (autoExpand > 0){
-					revealReplies();
-				}
-				None
-			});
-			<li key={"comment"++cid} className="comments">
-				<div className="content">{React.string(content)}</div>
-				<button className="show-replies"
-				onClick={ _ => revealReplies() }>
-					{React.string((showRep?"Hide":"Show") ++ " replies")}
-				</button>
-				
-				<span className="spacer" hidden={!showRep}/>
-				<ol className="replies" hidden={!showRep}>
-				{
-					replies
-					|>Array.map(x => {
-						let cid = switch (Js.Dict.get(x,"id")) {
-							| Some(v) => v 
-							| None => "67"
-							}
-						let content = switch (Js.Dict.get(x,"content")) {
-							| Some(v) => v 
-							| None => "no content"
-							};
-							<Comments key=cid cid content autoExpand={autoExpand == 0 ? 0 : autoExpand-1}/>
-						})
-					|>React.array
-				}
-				</ol>
-				<button className="more-replies"
-				onClick={ _ => fetchReplies() }
-				hidden={!showRep || !showMore}>
-					{React.string("More replies")}
-				</button>
-			</li>
-		}
-	};
+    let make: (
+      ~id : string,
+      ~text : string,
+      ~rating : string,
+      ~user_rating : string,
+      ~timestamp : string,
+      ~post_vers : string,
+      ~author_name : string,
+      ~author_id : string,
+      ~author_role : string,
+      ~author_rep : string,
+      ~nestLevel: int
+      ) => React.element;
+  } = {
+      [@react.component]
+      let make = (
+        ~id           : string,
+        ~text         : string,
+        ~rating       : string,
+        ~user_rating  : string,
+        ~timestamp    : string,
+        ~post_vers    : string,
+        ~author_name  : string,
+        ~author_id    : string,
+        ~author_role  : string,
+        ~author_rep   : string,
+        ~nestLevel: int
+      ) => {
+        let (replies,setReplies) = React.useState(() => [||]);
+        let (showRep, setShowRep) = React.useState(() => false);
+        let (showMore, setShowMore) = React.useState(() => true);
+        // kinda have to keep track of if the user has upvoted or downvoted this comment yikes
+        // you know what that means~ more column in the fetching
+        let (userRating,setUserRating) = React.useState(() => user_rating); // "-1" = down, "0" = neutral, "1" = up
+        let limit = 3;
+        let autoExpand = 1;
+        // opening concept: Js.Promise.()
+        let fetchReplies = () => {
+          let open Fetch_syntax;
+          Fetch.fetch(Env.backend ++ "/api/comment"
+            ++ "?limit="  ++ string_of_int(limit)
+            ++ "&offset=" ++ string_of_int(Array.length(replies))
+            ++ "&parent=" ++ id)
+          >>= Fetch.Response.json
+          |> decodeJson
+          >>= (aod => {
+            setReplies( x => Array.append(x,aod));
+            setShowMore( _ => Array.length(aod) < limit ? false : true);
+            Js.Promise.resolve(aod)
+          })
+          >!= (err => {
+              Js.log(err);
+              setShowMore( _ => false);
+              return([||])
+            })
+          |> ignore;
+        };
+        let revealReplies = () => {
+          if (Array.length(replies) == 0 && showMore){
+            fetchReplies();
+          };
+          setShowRep(s => !s);
+        };
+        let timeAgo = (seconds: int): string => {
+          let now =
+              Js.Date.make()
+              |> Js.Date.getTime
+              |> int_of_float;
+
+          let diffMs = (now - seconds*1000)/1000;
+          let minutes = diffMs / 60;
+          let hours = minutes / 60;
+          let days = hours / 24;
+          if (seconds < 10) {
+              "just now"
+          } else if (seconds < 60) {
+              string_of_int(seconds) ++ "s ago"
+          } else if (minutes < 60) {
+              string_of_int(minutes) ++ "m ago"
+          } else if (hours < 24) {
+              string_of_int(hours) ++ "h ago"
+          } else {
+              string_of_int(days) ++ "d ago"
+          };
+        };
+        let setVote = (action) => {
+          switch (action) {
+            | "-1"|"1"|"0" =>
+              if (userRating == action) setUserRating(_ =>"0")
+              else setUserRating(_ =>action);
+              // some API thing to send the fact that
+              // this user has liked or disliked the comment
+            | _ => ()
+          };
+        };
+        React.useEffect0(()=>{
+          if (nestLevel < autoExpand){
+            revealReplies();
+          }
+          None
+        });
+        <li key={"comment"++id} className="comments">
+          <div className="content">
+            <header>
+              <div className="author_name">{React.string(author_name)}</div>
+              <div className="author_id" hidden=true >{React.string(author_id  )}</div>
+              <div className={"author_role "++author_role}>{React.string(author_role)}</div>
+              <div className="author_rep" >{React.string("rep: " ++ author_rep )}</div>
+              <div className="timestamp"  >{React.string(timeAgo(int_of_string(timestamp)))}</div>
+              <div className="post_vers"  >{React.string("v: " ++ post_vers  )}</div>
+            </header>
+            <div className="text"       >{React.string(text       )}</div>
+            <div className="rating"     >
+              <button className="up"
+              onClick={_ => setVote("1")}>
+                {React.string(">")}
+              </button>
+              <span className={"v"++userRating}>{{React.int(int_of_string(rating) + int_of_string(userRating))}}</span>
+              <button className="down"
+              onClick={_ => setVote("-1")}>
+                {React.string("<")}
+              </button>
+            </div>
+            <button className="show-replies"
+            onClick={ _ => revealReplies() }>
+              {React.string((showRep?"Hide":"Show") ++ " replies")}
+            </button>
+          </div>
+          <span className="spacer" hidden={!showRep}/>
+          <ol className="replies" hidden={!showRep}>
+          {
+            replies
+            |> Array.map(x => {
+              <Comments
+                key =  {Js.Dict.get(x,"id") |> Option.value(~default="67")} 
+                id          = {Js.Dict.get(x,"id")          |> Option.value(~default="Error: Bad Fetch")} 
+                text        = {Js.Dict.get(x,"text")        |> Option.value(~default="Error: Bad Fetch")} 
+                rating      = {Js.Dict.get(x,"rating")      |> Option.value(~default="Error: Bad Fetch")} 
+                user_rating = {Js.Dict.get(x,"user_rating") |> Option.value(~default="Error: Bad Fetch")} 
+                timestamp   = {Js.Dict.get(x,"timestamp")   |> Option.value(~default="Error: Bad Fetch")} 
+                post_vers   = {Js.Dict.get(x,"post_vers")   |> Option.value(~default="Error: Bad Fetch")} 
+                author_name = {Js.Dict.get(x,"author_name") |> Option.value(~default="Error: Bad Fetch")} 
+                author_id   = {Js.Dict.get(x,"author_id")   |> Option.value(~default="Error: Bad Fetch")} 
+                author_role = {Js.Dict.get(x,"author_role") |> Option.value(~default="Error: Bad Fetch")} 
+                author_rep  = {Js.Dict.get(x,"author_rep")  |> Option.value(~default="Error: Bad Fetch")} 
+                nestLevel   = { nestLevel + 1 }
+              />
+              })
+            |> React.array
+          }
+          </ol>
+          <button className="more-replies"
+          onClick={ _ => fetchReplies() }
+          hidden={!showRep || !showMore}>
+            {React.string("More replies")}
+          </button>
+        </li>
+      }
+    };
 	[@react.component]
 	let make = (~post) => {
     let (comments,setComments) = React.useState(() => [||]);
     let (showMore, setShowMore) = React.useState(() => true);
     let limit = 3;
-    let aExpand = 3;
     // opening concept: Js.Promise.()
     let fetchComments = () => {
       let open Fetch__syntax;
@@ -278,18 +362,23 @@ module DiscussionBody = {
       <ol>
       {
         comments
-        |>Array.map(x => {
-          let cid = switch (Js.Dict.get(x,"id")) {
-            | Some(v) => v 
-            | None => "67"
-            }
-          let content = switch (Js.Dict.get(x,"content")) {
-            | Some(v) => v 
-            | None => "no content"
-            };
-            <Comments key=cid cid content autoExpand=aExpand />
-          })
-        |>React.array
+            |> Array.map(x => {
+              <Comments
+                key =  {Js.Dict.get(x,"id") |> Option.value(~default="67")} 
+                id          = {Js.Dict.get(x,"id")          |> Option.value(~default="Error: Bad Fetch")} 
+                text        = {Js.Dict.get(x,"text")        |> Option.value(~default="Error: Bad Fetch")} 
+                rating      = {Js.Dict.get(x,"rating")      |> Option.value(~default="Error: Bad Fetch")} 
+                user_rating = {Js.Dict.get(x,"user_rating") |> Option.value(~default="Error: Bad Fetch")} 
+                timestamp   = {Js.Dict.get(x,"timestamp")   |> Option.value(~default="Error: Bad Fetch")} 
+                post_vers   = {Js.Dict.get(x,"post_vers")   |> Option.value(~default="Error: Bad Fetch")} 
+                author_name = {Js.Dict.get(x,"author_name") |> Option.value(~default="Error: Bad Fetch")} 
+                author_id   = {Js.Dict.get(x,"author_id")   |> Option.value(~default="Error: Bad Fetch")} 
+                author_role = {Js.Dict.get(x,"author_role") |> Option.value(~default="Error: Bad Fetch")} 
+                author_rep  = {Js.Dict.get(x,"author_rep")  |> Option.value(~default="Error: Bad Fetch")} 
+                nestLevel   = 0
+              />
+              })
+            |> React.array
       }
       </ol>
       <button className="more-replies"

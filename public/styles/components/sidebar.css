@@ -217,7 +217,7 @@
 }
 #root > aside > section#sidebar-search > .filter-list{
 	display: none;
-  	grid-template-columns: repeat(auto-fill, minmax(5rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(5rem, 1fr));
 	place-items: center;
 	/* grid-auto-flow: column; */
 	gap: var(--space-a);
