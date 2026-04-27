@@ -8,7 +8,11 @@
 	border-bottom-style: solid;
 	position: sticky;
 	top: 0px;
-	padding: var(--space-a);
+	padding-left: var(--space-a);
+	padding-right: var(--space-a);
+	padding-top: 0;
+	padding-bottom: 0;
+	height: calc(1.5rem + 2 * var(--space-a));
 	display: grid;
 	grid-template-columns: max-content max-content minmax(0, 1fr) max-content max-content;
 	align-items: center;
@@ -35,9 +39,9 @@
 	content: " ";
 	margin-left: var(--space-a);
 	background-image: url("/assets/logo.svg");
-	background-size: 5rem 1.5rem;
-	width: 5rem;
-	height: 1.5rem;
+	background-size: 6rem 1.7rem;
+	width: 6rem;
+	height: 1.7rem;
 }
 
 #root > header > a.place {
