@@ -417,14 +417,6 @@ module At_repo_2(S : {
 	}
 }
 
-let example = 
-"In computer science, graph algorithm complexity analysis is the study of the computational resources required to solve problems on graph data structures. This article provides a comprehensive examination of time complexity for fundamental graph algorithms, including breadth-first search (BFS), depth-first search (DFS), Dijkstra's algorithm, and the Floyd-Warshall algorithm.
-
-## Test Heading
-
-Understanding these complexities is essential for algorithm selection and optimization in practical applications ranging from network routing to social network analysis.
-"
-
 module App = {
 	[@react.component]
 	let make = () => {
