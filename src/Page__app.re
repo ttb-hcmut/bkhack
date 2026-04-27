@@ -601,6 +601,8 @@ module ReactDOM0 = {
 		}
 }
 
-let element = ReactDOM0.querySelector("#root");
-let root = ReactDOM.Client.createRoot(element);
-ReactDOM.Client.render(root, <App />);
+let () = {
+	let element = ReactDOM0.querySelector("#root");
+	let root = ReactDOM.Client.createRoot(element);
+	ReactDOM.Client.render(root, <App />)
+}
