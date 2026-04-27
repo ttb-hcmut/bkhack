@@ -24,7 +24,7 @@ let all = (type t, module Data : Data with type t = t, module Env : Env) => Fetc
 	let open Fetch;
 	let q = Data.q;
 	Js.Console.log(q);
-	let* resp = fetchWithInit(Env.backend ++ "/api/test/raw?query=" ++ q,
+	let* resp = fetchWithInit(Env.backend ++ "/api/test/free?query=" ++ q,
 		RequestInit.make(~method_=Post, ()));
 	let* data = Fetch.Response.json(resp);
 	Js.Console.log(data)

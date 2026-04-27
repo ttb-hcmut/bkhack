@@ -50,7 +50,7 @@ defmodule App
     |> send_resp(200, sh)
   end
 
-  post "/api/test/raw" do
+  post "/api/test/free" do
     Logger.info conn
     r = Ecto.Adapters.SQL.query!(Data0, conn.query_params["query"], [])
     xs = r.rows
