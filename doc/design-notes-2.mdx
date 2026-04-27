@@ -1,0 +1,7 @@
+During development, it's sometimes useful to perform direct data binding. No algebraization or typing of values. No responsibility designation or MVC separation. At least, not yet. Consider a problem where the service API needs to specialize for the front-end's (technical) use case, but the front-end is still too early in development for any use case to be known.
+
+|                  | SQL | NoSQL (mongodb) | NoSQL (firestore) |
+|------------------|-----|-----------------|-------------------|
+| gateway api      | y   | y               | n                 |
+| free sql         | n   | n               | n                 |
+| free sql direct  | n   | n               | n                 |
