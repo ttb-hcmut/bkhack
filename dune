@@ -11,3 +11,13 @@
 ;; - add a `(subdir node_modules (dirs only_your_package))`
 
 (dirs :standard \ node_modules)
+
+(subdir vendors
+ (subdir re+melange
+  (subdir re
+   (dirs ))))
+
+(subdir vendors
+ (subdir bigstringaf+melange
+  (subdir bigstringaf
+   (dirs ))))

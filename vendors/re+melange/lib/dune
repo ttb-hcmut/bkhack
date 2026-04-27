@@ -1,0 +1,4 @@
+(library
+ (modes melange)
+ (name melange__re)
+ (synopsis "Pure OCaml regular expression library"))

@@ -1,0 +1,5 @@
+(library
+ (modes melange)
+ (name melange__angstrom)
+ (libraries melange__bigstringaf)
+ (preprocess future_syntax))

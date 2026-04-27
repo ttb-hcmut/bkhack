@@ -10,3 +10,9 @@
 [submodule "vendors/iter+melange/iter"]
 	path = vendors/iter+melange/iter
 	url = git@github.com:c-cube/iter.git
+[submodule "vendors/bigstringaf+melange/bigstringaf"]
+	path = vendors/bigstringaf+melange/bigstringaf
+	url = git@github.com:inhabitedtype/bigstringaf
+[submodule "vendors/re+melange/re"]
+	path = vendors/re+melange/re
+	url = git@github.com:ocaml/ocaml-re.git
