@@ -1,10 +1,10 @@
-# BKHack
-
-A social news website oriented towards computer science, for HCMUT
+bkhack
+======
+*Abstract, heterogeneous full-stack application*
 
 ## How to develop
 
-### Nix shell
+### Nix shell (courtesy of Tuong)
 
 Start nix shell
 
@@ -14,7 +14,7 @@ nix-shell
 
 Assume you've successfully entered nix shell
 
-> After this, if you have never run opam initialization, you must run at least once, with `opam init`
+> After this, if you have never run opam initialization, you must run at least once, with `opam init` (courtesy of Khang)
 
 Prepare
 
@@ -31,7 +31,7 @@ pnpm dev
 
 Voila!
 
-### Nix shell from Docker
+### Nix shell from Docker (courtesy of Tung)
 
 ```sh
 docker-compose up -d
