@@ -386,23 +386,34 @@ module HintPanel = {
 }
 
 module Filter = {
+	open Melange__iter
+
+	let methods = xs =>
+	{ let children = Iter.map @@ s => <option key=s>{string(s)}</option>;
+		<select id="showMethods" name="showMethods">
+			{React.array @@ Iter.to_array @@ children @@ Iter.of_list @@ xs }
+		</select>
+	};
+
+	let options = xs =>
+	{ let children = Iter.map @@ n => <option key={string_of_int(n)}>{React.int(n)}</option>;
+		<select id="showCount" name="showCount">
+			{React.array @@ Iter.to_array @@ children @@ Iter.of_list @@ xs}
+		</select>
+	};
+
 	[@react.component]
-	let make = () => {
-		<form className="dashboard-filter">
+	let make = (~onUpdateCount) =>
+	{ let submission = React.useRef(Js.Nullable.null);
+		let onSubmit = e => {
+			React.Event.Synthetic.preventDefault(e);
+			let u = React.Event.Form.target(e)##showCount##value;
+			onUpdateCount(u)
+		};
+		<form ref={ReactDOM.Ref.domRef(submission)} className="dashboard-filter" onSubmit>
 			<input />
-			<select>
-				<option>{string("hot")}</option>
-				<option>{string("new")}</option>
-				<option>{string("top-voted")}</option>
-				<option>{string("most-discussed")}</option>
-				<option>{string("recent-activity")}</option>
-			</select>
-			<select>
-				<option>{React.int(10)}</option>
-				<option>{React.int(25)}</option>
-				<option>{React.int(50)}</option>
-				<option>{React.int(100)}</option>
-			</select>
+			{methods @@ ["hot", "new", "top-voted", "most-discussed", "recent-activity"]}
+			{options @@ [10, 25, 50, 100, 0]}
 		</form>
 	}
 }
@@ -450,17 +461,22 @@ module Dashboard = {
 		}
 	}
 
-	module At_repo_0'(S : Experimental.S) =
+	module At_repo_0'(S : {
+		include Experimental.S;
+		let paginate : 't. ((int, int) => 't) => 't }) =
 	{
 		open S
 		let rec q' = () =>
 			foreach(posts') @@ o =>
+			paginate(limit) @@ () =>
 			yield(o)
 		and posts' = () => table @@ ("posts", posts())
 		let q = observe(q')
 	}
 
-	module At_repo_0(S : Experimental.S) =
+	module At_repo_0(S : {
+		include Experimental.S;
+		let paginate : 't. ((int, int) => 't) => 't }) =
 	{
 		include At_repo_0'(S)
 		module Json = Js.Json
@@ -478,14 +494,17 @@ module Dashboard = {
 
   [@react.component]
   let make = () => {
+		let (counts, setCounts) = React.useState(() => 10);
 		let (items, setItems) = React.useState(() => [||]);
 		let (sidebarState, setSidebarState) = React.useState( _ => "state0");
 		let module X = Experimental;
-		React.useEffect0(Effect.async @@ () => Fetch.Syntax.({
-			let* posts = X.Fetch.all(module At_repo_0(X.GenSQL))(module Env);
+		React.useEffect1(Effect.async @@ () => Fetch.Syntax.({
+			let* posts = X.Fetch.all(module At_repo_0({
+				include X.GenSQL; let paginate = limit => limit(counts, 0) }))(module Env);
 			setItems(_ => posts)
 			return(())
-		}));
+		}), [|counts|]);
+		let onUpdateCount = React.useCallback0(newVal => setCounts(_ => newVal));
 		<>
 			<header>
 				<Component__header />
@@ -494,7 +513,7 @@ module Dashboard = {
 				<header>
 					<HintPanel />
 				</header>
-				<Filter />
+				<Filter onUpdateCount />
 			</nav>
 			<main className=sidebarState><ol>
 			{ items

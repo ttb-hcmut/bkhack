@@ -1,0 +1,8 @@
+(library
+ (modes melange)
+ (name melange__iter))
+
+(env
+ (_
+  (flags :standard -w +a -warn-error -a+8 -w -4 -w -102)
+  (ocamlopt_flags :standard -O3 -unbox-closures -unbox-closures-factor 20)))

@@ -3,7 +3,7 @@ open Quel_sym;
 
 [@alert development("Free querying of data is not fit for production environment.")]
 module type S = {
-  include SymanticsL;
+  include SymanticsL';
   type user and post and pr;
 
   /** {1 Input / output records} */
