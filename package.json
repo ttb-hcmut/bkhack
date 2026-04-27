@@ -40,7 +40,10 @@
     "deploy": "# Deploy website front-end at dist to configured Firebase hosting"
   },
   "dependencies": {
-    "firebase": "^12.6.0",
+    "@firebase/app": "^0.14.11",
+    "@firebase/firestore": "^4.14.0",
+    "firebase": "^11.10.0",
+    "firesql": "^2.0.2",
     "live-server": "^1.2.2",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",

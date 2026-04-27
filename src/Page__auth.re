@@ -325,11 +325,11 @@ module App = {
 		<p><span className="command">{React.string("ssh user@bkhack.wiki")}</span></p>
 		{
 			switch (action) {
-				| "login" => <Login/>
-				| "register" => <Register/>
-				| "forgot" => <Forgot/>
-				| "reset" => <Reset/>
-				| _ => <Login/>
+				| "login" => <Login key="login" />
+				| "register" => <Register key="register" />
+				| "forgot" => <Forgot key="forgot" />
+				| "reset" => <Reset key="reset" />
+				| _ => <Login key="login" />
 			} 
 		}
     </>
