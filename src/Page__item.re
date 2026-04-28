@@ -509,7 +509,7 @@ module App = {
 			let k = to_string(y);
 			ReasonReactRouter.push(String.concat("/", ["", ...url.path]) ++ {
 				let dict = Util.parseQueryParams'(url.search);
-				if (List.length(dict) == 0) { "" } else { "/?" ++ {
+				if (List.length(dict) == 0) { "/" } else { "/?" ++ {
 					let dict =
 						switch (List.assoc_opt("view", dict)) {
 							| Some(u) when (k == u) => dict
