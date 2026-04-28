@@ -1,3 +1,16 @@
+/** vendored */
+module Fetch__syntax = {
+	open Js.Promise
+
+	let ( >>= ) = (x, f) => x |> then_(f)
+
+	let ( >!= ) = (x, f) => x |> catch(f)
+
+	let return  = resolve
+
+	let ( let* ) = ( >>= )
+};
+
 module type Data' = {
 	let q : string;
 };
@@ -18,9 +31,7 @@ module type Env = {
 	let backend : string;
 };
 
-module Fetch = Bkhack__fetch;
-
-let all = (type t, module Data : Data with type t = t, module Env : Env) => Fetch.Syntax.({
+let all = (type t, module Data : Data with type t = t, module Env : Env) => Fetch__syntax.({
 	let open Fetch;
 	let q = Data.q;
 	Js.Console.log(q);

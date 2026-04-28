@@ -55,12 +55,10 @@ let[@inline] should_grow t =
 
 let absent = -16711681
 
-(* let () = *)
-(*   let x = Array.make_absent 1 in *)
-(*   let d = Array.unsafe_get x 0 in *)
-(*   Printf.printf "haha: '%d'\n" d; *)
-(*   assert (d = absent) *)
-(* ;; *)
+let () =
+  let x = Array.make_absent 1 in
+  assert (Array.unsafe_get x 0 = absent)
+;;
 
 let create () = ref None
 

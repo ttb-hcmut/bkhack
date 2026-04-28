@@ -1,6 +1,5 @@
 [@page "/item"]
 open Melange__containers.Fun
-open Bkhack
 
 let to_string = fun
 | `Article => "article"
@@ -117,7 +116,7 @@ module DiscussionFilter = {
 
 module DiscussionBody = {
   let decodeJson = (json) => {
-    let open Fetch.Syntax;
+    let open Fetch__syntax;
     json
     >>= (undecoded => {
     let arrayOfDict = undecoded 
@@ -152,7 +151,7 @@ module DiscussionBody = {
 			let limit = 3;
 			// opening concept: Js.Promise.()
 			let fetchReplies = () => {
-				let open Fetch.Syntax;
+				let open Fetch__syntax;
 				Fetch.fetch(Env.backend ++ "/api/comment"
 					++ "?limit="  ++ string_of_int(limit)
 					++ "&offset=" ++ string_of_int(Array.length(replies))
@@ -224,7 +223,7 @@ module DiscussionBody = {
     let aExpand = 3;
     // opening concept: Js.Promise.()
     let fetchComments = () => {
-      let open Fetch.Syntax;
+      let open Fetch__syntax;
       Fetch.fetch(Env.backend ++ "/api/comment"
         ++ "?limit="  ++ string_of_int(limit)
         ++ "&offset=" ++ string_of_int(Array.length(comments))
@@ -325,7 +324,7 @@ module PullrequestsBody = {
 }
 
 module At_repo_0'(S : {
-	include Experimental.S;
+	include Bkhack__experimental.S;
 	let tgt_post_id : int }) =
 {
 	open S
@@ -338,11 +337,11 @@ module At_repo_0'(S : {
 }
 
 module At_repo_0(S : {
-	include Experimental.S;
+	include Bkhack__experimental.S;
 	let tgt_post_id : int }) =
 {
 	include At_repo_0'(S)
-	module Json = Js.Json
+	module Json = Js__json
 
 	type t = array((int, int, int, string, string));
 
@@ -356,7 +355,7 @@ module At_repo_0(S : {
 }
 
 module At_repo_1'(S : {
-	include Experimental.S;
+	include Bkhack__experimental.S;
 	let tgt_user_id : int }) =
 {
 	open S
@@ -369,11 +368,11 @@ module At_repo_1'(S : {
 }
 
 module At_repo_1(S : {
-	include Experimental.S;
+	include Bkhack__experimental.S;
 	let tgt_user_id : int }) =
 {
 	include At_repo_1'(S)
-	module Json = Js.Json
+	module Json = Js__json
 
 	type t = array((int, string))
 
@@ -387,7 +386,7 @@ module At_repo_1(S : {
 }
 
 module At_repo_2'(S : {
-	include Experimental.S;
+	include Bkhack__experimental.S;
 	let tgt_post_id : int }) =
 {
 	open S
@@ -400,11 +399,11 @@ module At_repo_2'(S : {
 }
 
 module At_repo_2(S : {
-	include Experimental.S;
+	include Bkhack__experimental.S;
 	let tgt_post_id : int }) =
 {
 	include At_repo_2'(S)
-	module Json = Js.Json
+	module Json = Js__json
 
 	type t = array((int, string, int, string));
 
@@ -425,6 +424,14 @@ module App = {
 		let (pullrequests, setPrs) = React.useState(() => [||]);
 		let (postInfo, setPostInfo) = React.useState(() => None);
 		let tags = [| "Algorithm", "Rust" |];
+		try ({
+			let test = Melange__re.({
+				Re.exec(Re.compile @@ Re.(seq @@ [char('a'), group(any |> rep1), char('b')]))
+				%> (x => Re.Group.get(x, 1))
+			});
+			let u = test("annb");
+			Js.Console.log("result:'" ++ u ++ "'");
+		}) { | Invalid_argument(msg) => Js.Console.log("Invalid argument: '" ++ msg ++ "'") };
     let post = "1"
 		// Js.Console.log(a);
 		let renderer = React.useMemo0(() => Melange__cmarkit.Cmarkit_html.renderer(~safe=false, ()));
@@ -451,21 +458,21 @@ module App = {
 		let id = React.useMemo1(() => to_string(currentTab), [|currentTab|]);
 		let url = ReasonReactRouter.useUrl();
 		let (sidebarState, setSidebarState) = React.useState( _ => "state0");
-		let module X = Experimental;
-		let join = ((_, _, contributor_id, _, _) as it) => Fetch.Syntax.({
+		let module X = Bkhack__experimental;
+		let join = ((_, _, contributor_id, _, _) as it) => Fetch__syntax.({
 			let* user_info = X.Fetch.all(module At_repo_1(
 				{ include X.GenSQL; let tgt_user_id = contributor_id }))(module Env);
 			let (_, name) = user_info[0];
 			return @@ (it, name)
 		});
-		React.useEffect0(Effect.async @@ () => Fetch.Syntax.({
+		React.useEffect0(React__effect.async @@ () => Fetch__syntax.({
 			let id = Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id"));
 			let* prs = X.Fetch.all(module At_repo_0(
 				{ include X.GenSQL; let tgt_post_id = int_of_string(id) }))(module Env);
 			let* dict = Js.Promise.all @@ Array.map(join) @@ prs;
 			return @@ ignore @@ setPrs(_ => dict);
 		}));
-		React.useEffect0(Effect.async @@ () => Fetch.Syntax.({
+		React.useEffect0(React__effect.async @@ () => Fetch__syntax.({
 			let post_id = Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id"));
 			let* posts = X.Fetch.all(module At_repo_2(
 				{ include X.GenSQL; let tgt_post_id = int_of_string(post_id) }))(module Env);

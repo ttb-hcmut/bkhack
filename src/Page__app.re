@@ -1,6 +1,5 @@
 [@page "/"]
 open Melange__containers.Fun
-open Bkhack
 
 module Post = {
 	type t =
@@ -274,7 +273,7 @@ module Thread = {
 		React.useEffect0(() => {
 			print_endline(item_id);
 			open Fetch;
-			open Fetch.Syntax;
+			open Fetch__syntax;
 			fetchWithInit(
 				Env.backend ++ "/api/test-item",
 				RequestInit.make(
@@ -462,7 +461,7 @@ module Dashboard = {
 	}
 
 	module At_repo_0'(S : {
-		include Experimental.S;
+		include Bkhack__experimental.S;
 		let paginate : 't. ((int, int) => 't) => 't }) =
 	{
 		open S
@@ -475,11 +474,11 @@ module Dashboard = {
 	}
 
 	module At_repo_0(S : {
-		include Experimental.S;
+		include Bkhack__experimental.S;
 		let paginate : 't. ((int, int) => 't) => 't }) =
 	{
 		include At_repo_0'(S)
-		module Json = Js.Json
+		module Json = Js__json
 
 		type t = array((int, string, int, string));
 
@@ -497,8 +496,15 @@ module Dashboard = {
 		let (counts, setCounts) = React.useState(() => 10);
 		let (items, setItems) = React.useState(() => [||]);
 		let (sidebarState, setSidebarState) = React.useState( _ => "state0");
-		let module X = Experimental;
-		React.useEffect1(Effect.async @@ () => Fetch.Syntax.({
+		let ticketParam = ReasonReactRouter.useUrl().search 
+		React.useEffect1(() => {
+			let limit = ticketParam->Util.parseQueryParams->Js.Dict.get("limit");
+			let limit = limit |> Option.map(int_of_string);
+			ignore( limit |> Option.iter @@ limit => setCounts(_ => limit) );
+			None
+		}, [|counts|]);
+		let module X = Bkhack__experimental;
+		React.useEffect1(React__effect.async @@ () => Fetch__syntax.({
 			let* posts = X.Fetch.all(module At_repo_0({
 				include X.GenSQL; let paginate = limit => limit(counts, 0) }))(module Env);
 			setItems(_ => posts)
