@@ -1,10 +1,10 @@
 bkhack
 ======
-*Abstract, heterogeneous full-stack application*
+`bkhack` is an abstract, heterogeneous full-stack application, currently deployed as a social news website at Ho Chi Minh University of Technology.
 
 ## How to develop
 
-### Nix shell (courtesy of Tuong)
+### Nix shell
 
 Start nix shell
 
@@ -14,7 +14,7 @@ nix-shell
 
 Assume you've successfully entered nix shell
 
-> After this, if you have never run opam initialization, you must run at least once, with `opam init` (courtesy of Khang)
+> After this, if you have never run opam initialization, you must run at least once, with `opam init`
 
 Prepare
 
