@@ -1,5 +1,5 @@
 bkhack: Bách Khoa Hack
-======
+======================
 `bkhack` is an abstract, heterogeneous full-stack application, currently deployed as a social news website at Ho Chi Minh University of Technology.
 
 ## Installation
