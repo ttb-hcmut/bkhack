@@ -1,12 +1,19 @@
 [@page "/item"]
 open Melange__containers.Fun
 
-let to_string = fun
-| `Article => "article"
-| `Discussion => "discussions"
-| `Pullrequest => "pullrequests"
-| `Log => "log"
-| `Edit => "edit"
+let uu = [
+( `Article, "article" ),
+( `Discussion, "discussions" ),
+( `Pullrequest, "pullrequests" ),
+( `Log, "log" ),
+( `Edit, "edit")
+]
+
+let uu' = uu |> List.map(((k, v)) => (v, k))
+
+let to_string = k => List.assoc(k, uu)
+
+let of_string = k => List.assoc(k, uu')
 
 module ItemNav = {
   [@react.component]
@@ -419,8 +426,11 @@ module At_repo_2(S : {
 module App = {
 	[@react.component]
 	let make = () => {
+		let url = ReasonReactRouter.useUrl();
 		let (prsExpand, setPrsExpand) = React.useState(() => []);
-		let (currentTab, setCurrentTab) = React.useState(() => `Article);
+		let (currentTab, setCurrentTab) = React.useState(() => {
+			Util.parseQueryParams(url.search)->Js.Dict.get("view")->Option.value(~default=to_string(`Article))->of_string
+		});
 		let (pullrequests, setPrs) = React.useState(() => [||]);
 		let (postInfo, setPostInfo) = React.useState(() => None);
 		let tags = [| "Algorithm", "Rust" |];
@@ -456,7 +466,6 @@ module App = {
 			}
 		}, (renderer, postInfo));
 		let id = React.useMemo1(() => to_string(currentTab), [|currentTab|]);
-		let url = ReasonReactRouter.useUrl();
 		let (sidebarState, setSidebarState) = React.useState( _ => "state0");
 		let module X = Bkhack__experimental;
 		let join = ((_, _, contributor_id, _, _) as it) => Fetch__syntax.({
@@ -495,6 +504,23 @@ module App = {
 			}
 			}; ()
 		}, [|prsExpand|]);
+		let setCurrentTab = React.useCallback2(f => setCurrentTab(x => {
+			let y = f(x);
+			let k = to_string(y);
+			ReasonReactRouter.push(String.concat("/", ["", ...url.path]) ++ {
+				let dict = Util.parseQueryParams'(url.search);
+				if (List.length(dict) == 0) { "" } else { "/?" ++ {
+					let dict =
+						switch (List.assoc_opt("view", dict)) {
+							| Some(u) when (k == u) => dict
+							| Some(_) => dict |> List.remove_assoc("view") |> xs => xs @ [("view", k)]
+							| None => dict @ [("view", k)]
+						};
+					Util.stringQueryParams'(dict)
+				}}
+			});
+			y
+		}), (setCurrentTab, url));
 		let show = (x, f) => switch (x) { | Some(info) => f(info) | None => { <> </> } };
 		show(art) @@ ((postInfo, headings, article_body)) =>
 		<>

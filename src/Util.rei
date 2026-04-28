@@ -6,3 +6,7 @@
 	- When using [Js], search can be obtained via
  */
 let parseQueryParams : string => Js.dict(string)
+
+let parseQueryParams' : string => list((string, string))
+
+let stringQueryParams' : list((string, string)) => string
