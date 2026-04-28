@@ -2,9 +2,21 @@ bkhack
 ======
 `bkhack` is an abstract, heterogeneous full-stack application, currently deployed as a social news website at Ho Chi Minh University of Technology.
 
-## How to develop
+## Installation
 
-### Nix shell
+1. Add the [ttb-hcmut/bkhack][bkhack-repo] repository:
+   ```sh
+   opam remote add bkhack git+https://github.com/ttb-hcmut/bkhack
+   ```
+
+2. Install the `bkhack` package:
+   ```sh
+   opam install bkhack
+   ```
+
+[bkhack-repo]: https://github.com/ttb-hcmut/bkhack
+
+## Development using Nix shell
 
 Start nix shell
 
@@ -31,7 +43,7 @@ pnpm dev
 
 Voila!
 
-### Nix shell from Docker (courtesy of Tung)
+## Development using Nix shell from Docker (courtesy of Tung)
 
 ```sh
 docker-compose up -d
