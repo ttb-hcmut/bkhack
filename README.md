@@ -2,6 +2,14 @@ bkhack: Bách Khoa Hack
 ======================
 `bkhack` is an abstract, heterogeneous full-stack application, currently deployed as a social news website at Ho Chi Minh University of Technology.
 
+The following paper provides more details:
+
+&nbsp;&nbsp;&nbsp;Phát triển mạng xã hội giáo dục hướng Khoa học Máy tính tại Đại học Bách Khoa TP.HCM([pdf][bkhack-paper])
+&nbsp;&nbsp;&nbsp;Lê Nguyễn Gia Bảo, Lê Công Minh Khang, and Hồ Gia Tường
+&nbsp;&nbsp;&nbsp;Undergraduate Thesis 2026
+
+[bkhack-paper]: https://baorepo.web.app/~ttb-hcmut/thesis.pdf
+
 ## Installation
 
 1. Add the [ttb-hcmut/bkhack][bkhack-repo] repository:
