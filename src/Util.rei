@@ -10,3 +10,7 @@ let parseQueryParams : string => Js.dict(string)
 let parseQueryParams' : string => list((string, string))
 
 let stringQueryParams' : list((string, string)) => string
+
+module List : {
+	let replace_assoc' : 'k => 'v => list(('k, 'v)) => list(('k, 'v))
+}

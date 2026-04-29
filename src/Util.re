@@ -26,3 +26,12 @@ let parseQueryParams' = (search: string) => {
 let stringQueryParams' = dict => {
 	dict |> List.map( ((k, v)) => k++"="++v ) |> String.concat("&")
 }
+
+module List = {
+	let replace_assoc' = (k, v, dict) =>
+		switch (List.assoc_opt(k, dict)) {
+			| Some(u) when (v == u) => dict
+			| Some(_) => dict |> List.remove_assoc(k) |> xs => xs @ [(k, v)]
+			| None => dict @ [(k, v)]
+		}
+}
