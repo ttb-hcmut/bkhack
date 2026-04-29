@@ -1,10 +1,17 @@
+@import "/styles/components/user.css";
+@import "/styles/components/tags.css";
+
+#root > main.pullrequests {
+	--margin-a: 2.5rem
+}
+
 #root > main.pullrequests > header {
 	background-color: var(--card-bg);
 }
 
 #root > main.pullrequests > header {
 	display: grid;
-	grid-template-columns: 2.5rem minmax(0,1fr) min-content;
+	grid-template-columns: var(--margin-a) minmax(0,1fr) min-content;
 	grid-template-rows: min-content min-content min-content;
 	padding: var(--space-a);
 }
@@ -37,20 +44,20 @@
 	margin-left: 1em;
 }
 
-#root > main.pullrequests > header > .sub > .summary > .comments {
-	color: var(--cyan);
+#root > main.pullrequests > header > .sub > .summary > .pr-open {
+	color: var(--card-fg-accent-2);
 }
 
-#root > main.pullrequests > header > .sub > .summary > .comments::after {
-	content: " comments";
+#root > main.pullrequests > header > .sub > .summary > .pr-open::after {
+	content: " open";
 }
 
-#root > main.pullrequests > header > .sub > .summary > .karma::before {
-	content: "+";
+#root > main.pullrequests > header > .sub > .summary > .pr-merged::after {
+	content: " merged";
 }
 
-#root > main.pullrequests > header > .sub > .summary > .karma::after {
-	content: " karma";
+#root > main.pullrequests > header > .sub > .summary > .pr-closed::after {
+	content: " closed";
 }
 
 #root > main.pullrequests > header > :first-child {
@@ -102,12 +109,12 @@
 
 #root > main.pullrequests > main {
 	border-top: solid 1px var(--card-border);
-	background-color: var(--card-bg-translucent);
+	background-color: var(--global-bg);
 }
 
 ul:has(li.pull-request-row) {
 	display: grid;
-	grid-template-columns: 3rem max-content minmax(0,1fr) max-content;
+	grid-template-columns: var(--margin-a) 2.5rem max-content minmax(0,1fr);
 	column-gap: var(--space-c);
 	grid-auto-rows: max-content;
 	padding-top: var(--space-a);
@@ -129,12 +136,22 @@ ul li.pull-request-row {
 	padding-right: var(--space-c);
 }
 
-ul li.pull-request-row > button:first-child {
-	content: "expand";
+ul li.pull-request-row:not(.expanded) {
+	align-items: center;
 }
 
 li.pull-request-row:not(:first-child) {
 	margin-top: 6px;
+}
+
+ul li.pull-request-row > .aee {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+ul li.pull-request-row > .aee > :first-child {
+	flex-grow: 1;
 }
 
 li.pull-request-row > .id {
@@ -143,10 +160,6 @@ li.pull-request-row > .id {
 
 li.pull-request-row > .id::before {
 	content: "#";
-}
-
-li.pull-request-row > .contributor::before {
-	content: "@";
 }
 
 ul li.pull-request-row > .expanded-content {
@@ -158,7 +171,73 @@ ul li.pull-request-row.expanded {
 
 }
 
-ul li.pull-request-row.expanded > :not(button):not(.expanded-content) {
+ul li.pull-request-row > .head {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+}
+
+ul li.pull-request-row.expanded > .head {
+	border-right: solid 1px var(--card-border);
+}
+
+ul li.pull-request-row > .head > button:first-child {
+	align-self: start;
+	transition-duration: 300ms;
+	transition-property: all /* transform color */;
+	transform-origin: center;
+	color: var(--card-fg-aux);
+}
+
+@media (prefers-reduced-motion) {
+	ul li.pull-request-row > .head > button:first-child {
+		transition-duration: none;
+		transition-property: none;
+	}
+}
+
+ul li.pull-request-row > .head > button:first-child:hover {
+	color: var(--card-fg);
+}
+
+ul li.pull-request-row > .status.open {
+	color: var(--success);
+}
+
+ul li.pull-request-row > .status.open::after {
+	content: "[-]";
+}
+
+#root[data-tileset="gui"] ul li.pull-request-row > .status.open::after {
+	content: "[-]";
+}
+
+ul li.pull-request-row > .status.merged {
+	color: var(--card-fg-accent-3);
+}
+
+ul li.pull-request-row > .status.merged::after {
+	content: "[y]";
+}
+
+#root[data-tileset="gui"] ul li.pull-request-row > .status.merged::after {
+	content: "[✓]";
+}
+
+ul li.pull-request-row > .status.closed::after {
+	content: "[x]";
+}
+
+#root[data-tileset="gui"] ul li.pull-request-row > .status.closed::after {
+	content: "[✗]";
+}
+
+ul li.pull-request-row.expanded > .head > button:first-child {
+	transform: rotate(90deg);
+	color: var(--card-fg-accent-1);
+}
+
+ul li.pull-request-row.expanded > :not(.head):not(.expanded-content) {
 	display: none;
 }
 
@@ -168,4 +247,24 @@ ul li.pull-request-row.expanded > .expanded-content {
 }
 
 ul li.pull-request-row.expanded > .expanded-content {
+}
+
+.time.second.ago::after {
+	content: "s ago";
+}
+
+.time.minute.ago::after {
+	content: "m ago";
+}
+
+.time.hour.ago::after {
+	content: "h ago";
+}
+
+.time.day.ago::after {
+	content: "d ago";
+}
+
+.time:not(.ago) > :not(:first-child)::before {
+	content: " ";
 }

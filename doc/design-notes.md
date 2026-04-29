@@ -53,6 +53,12 @@ It'd be nice to have a Reason abstraction for importing static assets. Currently
 4. The light mode encoding
 5. CSS User-agent (Arc themes, GNOME Web Custom JS/CSS, Tampermonkey extension for Chrome and Firefox)
 
+This architecture was formed based on what we want, plus that we have the right setups to quickly test and report for these layers.
+
+- Layer 2 is usually reported by Kinten (his GNOME machine uses reduced motion and he explicitly requested this feature)
+- Layer 4 duty. Due to their respective daily driver setups, Kinten usually reports for light mode, Khang usually reports for dark mode.
+- Layer 5 duty. Due to their respective daily driver setups, Kinten usually reports for GNOME Web, Khang usually reports for Chrome, Tuong usually reports for Arc.
+
 # Build system and file attributes
 
 For our current build system, our philosophy is to distribute configurations as much as possible. Avoid the phenomenon where we need a bunch of centralized `.rc` files or `jsconfig` files or a dictionary in a script file, etc.

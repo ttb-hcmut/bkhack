@@ -1,0 +1,7 @@
+.user {
+  	color: var(--card-fg-accent-0);
+}
+
+.user::before {
+	content: "@";
+}

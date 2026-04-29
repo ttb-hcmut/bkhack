@@ -16,6 +16,17 @@ module Window : {
 /** [Date] objects represent a single moment in time in a platform-independent format. Date objects encapsulate an integral number that represents milliseconds since the midnight at the beginning of January 1, 1970, UTC (the epoch). */
 module Date : {
 	type t;
+	let of_now : unit => t
 	let of_iso_string : string => t
-	let get_time : date => int
+	let get_time : t => int
+	let to_date_string : t => string
+	module Utc : {
+		let date : t => int
+		let month : t => int
+		let full_year : t => int
+	}
+}
+
+module Document : {
+	let title_set : string => unit
 }

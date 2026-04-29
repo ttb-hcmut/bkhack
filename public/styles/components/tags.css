@@ -1,0 +1,24 @@
+ul.tags {
+	display: flex;
+	flex-direction: row;
+}
+
+ul.tags > li:not(:first-child) {
+	margin-left: 0.5rem;
+}
+
+ul.tags > li > span {
+	font-size: var(--text-xs);
+	font-family: var(--font-mono);
+	border: solid 1px var(--card-fg-accent-1-30);
+	background-color: var(--card-fg-accent-1-20);
+	color: var(--card-fg-accent-1);
+	padding-left: 0.3rem;
+	padding-right: 0.3rem;
+	border-radius: 9999px;
+}
+
+ul.tags > li > span::before {
+	content: "#";
+}
+

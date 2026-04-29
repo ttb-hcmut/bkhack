@@ -4,15 +4,17 @@
 
 module Nav =
 {
+	open Shell__lang
+
 	let eval = {
 		let url = ref("")
 		let url_args = ref([])
 		let rec aux = fun
-			| Shell__lang.Cons_cmd(`unfetched(["feed"]), next) => { url := "/"; aux(next) }
-			| Shell__lang.Cons_cmd(`unfetched(["split", num]), next) => { url_args := url_args^ @ [("limit", num)]; aux(next) }
-			| Shell__lang.Cons_cmd(`unfetched(_), _) => failwith("unknown command")
-			| Shell__lang.Cons_subprogram(a, b) => { aux(a); aux(b) }
-			| Shell__lang.Nil => ();
+			| Cons_cmd(`unfetched(["feed"]), next) => { url := "/"; aux(next) }
+			| Cons_cmd(`unfetched(["split", num]), next) => { url_args := Util.List.replace_assoc'("limit", num, url_args^); aux(next) }
+			| Cons_cmd(`unfetched(_), _) => failwith("unknown command")
+			| Cons_subprogram(a, b) => { aux(a); aux(b) }
+			| Nil => ();
 		s => { aux(s); (url^, url_args^) }
 	}
 }

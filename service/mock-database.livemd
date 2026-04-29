@@ -72,6 +72,9 @@ result5 =
       contributor_id integer not null,
       title varchar(255) not null,
       description varchar(1024) not null,
+      status varchar(16) not null,
+      tags varchar(255) not null,
+      date_created_utc varchar(255) not null,
       foreign key (post_id) references posts(post_id),
       foreign key (contributor_id) references users(user_id)
     )
@@ -125,7 +128,7 @@ result3 =
   Exqlite.query!(
     conn,
     ~S"""
-    insert into pullrequests values (6, 77, 0, 'Original post edits', 'Sau ngày 9/3/2016, admin bên Jane Street blog có chỉnh nội dung blog ngầm. Mấy này không ảnh hưởng đến integrity của post nhưng mình vẫn nên bump ref cho chính xác.')
+    insert into pullrequests values (6, 77, 0, 'Original post edits', 'Sau ngày 9/3/2016, admin bên Jane Street blog có chỉnh nội dung blog ngầm. Mấy này không ảnh hưởng đến integrity của post nhưng mình vẫn nên bump ref cho chính xác.', 'open', 'doc', '2026-04-28T15:18:26Z')
     """,
     []
   )
@@ -133,7 +136,16 @@ result3 =
   Exqlite.query!(
     conn,
     ~S"""
-    insert into pullrequests values (7, 77, 0, 'Giới thiệu về FRP cho người học mới', 'Post có thể cải thiện thêm bằng cách thêm phần giới thiệu kiến thức. Này mình không có opinion, nhưng OP có thể tham khảo ở đây: https://blog.janestreet.com/breaking-down-frp/')
+    insert into pullrequests values (7, 77, 0, 'Giới thiệu về FRP cho người học mới', 'Post có thể cải thiện thêm bằng cách thêm phần giới thiệu kiến thức. Này mình không có opinion, nhưng OP có thể tham khảo ở đây: https://blog.janestreet.com/breaking-down-frp/', 'closed', 'doc,frp', '2026-03-12T11:08:06Z')
+    """,
+    []
+  )
+
+result3 =
+  Exqlite.query!(
+    conn,
+    ~S"""
+    insert into pullrequests values (8, 77, 0, 'Giới thiệu về FRP cho người học mới', 'Post có thể cải thiện thêm bằng cách thêm phần giới thiệu kiến thức. Này mình không có opinion, nhưng OP có thể tham khảo ở đây: https://blog.janestreet.com/breaking-down-frp/', 'merged', '', '2026-03-12T11:08:06Z')
     """,
     []
   )

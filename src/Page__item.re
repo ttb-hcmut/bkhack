@@ -1,39 +1,58 @@
 [@page "/item"]
 open Melange__containers.Fun
 
-let uu = [
-( `Article, "article" ),
-( `Discussion, "discussions" ),
-( `Pullrequest, "pullrequests" ),
-( `Log, "log" ),
-( `Edit, "edit")
-]
+module Tags = {
+	type t = list([`unfetched(string)])
 
-let uu' = uu |> List.map(((k, v)) => (v, k))
+	let of_string : string => t =
+		String.split_on_char(',')
+		%> List.map(x => `unfetched(x))
+}
 
-let to_string = k => List.assoc(k, uu)
+module View = {
+	type t =
+		| Article
+		| Discussion
+		| Pullrequest
+		| Log
+		| Edit
 
-let of_string = k => List.assoc(k, uu')
+	let uu = [
+		( Article, "article" ),
+		( Discussion, "discussions" ),
+		( Pullrequest, "pullrequests" ),
+		( Log, "log" ),
+		( Edit, "edit")
+	]
+
+	let uu' = uu |> List.map(((k, v)) => (v, k))
+
+	let to_string = k => List.assoc(k, uu)
+
+	let of_string = k => List.assoc(k, uu')
+}
 
 module ItemNav = {
+	open View
+
   [@react.component]
   let make = (~currentTab,~setCurrentTab,~prCount) => {
     <>
-    <button onClick={_ => setCurrentTab(_ => `Article)} className={"article " ++ (currentTab == `Article ? "selected" : "")}>
+    <button onClick={_ => setCurrentTab(_ => Article)} className={"article " ++ (currentTab == Article ? "selected" : "")}>
       <label>{React.string("article")}</label>
     </button>
-    <button onClick={_ => setCurrentTab(_ => `Discussion)} className={"discussions " ++ (currentTab == `Discussion ? "selected" : "")}>
+    <button onClick={_ => setCurrentTab(_ => Discussion)} className={"discussions " ++ (currentTab == Discussion ? "selected" : "")}>
       <label>{React.string("discussions")}</label>
       <data className="count">{React.int(24)}</data>
     </button>
-    <button onClick={_ => setCurrentTab(_ => `Pullrequest)} className={"pullrequests " ++ (currentTab == `Pullrequest ? "selected" : "")}>
+    <button onClick={_ => setCurrentTab(_ => Pullrequest)} className={"pullrequests " ++ (currentTab == Pullrequest ? "selected" : "")}>
       <label>{React.string("pull-requests")}</label>
       <data className="count">{React.int(prCount)}</data>
     </button>
-    <button onClick={_ => setCurrentTab(_ => `Log)} className={"log " ++ (currentTab == `Log ? "selected" : "")}>
+    <button onClick={_ => setCurrentTab(_ => Log)} className={"log " ++ (currentTab == Log ? "selected" : "")}>
       <label>{React.string("history")}</label>
     </button>
-    <button onClick={_ => setCurrentTab(_ => `Edit)} className={"edit " ++ (currentTab == `Edit ? "selected" : "")}>
+    <button onClick={_ => setCurrentTab(_ => Edit)} className={"edit " ++ (currentTab == Edit ? "selected" : "")}>
       <label>{React.string("editor")}</label>
     </button>
     </>
@@ -104,8 +123,8 @@ module DiscussionHint = {
 			<div className="sub">
 				<span className="command">{React.string("discuss --thread=main")}</span>
 				<span className="summary">
-					<data className="comments" value=Int.to_string(13)>{React.int(13)}</data>
-					<data className="karma" value=Int.to_string(364)>{React.int(364)}</data>
+					<data className="comments">{React.int(13)}</data>
+					<data className="karma">{React.int(364)}</data>
 				</span>
 			</div>
 			<button className="action">{React.string("new comment")}</button>
@@ -284,15 +303,16 @@ module DiscussionBody = {
 
 module PullrequestsHint = {
 	[@react.component]
-	let make = () => {
+	let make = (~num_open, ~num_merged, ~num_closed) => {
 		<>
 			<div className="logo" />
 			<h1>{React.string("pull requests")}</h1>
 			<div className="sub">
 				<span className="command">{React.string("pr --list")}</span>
 				<span className="summary">
-					<data className="pr-open" value=Int.to_string(13)>{React.int(13)}</data>
-					<data className="pr-closed" value=Int.to_string(364)>{React.int(364)}</data>
+					<data className="pr-open">{React.int(num_open)}</data>
+					<data className="pr-merged">{React.int(num_merged)}</data>
+					<data className="pr-closed">{React.int(num_closed)}</data>
 				</span>
 			</div>
 			<button className="action">{React.string("new pr")}</button>
@@ -308,21 +328,74 @@ module PullrequestsFilter = {
 }
 
 module PullrequestsBody = {
+	let duration = (x, y) => {
+		let (end_, begin_) = (Js__dom.Date.get_time(x) / 1000, Js__dom.Date.get_time(y) / 1000);
+		let span = end_ - begin_;
+		if (span < 60) {
+			Some(`Seconds(span))
+		} else {
+			let span2 = span / 60;
+			if (span2 < 60) {
+				Some(`Minutes(span2))
+			} else {
+				let span3 = span / (60 * 60);
+				if (span3 < 24) {
+					Some(`Hours(span3))
+				} else {
+					let span4 = span / (60 * 60 * 24);
+					if (span4 < 4) {
+						Some(`Days(span4))
+					} else None
+				}
+			}
+		}
+	};
+
+	let date_to_string = d => (d->Js__dom.Date.Utc.date->string_of_int, (d->Js__dom.Date.Utc.month+1)->string_of_int, d->Js__dom.Date.Utc.full_year->string_of_int);
+
 	[@react.component]
 	let make = (~pullrequests, ~prsExpand, ~expand_this) => {
+		let now = Js__dom.Date.of_now();
 		<ul>
 			{pullrequests |> Array.map(x => {
-				let ((id, _post_id, _contributor_id, title, _desc), contributor_name) = x;
+				let ((id, _post_id, _contributor_id, title, _desc, status, tags, created), contributor_name) = x;
+				let created = Js__dom.Date.of_iso_string(created);
+				let duration = duration(now, created) |> Option.map @@ fun
+					| `Seconds(i) => <span className="time ago second">{React.int(i)}</span>
+					| `Minutes(i) => <span className="time ago minute">{React.int(i)}</span>
+					| `Hours(i) => <span className="time ago hour">{React.int(i)}</span>
+					| `Days(i) => <span className="time ago day">{React.int(i)}</span>
+					;
+				let status_class = switch (status) { | `Open => "open" | `Closed => "closed" | `Merged => "merged" };
 				let is_expanded = List.assoc_opt(id, prsExpand) |> Option.value(~default=false);
 				<li key=string_of_int(id) className=("pull-request-row " ++ (is_expanded ? "expanded" : " "))>
-					<button onClick={_ => expand_this(id)}></button>
+					<div className="head">
+						<button onClick={_ => expand_this(id)}>{React.string(">")}</button>
+					</div>
 					<span className="id">{React.int(id)}</span>
-					<span className="title">{React.string(title)}</span>
-					<span className="contributor">{React.string(contributor_name)}</span>
+					<span className={"status " ++ status_class}></span>
+					<div className="aee">
+						<span className="title">{React.string(title)}</span>
+						<span className="contributor user">{React.string(contributor_name)}</span>
+						{ switch (duration) {
+							| Some(duration) => duration
+							| None => {
+								let (date, month, year) = created->date_to_string;
+								<span className="time">
+									<span className="date">{React.string(date)}</span>
+									<span className="month">{React.string(month)}</span>
+									<span className="year">{React.string(year)}</span>
+								</span>
+							}
+						} }
+					</div>
 					<div className="expanded-content">
 						<span className="id">{React.int(id)}</span>
 						<span className="title">{React.string(title)}</span>
-						<span className="contributor">{React.string(contributor_name)}</span>
+						<ul className="tags">{ tags |> List.map(x =>
+							<li key=x><span className="tag">{React.string(x)}</span></li>
+						) |> Array.of_list |> React.array}</ul>
+						<span className="contributor user">{React.string(contributor_name)}</span>
 					</div>
 				</li>
 			}) |> React.array}
@@ -350,13 +423,20 @@ module At_repo_0(S : {
 	include At_repo_0'(S)
 	module Json = Js__json
 
-	type t = array((int, int, int, string, string));
+	type t = array((int, int, int, string, string, S.pr_status, list(string), string));
 
-	let  row = [@warning "-8"] fun | [|id, post_id, contributor, title, description|] =>
-		( Float.to_int(Json.decodeNumberExn(id)), Float.to_int(Json.decodeNumberExn(post_id)), Float.to_int(Json.decodeNumberExn(contributor)), Json.decodeStringExn(title), Json.decodeStringExn(description) );
+	let  row = [@warning "-8"] fun | [id, post_id, contributor, title, description, status, tags, created, ..._] => {
+		let status = switch(Json.decodeStringExn(status)) {
+			| "open" => `Open
+			| "closed" => `Closed
+			| "merged" => `Merged
+		};
+		let tags = String.split_on_char(',', Json.decodeStringExn(tags));
+		( Float.to_int(Json.decodeNumberExn(id)), Float.to_int(Json.decodeNumberExn(post_id)), Float.to_int(Json.decodeNumberExn(contributor)), Json.decodeStringExn(title), Json.decodeStringExn(description), status, tags, Json.decodeStringExn(created) );
+	}
 
 	let json = {
-		let per_row = row % Json.decodeArrayExn;
+		let per_row = row % Array.to_list % Json.decodeArrayExn;
 		Array.map(per_row) % Json.decodeArrayExn
 	}
 }
@@ -428,8 +508,11 @@ module App = {
 	let make = () => {
 		let url = ReasonReactRouter.useUrl();
 		let (prsExpand, setPrsExpand) = React.useState(() => []);
-		let (currentTab, setCurrentTab) = React.useState(() => {
-			Util.parseQueryParams(url.search)->Js.Dict.get("view")->Option.value(~default=to_string(`Article))->of_string
+		let (tab, setTab) = React.useState(() => {
+			Util.parseQueryParams(url.search)
+			->Js.Dict.get("view")
+			->Option.value(~default=View.to_string(Article))
+			->View.of_string
 		});
 		let (pullrequests, setPrs) = React.useState(() => [||]);
 		let (postInfo, setPostInfo) = React.useState(() => None);
@@ -465,10 +548,10 @@ module App = {
 				| Js.Exn.Error(x) => { Js.Console.error("js error: '" ++ Option.value(~default="", Js.Exn.message(x)) ++ "'"); failwith("sdf") }
 			}
 		}, (renderer, postInfo));
-		let id = React.useMemo1(() => to_string(currentTab), [|currentTab|]);
+		let id = React.useMemo1(() => View.to_string(tab), [|tab|]);
 		let (sidebarState, setSidebarState) = React.useState( _ => "state0");
 		let module X = Bkhack__experimental;
-		let join = ((_, _, contributor_id, _, _) as it) => Fetch__syntax.({
+		let join = ((_, _, contributor_id, _, _, _, _, _) as it) => Fetch__syntax.({
 			let* user_info = X.Fetch.all(module At_repo_1(
 				{ include X.GenSQL; let tgt_user_id = contributor_id }))(module Env);
 			let (_, name) = user_info[0];
@@ -504,54 +587,59 @@ module App = {
 			}
 			}; ()
 		}, [|prsExpand|]);
-		let setCurrentTab = React.useCallback2(f => setCurrentTab(x => {
+		let setCurrentTab = React.useCallback2(f => setTab(x => {
 			let y = f(x);
-			let k = to_string(y);
 			ReasonReactRouter.push(String.concat("/", ["", ...url.path]) ++ {
 				let dict = Util.parseQueryParams'(url.search);
-				if (List.length(dict) == 0) { "/" } else { "/?" ++ {
-					let dict =
-						switch (List.assoc_opt("view", dict)) {
-							| Some(u) when (k == u) => dict
-							| Some(_) => dict |> List.remove_assoc("view") |> xs => xs @ [("view", k)]
-							| None => dict @ [("view", k)]
-						};
-					Util.stringQueryParams'(dict)
-				}}
+				"/?" ++ ( dict |> Util.List.replace_assoc'("view", View.to_string(y)) |> Util.stringQueryParams' )
 			});
 			y
-		}), (setCurrentTab, url));
+		}), (setTab, url));
 		let show = (x, f) => switch (x) { | Some(info) => f(info) | None => { <> </> } };
+		React.useEffect1(() => {
+			let show = (x, f) => switch (x) { | Some(info) => { f(info); None } | None => None };
+			show(art) @@ (((title, _, _, _), _, _)) =>
+			try ({
+				Js__dom.Document.title_set(title)
+			})
+			{
+			| e => Js.Console.error(e)
+			}
+		}, [|art|]);
 		show(art) @@ ((postInfo, headings, article_body)) =>
 		<>
 			<header>
 				<Component__header />
 			</header>	
 			<nav className=sidebarState>
-				<ItemNav currentTab setCurrentTab prCount=Array.length(pullrequests)/>
+				<ItemNav currentTab=tab setCurrentTab prCount=Array.length(pullrequests)/>
 			</nav>
 			<main className={sidebarState ++ " " ++ id}>
 				<>
-					<header className=Printf.sprintf("only %s", to_string(`Article))><ArticleHeader tags info=postInfo /></header>
-					<div className=Printf.sprintf("innerbody only %s", to_string(`Article))><ArticleBody headings article_body /></div>
+					<header className=Printf.sprintf("only %s", View.to_string(Article))><ArticleHeader tags info=postInfo /></header>
+					<div className=Printf.sprintf("innerbody only %s", View.to_string(Article))><ArticleBody headings article_body /></div>
 				</>
 				<>
-					<header className=Printf.sprintf("only %s", to_string(`Discussion))>
+					<header className=Printf.sprintf("only %s", View.to_string(Discussion))>
 						<DiscussionHint />
 						<nav>
 							<DiscussionFilter />
 						</nav>
 					</header>
-					<main className=Printf.sprintf("only %s", to_string(`Discussion))><DiscussionBody post /></main>
+					<main className=Printf.sprintf("only %s", View.to_string(Discussion))><DiscussionBody post /></main>
 				</>
 				<>
-					<header className=Printf.sprintf("only %s", to_string(`Pullrequest))>
-						<PullrequestsHint />
+					<header className=Printf.sprintf("only %s", View.to_string(Pullrequest))>
+						<PullrequestsHint
+							num_open={pullrequests |> Array.fold_left(((acc, ((_, _, _, _, _, it, _, _), _)) => switch (it) { | `Open => acc + 1 | _ => acc }), 0)}
+							num_merged={pullrequests |> Array.fold_left(((acc, ((_, _, _, _, _, it, _, _), _)) => switch (it) { | `Merged => acc + 1 | _ => acc }), 0)}
+							num_closed={pullrequests |> Array.fold_left(((acc, ((_, _, _, _, _, it, _, _), _)) => switch (it) { | `Closed => acc + 1 | _ => acc }), 0)}
+							/>
 						<nav>
 							<PullrequestsFilter />
 						</nav>
 					</header>
-					<main className=Printf.sprintf("only %s", to_string(`Pullrequest))><PullrequestsBody pullrequests prsExpand expand_this=on_prs_update_expand /></main>
+					<main className=Printf.sprintf("only %s", View.to_string(Pullrequest))><PullrequestsBody pullrequests prsExpand expand_this=on_prs_update_expand /></main>
 				</>
 			</main>
 			<button 

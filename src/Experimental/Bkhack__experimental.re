@@ -4,13 +4,13 @@ open Quel_sym;
 [@alert development("Free querying of data is not fit for production environment.")]
 module type S = {
   include SymanticsL';
-  type user and post and pr;
+  type user and post and pr and pr_status = [ `Open | `Closed | `Merged ];
 
   /** {1 Input / output records} */
 
 	let user : repr(int) => repr(string) => repr(user);
 	let post : repr(int) => repr(string) => repr(int) => repr(string) => repr(post);
-	let pr : repr(int) => repr(int) => repr(int) => repr(string) => repr(string) => repr(pr);
+	let pr : repr(int) => repr(int) => repr(int) => repr(string) => repr(string) => repr(pr_status) => repr(list(string)) => repr(string) => repr(pr);
 
 	/** {1 Projections} */
 
@@ -32,6 +32,9 @@ module type S = {
 		let contributor : repr(pr) => repr(int);
 		let title : repr(pr) => repr(string);
 		let description : repr(pr) => repr(string);
+		let status : repr(pr) => repr(pr_status);
+		let tags : repr(pr) => repr(list(string));
+		let date_created_utc : repr(pr) => repr(string);
 	};
 
 	/** {1 Data sources} */

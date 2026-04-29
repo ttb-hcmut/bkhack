@@ -1,3 +1,5 @@
+@import "/styles/components/tags.css";
+
 #root > main.article > header {
 	display: grid;
 	grid-template-columns: min-content minmax(0,1fr) min-content;
@@ -47,34 +49,10 @@
 	color: var(--card-fg);
 }
 
-#root > main.article > header > ul.tags {
-	display: flex;
-	flex-direction: row;
-}
-
-#root > main.article > header > ul.tags > li:not(:first-child) {
-	margin-left: 0.5rem;
-}
-
-#root > main.article > header > ul.tags > li > span {
-	font-size: var(--text-xs);
-	font-family: var(--font-mono);
-	border: solid 1px var(--card-fg-accent-1-30);
-	background-color: var(--card-fg-accent-1-20);
-	color: var(--card-fg-accent-1);
-	padding-left: 0.3rem;
-	padding-right: 0.3rem;
-	border-radius: 9999px;
-}
-
-#root > main.article > header > ul.tags > li > span::before {
-	content: "#";
-}
-
 #root > main.article > header > .author > span {
 	font-size: var(--text-xs);
 	font-family: var(--font-mono);
-	color: var(--cyan);
+	color: var(--card-fg-accent-0);
 }
 
 #root > main.article > header > .author > span::before {

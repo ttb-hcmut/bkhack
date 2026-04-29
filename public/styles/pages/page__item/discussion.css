@@ -35,7 +35,7 @@
 }
 
 #root > main.discussions > header > .sub > .summary > .comments {
-	color: var(--cyan);
+	color: var(--card-fg-accent-1);
 }
 
 #root > main.discussions > header > .sub > .summary > .comments::after {
