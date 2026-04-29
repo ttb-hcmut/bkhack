@@ -4,6 +4,10 @@ type window_location_api;
 module Window = {
 	module Location = {
 		let href_set = window_location_href_set(window_location_api);
-	};
+	}
 }
-
+module Date = {
+	type t;
+	[@mel.new] external of_iso_string : string => t = "Date";
+	[@mel.send] external get_time : t => int = "getTime"
+}
