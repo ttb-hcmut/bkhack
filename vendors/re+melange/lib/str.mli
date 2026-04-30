@@ -1,1 +1,1 @@
-/home/kinten/s/bkhack/vendors/re+melange/re/lib/str.mli
+../re/lib/str.mli

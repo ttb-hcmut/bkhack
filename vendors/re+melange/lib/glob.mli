@@ -1,1 +1,1 @@
-/home/kinten/s/bkhack/vendors/re+melange/re/lib/glob.mli
+../re/lib/glob.mli

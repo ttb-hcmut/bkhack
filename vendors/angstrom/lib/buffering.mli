@@ -1,1 +1,1 @@
-/home/kinten/s/bkhack/vendors/angstrom/angstrom/lib/buffering.mli
+../angstrom/lib/buffering.mli

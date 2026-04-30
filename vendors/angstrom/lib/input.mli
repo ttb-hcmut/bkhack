@@ -1,1 +1,1 @@
-/home/kinten/s/bkhack/vendors/angstrom/angstrom/lib/input.mli
+../angstrom/lib/input.mli

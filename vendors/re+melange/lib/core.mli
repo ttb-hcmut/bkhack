@@ -1,1 +1,1 @@
-/home/kinten/s/bkhack/vendors/re+melange/re/lib/core.mli
+../re/lib/core.mli

@@ -1,1 +1,1 @@
-/home/kinten/s/bkhack/vendors/re+melange/re/lib/posix_class.mli
+../re/lib/posix_class.mli

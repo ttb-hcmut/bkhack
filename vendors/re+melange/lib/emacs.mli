@@ -1,1 +1,1 @@
-/home/kinten/s/bkhack/vendors/re+melange/re/lib/emacs.mli
+../re/lib/emacs.mli

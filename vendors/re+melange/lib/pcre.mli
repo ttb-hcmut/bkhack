@@ -1,1 +1,1 @@
-/home/kinten/s/bkhack/vendors/re+melange/re/lib/pcre.mli
+../re/lib/pcre.mli

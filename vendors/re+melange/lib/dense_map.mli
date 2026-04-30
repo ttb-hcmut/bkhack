@@ -1,1 +1,1 @@
-/home/kinten/s/bkhack/vendors/re+melange/re/lib/dense_map.mli
+../re/lib/dense_map.mli

@@ -1,1 +1,1 @@
-/home/kinten/s/bkhack/vendors/bigstringaf+melange/bigstringaf/lib/bigstringaf.ml
+../bigstringaf/lib/bigstringaf.ml

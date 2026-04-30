@@ -1,1 +1,1 @@
-/home/kinten/s/bkhack/vendors/angstrom/angstrom/lib/angstrom.mli
+../angstrom/lib/angstrom.mli

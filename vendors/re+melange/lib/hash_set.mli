@@ -1,1 +1,1 @@
-/home/kinten/s/bkhack/vendors/re+melange/re/lib/hash_set.mli
+../re/lib/hash_set.mli

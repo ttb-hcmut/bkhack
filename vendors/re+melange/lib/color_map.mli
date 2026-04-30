@@ -1,1 +1,1 @@
-/home/kinten/s/bkhack/vendors/re+melange/re/lib/color_map.mli
+../re/lib/color_map.mli

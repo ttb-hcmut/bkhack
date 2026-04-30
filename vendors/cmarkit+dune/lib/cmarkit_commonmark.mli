@@ -1,1 +1,1 @@
-/home/kinten/s/bkhack/vendors/cmarkit+dune/cmarkit/src/cmarkit_commonmark.mli
+../cmarkit/src/cmarkit_commonmark.mli
