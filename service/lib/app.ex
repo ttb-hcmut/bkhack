@@ -31,12 +31,14 @@ defmodule App
   require ReturnChildID
 
   plug :match
+  plug Plug.Parsers,
+    parsers: [:json],
+    json_decoder: JSON
   plug :fetch_query_params
   plug :dispatch
 
   get "/api/comment" do
     Logger.info "GET comment"
-    before = System.monotonic_time(:millisecond)
     parent = Map.get(conn.params,"parent","0")
     offset = String.to_integer(Map.get(conn.params,"offset","0"))
     limit = String.to_integer(Map.get(conn.params,"limit","10"))
@@ -49,8 +51,62 @@ defmodule App
     |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
     |> put_resp_content_type("application/json")
     |> send_resp(200, sh)
+  end
 
-    IO.puts(System.monotonic_time(:millisecond) - before)
+  options "/api/postcomment" do
+    conn
+    # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+    |> put_resp_header("Access-Control-Allow-Origin", "*")
+    |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+    |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+    |> send_resp(200, "")
+  end
+  post "/api/postcomment" do
+    Logger.info "POST comment"
+    body = conn.body_params
+    id      = body["id"]
+    user_id = body["user_id"]
+    type    = body["type"]
+    content  = body["content"]
+
+    data = "User "<>user_id<>" commented \""<>content<>"\" on "<>type<>" "<>id
+    IO.puts(data);
+    {:ok, sh} = JSON.encode(data)
+    conn
+    # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+    |> put_resp_header("Access-Control-Allow-Origin", "*")
+    |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+    |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+    |> put_resp_content_type("application/json")
+    |> send_resp(201, sh)
+  end
+
+  options "/api/setvote" do
+    conn
+    # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+    |> put_resp_header("Access-Control-Allow-Origin", "*")
+    |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+    |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+    |> send_resp(200, "")
+  end
+  post "/api/setvote" do
+    Logger.info "POST vote"
+    body = conn.body_params
+    id      = body["id"]
+    user_id = body["user_id"]
+    type    = body["type"]
+    action  = body["action"]
+
+    data = "User "<>user_id<>" voted "<>action<>" on "<>type<>" "<>id
+    IO.puts(data);
+    {:ok, sh} = JSON.encode(data)
+    conn
+    # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+    |> put_resp_header("Access-Control-Allow-Origin", "*")
+    |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+    |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+    |> put_resp_content_type("application/json")
+    |> send_resp(201, sh)
   end
 
   post "/api/test/free" do

@@ -165,28 +165,191 @@ module DiscussionBody = {
       return(arrayOfDict)
     })
   };
-  let cRef: ref(option((
-      ~id : string,
-      ~isRep: bool,
-      ~showRep: bool,
-      ~nestDepth: int
-      ) => React.element)) = ref(None);
-  module rec Comments: {
+  // module PostCommentContext = {
+  //   type t = {
+  //     isBusy            : bool,
+  //     setIsBusy         : unit => unit,
+  //     parentId          : ref(string),
+  //     parentType        : ref(string),
+  //     prevBoxCloseFunc  : ref(unit=>unit),
+  //     openCommentBox    : ref((~newId : string, ~pType : string, ~newFunc : unit => unit)=>unit),
+  //     sendComment       : ref((~content : string)=>unit)
+  //   };
+  //   let defaultValue: t = {
+  //     activePos:   None,
+  //     currentUser: None,
+  //     isLoading:   false,
+
+  //     setActive:   (_) => (),
+  //     deactivate:  ()  => (),
+  //     setUser:     (_) => (),
+  //     setLoading:  (_) => (),
+  //   };
+  //   let context = React.createContext({
+  //     count: 0,
+  //     increment: () => (),
+  //     reset: () => (),
+  //   });
+  //    module Provider = {
+  //     let make = React.Context.provider(context);
+  //   };
+  //   let (isBusy,setIsBusy) = React.useState(()=>false)
+  //   let parentId : ref(string) = ref("")
+  //   let parentType : ref(string) = ref("")
+  //   let prevBoxCloseFunc : ref(unit => unit) = ref(()=>())
+  //   let openCommentBox = (
+  //     ~newId : string, 
+  //     ~pType : string, 
+  //     ~newFunc : unit => unit
+  //     ) => {
+  //     prevBoxCloseFunc.contents()
+  //     prevBoxCloseFunc := newFunc
+  //     parentId := newId
+  //     parentType := pType
+  //   }
+  //   let sendComment = (~content : string) => {
+  //     setIsBusy(_ => true);
+  //     open Fetch_syntax
+  //     let payload = Js.Dict.empty();
+  //     // TODO: [khang] identity provider sth sth somehow
+  //     Js.Dict.set(payload, "user_id", Js.Json.string("SomeBody"));
+  //     Js.Dict.set(payload, "id", Js.Json.string(parentId.contents));
+  //     Js.Dict.set(payload, "type", Js.Json.string(parentType.contents));
+  //     Js.Dict.set(payload, "content", Js.Json.string(content));
+  //     let json = Js.Json.object_(payload);
+  //     Fetch.fetchWithInit(
+  //       Env.backend ++"/api/postcomment",
+  //       Fetch.RequestInit.make(
+  //         ~method_=Post,
+  //         ~body=Fetch.BodyInit.make(Js.Json.stringify(
+  //           json
+  //         )),
+  //         ~headers=Fetch.HeadersInit.make({
+  //           "Content-Type": "application/json"
+  //         }),
+  //         ()
+  //       )
+  //     )
+  //     >>= Fetch.Response.json
+  //     >>= (j => {
+  //       setIsBusy(_ => false);
+  //       Js.Promise.resolve(j)
+  //     })
+  //     >!= (err => {
+  //       Js.log(err);
+  //       setIsBusy(_ => false);
+  //       Js.Promise.resolve(Js.Json.null)
+  //     })
+  //     |> ignore
+  //   };
+  // }
+  module AddComment = {
     [@react.component]
-    let make: (
+    let make = (~id, ~parentType, ~setShow) => {
+      let (isBusy, setIsBusy) = React.useState(()=> false)
+      let (content, setContent) = React.useState(()=> "")
+      let sendComment = () => {
+        setIsBusy(_ => true);
+        open Fetch_syntax
+        let payload = Js.Dict.empty();
+        // TODO: [khang] identity provider sth sth somehow
+        Js.Dict.set(payload, "user_id", Js.Json.string("SomeBody"));
+        Js.Dict.set(payload, "id", Js.Json.string(id));
+        Js.Dict.set(payload, "type", Js.Json.string(parentType));
+        Js.Dict.set(payload, "content", Js.Json.string(content));
+        let json = Js.Json.object_(payload);
+        Fetch.fetchWithInit(
+          Env.backend ++"/api/postcomment",
+          Fetch.RequestInit.make(
+            ~method_=Post,
+            ~body=Fetch.BodyInit.make(Js.Json.stringify(
+              json
+            )),
+            ~headers=Fetch.HeadersInit.make({
+              "Content-Type": "application/json"
+            }),
+            ()
+          )
+        )
+        >>= Fetch.Response.json
+        >>= (j => {
+          setIsBusy(_ => false);
+          setShow(_ => false);
+          Js.Promise.resolve(j)
+        })
+        >!= (err => {
+          Js.log(err);
+          setIsBusy(_ => false);
+          Js.Promise.resolve(Js.Json.null)
+        })
+        |> ignore
+      };
+      <div className="comments add-reply">
+        <div className="content">
+          <header>
+            // TODO: [khang] identity provider sth sth somehow
+            <div className="author_name">{React.string("@AuthorName")}</div>
+          </header>
+          <form onSubmit={ e => {
+            React.Event.Form.preventDefault(e);
+            sendComment()
+          }}>
+            <textarea autoFocus=true id="comment-body" className="text" 
+            onChange={ e => setContent( _=> React.Event.Form.target(e)##value)}
+            onKeyDown= { e => {
+              if(React.Event.Keyboard.ctrlKey(e) && React.Event.Keyboard.key(e) === "Enter") sendComment()
+            }}
+            disabled=isBusy
+            value=content/>
+            <div className="text ghost">{React.string(content++"\n")}</div>
+            <button type_="submit" className="submit" 
+            disabled=isBusy>
+              {React.string(isBusy?"Sending":"Send")}
+            </button>
+          </form>
+        </div>
+      </div>
+    }
+  }
+  module LoadingComments = {
+    [@react.component]
+    let make = (~id,~show) => {
+      !show ? 
+      React.null
+      :
+      <li key={"loadingcomment"++id} className="comments loading" hidden={!show}>
+        <div className="content">
+          <header>
+            <div className="author_name">{React.string("loading")}</div>
+            <div className={"author_role"}>{React.string("loading")}</div>
+            <div className="author_rep" >{React.string("loading")}</div>
+            <div className="timestamp"  >{React.string("loading")}</div>
+            <div className="post_vers"  >{React.string("loading")}</div>
+          </header>
+          <div className="text"       >{React.string("loading loading loading loading")}</div>
+          <div className="rating"     >
+            <button className="up" disabled=true>
+              {React.string(">")}
+            </button>
+            <span>{React.string("loading")}</span>
+            <button className="down" disabled=true>
+              {React.string("<")}
+            </button>
+          </div>
+          <button className="show-replies" disabled=true>
+            {React.string("Show replies")}
+          </button>
+        </div>
+      </li>
+    }
+  }
+  let cRef : ref(option((
       ~id : string,
-      ~text : string,
-      ~rating : string,
-      ~user_rating : string,
-      ~timestamp : string,
-      ~post_vers : string,
-      ~author_name : string,
-      ~author_id : string,
-      ~author_role : string,
-      ~author_rep : string,
-      ~nestDepth: int
-      ) => React.element;
-  } = {
+      ~pType : string,
+      ~showRep : bool,
+      ~nestDepth : int
+      ) => React.element)) = ref(None);
+  module Comments = {
     [@react.component]
     let make = (
       ~id           : string,
@@ -206,7 +369,8 @@ module DiscussionBody = {
       // you know what that means~ more column in the fetching
       let (userRating,setUserRating) = React.useState(() => user_rating); // "-1" = down, "0" = neutral, "1" = up
       let (showRep, setShowRep) = React.useState(() => false);
-      let isRep=true;
+      let (addRep, setAddRep) = React.useState(() => false);
+      let pType="comment";
       let timeAgo = (seconds: int): string => {
         let now =
             Js.Date.make()
@@ -230,12 +394,44 @@ module DiscussionBody = {
         };
       };
       let setVote = (action) => {
+        open Fetch_syntax;
+        let payload = Js.Dict.empty();
+        Js.Dict.set(payload, "id", Js.Json.string(id));
+        // TODO: [khang] identity provider sth sth somehow
+        Js.Dict.set(payload, "user_id", Js.Json.string("SomeBody"));
+        Js.Dict.set(payload, "type", Js.Json.string("comment"));
+        // mofo will grab userRating before setUserRating fires bruh
         switch (action) {
           | "-1"|"1"|"0" =>
-            if (userRating == action) setUserRating(_ =>"0")
-            else setUserRating(_ =>action);
-            // some API thing to send the fact that
-            // this user has liked or disliked the comment
+            if (userRating == action){
+              setUserRating(_ =>"0")
+              Js.Dict.set(payload, "action", Js.Json.string("0"));
+            }
+            else{
+              setUserRating(_ =>action);
+              Js.Dict.set(payload, "action", Js.Json.string(action));
+            }
+            
+            let json = Js.Json.object_(payload);
+            Fetch.fetchWithInit(
+              Env.backend ++"/api/setvote",
+              Fetch.RequestInit.make(
+                ~method_=Post,
+                ~body=Fetch.BodyInit.make(Js.Json.stringify(
+                  json
+                )),
+                ~headers=Fetch.HeadersInit.make({
+                  "Content-Type": "application/json"
+                }),
+                ()
+              )
+            )
+            >>= Fetch.Response.json
+            >!= (err => {
+                Js.log(err);
+                Js.Promise.resolve(Js.Json.null)
+              })
+            |> ignore;
           | _ => ()
         };
       };
@@ -271,11 +467,20 @@ module DiscussionBody = {
           onClick={ _ => setShowRep(a => !a) }>
             {React.string((showRep?"Hide":"Show") ++ " replies")}
           </button>
+          <button className="add-reply"
+          onClick={ _ => setAddRep(a => !a)}>
+            {React.string(addRep?"Cancel":"Add Reply")}
+          </button>
         </div>
-        <span className="spacer" hidden={!showRep}/>
+        <span className="spacer" hidden={!showRep && !addRep}/>
+        
+        {!addRep ? 
+        React.null
+        :
+        <AddComment id parentType=pType setShow=setAddRep/>}
         {switch (cRef.contents) {
         | None => React.null
-        | Some(comp) => comp(~id, ~isRep, ~showRep, ~nestDepth=nestDepth+1)
+        | Some(comp) => comp(~id, ~pType, ~showRep, ~nestDepth=nestDepth+1)
         }}
       </li>
     }
@@ -285,31 +490,35 @@ module DiscussionBody = {
     [@react.component]
     let make = (
       ~id : string,
-      ~isRep: bool,
-      ~showRep: bool,
-      ~nestDepth: int
+      ~pType : string,
+      ~showRep : bool,
+      ~nestDepth : int
     ) => {
       let (comments,setComments) = React.useState(() => [||]);
       let (showMore, setShowMore) = React.useState(() => true);
+      let (loading, setLoading) = React.useState(() => false);
       let limit = 3;
       // opening concept: Js.Promise.()
       let fetchComments = () => {
         let open Fetch_syntax;
+        setLoading(_=>true);
         Fetch.fetch(Env.backend ++ "/api/comment"
           ++ "?limit="  ++ string_of_int(limit)
           ++ "&offset=" ++ string_of_int(Array.length(comments))
           ++ "&parent=" ++ id
-          ++ "&type="   ++ (isRep?"comment":"post"))
+          ++ "&type="   ++ pType)
         >>= Fetch.Response.json
         |> decodeJson
         >>= (aod => {
           setComments( x => Array.append(x,aod));
           setShowMore( _ => Array.length(aod) < limit ? false : true);
+          setLoading(_=>false);
           Js.Promise.resolve(aod)
         })
         >!= (err => {
             Js.log(err);
             setShowMore( _ => false);
+            setLoading(_=>false);
             return([||])
           })
         |> ignore;
@@ -345,10 +554,11 @@ module DiscussionBody = {
             })
           |> React.array
         }
+        <LoadingComments id show={showRep && loading} />
       </ol>
       <button className="more-replies"
       onClick={ _ => fetchComments() }
-      hidden={!showRep || !showMore}>
+      hidden={!showRep || !showMore || loading}>
         {React.string("More replies")}
       </button>
       </>
@@ -356,17 +566,14 @@ module DiscussionBody = {
   };
   let () = cRef := Some((
     ~id, 
-    ~isRep, 
+    ~pType, 
     ~showRep, 
     ~nestDepth
   ) => 
-    <CommentGroup id isRep showRep nestDepth />);
+    <CommentGroup id pType showRep nestDepth />);
 	[@react.component]
 	let make = (~post) => {
-    {switch (cRef.contents) {
-    | None => React.null
-    | Some(comp) => comp(~id=post, ~isRep=false, ~showRep=true, ~nestDepth=0)
-    }}
+    <CommentGroup id=post pType="post" showRep=true nestDepth=0 />
 	}
 }
 
