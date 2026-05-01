@@ -1,0 +1,94 @@
+.docname {BKHack: Week 2: Reactive programming}
+.doctype {slides}
+.autopagebreak maxdepth:{2}
+
+# This is week 2
+
+Reactive programming for UI development
+
+React, ReasonML
+
+Source: ttb-hcmut/bkhack/doc/thesis-week-2-reactive-programming
+
+.tableofcontents
+
+# What is UI development?
+
+Normal development: program as one-shot command, user manage input and output
+
+UI development: program as persistent process
+
+## Open problem: how to detect changes
+
+Setter, getters
+- Object-oriented programming
+- Immediate-mode graphics programming
+
+Events / signals
+- Event-driven programming
+
+Graph of chain reactions
+- (Functional) Reactive programming
+
+# What is the ecosystem?
+
+## Reactive UI programming
+
+(For some reasons) reactive programming is coupled with ui programming
+
+- React
+- Elm
+- Redux
+- Flutter
+- Jetpack Compose
+- Vue
+
+## Reactive programming in OCaml
+
+(notice: there's no "UI")
+
+Reactive graph construction primitives
+
+- Janestreet's Incremental
+- Janestreet's Bonsai
+- Daniel Buenzli's React
+
+## Reactive UI programming in OCaml
+
+- Janestreet's Bonsai Web
+- Melange's ReasonML
+
+# React-style reactive programming
+
+## ecosystem
+
+- React
+- ReasonML
+- Jetpack Compose?
+- Vue?
+
+## what
+
+The art of graph construction
+
+## what
+
+- useState (ref): source of changes
+- useEffect (watch): when detect change, run a procedure
+- useMemo (compute): a variable: when detect change, run a function
+- (useCallback: convenient wrapper over useMemo)
+- return: sink of changes
+
+## ..other 
+
+- useRef: a variable outside of the system's control
+- useLayoutEffect: like useEffect but guaranteed before UI layout processing
+- useReducer: Elm
+
+# Resources
+
+Jane Street Blog - Breaking down FRP (https://blog.janestreet.com/breaking-down-frp)
+
+Composition frameworks comparison (https://github.com/TyOverby/composition-comparison/blob/main/readme.md)
+
+# QA
