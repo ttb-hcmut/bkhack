@@ -1,0 +1,202 @@
+.include {bachkhoa.qd}
+.docname {BKHack\: Week 3\: programming language papers}
+.doctype {slides}
+.autopagebreak maxdepth:{2}
+.docauthor {Kinten Le}
+
+.front
+	.frontTitle {Advanced programming: Programming language papers and how to read them}
+	.frontBody
+		.frontAuthor
+			.aauthor {.docauthor}
+		.frontContacts
+			.email {kinten108101\@protonmail\.com}
+		.frontOrigin
+			.align {center}
+				.container
+					HCMUT-VNUHCM
+	.align {center}
+		.container
+			Source at ttb-hcmut/bkhack/doc/thesis-week-3-progpaper
+
+.speakernote
+	reference to Fantastic Beasts lol
+
+.tableofcontents {Content} maxdepth:{1}
+
+# Why research languages
+
+## why
+
+- programming as science vs. programming as trades
+- most languages are NOT based on formal semantics
+
+<<<
+
+- rust doesn't have formal semantics
+  - "Rust is memory-safe" but where is your source?
+    - introducing Oxide
+
+## lol
+
+Q: But I'm bad at math-
+
+Do you think I'm EVER good at math??
+
+<<<
+
+- don't you love rust?
+  - rust is based on LOTS of historical language designs (especially ML)
+
+<<<
+
+- Relational algebra
+
+[insert some examples]
+
+# Case study
+
+## Writing SQL queries
+*bindings, design pattern, new syntax,
+ etc*
+
+- C# T-LINQ
+- F# first-class query expression .cite {fs-query}
+- OCaml caqti, petrol, sequoia, quel .cite {quel}, irmin
+- Elixir ecto
+
+## QueL .cite {quel}
+*Suzuki Kenichi (knih), Oleg Kiselyov
+ (okmij), .br Yukiyoshi Kameyama
+ (Programming Logic Group)*
+
+```reason
+let q = observe @@ () =>
+	foreach(products) @@ o =>
+	yield (o)
+```
+
+.speakernote
+	`observer @@ () =>` does look like the decorator pattern
+
+<<<
+
+```reason "SQL query as a functor"
+module _ (S : SYM_SCHEMA) = {
+	open S;
+	let products = table("products", products());
+	let q = observe @@ () =>
+		foreach(products) @@ o =>
+		yield o
+}
+```
+
+```reason "\"Concretize\" query into string"
+let module M = Ex(GenSQL);
+print_endline(M.q)
+```
+
+<<<
+
+.container
+	.column
+		.center
+			![](./cap-linq.png)
+		.center
+			![](./cap-quel.png)
+		.center
+			![](./cap-squr.png)
+
+<<<
+
+- We adopt QueL .cite {quel} to write
+	type-checked SQL
+	- avoid late runtime errors
+	  nice to have
+  - The paper presents the type system
+	  for QueL
+  - The code implements the type system
+		from the paper
+- Equivalent to ORM (Object-Relational
+	Mapping) in the OOP world
+
+<<<
+
+[insert example typing rules]
+
+# What is the language for PL
+
+<<<
+
+*A pseudoscience approach*
+
+- Semantics
+    - Operational semantics
+    - Denotational semantics
+    - Algebraic semantics
+- Type systems
+    - Typing rules
+- (Lambda) Calculus
+
+## Big-step operational semantics
+
+## Small-step operational semantics
+
+## Denotational semantics
+
+# Review of relational algebra
+
+# How to apply
+
+## lol
+
+[break it down, richard-eisenberg-style]
+
+## lol2
+
+## lol3
+
+.bibliography {works.bib}
+
+<<<
+
+Read more on LINQ
+
+https://learn.microsoft.com/en-us/dotnet/csharp/linq/
+
+<<<
+
+#! Thanks for listening!
+
+<<<
+
+Questions?
+
+<<<
+
+#! Appendix
+
+<<<
+
+![](./logic.cs.tsukuba.ac.jp.png)
+
+<<<
+
+##! query expression
+
+```fsharp "F# first-class query expression"
+let q =
+	query {
+		for student in db.Student do
+		where student.Age.IsSome
+		select student.Age.Value
+		contains 11
+	}
+```
+
+```fsharp "Perform query as a stream operation (Seq)"
+q |> Seq.iter (fun customer ->
+	printfn "company: %s contact: %s"
+		customer.CompanyName customer.ContactName
+)
+```
