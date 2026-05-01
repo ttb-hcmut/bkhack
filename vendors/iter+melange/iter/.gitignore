@@ -1,0 +1,10 @@
+.*.swp
+_build
+*.native
+*.docdir
+*.html
+man/
+*.install
+.merlin
+.gh-pages
+_opam

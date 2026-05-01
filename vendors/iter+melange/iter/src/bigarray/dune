@@ -1,0 +1,7 @@
+(library
+ (name iter_bigarray)
+ (public_name iter.bigarray)
+ (libraries iter bigarray unix)
+ (modules IterBigarray)
+ (wrapped false)
+ (optional))
