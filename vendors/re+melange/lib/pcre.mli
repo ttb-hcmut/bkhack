@@ -1,1 +1,1 @@
-../re/lib/pcre.mli
+../../../_opam/lib/re/pcre.mli

@@ -1,1 +1,1 @@
-../re/lib/core.mli
+../../../_opam/lib/re/core.mli

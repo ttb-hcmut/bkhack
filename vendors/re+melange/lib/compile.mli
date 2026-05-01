@@ -1,1 +1,1 @@
-../re/lib/compile.mli
+../../../_opam/lib/re/compile.mli

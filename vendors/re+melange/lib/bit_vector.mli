@@ -1,1 +1,1 @@
-../re/lib/bit_vector.mli
+../../../_opam/lib/re/bit_vector.mli

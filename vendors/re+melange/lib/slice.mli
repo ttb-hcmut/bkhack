@@ -1,1 +1,1 @@
-../re/lib/slice.mli
+../../../_opam/lib/re/slice.mli

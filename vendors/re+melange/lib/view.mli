@@ -1,1 +1,1 @@
-../re/lib/view.mli
+../../../_opam/lib/re/view.mli

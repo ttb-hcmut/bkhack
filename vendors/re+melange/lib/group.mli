@@ -1,1 +1,1 @@
-../re/lib/group.mli
+../../../_opam/lib/re/group.mli

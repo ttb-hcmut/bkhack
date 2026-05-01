@@ -1,1 +1,1 @@
-../re/lib/str.mli
+../../../_opam/lib/re/str.mli

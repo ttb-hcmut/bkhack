@@ -1,1 +1,1 @@
-../re/lib/perl.mli
+../../../_opam/lib/re/perl.mli

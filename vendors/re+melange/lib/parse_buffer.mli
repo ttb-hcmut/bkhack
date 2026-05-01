@@ -1,1 +1,1 @@
-../re/lib/parse_buffer.mli
+../../../_opam/lib/re/parse_buffer.mli

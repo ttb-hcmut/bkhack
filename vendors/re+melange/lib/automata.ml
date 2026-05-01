@@ -1,1 +1,1 @@
-../re/lib/automata.ml
+../../../_opam/lib/re/automata.ml

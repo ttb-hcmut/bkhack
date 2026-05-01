@@ -1,1 +1,1 @@
-../re/lib/posix_class.ml
+../../../_opam/lib/re/posix_class.ml

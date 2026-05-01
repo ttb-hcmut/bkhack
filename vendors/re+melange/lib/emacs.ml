@@ -1,1 +1,1 @@
-../re/lib/emacs.ml
+../../../_opam/lib/re/emacs.ml

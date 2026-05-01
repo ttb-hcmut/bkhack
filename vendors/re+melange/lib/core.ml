@@ -1,1 +1,1 @@
-../re/lib/core.ml
+../../../_opam/lib/re/core.ml

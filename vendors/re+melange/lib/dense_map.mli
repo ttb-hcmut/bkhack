@@ -1,1 +1,1 @@
-../re/lib/dense_map.mli
+../../../_opam/lib/re/dense_map.mli

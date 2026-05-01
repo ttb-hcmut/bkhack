@@ -1,1 +1,1 @@
-../re/lib/automata.mli
+../../../_opam/lib/re/automata.mli

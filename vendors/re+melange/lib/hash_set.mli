@@ -1,1 +1,1 @@
-../re/lib/hash_set.mli
+../../../_opam/lib/re/hash_set.mli

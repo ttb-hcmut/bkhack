@@ -1,1 +1,1 @@
-../re/lib/glob.mli
+../../../_opam/lib/re/glob.mli

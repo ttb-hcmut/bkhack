@@ -1,1 +1,1 @@
-../re/lib/color_map.mli
+../../../_opam/lib/re/color_map.mli
