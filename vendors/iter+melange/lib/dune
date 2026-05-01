@@ -1,5 +1,6 @@
 (library
  (modes melange)
+ (public_name bkhack.melange__iter)
  (name melange__iter))
 
 (env

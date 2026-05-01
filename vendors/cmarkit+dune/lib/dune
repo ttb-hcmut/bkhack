@@ -1,4 +1,5 @@
 (library
  (flags -w -27 -w -35 -w -9 -w -32 -w -30)
  (modes melange)
+ (public_name bkhack.melange__cmarkit)
  (name melange__cmarkit))

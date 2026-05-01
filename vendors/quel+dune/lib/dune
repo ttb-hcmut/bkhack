@@ -3,6 +3,6 @@
   (flags (:standard -w -27 -w -33 -w -39))))
 
 (library
- ; (public_name quel)
+ (public_name bkhack.quel)
  (modes melange)
  (name quel))

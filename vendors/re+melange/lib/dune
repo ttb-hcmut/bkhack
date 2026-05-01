@@ -1,4 +1,5 @@
 (library
  (modes melange)
+ (public_name bkhack.melange__re)
  (name melange__re)
  (synopsis "Pure OCaml regular expression library"))

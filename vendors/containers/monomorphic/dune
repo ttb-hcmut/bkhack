@@ -1,5 +1,6 @@
 (library
  (modes melange)
+ (public_name bkhack.monomorphic)
  (name monomorphic)
  (preprocess
   (action

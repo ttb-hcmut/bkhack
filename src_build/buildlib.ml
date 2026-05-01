@@ -5,7 +5,7 @@ module P =
 
 module Output = struct
   let src x =
-    "./_build/default/src/output/src/" ^ x ^ ".js"
+    "./_build/default/src/output/node_modules/bkhack/" ^ x ^ ".js"
 end
 
 let fix_base_path =

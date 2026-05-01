@@ -1,5 +1,6 @@
 (library
  (modes melange)
+ (public_name bkhack.melange__containers)
  (name melange__containers)
  (wrapped false)
  (preprocess
