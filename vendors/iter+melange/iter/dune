@@ -1,8 +1,0 @@
-(rule
- (alias runtest)
- (deps
-  (:dep README.md))
- (action
-  (progn
-   (run ocaml-mdx test %{dep})
-   (diff? %{dep} %{dep}.corrected))))
