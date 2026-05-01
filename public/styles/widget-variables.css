@@ -37,7 +37,7 @@
 	--info-foreground: var(--ctp-base);
 
 	/* Borders and dividers */
-	--border: var(--ctp-surface0);
+	--border: var(--ctp-surface1);
 
 	/* Input fields */
 	--input: var(--ctp-crust);
@@ -63,7 +63,7 @@
 	--sidebar-primary-foreground: #ffffff;
 	--sidebar-accent: var(--ctp-surface0);
 	--sidebar-accent-foreground: var(--ctp-text);
-	--sidebar-border: var(--ctp-surface0);
+	--sidebar-border: var(--ctp-surface1);
 	--sidebar-ring: var(--sig-blue);
 
 	/* old */
@@ -84,7 +84,7 @@
 	--card-fg-suggestive-halftransparentlol: oklab(from var(--sig-blue) l a b / 0.5);
 	--card-bg: var(--ctp-mantle);
 	--card-bg-translucent: var(--ctp-crust);
-	--card-border: var(--ctp-surface0);
+	--card-border: var(--ctp-surface1);
 	--card-fg-highlighted-dimmer: var(--ctp-subtext1);
 	--card-fg-unhighlighted: var(--ctp-overlay0);
 	--card-border-20: oklab(from var(--sig-blue) l a b / 0.2);
