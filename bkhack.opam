@@ -13,6 +13,8 @@ depends: [
   "eio"
   "eio_main"
   "containers"
+  "iter"
+  "re"
   "opam-check-npm-deps" {with-dev-setup}
   "ocaml-lsp-server" {with-dev-setup}
   "dot-merlin-reader" {with-dev-setup}
