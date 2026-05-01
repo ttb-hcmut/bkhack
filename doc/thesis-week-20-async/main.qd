@@ -1,0 +1,53 @@
+.include {bachkhoa.qd}
+.docname {BKHack\: Week 20\: concurrency models}
+.doctype {slides}
+.autopagebreak maxdepth:{2}
+.docauthor {Kinten Le}
+
+.front
+	.frontTitle {Advanced programming: concurrency models}
+	.frontBody
+		.frontAuthor
+			.aauthor {.docauthor}
+		.frontContacts
+			.email {kinten108101\@protonmail\.com}
+		.frontOrigin
+			.align {center}
+				.container
+					HCMUT-VNUHCM
+	.align {center}
+		.container
+			Source at ttb-hcmut/bkhack/doc/thesis-week-20-async
+
+.tableofcontents {Content} maxdepth:{1}
+
+Assume that you know concurrency vs. parallel...
+
+Concurrency is an abstraction
+
+# Architecture of a concurrency system
+
+The API
+
+The scheduler
+
+# SOTA (state of the art)
+
+- Promise API from JavaScript
+- Web Workers from JavaScript
+- Asyncio from Python
+- Goroutine and channel from Go (Communicating sequential process (CSP))
+- Algebraic Effects and streams from OCaml Eio (CSP)
+- XXX from Scala ZIO
+- Algebraic Effects from TypeScript Effects.js
+- Async and Task from C#, F# Task Parallel Library (TPL) https://learn.microsoft.com/en-us/dotnet/csharp/asynchronous-programming/task-asynchronous-programming-model
+- IO from Haskell
+- Rust Commands https://relm4.org/book/stable/threads_and_async/commands.html
+- Rust Workers
+- Rust Async
+
+# Walkthrough 1
+
+# Walkthrough 2
+
+# Fire-n-forget

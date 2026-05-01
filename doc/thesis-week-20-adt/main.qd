@@ -1,0 +1,55 @@
+.front
+	.frontTitle {Advanced programming\: Enum\, algebraic data types\, and domain modeling}
+
+## Version 1
+
+```javascript
+switch (response) {
+case "ok": // ...
+case "cancel": // ...
+}
+```
+
+## Version 2
+
+```typescript
+enum ResponseCode {
+	OK = "ok",
+	CANCEL = "cancel"
+}
+
+switch (responseCode) {
+case "ok": // ...
+case "cancel": // ...
+}
+```
+
+## Version 3
+
+```typescript
+class Response {
+	code: ResponseCode = null
+	ok__value: unknown = null
+	er__code: number = null
+
+	// ...
+}
+
+enum ResponseCode {
+	OK = "ok",
+	CANCEL = "cancel"
+}
+
+switch (response.code) {
+case "ok":
+	{
+		const v = response.ok__value
+		// ...
+	}
+case "cancel":
+	{
+		const e = response.er__code
+		// ...
+	}
+}
+```
