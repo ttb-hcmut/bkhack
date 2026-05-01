@@ -103,7 +103,7 @@
 
 #root > main.discussions > main {
 	border-top: solid 1px var(--card-border);
-	background-color: var(--card-bg-translucent);
+	background-color: var(--global-bg);
 	padding: var(--space-a) var(--space-a) 0 var(--space-a);
 }
 
