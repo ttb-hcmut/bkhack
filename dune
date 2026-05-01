@@ -12,7 +12,7 @@
 
 (dirs :standard \ node_modules)
 
-(subdir vendors
+(subdir src_vendors
  (subdir re+melange
   (subdir re
    (dirs ))))

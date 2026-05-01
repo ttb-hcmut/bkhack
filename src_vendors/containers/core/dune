@@ -5,7 +5,7 @@
  (wrapped false)
  (preprocess
   (action
-   (run %{project_root}/vendors/containers/core/cpp/cpp.exe %{input-file})))
+   (run %{project_root}/src_vendors/containers/core/cpp/cpp.exe %{input-file})))
  (flags :standard -nolabels -open CCMonomorphic)
  (libraries monomorphic))
 
