@@ -494,8 +494,8 @@ module DiscussionBody = {
   ) => 
     <CommentGroup id pType showRep nestDepth />);
 	[@react.component]
-	let make = (~post) => {
-    <CommentGroup id=post pType="post" showRep=true nestDepth=0 />
+	let make = () => {
+    <CommentGroup id="1" pType="post" showRep=true nestDepth=0 />
 	}
 }
 
@@ -723,7 +723,6 @@ module App = {
 			let u = test("annb");
 			Js.Console.log("result:'" ++ u ++ "'");
 		}) { | Invalid_argument(msg) => Js.Console.log("Invalid argument: '" ++ msg ++ "'") };
-    let post = "1"
 		// Js.Console.log(a);
 		let renderer = React.useMemo0(() => Melange__cmarkit.Cmarkit_html.renderer(~safe=false, ()));
 		let art = React.useMemo2(() => {
@@ -824,7 +823,7 @@ module App = {
 							<DiscussionFilter />
 						</nav>
 					</header>
-					<main className=Printf.sprintf("only %s", View.to_string(Discussion))><DiscussionBody post /></main>
+					<main className=Printf.sprintf("only %s", View.to_string(Discussion))><DiscussionBody /></main>
 				</>
 				<>
 					<header className=Printf.sprintf("only %s", View.to_string(Pullrequest))>
