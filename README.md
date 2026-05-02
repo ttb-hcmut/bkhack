@@ -27,7 +27,7 @@ The following paper provides more details:
 
 ## Usage
 
-`bkhack` is distributed as a front-end library and a suite of bundling tools. Once you've installed the package, you can use it in the composition of your own front-end.
+`bkhack` is distributed as a front-end library and a suite of bundling tools. Once you've installed the package, you can use the library in the composition of your own front-end.
 
 ```dune
 (melange.emit
