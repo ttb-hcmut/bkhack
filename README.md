@@ -9,7 +9,7 @@ The following paper provides more details:
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lê Nguyễn Gia Bảo, Lê Công Minh Khang, and Hồ Gia Tường  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Undergraduate Thesis 2026  
 
-[bkhack-paper]: https://baorepo.web.app/~ttb-hcmut/thesis.pdf
+[bkhack-paper]: https://baorepo.web.app/~ttb-hcmut/bkhack.pdf
 
 ## Installation
 
