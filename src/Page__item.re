@@ -544,7 +544,7 @@ module PullrequestsBody = {
 	let date_to_string = d => (d->Js__dom.Date.Utc.date->string_of_int, (d->Js__dom.Date.Utc.month+1)->string_of_int, d->Js__dom.Date.Utc.full_year->string_of_int);
 
 	[@react.component]
-	let make = (~pullrequests, ~prsExpand, ~expand_this) => {
+	let make = (~pullrequests, ~prsExpand, ~expand_this, ~inspect_this) => {
 		let now = Js__dom.Date.of_now();
 		<ul>
 			{pullrequests |> Array.map(x => {
@@ -556,16 +556,16 @@ module PullrequestsBody = {
 					| `Hours(i) => <span className="time ago hour">{React.int(i)}</span>
 					| `Days(i) => <span className="time ago day">{React.int(i)}</span>
 					;
-				let status_class = switch (status) { | `Open => "open" | `Closed => "closed" | `Merged => "merged" };
+				let status_class = fun | `Open => "open" | `Closed => "closed" | `Merged => "merged";
 				let is_expanded = List.assoc_opt(id, prsExpand) |> Option.value(~default=false);
-				<li key=string_of_int(id) className=("pull-request-row " ++ (is_expanded ? "expanded" : " "))>
+				<li key=string_of_int(id) onClick={_ => expand_this(id)} className=("pull-request-row " ++ (is_expanded ? "expanded" : " "))>
 					<div className="head">
 						<button onClick={_ => expand_this(id)}>{React.string(">")}</button>
 					</div>
 					<span className="id">{React.int(id)}</span>
-					<span className={"status " ++ status_class}></span>
+					<span className={"status " ++ status_class(status)}></span>
 					<div className="aee">
-						<span className="title">{React.string(title)}</span>
+						<a className="title" onClick={inspect_this(id)}>{React.string(title)}</a>
 						<span className="contributor user">{React.string(contributor_name)}</span>
 						{ switch (duration) {
 							| Some(duration) => duration
@@ -581,7 +581,7 @@ module PullrequestsBody = {
 					</div>
 					<div className="expanded-content">
 						<span className="id">{React.int(id)}</span>
-						<span className="title">{React.string(title)}</span>
+						<a className="title">{React.string(title)}</a>
 						<ul className="tags">{ tags |> List.map(x =>
 							<li key=x><span className="tag">{React.string(x)}</span></li>
 						) |> Array.of_list |> React.array}</ul>
@@ -590,6 +590,25 @@ module PullrequestsBody = {
 				</li>
 			}) |> React.array}
 		</ul>
+	}
+}
+
+module PullrequestsInspectHint = {
+	[@react.component]
+	let make = (~pullrequests, ~pr_inspect, ~inspect_back_this) => {
+		let pullrequest =
+			(pullrequests, pr_inspect) |> React.useMemo2 @@ () =>
+			pullrequests |> Array.find_map @@ (((id, _, _, _, _, _, _, _), _) as x) =>
+			Option.bind(pr_inspect) @@ pr_inspect =>
+			id == pr_inspect ? Some(x) : None;
+		let show = (it, f) => switch (it) { | None => <> </> | Some(it) => f(it) };
+		let status_class = fun | `Open => "open" | `Closed => "closed" | `Merged => "merged";
+		show(pullrequest) @@ (((id, _post_id, _contributor_id, title, _desc, status, _, _), _)) =>
+		<>
+		<button className="back" onClick={_ => inspect_back_this()}>{React.string("back")}</button>
+		<span>{React.int(id)}</span><span>{React.string(title)}</span>
+		<span>{React.string(status_class(status))}</span>
+		</>
 	}
 }
 
@@ -707,6 +726,10 @@ module App =
 			->Option.value(~default=View.to_string(Article))
 			->View.of_string
 		});
+		let (pr_inspect, pr_inspect_set) = React.useState(() => {
+			let pr_id = Util.parseQueryParams(url.search)->Js.Dict.get("pr_id");
+			pr_id |> Option.map(int_of_string)
+		});
 		let (pullrequests, setPrs) = React.useState(() => [||]);
 		let (postInfo, setPostInfo) = React.useState(() => None);
 		let tags = [| "Algorithm", "Rust" |];
@@ -740,7 +763,9 @@ module App =
 				| Js.Exn.Error(x) => { Js.Console.error("js error: '" ++ Option.value(~default="", Js.Exn.message(x)) ++ "'"); failwith("sdf") }
 			}
 		}, (renderer, postInfo));
-		let id = React.useMemo1(() => View.to_string(tab), [|tab|]);
+		let id = React.useMemo2(() => switch (tab) { | View.Pullrequest as tab => {
+			View.to_string(tab) ++ " " ++ (pr_inspect |> Option.map(_ => "inspect") |> Option.value(~default=""))
+		} | tab => View.to_string(tab) }, (tab, pr_inspect));
 		let (sidebarState, setSidebarState) = React.useState( _ => "state0");
 		let module X = Bkhack__experimental;
 		let join = ((_, _, contributor_id, _, _, _, _, _) as it) => Fetch__syntax.({
@@ -779,6 +804,21 @@ module App =
 			}
 			}; ()
 		}, [|prsExpand|]);
+		let on_prs_update_inspect = React.useMemo1(() => (id, e) => {
+			React.Event.Synthetic.stopPropagation(e);
+			ReasonReactRouter.push(String.concat("/", ["", ...url.path]) ++ {
+				let dict = Util.parseQueryParams'(url.search);
+				"/?" ++ ( dict |> Util.List.replace_assoc'("pr_id", string_of_int(id)) |> Util.stringQueryParams' )
+			});
+			pr_inspect_set(_ => Some(id))
+		}, [|pr_inspect_set|])
+		let on_prs_update_inspect_back = React.useMemo1(((), ()) => {
+			ReasonReactRouter.push(String.concat("/", ["", ...url.path]) ++ {
+				let dict = Util.parseQueryParams'(url.search);
+				"/?" ++ ( dict |> List.remove_assoc("pr_id") |> Util.stringQueryParams' )
+			});
+			pr_inspect_set(_ => None)
+		}, [|pr_inspect_set|])
 		let setCurrentTab = React.useCallback2(f => setTab(x => {
 			let y = f(x);
 			ReasonReactRouter.push(String.concat("/", ["", ...url.path]) ++ {
@@ -821,7 +861,12 @@ module App =
 							<PullrequestsFilter />
 						</nav>
 					</header>
-					<main className=Printf.sprintf("only %s", View.to_string(Pullrequest))><PullrequestsBody pullrequests prsExpand expand_this=on_prs_update_expand /></main>
+					<main className=Printf.sprintf("only %s", View.to_string(Pullrequest))><PullrequestsBody pullrequests prsExpand expand_this=on_prs_update_expand inspect_this=on_prs_update_inspect /></main>
+					<header className=Printf.sprintf("only %s inspect", View.to_string(Pullrequest))>
+						<PullrequestsInspectHint pullrequests pr_inspect inspect_back_this=on_prs_update_inspect_back />
+					</header>
+					<main className=Printf.sprintf("only %s inspect", View.to_string(Pullrequest))>
+					</main>
 				</>
 			</main>
 			<button 

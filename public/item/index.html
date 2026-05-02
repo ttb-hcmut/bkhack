@@ -98,6 +98,8 @@ html {
 #root > main.article > *.only:not(.article),
 #root > main.discussions > *.only:not(.discussions),
 #root > main.pullrequests > *.only:not(.pullrequests),
+#root > main.pullrequests:not(.inspect) > *.only.pullrequests.inspect,
+#root > main.pullrequests.inspect > *.only:not(.pullrequests.inspect),
 #root > main.log > *.only:not(.log),
 #root > main.edit > *.only:not(.edit) {
 	display: none;

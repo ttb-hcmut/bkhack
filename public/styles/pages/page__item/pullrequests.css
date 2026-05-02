@@ -138,6 +138,19 @@ ul li.pull-request-row {
 	padding-bottom: var(--space-c);
 	padding-left: var(--space-c);
 	padding-right: var(--space-c);
+	transition-duration: 300ms;
+	transition-property: border;
+}
+
+@media (prefers-reduced-motion) {
+	ul li.pull-request-row {
+		transition-duration: 0ms;
+		transition-property: none;
+	}
+}
+
+ul li.pull-request-row:hover {
+	border: solid 1px var(--card-fg-accent-0);
 }
 
 ul li.pull-request-row:not(.expanded) {
@@ -155,7 +168,35 @@ ul li.pull-request-row > .aee {
 }
 
 ul li.pull-request-row > .aee > :first-child {
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+ul li.pull-request-row > .aee > :nth-child(2) {
+	display: inline-flex;
 	flex-grow: 1;
+	justify-content: right;
+}
+
+ul li.pull-request-row > .aee > .title {
+	cursor: default;
+}
+
+ul li.pull-request-row > .aee > .title {
+	transition-duration: 300ms;
+	transition-property: color;
+}
+
+@media (prefers-reduced-motion) {
+	ul li.pull-request-row > .aee > .title {
+		transition-duration: 0ms;
+		transition-property: none;
+	}
+}
+
+ul li.pull-request-row > .aee > .title:hover {
+	color: var(--card-fg-accent-0);
 }
 
 li.pull-request-row > .id {
