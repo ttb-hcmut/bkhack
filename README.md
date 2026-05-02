@@ -27,7 +27,7 @@ The following paper provides more details:
 
 ## Usage
 
-`bkhack` is distributed as a front-end library and a suite of bundling tools. Once you've installed the package, you can use the library in the composition of your own front-end.
+`bkhack` is distributed as a library and a suite of bundling tools. Once you've installed the package, you can use the library in the composition of your own application.
 
 ```dune
 (melange.emit
@@ -35,7 +35,7 @@ The following paper provides more details:
  (libraries bkhack))
 ```
 
-Bundle your front-end as a web package
+Bundle your application as a web package
 
 ```sh
 export BKHACK_BACKEND_ADDRESS='http://localhost:5000' # configure a back-end server to plug in
