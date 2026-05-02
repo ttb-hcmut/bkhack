@@ -9,7 +9,7 @@ The following paper provides more details:
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lê Nguyễn Gia Bảo, Lê Công Minh Khang, and Hồ Gia Tường  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Undergraduate Thesis 2026  
 
-[bkhack-paper]: https://baorepo.web.app/~ttb-hcmut/thesis.pdf
+[bkhack-paper]: https://baorepo.web.app/~ttb-hcmut/bkhack.pdf
 
 ## Installation
 
@@ -25,6 +25,25 @@ The following paper provides more details:
 
 [bkhack-repo]: https://github.com/ttb-hcmut/bkhack
 
+## Usage
+
+`bkhack` is distributed as a library and a suite of bundling tools. Once you've installed the package, you can use the library in the composition of your own application.
+
+```dune
+(melange.emit
+ ; ...
+ (libraries bkhack))
+```
+
+Bundle your application as a web package
+
+```sh
+export BKHACK_BACKEND_ADDRESS='http://localhost:5000' # configure a back-end server to plug in
+bkhack.bundle ./ -o dist
+```
+
+You will get a `dist` folder with the necessary static HTML and JavaScript bundles for deployment e.g. Firebase Hosting, Netlify.
+
 ## Development using Nix shell
 
 Start nix shell
@@ -33,13 +52,10 @@ Start nix shell
 nix-shell
 ```
 
-Assume you've successfully entered nix shell
-
-> After this, if you have never run opam initialization, you must run at least once, with `opam init`
-
-Prepare
+Assume you've successfully entered nix shell. Prepare
 
 ```sh
+[ -d ~/.opam ] && opam init
 pnpm install
 pnpm run init
 ```
