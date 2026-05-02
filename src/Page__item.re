@@ -701,7 +701,10 @@ module At_repo_2(S : {
 	}
 }
 
-module App = {
+module App =
+{
+	let show = (x, f) => switch (x) { | Some(info) => f(info) | None => { <> </> } };
+
 	[@react.component]
 	let make = () => {
 		let url = ReasonReactRouter.useUrl();
@@ -792,19 +795,9 @@ module App = {
 			});
 			y
 		}), (setTab, url));
-		let show = (x, f) => switch (x) { | Some(info) => f(info) | None => { <> </> } };
-		React.useEffect1(() => {
-			let show = (x, f) => switch (x) { | Some(info) => { f(info); None } | None => None };
-			show(art) @@ (((title, _, _, _), _, _)) =>
-			try ({
-				Js__dom.Document.title_set(title)
-			})
-			{
-			| e => Js.Console.error(e)
-			}
-		}, [|art|]);
-		show(art) @@ ((postInfo, headings, article_body)) =>
+		show(art) @@ (((_, postTitle, _, _) as postInfo, headings, article_body)) =>
 		<>
+			<title>{React.string(postTitle++" | bkhack")}</title>
 			<header>
 				<Component__header />
 			</header>	
