@@ -39,8 +39,10 @@ Bundle your front-end as a web package
 
 ```sh
 export BKHACK_BACKEND_ADDRESS='http://localhost:5000' # configure a back-end server to plug in
-bkhack.bundle ./
+bkhack.bundle ./ -o dist
 ```
+
+You will get a `dist` folder with the necessary static HTML and JavaScript bundles for deployment e.g. Firebase Hosting, Netlify.
 
 ## Development using Nix shell
 
