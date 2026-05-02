@@ -1,14 +1,6 @@
 [@page "/item"]
 open Melange__containers.Fun
 
-module Tags = {
-	type t = list([`unfetched(string)])
-
-	let of_string : string => t =
-		String.split_on_char(',')
-		%> List.map(x => `unfetched(x))
-}
-
 module View = {
 	type t =
 		| Article
