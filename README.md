@@ -52,13 +52,10 @@ Start nix shell
 nix-shell
 ```
 
-Assume you've successfully entered nix shell
-
-> After this, if you have never run opam initialization, you must run at least once, with `opam init`
-
-Prepare
+Assume you've successfully entered nix shell. Prepare
 
 ```sh
+[ -d ~/.opam ] && opam init
 pnpm install
 pnpm run init
 ```
