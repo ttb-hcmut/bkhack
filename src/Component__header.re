@@ -19,22 +19,93 @@ module Nav =
 	}
 }
 
+open React
+
+module Rlwrap =
+{
+	let do_ = (memo, task) => {
+		let acc = Dom.Storage.getItem("bkhack.cmd-history", Dom.Storage.localStorage) |> Option.map(String.split_on_char(',')) |> Option.value(~default=[]);
+		Dom.Storage.setItem("bkhack.cmd-history", String.concat(",", acc @ [memo]), Dom.Storage.localStorage);
+		task()
+	}
+
+	let index_init = () => Dom.Storage.getItem("bkhack.cmd-history", Dom.Storage.localStorage) |> Option.map(String.split_on_char(',')) |> Option.value(~default=[]) |> List.length
+
+	let on_scroll = (historyIndex, k) => {
+		let a = x => List.nth_opt(x, historyIndex);
+		let u =
+			Dom.Storage.getItem("bkhack.cmd-history", Dom.Storage.localStorage) |> Option.map(String.split_on_char(',')) |> Option.value(~default=[])
+			|> a;
+		k(u)
+	}
+}
+
 let onSubmit = e => {
-	React.Event.Synthetic.preventDefault(e);
-	let u = React.Event.Form.target(e)##siteNavigator##value -> Shell__parse.test_parse;
+	Event.Synthetic.preventDefault(e);
+	let rawstr = Event.Form.target(e)##siteNavigator##value;
+	let u = rawstr->Shell__parse.test_parse;
 	let (url, url_args) = Nav.eval(u);
-	let open Js__dom;
-	Window.Location.href_set(url ++ {
-		List.length(url_args) == 0 ? "" : "?" ++ {
-			url_args |> List.map(((a,b)) => a++"="++b) |> String.concat("&")}
-	});
+	Rlwrap.do_(rawstr) @@ () => {
+		let open Js__dom;
+		Window.Location.href_set(url ++ {
+			List.length(url_args) == 0 ? "" : "?" ++ {
+				url_args |> List.map(((a,b)) => a++"="++b) |> String.concat("&")}
+		});
+	}
+};
+
+let onKeyDown = (setHistoryIndex, e) => {
+	let key = Event.Keyboard.key(e);
+	let mk_char = s => try (String.get(s, 0)->Option.some) { | Invalid_argument(_) => None }
+	switch ((key, mk_char(key))) {
+	| ("ArrowUp", _) => setHistoryIndex(it => it - 1)
+	| ("ArrowDown", _) => setHistoryIndex(it => it + 1)
+	| _ => ()
+	}
 };
 
 [@react.component]
 let make = () => {
+	let bar = useRef(Js.Nullable.null);
+	let (historyIndex, setHistoryIndex) = useState(Rlwrap.index_init);
+	let setHistoryIndex = useCallback1(k => {
+		setHistoryIndex(prev => {
+			let newval = k(prev);
+			let newval = newval->Int.min(Dom.Storage.getItem("bkhack.cmd-history", Dom.Storage.localStorage) |> Option.map(String.split_on_char(',')) |> Option.value(~default=[]) |> List.length);
+			let newval = newval->Int.max(0)
+			newval
+		})
+	}, [|setHistoryIndex|])
+	let (navigatorStyle, setNavigatorStyle) = useState(() => None);
+	let setBarContent = (str: string) => {
+		let bar = bar.current->Js.Nullable.toOption->Option.get->ReactDOM.domElementToObj;
+		bar##value #= str
+	};
+	let assert_ = useCallback1(k => {
+		setNavigatorStyle(prev => {
+			try ({
+				let () = k(prev);
+				None
+			}) {
+				| _ => Some("error")
+			}
+		})
+	}, [|setNavigatorStyle|]);
+	useEffect0(
+		React__effect.async @@ () =>
+		Fetch__syntax.({
+			let bar = bar.current->Js.Nullable.toOption->Option.get->ReactDOM.domElementToObj;
+			bar##focus();
+			return()
+		})
+	);
+	useEffect1(() => {
+		Rlwrap.on_scroll(historyIndex) @@ u =>
+		setBarContent(Option.value(~default="", u)); None
+	}, [|historyIndex|]);
 	<>
 	<a className="logo" href="/" />
-	<form onSubmit> <input id="siteNavigator" /> </form>
+	<form onSubmit={e => assert_ @@ _ => onSubmit(e)}> <input onKeyDown={onKeyDown(setHistoryIndex)} ref={ReactDOM.Ref.domRef(bar)} id="siteNavigator" className={Option.value(~default="", navigatorStyle)} /> </form>
 	<a className="place projects" href="/projects"></a>
 	<a className="place wiki" href="/wiki"></a>
 	<a className="place auth" href="/auth"></a>
