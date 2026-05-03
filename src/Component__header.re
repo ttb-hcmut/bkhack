@@ -37,5 +37,6 @@ let make = () => {
 	<form onSubmit> <input id="siteNavigator" /> </form>
 	<a className="place projects" href="/projects"></a>
 	<a className="place wiki" href="/wiki"></a>
+	<a className="place auth" href="/auth"></a>
 	</>
 }
