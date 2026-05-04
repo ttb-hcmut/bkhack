@@ -265,7 +265,7 @@ defmodule App.Book do
   def init(_state) do
     Process.flag(:trap_exit, true)
     x = Task.async(fn ->
-      System.shell "/home/kinten/s/bkhack/service/bin/livebook.AppImage 2>log-livebook"
+      System.shell "LIVEBOOK_PORT=32123 LIVEBOOK_PASSWORD=ballsballsballs livebook start 2>log-livebook"
     end)
     {:ok, x}
   end

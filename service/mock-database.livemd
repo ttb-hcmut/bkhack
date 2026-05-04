@@ -9,10 +9,10 @@ Mix.install([
 
 ## Setup
 
-<!-- livebook:{"attrs":"eyJkYXRhYmFzZV9wYXRoIjoiL2hvbWUva2ludGVuL3MvYmtoYWNrL3NlcnZpY2UvZGIiLCJ0eXBlIjoic3FsaXRlIiwidmFyaWFibGUiOiJjb25uIn0","chunks":null,"kind":"Elixir.KinoDB.ConnectionCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":"eyJkYXRhYmFzZV9wYXRoIjoiZGIiLCJ0eXBlIjoic3FsaXRlIiwidmFyaWFibGUiOiJjb25uIn0","chunks":null,"kind":"Elixir.KinoDB.ConnectionCell","livebook_object":"smart_cell"} -->
 
 ```elixir
-opts = [database: "/home/kinten/s/bkhack/service/db"]
+opts = [database: "db"]
 {:ok, conn} = Kino.start_child({Exqlite, opts})
 ```
 
@@ -98,7 +98,7 @@ result3 =
   )
 ```
 
-### Scenario
+### Scenario 1
 
 ```elixir
 result2 = Exqlite.query!(conn, ~S"delete from comments", [])
