@@ -117,6 +117,7 @@
   grid-template-rows: repeat(auto);
 	margin-top: var(--space-a);
 }
+
 .comments > .content {
   border: 1px solid var(--ctp-surface0);
   background-color: var(--ctp-mantle);
