@@ -5,6 +5,7 @@ let
 		nixd
 		sqlite
 		beamMinimalPackages.elixir
+		beamMinimalPackages.livebook
 	];
 in
 	nixpkgs.mkShell {
