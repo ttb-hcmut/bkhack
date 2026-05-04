@@ -11,6 +11,9 @@ module Window : {
 		    navigate to it. */
 		let href_set : string => unit
 	}
+
+	external add_event_listener : string => (React.Event.Keyboard.t => unit) => unit = "window.addEventListener"
+	external remove_event_listener : string => (React.Event.Keyboard.t => unit) => unit = "window.removeEventListener"
 }
 
 /** [Date] objects represent a single moment in time in a platform-independent format. Date objects encapsulate an integral number that represents milliseconds since the midnight at the beginning of January 1, 1970, UTC (the epoch). */

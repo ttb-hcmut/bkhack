@@ -595,7 +595,9 @@ module App = {
 		| _ => <UnknownPage />
 		}
 	}
-};
+}
+
+module App' = Keyboard.Make(App)
 
 module ReactDOM0 = {
 	let querySelector = x =>
@@ -610,5 +612,5 @@ module ReactDOM0 = {
 let () = {
 	let element = ReactDOM0.querySelector("#root");
 	let root = ReactDOM.Client.createRoot(element);
-	ReactDOM.Client.render(root, <App />)
+	ReactDOM.Client.render(root, <App' />)
 }

@@ -6,6 +6,8 @@ module Window = {
 	module Location = {
 		let href_set = window_location_href_set(window_location_api);
 	}
+	external add_event_listener : string => (React.Event.Keyboard.t => unit) => unit = "window.addEventListener"
+	external remove_event_listener : string => (React.Event.Keyboard.t => unit) => unit = "window.removeEventListener"
 }
 
 module Date = {

@@ -603,13 +603,41 @@ module PullrequestsInspectHint = {
 			id == pr_inspect ? Some(x) : None;
 		let show = (it, f) => switch (it) { | None => <> </> | Some(it) => f(it) };
 		let status_class = fun | `Open => "open" | `Closed => "closed" | `Merged => "merged";
-		show(pullrequest) @@ (((id, _post_id, _contributor_id, title, _desc, status, _, _), _)) =>
+		show(pullrequest) @@ (((id, _post_id, _contributor_id, title, _desc, status, _, _), contributor_name)) =>
 		<>
-		<button className="back" onClick={_ => inspect_back_this()}>{React.string("back")}</button>
-		<span>{React.int(id)}</span><span>{React.string(title)}</span>
-		<span>{React.string(status_class(status))}</span>
+		<button className="back" onClick={_ => inspect_back_this()}></button>
+		<div>
+			<span className="id">{React.int(id)}</span><span>{React.string(title)}</span>
+		</div>
+		<div>
+			<span className="status">{React.string(status_class(status))}</span>
+			<span className="contributor user wants-to">{contributor_name->React.string}</span>
+		</div>
 		</>
 	}
+}
+
+module PullrequestsInspectBody{
+	[@react.component]
+	let make = (~pullrequests, ~pr_inspect) => {
+		let pullrequest =
+			(pullrequests, pr_inspect) |> React.useMemo2 @@ () =>
+			pullrequests |> Array.find_map @@ (((id, _, _, _, _, _, _, _), _) as x) =>
+			Option.bind(pr_inspect) @@ pr_inspect =>
+			id == pr_inspect ? Some(x) : None;
+		let show = (it, f) => switch (it) { | None => <> </> | Some(it) => f(it) };
+		show(pullrequest) @@ (((_, _, _, _, desc, _, _, _), _)) =>
+		<>
+			<section className="cat">
+				<header className="command">{"cat pullrequest.md"->React.string}</header>
+				<div className="content">{desc->React.string}</div>
+			</section>
+			<section className="reviews">
+				<header className="command">{"review --list"->React.string}</header>
+			</section>
+		</>
+	}
+
 }
 
 module At_repo_0'(S : {
@@ -866,6 +894,7 @@ module App =
 						<PullrequestsInspectHint pullrequests pr_inspect inspect_back_this=on_prs_update_inspect_back />
 					</header>
 					<main className=Printf.sprintf("only %s inspect", View.to_string(Pullrequest))>
+						<PullrequestsInspectBody pullrequests pr_inspect />
 					</main>
 				</>
 			</main>
@@ -889,7 +918,9 @@ module App =
 			
 		</>
 	}
-}
+};
+
+module App' = Keyboard.Make(App);
 
 module ReactDOM0 = {
 	let querySelector = x =>
@@ -901,6 +932,8 @@ module ReactDOM0 = {
 		}
 }
 
-let element = ReactDOM0.querySelector("#root");
-let root = ReactDOM.Client.createRoot(element);
-ReactDOM.Client.render(root, <App />);
+let () = {
+	let element = ReactDOM0.querySelector("#root");
+	let root = ReactDOM.Client.createRoot(element);
+	ReactDOM.Client.render(root, <App' />)
+}
