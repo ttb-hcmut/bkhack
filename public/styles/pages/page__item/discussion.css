@@ -104,7 +104,7 @@
 #root > main.discussions > main {
 	border-top: solid 1px var(--card-border);
 	background-color: var(--global-bg);
-	padding: var(--space-a) var(--space-a) 0 var(--space-a);
+	padding: 0 var(--space-a) 0 var(--space-a);
 }
 
 #root > main.discussions > main > ol > li:not(:first-child) {
@@ -115,6 +115,7 @@
   display: grid;
   grid-template-columns: min-content auto;
   grid-template-rows: repeat(auto);
+	margin-top: var(--space-a);
 }
 .comments > .content {
   border: 1px solid var(--ctp-surface0);
