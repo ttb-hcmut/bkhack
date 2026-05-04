@@ -40,10 +40,10 @@
 #root > main.discussions > header > .sub > .summary > :not(:first-child) {
 	margin-left: 1em;
 }
-#root > main.discussions > header > .sub > .summary > .comments {
+#root > main.discussions > header > .sub > .summary > .n-comments {
 	color: var(--card-fg-accent-1);
 }
-#root > main.discussions > header > .sub > .summary > .comments::after {
+#root > main.discussions > header > .sub > .summary > .n-comments::after {
 	content: " comments";
 }
 #root > main.discussions > header > .sub > .summary > .karma::before {

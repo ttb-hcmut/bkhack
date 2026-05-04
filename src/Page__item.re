@@ -115,7 +115,7 @@ module DiscussionHint = {
 			<div className="sub">
 				<span className="command">{React.string("discuss --thread=main")}</span>
 				<span className="summary">
-					<data className="comments">{React.int(13)}</data>
+					<data className="n-comments">{React.int(13)}</data>
 					<data className="karma">{React.int(364)}</data>
 				</span>
 			</div>
