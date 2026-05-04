@@ -58,6 +58,7 @@ let onSubmit = e => {
 	let u = rawstr->Shell__parse.test_parse;
 	let (url, url_args) = Nav.eval(u);
 	Rlwrap.do_(rawstr) @@ () => {
+		Dom.Storage.setItem("bkhack.cmd-greeting-shown", "y", Dom.Storage.sessionStorage);
 		let open Js__dom;
 		Window.Location.href_set(url ++ {
 			List.length(url_args) == 0 ? "" : "?" ++ {
@@ -103,6 +104,10 @@ let make = () => {
 			}
 		})
 	}, [|setNavigatorStyle|]);
+	let placeholder = useMemo0(() =>
+		Dom.Storage.getItem("bkhack.cmd-greeting-shown", Dom.Storage.sessionStorage)
+		|> [@warning "-8"] fun | None => Some("Start typing to dismiss or don't show this again.") | Some("y") => None
+	);
 	useEffect0(
 		React__effect.async @@ () =>
 		Fetch__syntax.({
@@ -117,7 +122,7 @@ let make = () => {
 	}, [|historyIndex|]);
 	<>
 	<a className="logo" href="/" />
-	<form onSubmit={e => assert_ @@ _ => onSubmit(e)}> <input onKeyDown={onKeyDown(setHistoryIndex)} ref={ReactDOM.Ref.domRef(bar)} id="siteNavigator" className={Option.value(~default="", navigatorStyle)} /> </form>
+	<form onSubmit={e => assert_ @@ _ => onSubmit(e)}> <input placeholder=?placeholder onKeyDown={onKeyDown(setHistoryIndex)} ref={ReactDOM.Ref.domRef(bar)} id="siteNavigator" className={Option.value(~default="", navigatorStyle)} /> </form>
 	<a className="place projects" href="/projects"></a>
 	<a className="place wiki" href="/wiki"></a>
 	<a className="place auth" href="/auth"></a>
