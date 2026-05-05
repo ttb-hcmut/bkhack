@@ -226,7 +226,7 @@ defmodule App.Supervisor do
   def init(_init_arg) do
     children = [
       Data0,
-      Data1
+      # Data1
     ]
 
     Supervisor.init(children, strategy: :one_for_one)
@@ -265,7 +265,7 @@ defmodule App.Book do
   def init(_state) do
     Process.flag(:trap_exit, true)
     x = Task.async(fn ->
-      System.shell "LIVEBOOK_PORT=32123 LIVEBOOK_PASSWORD=ballsballsballs livebook start 2>log-livebook"
+      System.shell "LIVEBOOK_PORT=32123 LIVEBOOK_PASSWORD=ballsballsballs livebook start"
     end)
     {:ok, x}
   end

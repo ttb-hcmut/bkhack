@@ -16,6 +16,14 @@ opts = [database: "db"]
 {:ok, conn} = Kino.start_child({Exqlite, opts})
 ```
 
+```elixir
+defmodule RunSql do
+  def query(conn,queryList) do
+    Enum.map( queryList , fn q -> Exqlite.query!(conn,q) end )
+  end
+end
+```
+
 <!-- livebook:{"attrs":"eyJjYWNoZV9xdWVyeSI6dHJ1ZSwiY29ubmVjdGlvbiI6eyJ0eXBlIjoic3FsaXRlIiwidmFyaWFibGUiOiJjb25uIn0sInF1ZXJ5IjoiU0VMRUNUICogRlJPTSBzcWxpdGVfbWFzdGVyIFdIRVJFIHR5cGU9J3RhYmxlJyIsInJlc3VsdF92YXJpYWJsZSI6InJlc3VsdCIsInRpbWVvdXQiOm51bGx9","chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
 
 ```elixir
@@ -23,10 +31,15 @@ result = Exqlite.query!(conn, ~S"SELECT * FROM sqlite_master WHERE type='table'"
 ```
 
 ```elixir
-result2 = Exqlite.query!(conn, ~S"drop table if exists pullrequests", [])
-result2 = Exqlite.query!(conn, ~S"drop table if exists comments", [])
-result2 = Exqlite.query!(conn, ~S"drop table if exists posts", [])
-result2 = Exqlite.query!(conn, ~S"drop table if exists users", [])
+dropTablesList = [
+  fn -> Exqlite.query!(conn, ~S"drop table if exists pullrequests", []) end,
+  fn -> Exqlite.query!(conn, ~S"drop table if exists comments", []) end,
+  fn -> Exqlite.query!(conn, ~S"drop table if exists posts", []) end,
+  fn -> Exqlite.query!(conn, ~S"drop table if exists users", []) end,
+  fn -> Exqlite.query!(conn, ~S"drop table if exists commentRatings", []) end,
+  fn -> IO.puts "Dropped Tables" end,
+]
+
 ```
 
 ### Relational tables
@@ -37,19 +50,19 @@ Note:
 * DDL statements should be laxed i.e. do only if (not) exists
 
 ```elixir
-result3 =
-  Exqlite.query!(
+createTablesList = [
+  fn -> Exqlite.query!(
     conn,
     ~S"""
     create table if not exists users (
       user_id integer primary key,
-      name varchar(255) not null
+      name varchar(255) not null,
+      role integer not null
     )
     """,
     []
-  )
-result3 =
-  Exqlite.query!(
+  ) end,
+  fn -> Exqlite.query!(
     conn,
     ~S"""
     create table if not exists posts (
@@ -61,9 +74,8 @@ result3 =
     )
     """,
     []
-  )
-result5 =
-  Exqlite.query!(
+  ) end,
+  fn -> Exqlite.query!(
     conn,
     ~S"""
     create table if not exists pullrequests (
@@ -80,22 +92,47 @@ result5 =
     )
     """,
     []
-  )
-result3 =
-  Exqlite.query!(
+  ) end,
+  fn -> Exqlite.query!(
     conn,
     ~S"""
     create table if not exists comments (
       comment_id integer primary key,
-      parent_id integer unique,
+      parent_post_id integer nullable,
+      parent_comment_id integer nullable,
       content varchar(255) not null,
-      commenter_id integer,
+      commenter_id integer not null,
+      date_created_utc varchar(255) not null,
+      post_version integer not null,
       foreign key (commenter_id) references users(user_id),
-      foreign key (parent_id) references comments(comment_id)
+      foreign key (parent_post_id) references posts(post_id),
+      foreign key (parent_comment_id) references comments(comment_id)
     )
     """,
     []
-  )
+  ) end,
+  fn -> Exqlite.query!(
+    conn,
+    ~S"""
+    create table if not exists commentratings (
+      comment_rating_id integer primary key,
+      commenter_id integer,
+      comment_id integer,
+      rating byte,
+      foreign key (commenter_id) references users(user_id),
+      foreign key (comment_id) references comments(comment_id)
+    )
+    """,
+    []
+  ) end,
+  fn -> IO.puts "Created Tables" end,
+]
+IO.inspect createTablesList
+```
+
+```elixir
+for drop <- dropTablesList do drop.() end
+for create <- createTablesList do create.() end
 ```
 
 ### Scenario 1
@@ -160,4 +197,17 @@ result5 =
     ~S"select users.name, posts.post_title, pullrequests.description from users, posts, pullrequests where users.name = 'yminsky_fan'",
     []
   )
+```
+
+### Scenario: Comments
+
+```elixir
+for drop <- dropTablesList do drop.() end
+for create <- createTablesList do create.() end
+RunSql.query(conn,[
+  ~S"delete from comments",
+  ~S"delete from posts",
+  ~S"delete from users",
+  ~S"delete from commentratings",
+])
 ```
