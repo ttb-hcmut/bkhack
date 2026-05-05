@@ -32,7 +32,7 @@
 }
 
 #root:not([data-tileset="gui"]) > header > .logo::after {
-	content: "BKHack";
+	content: "bkhack";
 }
 
 #root[data-tileset="gui"] > header > .logo {
