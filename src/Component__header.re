@@ -2,61 +2,14 @@
 // Js.Console.log("parsing '" ++ shell ++ "'");
 // Js.Console.log(Shell.test_parse(shell));
 
-module Nav =
-{
-	open Shell__lang
-
-	let eval = {
-		let url = ref("")
-		let url_args = ref([])
-		let rec aux = fun
-			| Cons_cmd(`unfetched(["feed"]), next) => { url := "/"; aux(next) }
-			| Cons_cmd(`unfetched(["split", num]), next) when url^ == "/" => { url_args := Util.List.replace_assoc'("limit", num, url_args^); aux(next) }
-			| Cons_cmd(`unfetched(["cat", id]), next) => {
-				url := "/item/";
-				url_args := Util.List.replace_assoc'("id", id, url_args^);
-				aux(next) }
-			| Cons_cmd(`unfetched(["discuss", id]), next) => {
-				url := "/item/";
-				url_args := url_args^ |> Util.List.replace_assoc'("id", id) |> Util.List.replace_assoc'("view", "discussions");
-				aux(next) }
-			| Cons_cmd(`unfetched(["pr", "list", id]), next) => {
-				url := "/item/";
-				url_args := url_args^ |> Util.List.replace_assoc'("id", id) |> Util.List.replace_assoc'("view", "pullrequests");
-				aux(next) }
-			| Cons_cmd(`unfetched(_), _) => failwith("unknown command")
-			| Cons_subprogram(a, b) => { aux(a); aux(b) }
-			| Nil => ();
-		s => { aux(s); (url^, url_args^) }
-	}
-}
-
 open React
 
-module Rlwrap =
-{
-	let do_ = (memo, task) => {
-		let acc = Dom.Storage.getItem("bkhack.cmd-history", Dom.Storage.localStorage) |> Option.map(String.split_on_char(',')) |> Option.value(~default=[]);
-		Dom.Storage.setItem("bkhack.cmd-history", String.concat(",", acc @ [memo]), Dom.Storage.localStorage);
-		task()
-	}
-
-	let index_init = () => Dom.Storage.getItem("bkhack.cmd-history", Dom.Storage.localStorage) |> Option.map(String.split_on_char(',')) |> Option.value(~default=[]) |> List.length
-
-	let on_scroll = (historyIndex, k) => {
-		let a = x => List.nth_opt(x, historyIndex);
-		let u =
-			Dom.Storage.getItem("bkhack.cmd-history", Dom.Storage.localStorage) |> Option.map(String.split_on_char(',')) |> Option.value(~default=[])
-			|> a;
-		k(u)
-	}
-}
 
 let onSubmit = e => {
 	Event.Synthetic.preventDefault(e);
 	let rawstr = Event.Form.target(e)##siteNavigator##value;
 	let u = rawstr->Shell__parse.test_parse;
-	let (url, url_args) = Nav.eval(u);
+	let (url, url_args) = Navigation.eval(current_url, u);
 	Rlwrap.do_(rawstr) @@ () => {
 		Dom.Storage.setItem("bkhack.cmd-greeting-shown", "y", Dom.Storage.sessionStorage);
 		let open Js__dom;
