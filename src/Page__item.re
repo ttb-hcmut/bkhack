@@ -1,5 +1,6 @@
 [@page "/item"]
 open Melange__containers.Fun
+module Melange__cmarkit = Remark_it
 
 module View = {
 	type t =
