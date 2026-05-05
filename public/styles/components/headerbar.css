@@ -14,7 +14,7 @@
 	padding-bottom: 0;
 	height: calc(1.5rem + 2 * var(--space-a));
 	display: grid;
-	grid-template-columns: max-content max-content minmax(0, 1fr) max-content max-content max-content;
+	grid-template-columns: max-content max-content minmax(0, 1fr) max-content max-content max-content max-content;
 	align-items: center;
 	flex-direction: row;
 	z-index:9999;
@@ -59,6 +59,10 @@
 
 #root > header > a.place.wiki::before {
 	content: "wiki";
+}
+
+#root > header > a.place.notifications::before {
+	content: "notifications";
 }
 
 #root > header > a.place.auth::before {

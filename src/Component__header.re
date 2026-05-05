@@ -78,6 +78,7 @@ let make = () => {
 	<form onSubmit={e => assert_ @@ _ => onSubmit(e)}> <input placeholder=?placeholder onKeyDown={onKeyDown(setHistoryIndex)} ref={ReactDOM.Ref.domRef(bar)} id="siteNavigator" className={Option.value(~default="", navigatorStyle)} /> </form>
 	<a className="place projects" href="/projects"></a>
 	<a className="place wiki" href="/wiki"></a>
+	<a className="place notifications"></a>
 	<a className="place auth" href="/auth"></a>
 	</>
 }
