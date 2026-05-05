@@ -3,3 +3,4 @@ deps
 lock
 lock-book
 log-livebook
+db-shm
