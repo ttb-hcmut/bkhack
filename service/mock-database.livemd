@@ -16,6 +16,14 @@ opts = [database: "db"]
 {:ok, conn} = Kino.start_child({Exqlite, opts})
 ```
 
+```elixir
+defmodule RunSql do
+  def query(conn,queryList) do
+    Enum.map( queryList , fn q -> Exqlite.query!(conn,q) end )
+  end
+end
+```
+
 <!-- livebook:{"attrs":"eyJjYWNoZV9xdWVyeSI6dHJ1ZSwiY29ubmVjdGlvbiI6eyJ0eXBlIjoic3FsaXRlIiwidmFyaWFibGUiOiJjb25uIn0sInF1ZXJ5IjoiU0VMRUNUICogRlJPTSBzcWxpdGVfbWFzdGVyIFdIRVJFIHR5cGU9J3RhYmxlJyIsInJlc3VsdF92YXJpYWJsZSI6InJlc3VsdCIsInRpbWVvdXQiOm51bGx9","chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
 
 ```elixir
@@ -23,10 +31,15 @@ result = Exqlite.query!(conn, ~S"SELECT * FROM sqlite_master WHERE type='table'"
 ```
 
 ```elixir
-result2 = Exqlite.query!(conn, ~S"drop table if exists pullrequests", [])
-result2 = Exqlite.query!(conn, ~S"drop table if exists comments", [])
-result2 = Exqlite.query!(conn, ~S"drop table if exists posts", [])
-result2 = Exqlite.query!(conn, ~S"drop table if exists users", [])
+dropTablesList = [
+  fn -> Exqlite.query!(conn, ~S"drop table if exists pullrequests", []) end,
+  fn -> Exqlite.query!(conn, ~S"drop table if exists commentratings", []) end,
+  fn -> Exqlite.query!(conn, ~S"drop table if exists comments", []) end,
+  fn -> Exqlite.query!(conn, ~S"drop table if exists posts", []) end,
+  fn -> Exqlite.query!(conn, ~S"drop table if exists users", []) end,
+  fn -> IO.puts "Dropped Tables" end,
+]
+
 ```
 
 ### Relational tables
@@ -37,19 +50,19 @@ Note:
 * DDL statements should be laxed i.e. do only if (not) exists
 
 ```elixir
-result3 =
-  Exqlite.query!(
+createTablesList = [
+  fn -> Exqlite.query!(
     conn,
     ~S"""
     create table if not exists users (
       user_id integer primary key,
-      name varchar(255) not null
+      name varchar(255) not null,
+      role integer not null
     )
     """,
     []
-  )
-result3 =
-  Exqlite.query!(
+  ) end,
+  fn -> Exqlite.query!(
     conn,
     ~S"""
     create table if not exists posts (
@@ -61,9 +74,8 @@ result3 =
     )
     """,
     []
-  )
-result5 =
-  Exqlite.query!(
+  ) end,
+  fn -> Exqlite.query!(
     conn,
     ~S"""
     create table if not exists pullrequests (
@@ -80,25 +92,51 @@ result5 =
     )
     """,
     []
-  )
-result3 =
-  Exqlite.query!(
+  ) end,
+  fn -> Exqlite.query!(
     conn,
     ~S"""
     create table if not exists comments (
       comment_id integer primary key,
-      parent_id integer unique,
+      parent_post_id integer nullable,
+      parent_comment_id integer nullable,
       content varchar(255) not null,
-      commenter_id integer,
+      commenter_id integer not null,
+      date_created_utc varchar(255) not null,
+      post_version integer not null,
+    
       foreign key (commenter_id) references users(user_id),
-      foreign key (parent_id) references comments(comment_id)
+      foreign key (parent_post_id) references posts(post_id),
+      foreign key (parent_comment_id) references comments(comment_id)
     )
     """,
     []
-  )
+  ) end,
+  fn -> Exqlite.query!(
+    conn,
+    ~S"""
+    create table if not exists commentratings (
+      comment_rating_id integer primary key,
+      voter integer,
+      comment_id integer,
+      upvote bool,
+      foreign key (voter) references users(user_id),
+      foreign key (comment_id) references comments(comment_id)
+    )
+    """,
+    []
+  ) end,
+  fn -> IO.puts "Created Tables" end,
+]
+IO.inspect createTablesList
 ```
 
-### Scenario 1
+```elixir
+for drop <- dropTablesList do drop.() end
+for create <- createTablesList do create.() end
+```
+
+### Scenario
 
 ```elixir
 result2 = Exqlite.query!(conn, ~S"delete from comments", [])
@@ -166,4 +204,164 @@ result5 =
     ~S"select users.name, posts.post_title, pullrequests.description from users, posts, pullrequests where users.name = 'yminsky_fan'",
     []
   )
+```
+
+### Scenario: Comments
+
+```elixir
+for drop <- dropTablesList do drop.() end
+for create <- createTablesList do create.() end
+RunSql.query(conn,[
+  ~S"delete from comments",
+  ~S"delete from posts",
+  ~S"delete from users",
+  ~S"delete from commentratings",
+])
+RunSql.query(conn,[
+  ~S"insert into users values (0, 'rhebed rhamma', 0)",
+  ~S"insert into users values (1, 'bukhen bame', 0)",
+  ~S"insert into users values (2, 'tandulm Emberspark', 0)",
+  ~S"insert into users values (3, 'bao Doomforge', 0)",
+  ~S"insert into users values (4, 'nogan kez', 1)",
+])
+RunSql.query(conn,[
+    ~S"""
+    insert into posts values (0, 'Seven Implementations of Incremental', 0, 'Video from Jane Street Tech Talk\n\nIncremental là một thư viện FRP (functional reactive programming) dùng để viết hàm tính toán tích hợp đạo hàm ‌và giải tích tự động. Anh em nào đam mê Giải tích 1 2, và thích code React, và thích đại số trừu tượng, thì có thể tham khảo.\n\n# FRP là gì?\n\nTBA')
+    """,
+])
+RunSql.query(conn,[
+  ~S"""
+  insert into comments values (
+  0,
+  0,
+  null,
+  'Dont you worry bout your curly hair',
+  0,
+  '2026-04-28T15:18:26Z',
+  0)
+  """,
+  ~S"""
+  insert into comments values (
+  1,
+  0,
+  null,
+  'Clothes that dont quite fit you anywhere',
+  1,
+  '2026-04-28T15:18:26Z',
+  0)
+  """,
+  ~S"""
+  insert into comments values (
+  2,
+  0,
+  null,
+  'Voices echo in the gym',
+  2,
+  '2026-04-28T15:18:26Z',
+  0)
+  """,
+  ~S"""
+  insert into comments values (
+  3,
+  null,
+  1,
+  'Another girls had her first kiss',
+  3,
+  '2026-04-28T15:18:26Z',
+  0)
+  """,
+  ~S"""
+  insert into comments values (
+  4,
+  null,
+  1,
+  'Please dont think too much of it, darling',
+  4,
+  '2026-04-28T15:18:26Z',
+  0)
+  """,
+])
+RunSql.query(conn,[
+  ~S"insert into commentratings values (0, 0, 1, false)",
+  ~S"insert into commentratings values (1, 1, 1, false)",
+  ~S"insert into commentratings values (2, 2, 1, false)",
+  ~S"insert into commentratings values (3, 0, 3, true)",
+  ~S"insert into commentratings values (4, 1, 3, true)",
+  ~S"insert into commentratings values (5, 2, 3, true)",
+  ~S"insert into commentratings values (6, 3, 4, true)",
+  ~S"insert into commentratings values (7, 4, 4, true)",
+])
+# fetch the comments count of a post
+RunSql.query(conn,[
+  
+# fetch comments count
+  ~S"""
+  WITH RECURSIVE all_comments AS (
+    SELECT comment_id, parent_post_id AS post_id
+    FROM comments
+    WHERE parent_post_id IS NOT NULL
+  
+    UNION ALL
+  
+    SELECT n.comment_id, an.post_id
+    FROM comments n
+    INNER JOIN all_comments an ON n.parent_comment_id = an.comment_id
+  )
+  SELECT
+    COUNT(comment_id) as total_comment_count
+  FROM all_comments
+  where post_id = 0
+  """,
+  
+# fetch the comments of a post
+  ~S"""
+  WITH commentsumratings as (
+    SELECT comment_id, SUM(CASE WHEN upvote = 1 THEN 1 ELSE -1 END) as total
+    FROM commentratings
+    GROUP BY comment_id
+  )
+  SELECT
+    c.comment_id as id,
+    c.content as text,
+    MAX(CASE WHEN r.voter = 0 THEN r.upvote ELSE NULL END) as user_rating,
+    CASE WHEN s.total IS NOT NULL then s.total else 0 end as rating,
+    c.date_created_utc as timestamp,
+    c.post_version as post_vers,
+    u.name as author_name,
+    u.user_id as author_id,
+    u.role as author_role
+  FROM comments c 
+  LEFT JOIN commentratings r on c.comment_id = r.comment_id
+  LEFT JOIN commentsumratings s on c.comment_id = s.comment_id
+  LEFT JOIN users u on c.commenter_id = u.user_id
+  where c.parent_post_id = 0
+  group by id
+  """,
+# fetch the replies of a comment
+  ~S"""
+  WITH commentsumratings as (
+    SELECT comment_id, SUM(CASE WHEN upvote = 1 THEN 1 ELSE -1 END) as total
+    FROM commentratings
+    GROUP BY comment_id
+  )
+  SELECT
+    c.comment_id as id,
+    c.content as text,
+    MAX(CASE WHEN r.voter = 0 THEN r.upvote ELSE NULL END) as user_rating,
+    s.total as rating,
+    c.date_created_utc as timestamp,
+    c.post_version as post_vers,
+    u.name as author_name,
+    u.user_id as author_id,
+    u.role as author_role
+  FROM comments c 
+  LEFT JOIN commentratings r on c.comment_id = r.comment_id
+  LEFT JOIN commentsumratings s on c.comment_id = s.comment_id
+  LEFT JOIN users u on c.commenter_id = u.user_id
+  where c.parent_comment_id = 1
+  group by id
+  """,
+])
+
+
 ```
