@@ -279,7 +279,7 @@ ul li.pull-request-row > .status.closed::after {
 
 ul li.pull-request-row.expanded > .head > button:first-child {
 	transform: rotate(90deg);
-	color: var(--card-fg-accent-1);
+	color: var(--card-fg-accent-0);
 }
 
 ul li.pull-request-row.expanded > :not(.head):not(.expanded-content) {
