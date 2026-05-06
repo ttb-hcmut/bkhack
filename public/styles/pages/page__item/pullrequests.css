@@ -177,6 +177,11 @@ ul li.pull-request-row > .aee > :nth-child(2) {
 	display: inline-flex;
 	flex-grow: 1;
 	justify-content: right;
+	padding-left: var(--space-c);
+}
+
+ul li.pull-request-row > .aee > :last-child {
+	margin-left: var(--space-c);
 }
 
 ul li.pull-request-row > .aee > .title {
@@ -199,14 +204,6 @@ ul li.pull-request-row > .aee > .title:hover {
 	color: var(--card-fg-accent-0);
 }
 
-li.pull-request-row > .id {
-	color: var(--card-fg-aux);
-}
-
-li.pull-request-row > .id::before {
-	content: "#";
-}
-
 ul li.pull-request-row > .expanded-content {
 	grid-column: 2 / -1;
 	display: none;
@@ -222,8 +219,8 @@ ul li.pull-request-row > .head {
 	justify-content: center;
 }
 
-ul li.pull-request-row.expanded > .head {
-	border-right: solid 1px var(--card-border);
+ul li.pull-request-row.expanded > .expanded-content {
+	border-left: solid 1px var(--card-border);
 }
 
 ul li.pull-request-row > .head > button:first-child {
@@ -289,9 +286,104 @@ ul li.pull-request-row.expanded > :not(.head):not(.expanded-content) {
 ul li.pull-request-row.expanded > .expanded-content {
 	display: block grid;
 	grid-template-rows: max-content max-content max-content max-content max-content;
+	padding-left: var(--space-a);
 }
 
-ul li.pull-request-row.expanded > .expanded-content {
+ul li.pull-request-row.expanded > .expanded-content > hgroup {
+	display: flex;
+	align-items: center;
+	font-size: var(--text-base);
+}
+
+ul li.pull-request-row.expanded > .expanded-content > hgroup > :nth-child(2) {
+	margin-left: var(--space-c);
+}
+
+ul li.pull-request-row.expanded > .expanded-content > hgroup > .title {
+	cursor: default;
+}
+
+ul li.pull-request-row.expanded > .expanded-content > hgroup > .title {
+	transition-duration: 300ms;
+	transition-property: color;
+}
+
+@media (prefers-reduced-motion) {
+	ul li.pull-request-row.expanded > .expanded-content > hgroup > .title {
+		transition-duration: 0ms;
+		transition-property: none;
+	}
+}
+
+ul li.pull-request-row.expanded > .expanded-content > hgroup > .title:hover {
+	color: var(--card-fg-accent-0);
+}
+
+ul li.pull-request-row.expanded > .expanded-content > hgroup > .status {
+	margin-left: auto;
+	display: flex;
+	align-items: center;
+	justify-content: end;
+}
+
+ul li.pull-request-row.expanded > .expanded-content > hgroup {
+	.status.open {
+		color: var(--card-fg-accent-2);
+		background-color: var(--card-fg-accent-2-10);
+		border: solid 1px var(--card-fg-accent-2-30);
+		border-radius: var(--radius);
+		padding-left: var(--space-c);
+		padding-right: var(--space-c);
+	}
+
+	.status.open:after {
+		content: "open";
+	}
+
+	.status.merged {
+		color: var(--card-fg-accent-3);
+		background-color: var(--card-fg-accent-3-10);
+		border: solid 1px var(--card-fg-accent-3-30);
+		border-radius: var(--radius);
+		padding-left: var(--space-c);
+		padding-right: var(--space-c);
+	}
+
+	.status.merged:after {
+		content: "merged";
+	}
+
+	.status.closed {
+		color: var(--card-fg-accent-4);
+		background-color: var(--card-fg-accent-4-10);
+		border: solid 1px var(--card-fg-accent-4-30);
+		border-radius: var(--radius);
+		padding-left: var(--space-c);
+		padding-right: var(--space-c);
+	}
+
+	.status.closed:after {
+		content: "closed";
+	}
+
+}
+
+ul li.pull-request-row.expanded > .expanded-content > .sub > :not(:first-child) {
+	margin-left: var(--space-c);
+}
+
+ul li.pull-request-row.expanded > .expanded-content > .sub > :not(:first-child)::before {
+	content: "•";
+	padding-right: var(--space-c);
+	color: var(--card-fg);
+}
+
+ul li.pull-request-row.expanded > .expanded-content > :nth-child(2) {
+	margin-top: var(--space-e);
+}
+
+ul li.pull-request-row.expanded > .expanded-content > :nth-child(3) {
+	margin-top: var(--space-c);
 }
 
 .time.second.ago::after {
@@ -312,4 +404,143 @@ ul li.pull-request-row.expanded > .expanded-content {
 
 .time:not(.ago) > :not(:first-child)::before {
 	content: "-";
+}
+
+#root > main.pullrequests > header.pullrequests.inspect {
+	display: block;
+}
+
+#root > main.pullrequests > header.pullrequests.inspect > .back {
+	font-size: var(--text-sm);
+	font-family: var(--font-mono);
+	color: var(--card-fg-accent-0);
+	display: flex;
+	padding-left: var(--space-a);
+	padding-right: var(--space-a);
+	padding-top: var(--space-f);
+	padding-bottom: var(--space-f);
+	border-radius: var(--radius);
+}
+
+#root > main.pullrequests > header.pullrequests.inspect > .back:hover {
+	background-color: var(--card-bg-translucent);
+}
+
+#root > main.pullrequests > header.pullrequests.inspect > .back:before {
+	content: "< ";
+}
+
+#root[data-tileset="gui"] > main.pullrequests > header.pullrequests.inspect > .back:before {
+	content: " ";
+	display: inline-block;
+	background-image: url("/assets/icon.goback.cyan.svg");
+	background-size: 1em 1em;
+	width: 1em;
+	height: 1em;
+	margin-right: 8px;
+}
+
+#root > main.pullrequests > header.pullrequests.inspect > .back:after {
+	content: "back to pull requests";
+}
+
+#root > main.pullrequests > header.pullrequests.inspect > div:nth-child(2) {
+	margin-top: var(--space-f);
+	font-size: var(--text-base);
+}
+
+#root > main.pullrequests > header.pullrequests.inspect > div:nth-child(2) > :not(:first-child) {
+	margin-left: var(--space-c);
+}
+
+#root > main.pullrequests > header.pullrequests.inspect > div:nth-child(3) {
+	margin-top: var(--space-f);
+	font-size: var(--text-sm);
+}
+
+#root > main.pullrequests > header.pullrequests.inspect > div:nth-child(3) > :not(:first-child) {
+	border-left: solid 1px var(--card-border);
+	padding-left: var(--space-a);
+	margin-left: var(--space-a);
+}
+
+
+.id {
+	color: var(--card-fg-aux);
+	font-family: var(--font-mono);
+}
+
+.id::before {
+	content: "#";
+}
+
+.contributor.wants-to::after {
+	content: " wants to merge some commits";
+	color: var(--card-fg);
+}
+
+#root > main.pullrequests.inspect > main {
+	padding: var(--space-a);
+}
+
+#root > main.pullrequests.inspect > main > :not(:first-child) {
+	margin-top: var(--space-a);
+}
+
+#root > main.pullrequests.inspect > main > section {
+	border: solid 1px var(--card-border);
+}
+
+#root > main.pullrequests.inspect > main > section.cat > header {
+	font-size: var(--text-sm);
+	color: var(--card-fg-aux);
+	background-color: var(--card-bg-translucent);
+	padding-top: var(--space-c);
+	padding-left: var(--space-a);
+	padding-right: var(--space-a);
+	padding-bottom: var(--space-c);
+}
+
+#root > main.pullrequests.inspect > main > section.cat > .content {
+	padding: var(--space-a);
+	border-top: solid 1px var(--card-border);
+}
+
+#root > main.pullrequests.inspect > main > section.reviews > header {
+	font-size: var(--text-sm);
+	color: var(--card-fg-aux);
+	background-color: var(--card-bg-translucent);
+	padding-top: var(--space-c);
+	padding-left: var(--space-a);
+	padding-right: var(--space-a);
+	padding-bottom: var(--space-c);
+}
+
+#root > main.pullrequests.inspect > main > section.reviews > .content {
+	padding: var(--space-a);
+	border-top: solid 1px var(--card-border);
+}
+
+.status.open {
+	color: var(--card-fg-accent-2);
+}
+
+.status.open:after {
+	content: "open";
+}
+
+.status.merged {
+	color: var(--card-fg-accent-3);
+}
+
+.status.merged:after {
+	content: "merged";
+}
+
+.status.closed {
+	color: var(--card-fg-accent-4);
+}
+
+.status.closed:after {
+	content: "closed";
 }

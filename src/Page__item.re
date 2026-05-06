@@ -114,7 +114,7 @@ module DiscussionHint = {
 			<div className="logo" />
 			<h1>{React.string("discussions")}</h1>
 			<div className="sub">
-				<span className="command">{React.string("discuss --thread=main")}</span>
+				<span className="command">{React.string("discuss $id")}</span>
 				<span className="summary">
 					<data className="n-comments">{React.int(13)}</data>
 					<data className="karma">{React.int(364)}</data>
@@ -499,7 +499,7 @@ module PullrequestsHint = {
 			<div className="logo" />
 			<h1>{React.string("pull requests")}</h1>
 			<div className="sub">
-				<span className="command">{React.string("pr --list")}</span>
+				<span className="command">{React.string("pr list $id")}</span>
 				<span className="summary">
 					<data className="pr-open">{React.int(num_open)}</data>
 					<data className="pr-merged">{React.int(num_merged)}</data>
@@ -581,12 +581,28 @@ module PullrequestsBody = {
 						} }
 					</div>
 					<div className="expanded-content">
-						<span className="id">{React.int(id)}</span>
-						<a className="title">{React.string(title)}</a>
+						<hgroup>
+							<span className="id">{React.int(id)}</span>
+							<a className="title" onClick={inspect_this(id)}>{React.string(title)}</a>
+							<span className=("status "++status_class(status))></span>
+						</hgroup>
+						<div className="sub">
+							<span className="contributor user">{React.string(contributor_name)}</span>
+							{ switch (duration) {
+								| Some(duration) => duration
+								| None => {
+									let (date, month, year) = created->date_to_string;
+									<span className="time">
+										<span className="date">{React.string(date)}</span>
+										<span className="month">{React.string(month)}</span>
+										<span className="year">{React.string(year)}</span>
+									</span>
+								}
+							} }
+						</div>
 						<ul className="tags">{ tags |> List.map(x =>
 							<li key=x><span className="tag">{React.string(x)}</span></li>
 						) |> Array.of_list |> React.array}</ul>
-						<span className="contributor user">{React.string(contributor_name)}</span>
 					</div>
 				</li>
 			}) |> React.array}
@@ -594,11 +610,13 @@ module PullrequestsBody = {
 	}
 }
 
-module PullrequestsInspectHint = {
+module PullrequestsInspectHint{
+	open React
+
 	[@react.component]
 	let make = (~pullrequests, ~pr_inspect, ~inspect_back_this) => {
 		let pullrequest =
-			(pullrequests, pr_inspect) |> React.useMemo2 @@ () =>
+			(pullrequests, pr_inspect) |> useMemo2 @@ () =>
 			pullrequests |> Array.find_map @@ (((id, _, _, _, _, _, _, _), _) as x) =>
 			Option.bind(pr_inspect) @@ pr_inspect =>
 			id == pr_inspect ? Some(x) : None;
@@ -608,21 +626,24 @@ module PullrequestsInspectHint = {
 		<>
 		<button className="back" onClick={_ => inspect_back_this()}></button>
 		<div>
-			<span className="id">{React.int(id)}</span><span>{React.string(title)}</span>
+			<span className="id">{int(id)}</span><span>{title->string}</span>
 		</div>
 		<div>
-			<span className="status">{React.string(status_class(status))}</span>
-			<span className="contributor user wants-to">{contributor_name->React.string}</span>
+			<span className={"status "++(status->status_class)}></span>
+			<span className="contributor user wants-to">{contributor_name->string}</span>
 		</div>
 		</>
 	}
 }
 
 module PullrequestsInspectBody{
+	open React
+
 	[@react.component]
-	let make = (~pullrequests, ~pr_inspect) => {
+	let make = (~pullrequests, ~pr_inspect, ~info) => {
+		let (_, _, creator_name, _) = info;
 		let pullrequest =
-			(pullrequests, pr_inspect) |> React.useMemo2 @@ () =>
+			(pullrequests, pr_inspect) |> useMemo2 @@ () =>
 			pullrequests |> Array.find_map @@ (((id, _, _, _, _, _, _, _), _) as x) =>
 			Option.bind(pr_inspect) @@ pr_inspect =>
 			id == pr_inspect ? Some(x) : None;
@@ -630,11 +651,14 @@ module PullrequestsInspectBody{
 		show(pullrequest) @@ (((_, _, _, _, desc, _, _, _), _)) =>
 		<>
 			<section className="cat">
-				<header className="command">{"cat pullrequest.md"->React.string}</header>
-				<div className="content">{desc->React.string}</div>
+				<header className="command">{"pr cat pullrequest.md"->string}</header>
+				<div className="content">{desc->string}</div>
 			</section>
 			<section className="reviews">
-				<header className="command">{"review --list"->React.string}</header>
+				<header className="command">{"pr status"->string}</header>
+				<ul className="content">
+					<li><span className="contributor user">{creator_name->string}</span><span className="unknown"></span></li>
+				</ul>
 			</section>
 		</>
 	}
@@ -895,7 +919,7 @@ module App =
 						<PullrequestsInspectHint pullrequests pr_inspect inspect_back_this=on_prs_update_inspect_back />
 					</header>
 					<main className=Printf.sprintf("only %s inspect", View.to_string(Pullrequest))>
-						<PullrequestsInspectBody pullrequests pr_inspect />
+						<PullrequestsInspectBody pullrequests pr_inspect info=postInfo />
 					</main>
 				</>
 			</main>

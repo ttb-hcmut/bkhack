@@ -80,6 +80,11 @@
 	--card-fg-accent-2-10: oklab(from var(--ctp-green) l a b / 0.1);
 	--card-fg-accent-2-30: oklab(from var(--ctp-green) l a b / 0.3);
 	--card-fg-accent-3: var(--ctp-mauve);
+	--card-fg-accent-3-10: oklab(from var(--ctp-mauve) l a b / 0.1);
+	--card-fg-accent-3-30: oklab(from var(--ctp-mauve) l a b / 0.3);
+	--card-fg-accent-4: var(--ctp-red);
+	--card-fg-accent-4-10: oklab(from var(--ctp-red) l a b / 0.1);
+	--card-fg-accent-4-30: oklab(from var(--ctp-red) l a b / 0.3);
 	--card-fg-suggestive: var(--sig-blue);
 	--card-fg-suggestive-halftransparentlol: oklab(from var(--sig-blue) l a b / 0.5);
 	--card-bg: var(--ctp-mantle);
