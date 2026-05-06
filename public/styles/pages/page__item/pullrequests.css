@@ -142,6 +142,11 @@ ul li.pull-request-row {
 	transition-property: border;
 }
 
+ul li.pull-request-row.expanded {
+	padding-top: var(--space-a);
+	padding-bottom: var(--space-a);
+}
+
 @media (prefers-reduced-motion) {
 	ul li.pull-request-row {
 		transition-duration: 0ms;
@@ -275,7 +280,7 @@ ul li.pull-request-row > .status.closed::after {
 }
 
 ul li.pull-request-row.expanded > .head > button:first-child {
-	transform: rotate(90deg);
+	transform: rotate(90deg) translate(0, calc(var(--space-a) - var(--space-c)));
 	color: var(--card-fg-accent-0);
 }
 
