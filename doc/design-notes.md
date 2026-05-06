@@ -59,6 +59,19 @@ This architecture was formed based on what we want, plus that we have the right 
 - Layer 4 duty. Due to their respective daily driver setups, Kinten usually reports for light mode, Khang usually reports for dark mode.
 - Layer 5 duty. Due to their respective daily driver setups, Kinten usually reports for GNOME Web, Khang usually reports for Chrome, Tuong usually reports for Arc.
 
+# Language layering
+
+Not to be confused with internalization, or i18n. Language layering is a generalization, an umbrella term for activities related to implementing internalization (write once, will be available across languages) and localization (adapt something per language, supporting multiple languages) etc.
+
+0. English encoding
+1. Vietnamese encoding
+
+For a string $s$, if $s$ doesn't have a corresponding translation in the current language, it will fallback to the string $s_0$ that is the English encoding (layer 0).
+
+- Layer 1 duty. Due to their respective daily driver setup, Kinten usually reports for the Vietnamese language.
+
+Currently, language layering is implemented in CSS styles, in similar fashion with Style Layering. In practice, most language layering is implemented via an i18n system as part of the build system, which will support an arbitrary number of languages, and there will be a centralized dictionary-like / index-like mechanism for writing and using translations. It will be a generic system. For now, the authors do not feel the need to use or build such a system.
+
 # Build system and file attributes
 
 For our current build system, our philosophy is to distribute configurations as much as possible. Avoid the phenomenon where we need a bunch of centralized `.rc` files or `jsconfig` files or a dictionary in a script file, etc.
