@@ -786,15 +786,6 @@ module App =
 		let (pullrequests, setPrs) = React.useState(() => [||]);
 		let (postInfo, setPostInfo) = React.useState(() => None);
 		let tags = [| "Algorithm", "Rust" |];
-		try ({
-			let test = Melange__re.({
-				Re.exec(Re.compile @@ Re.(seq @@ [char('a'), group(any |> rep1), char('b')]))
-				%> (x => Re.Group.get(x, 1))
-			});
-			let u = test("annb");
-			Js.Console.log("result:'" ++ u ++ "'");
-		}) { | Invalid_argument(msg) => Js.Console.log("Invalid argument: '" ++ msg ++ "'") };
-		// Js.Console.log(a);
 		let renderer = React.useMemo0(() => Melange__cmarkit.Cmarkit_html.renderer(~safe=false, ()));
 		let art = React.useMemo2(() => {
 			open Melange__cmarkit; open Cmarkit;
