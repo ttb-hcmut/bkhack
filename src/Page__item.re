@@ -936,8 +936,6 @@ module App =
 	}
 };
 
-module App' = Keyboard.Make(App);
-
 module ReactDOM0 = {
 	let querySelector = x =>
 		switch (ReactDOM.querySelector(x)) {
@@ -947,6 +945,15 @@ module ReactDOM0 = {
 			failwith("lol")
 		}
 }
+
+open Decorator
+
+module App' =
+(
+	val (module App)
+	->React.use(module Language.Make)
+	->React.use(module Keyboard.Make)
+)
 
 let () = {
 	let element = ReactDOM0.querySelector("#root");
