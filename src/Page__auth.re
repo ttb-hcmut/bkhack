@@ -2,7 +2,7 @@
 
 module Login = {
 	[@react.component]
-	let make = () => {
+	let make = (~setAction) => {
 		let (errorMsg,setErrorMsg) = React.useState(_ => "");
 
 		let (formUsername, setFormUsername) = React.useState(_ => "");
@@ -44,8 +44,8 @@ module Login = {
 				<button type_="submit" onClick=handleSubmit>{React.string("log in")}</button>
 			</form>
 			<span/>
-			<a href="?action=forgot">{React.string("forgot password?")}</a>
-			<a href="?action=register">{React.string("register an account?")}</a>
+			<a onClick={_ => setAction(_ => "forgot")}>{React.string("forgot password?")}</a>
+			<a onClick={_ => setAction(_ => "register")}>{React.string("register an account?")}</a>
 
 		</main>
 	}
@@ -53,7 +53,7 @@ module Login = {
 
 module Register = {
 	[@react.component]
-	let make = () => {
+	let make = (~setAction) => {
 		let (errorMsg,setErrorMsg)=React.useState(_ => "");
 
 		let (formEmail, setFormEmail) = React.useState(_ => "");
@@ -122,7 +122,7 @@ module Register = {
 				<button type_="submit" onClick=handleSubmit>{React.string("register account")}</button>
 			</form>
 			<span/>
-			<a href="?action=login">{React.string("already have an account?")}</a>
+			<a onClick={_ => setAction(_ => "login")}>{React.string("already have an account?")}</a>
 
 		</main>
 	}
@@ -154,7 +154,7 @@ module Countdown = {
 
 module Forgot = {
 	[@react.component]
-	let make = () => {
+	let make = (~setAction) => {
 		let (errorMsg,setErrorMsg) = React.useState(_ => "");
 		
 		let id = React.useRef(None);
@@ -174,7 +174,7 @@ module Forgot = {
 				| (true,true) =>
 					setErrorMsg(_=>"");
 					Js.log("sent code to email "++ formEmail);
-					setTimeleft(_=>30);
+					setTimeleft(_ => 30);
 					timeleftCleanup.current = Countdown.start(~setCount = setTimeleft,~id = id,());
 			}
 		};
@@ -235,14 +235,14 @@ module Forgot = {
 				</form>
 			}
 			<span/>
-			<a href="?action=login">{React.string("remembered password?")}</a>
+			<a onClick={_ => setAction(_ => "login")}>{React.string("remembered password?")}</a>
 		</main>
 	}
 }
 
 module Reset = {
 	[@react.component]
-	let make = () => {
+	let make = (~setAction) => {
 		let (errorMsg,setErrorMsg) = React.useState(_ => "");
 
 		let (formPassword, setFormPassword) = React.useState(_ => "");
@@ -305,7 +305,7 @@ module Reset = {
 				<button type_="submit" onClick=handleSubmit>{React.string("reset password")}</button>
 			</form>
 			<span/>
-			<a href="?action=login">{React.string("already have an account?")}</a>
+			<a onClick={_ => setAction(_ => "login")}>{React.string("already have an account?")}</a>
 		</main>
     }
 }
@@ -313,23 +313,35 @@ module Reset = {
 module App = {
 	[@react.component]
 	let make = () => {
-		let search = ReasonReactRouter.useUrl().search;
-		let params = Util.parseQueryParams(search);
+		let url = ReasonReactRouter.useUrl();
+		let search = url.search;
+		let params = Util.parseQueryParams(search)
+		and params' = Util.parseQueryParams'(search);
 
-		let action = switch (Js.Dict.get(params, "action")) {
-			| Some(id) => id
-			| None => "login"
-		};
+		let (action, setAction) = React.useState(() =>
+			switch (Js.Dict.get(params, "action")) {
+				| Some(id) => id
+				| None => "login"
+			});
+		let setAction = React.useCallback1(make => {
+			setAction(prev => {
+				let verb = make(prev);
+				ReasonReactRouter.push(String.concat("/", ["", ...url.path]) ++ {
+					"/?" ++ ( params' |> Util.List.replace_assoc'("action", verb) |> Util.stringQueryParams' )
+				});
+				verb
+			});
+		}, [|setAction|]);
     <>
 		<a className="logo" href="/" />
 		<p><span className="command">{React.string("ssh user@bkhack.wiki")}</span></p>
 		{
 			switch (action) {
-				| "login" => <Login key="login" />
-				| "register" => <Register key="register" />
-				| "forgot" => <Forgot key="forgot" />
-				| "reset" => <Reset key="reset" />
-				| _ => <Login key="login" />
+				| "login" => <Login key="login" setAction />
+				| "register" => <Register key="register" setAction />
+				| "forgot" => <Forgot key="forgot" setAction />
+				| "reset" => <Reset key="reset" setAction />
+				| _ => <Login key="login" setAction />
 			} 
 		}
     </>
