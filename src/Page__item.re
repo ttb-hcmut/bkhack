@@ -29,14 +29,37 @@ module ItemNav = {
 	open View
 
   [@react.component]
-  let make = (~currentTab,~setCurrentTab,~prCount) => {
+  let make = (~post_id, ~currentTab, ~setCurrentTab, ~prCount) => {
+		let id = post_id;
 		let className = x =>
 			View.to_string(x)++" " ++ (currentTab == x ? "selected" : "");
+    let (disCount,setDisCount) = React.useState(() => 0);
+    let fetchCommentCount = (~id) => {
+      let open Fetch__syntax;
+      Fetch.fetch(Env.backend ++ "/api/comment"
+        ++ "?parent="  ++ id
+        ++ "&type="    ++ "0")
+      >>= Fetch.Response.json
+      >!= (err => {
+          Js.log(err);
+          return(Js.Json.number(0.0))
+        })
+      >>= (json => {
+        let x = Js.Json.decodeNumber(json) |> Option.value(~default = 0.0);
+        setDisCount(_ => int_of_float(x));
+        Js.Promise.resolve(json)
+      })
+      |> ignore;
+    };
+    React.useEffect0(()=>{
+      fetchCommentCount(~id=id)
+      None
+    });
     <>
     <button onClick={_ => setCurrentTab(_ => Article)} className=className(Article)> <label /> </button>
     <button onClick={_ => setCurrentTab(_ => Discussion)} className=className(Discussion)>
       <label>{React.string("discussions")}</label>
-      <data className="count">{React.int(24)}</data>
+      <data className="count">{React.int(disCount)}</data>
     </button>
     <button onClick={_ => setCurrentTab(_ => Pullrequest)} className=className(Pullrequest)>
       <label>{React.string("pull-requests")}</label>
@@ -136,6 +159,7 @@ module DiscussionBody = {
     let open Fetch__syntax;
     json
     >>= (undecoded => {
+    Js.log(json)
     let arrayOfDict = undecoded 
       |> Js.Json.decodeArray
       |> Option.value(~default=[||])
@@ -163,20 +187,21 @@ module DiscussionBody = {
       let (content, setContent) = React.useState(()=> "")
       let sendComment = () => {
         setIsBusy(_ => true);
-        open Fetch__syntax
-        let payload = Js.Dict.empty();
-        // TODO: [khang] identity provider sth sth somehow
-        Js.Dict.set(payload, "user_id", Js.Json.string("SomeBody"));
-        Js.Dict.set(payload, "id", Js.Json.string(id));
-        Js.Dict.set(payload, "type", Js.Json.string(parentType));
-        Js.Dict.set(payload, "content", Js.Json.string(content));
-        let json = Js.Json.object_(payload);
+        open Model.FetchBody;
+        let body = empty()
+        |> "user_id"  ^^ int    @@ 0
+        |> "id"       ^^ int    @@ id
+        |> "type"     ^^ string @@ parentType
+        |> "content"  ^^ string @@ content
+        |> finish;
+
+        open Fetch__syntax;
         Fetch.fetchWithInit(
           Env.backend ++"/api/postcomment",
           Fetch.RequestInit.make(
             ~method_=Post,
             ~body=Fetch.BodyInit.make(Js.Json.stringify(
-              json
+              body
             )),
             ~headers=Fetch.HeadersInit.make({
               "Content-Type": "application/json"
@@ -230,7 +255,7 @@ module DiscussionBody = {
       !show ? 
       React.null
       :
-      <li key={"loadingcomment"++id} className="comments loading" hidden={!show}>
+      <li key={"loadingcomment"++string_of_int(id)} className="comments loading" hidden={!show}>
         <div className="content">
           <header>
             <div className="author_name">{React.string("loading")}</div>
@@ -257,7 +282,7 @@ module DiscussionBody = {
     }
   }
   let cRef : ref(option((
-      ~id : string,
+      ~id : int,
       ~pType : string,
       ~showRep : bool,
       ~nestDepth : int
@@ -265,16 +290,16 @@ module DiscussionBody = {
   module Comments = {
     [@react.component]
     let make = (
-      ~id           : string,
+      ~id           : int,
       ~text         : string,
-      ~rating       : string,
-      ~user_rating  : string,
+      ~rating       : int,
+      ~user_rating  : int,
       ~timestamp    : string,
-      ~post_vers    : string,
+      ~post_vers    : int,
       ~author_name  : string,
-      ~author_id    : string,
-      ~author_role  : string,
-      ~author_rep   : string,
+      ~author_id    : int,
+      ~author_role  : int,
+      // ~author_rep   : int,
       ~nestDepth: int
     ) => {
       let autoExpand = 1;
@@ -284,54 +309,30 @@ module DiscussionBody = {
       let (showRep, setShowRep) = React.useState(() => false);
       let (addRep, setAddRep) = React.useState(() => false);
       let pType="comment";
-      let timeAgo = (seconds: int): string => {
-        let now =
-            Js.Date.make()
-            |> Js.Date.getTime
-            |> int_of_float;
-
-        let diffMs = (now - seconds*1000)/1000;
-        let minutes = diffMs / 60;
-        let hours = minutes / 60;
-        let days = hours / 24;
-        if (seconds < 10) {
-            "just now"
-        } else if (seconds < 60) {
-            string_of_int(seconds) ++ "s ago"
-        } else if (minutes < 60) {
-            string_of_int(minutes) ++ "m ago"
-        } else if (hours < 24) {
-            string_of_int(hours) ++ "h ago"
-        } else {
-            string_of_int(days) ++ "d ago"
-        };
-      };
       let setVote = (action) => {
-        open Fetch__syntax;
-        let payload = Js.Dict.empty();
-        Js.Dict.set(payload, "id", Js.Json.string(id));
-        // TODO: [khang] identity provider sth sth somehow
-        Js.Dict.set(payload, "user_id", Js.Json.string("SomeBody"));
-        Js.Dict.set(payload, "type", Js.Json.string("comment"));
-        // mofo will grab userRating before setUserRating fires bruh
         switch (action) {
-          | "-1"|"1"|"0" =>
-            if (userRating == action){
-              setUserRating(_ =>"0")
-              Js.Dict.set(payload, "action", Js.Json.string("0"));
-            }
-            else{
-              setUserRating(_ =>action);
-              Js.Dict.set(payload, "action", Js.Json.string(action));
-            }
-            
-            let json = Js.Json.object_(payload);
+          | -1|0|1 =>
+            open Fetch__syntax;
+            open Model.FetchBody;
+            let body = empty()
+            |> "user_id"  ^^ int    @@ 0
+            |> "id"       ^^ int    @@ id
+            |> "type"     ^^ string @@ "comment"
+            |> (d) => {if (userRating == action){
+                setUserRating(_ =>0);
+                d |> "action"   ^^ int    @@ 0
+              }
+              else{
+                setUserRating(_ =>action);
+                d |> "action"   ^^ int    @@ action
+            }}
+            |> finish;
             Fetch.fetchWithInit(
               Env.backend ++"/api/setvote",
               Fetch.RequestInit.make(
                 ~method_=Post,
                 ~body=Fetch.BodyInit.make(Js.Json.stringify(
-                  json
+                  body
                 )),
                 ~headers=Fetch.HeadersInit.make({
                   "Content-Type": "application/json"
@@ -354,25 +355,25 @@ module DiscussionBody = {
         }
         None
       });
-      <li key={"comment"++id} className="comments">
+      <li key={"comment"++string_of_int(id)} className="comments">
         <div className="content">
           <header>
             <div className="author_name">{React.string(author_name)}</div>
-            <div className="author_id" hidden=true >{React.string(author_id  )}</div>
-            <div className={"author_role "++author_role}>{React.string(author_role)}</div>
-            <div className="author_rep" >{React.string("rep: " ++ author_rep )}</div>
-            <div className="timestamp"  >{React.string(timeAgo(int_of_string(timestamp)))}</div>
-            <div className="post_vers"  >{React.string("v: " ++ post_vers  )}</div>
+            <div className="author_id" hidden=true >{React.int(author_id  )}</div>
+            <div className={"author_role "++ (author_role==0?"student":"prof")}>{React.string(author_role==0?"student":"prof")}</div>
+            // <div className="author_rep" >{React.string("rep: " ++ string_of_int(author_rep) )}</div>
+            <div className="timestamp"  >{React.string(timestamp)}</div>
+            <div className="post_vers"  >{React.string("v: " ++ string_of_int(post_vers))}</div>
           </header>
           <div className="text"       >{React.string(text       )}</div>
           <div className="rating"     >
             <button className="up"
-            onClick={_ => setVote("1")}>
+            onClick={_ => setVote(1)}>
               {React.string(">")}
             </button>
-            <span className={"v"++userRating}>{{React.int(int_of_string(rating) + int_of_string(userRating))}}</span>
+            <span className={"v"++string_of_int(userRating)}>{{React.int(rating - user_rating + userRating)}}</span>
             <button className="down"
-            onClick={_ => setVote("-1")}>
+            onClick={_ => setVote(-1)}>
               {React.string("<")}
             </button>
           </div>
@@ -402,7 +403,7 @@ module DiscussionBody = {
   module CommentGroup = {
     [@react.component]
     let make = (
-      ~id : string,
+      ~id : int,
       ~pType : string,
       ~showRep : bool,
       ~nestDepth : int
@@ -415,13 +416,15 @@ module DiscussionBody = {
       let fetchComments = () => {
         let open Fetch__syntax;
         setLoading(_=>true);
+        let fetchType = pType == "post" ? "1" : "2";
         Fetch.fetch(Env.backend ++ "/api/comment"
           ++ "?limit="  ++ string_of_int(limit)
           ++ "&offset=" ++ string_of_int(Array.length(comments))
-          ++ "&parent=" ++ id
-          ++ "&type="   ++ pType)
+          ++ "&user="   ++ "0"
+          ++ "&parent=" ++ string_of_int(id)
+          ++ "&type="   ++ fetchType)
         >>= Fetch.Response.json
-        |> decodeJson
+        >>= Model.Decode.Response.fetchedComments
         >>= (aod => {
           setComments( x => Array.append(x,aod));
           setShowMore( _ => Array.length(aod) < limit ? false : true);
@@ -450,20 +453,21 @@ module DiscussionBody = {
         {
           comments
           |> Array.map(x => {
+            open Model.FetchedComment;
             <Comments
-              key =  {Js.Dict.get(x,"id") |> Option.value(~default="67")} 
-              id          = {Js.Dict.get(x,"id")          |> Option.value(~default="Error: Bad Fetch")} 
-              text        = {Js.Dict.get(x,"text")        |> Option.value(~default="Error: Bad Fetch")} 
-              rating      = {Js.Dict.get(x,"rating")      |> Option.value(~default="Error: Bad Fetch")} 
-              user_rating = {Js.Dict.get(x,"user_rating") |> Option.value(~default="Error: Bad Fetch")} 
-              timestamp   = {Js.Dict.get(x,"timestamp")   |> Option.value(~default="Error: Bad Fetch")} 
-              post_vers   = {Js.Dict.get(x,"post_vers")   |> Option.value(~default="Error: Bad Fetch")} 
-              author_name = {Js.Dict.get(x,"author_name") |> Option.value(~default="Error: Bad Fetch")} 
-              author_id   = {Js.Dict.get(x,"author_id")   |> Option.value(~default="Error: Bad Fetch")} 
-              author_role = {Js.Dict.get(x,"author_role") |> Option.value(~default="Error: Bad Fetch")} 
-              author_rep  = {Js.Dict.get(x,"author_rep")  |> Option.value(~default="Error: Bad Fetch")} 
+              key         = {string_of_int(x.id)}
+              id          = {x.id          }
+              text        = {x.text        }
+              rating      = {x.rating      }
+              user_rating = {x.user_rating }
+              timestamp   = {x.timestamp   }
+              post_vers   = {x.post_vers   }
+              author_name = {x.author_name }
+              author_id   = {x.author_id   }
+              author_role = {x.author_role }
+              // author_rep  = {x.author_rep  }
               nestDepth
-            />
+            /> 
             })
           |> React.array
         }
@@ -485,8 +489,8 @@ module DiscussionBody = {
   ) => 
     <CommentGroup id pType showRep nestDepth />);
 	[@react.component]
-	let make = () => {
-    <CommentGroup id="1" pType="post" showRep=true nestDepth=0 />
+	let make = (~id) => {
+    <CommentGroup id pType="post" showRep=true nestDepth=0 />
 	}
 }
 
@@ -754,7 +758,7 @@ module At_repo_2(S : {
 
 	type t = array((int, string, int, string));
 
-	let  row = [@warning "-8"] fun | [id, title, creator, text, ..._] =>
+	let  row = [@warning "-8"] fun | [id, title, creator, text,..._] =>
 		( Float.to_int(Json.decodeNumberExn(id)), Json.decodeStringExn(title), Float.to_int(Json.decodeNumberExn(creator)), Json.decodeStringExn(text) );
 
 	let json = {
@@ -876,7 +880,7 @@ module App =
 				<Component__header />
 			</header>	
 			<nav className=sidebarState>
-				<ItemNav currentTab=tab setCurrentTab prCount=Array.length(pullrequests)/>
+				<ItemNav post_id={Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id"))} currentTab=tab setCurrentTab prCount=Array.length(pullrequests)/>
 			</nav>
 			<main className={sidebarState ++ " " ++ id}>
 				<>
@@ -890,7 +894,7 @@ module App =
 							<DiscussionFilter />
 						</nav>
 					</header>
-					<main className=Printf.sprintf("only %s", View.to_string(Discussion))><DiscussionBody /></main>
+					<main className=Printf.sprintf("only %s", View.to_string(Discussion))><DiscussionBody id={int_of_string(Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id")))} /></main>
 				</>
 				<>
 					<header className=Printf.sprintf("only %s", View.to_string(Pullrequest))>

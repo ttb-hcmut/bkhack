@@ -29,6 +29,7 @@ defmodule App
   require Logger
   require Db
   require ReturnChildID
+  require DiscussionBE
 
   plug :match
   plug Plug.Parsers,
@@ -39,18 +40,40 @@ defmodule App
 
   get "/api/comment" do
     Logger.info "GET comment"
-    parent = Map.get(conn.params,"parent","0")
-    offset = String.to_integer(Map.get(conn.params,"offset","0"))
-    limit = String.to_integer(Map.get(conn.params,"limit","10"))
-    data = ReturnChildID.getChildComments(parent, offset, limit)
-    {:ok, sh} = JSON.encode(data)
-    conn
-    # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
-    |> put_resp_header("Access-Control-Allow-Origin", "*")
-    |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
-    |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
-    |> put_resp_content_type("application/json")
-    |> send_resp(200, sh)
+    type   = Map.get(conn.params,"type"  ,"0") |> String.to_integer
+    parent = Map.get(conn.params,"parent","0") |> String.to_integer
+    user   = Map.get(conn.params,"user"  ,"-1")|> String.to_integer
+    offset = Map.get(conn.params,"offset","0") |> String.to_integer
+    limit  = Map.get(conn.params,"limit","10") |> String.to_integer
+
+    data = case type do
+      0 -> DiscussionBE.getCommentsCount(parent)
+      1 -> DiscussionBE.getPostComments(user,parent,offset,limit)
+      2 -> DiscussionBE.getCommentReplies(user,parent,offset,limit)
+      _ -> nil
+    end
+
+    # data = ReturnChildID.getChildComments(parent, offset, limit)
+    case data do
+      nil ->
+        {:ok, sh} = JSON.encode([])
+        conn
+        # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+        |> put_resp_header("Access-Control-Allow-Origin", "*")
+        |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+        |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+        |> put_resp_content_type("application/json")
+        |> send_resp(501 , sh)
+      x ->
+        {:ok, sh} = JSON.encode(x)
+        conn
+        # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+        |> put_resp_header("Access-Control-Allow-Origin", "*")
+        |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+        |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+        |> put_resp_content_type("application/json")
+        |> send_resp(200 , sh)
+    end
   end
 
   options "/api/postcomment" do
@@ -64,12 +87,13 @@ defmodule App
   post "/api/postcomment" do
     Logger.info "POST comment"
     body = conn.body_params
+    IO.inspect conn.body_params
     id      = body["id"]
     user_id = body["user_id"]
     type    = body["type"]
     content  = body["content"]
 
-    data = "User "<>user_id<>" commented \""<>content<>"\" on "<>type<>" "<>id
+    data = "User "<>Integer.to_string(user_id)<>" commented \""<>content<>"\" on "<>type<>" "<>Integer.to_string(id)
     IO.puts(data);
     {:ok, sh} = JSON.encode(data)
     conn
@@ -97,8 +121,9 @@ defmodule App
     type    = body["type"]
     action  = body["action"]
 
-    data = "User "<>user_id<>" voted "<>action<>" on "<>type<>" "<>id
+    data = "User "<>Integer.to_string(user_id)<>" voted "<>Integer.to_string(action)<>" on "<>type<>" "<>Integer.to_string(id)
     IO.puts(data);
+    DiscussionBE.setVote(user_id,id,action)
     {:ok, sh} = JSON.encode(data)
     conn
     # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
@@ -205,9 +230,8 @@ defmodule App
   end
 
   def stop() do
-    {:ok, pid} = File.read("lock")
+    {:ok, _pid} = File.read("lock")
     # NOTE(kinten): reference https://stackoverflow.com/questions/70102293/transform-process-id-pid-in-elixir-to-tuple-or-string-parse-pid-to-other#70105854
-    pid = pid |> String.to_charlist |> :erlang.list_to_pid
     :ok = Plug.Cowboy.shutdown(__MODULE__.HTTP)
     :ok = File.rm "lock"
     {:ok, msg: "stopped server"}

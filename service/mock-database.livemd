@@ -10,12 +10,11 @@ Mix.install([
 
 ## Setup mux
 
-Target 1: local SQLite
+<!-- livebook:{"attrs":"eyJkYXRhYmFzZV9wYXRoIjoiYmtoYWNrL3NlcnZpY2UvZGIiLCJ0eXBlIjoic3FsaXRlIiwidmFyaWFibGUiOiJjb25uIn0","chunks":null,"kind":"Elixir.KinoDB.ConnectionCell","livebook_object":"smart_cell"} -->
 
 ```elixir
-opts = [database: "/home/kinten/s/bkhack/service/db"]
-{:ok, conn_sqlite} = Kino.start_child({Exqlite, opts})
-alias Exqlite, as: Sqlx_sqlite
+opts = [database: "bkhack/service/db"]
+{:ok, conn} = Kino.start_child({Exqlite, opts})
 ```
 
 Target 2: Supabase Postgres
@@ -99,88 +98,85 @@ Note:
 * DDL statements should be laxed i.e. do only if (not) exists
 
 ```elixir
-Sqlx.query!(conn, ~S"drop table if exists pullrequests", [])
-Sqlx.query!(conn, ~S"drop table if exists commentratings", [])
-Sqlx.query!(conn, ~S"drop table if exists comments", [])
-Sqlx.query!(conn, ~S"drop table if exists posts", [])
-Sqlx.query!(conn, ~S"drop table if exists users", [])
-IO.puts "Dropped Tables"
-Sqlx.query!(
-  conn,
-  ~S"""
-  create table if not exists users (
-    user_id integer primary key,
-    name varchar(255) not null,
-    role integer not null
-  )
-  """,
-  []
-)
-Sqlx.query!(
-  conn,
-  ~S"""
-  create table if not exists posts (
-    post_id integer primary key,
-    post_title varchar(255) not null,
-    creator_id integer not null,
-    post_text varchar(2048) not null,
-    foreign key (creator_id) references users(user_id)
-  )
-  """,
-  []
-)
-Sqlx.query!(
-  conn,
-  ~S"""
-  create table if not exists pullrequests (
-    pr_id integer primary key,
-    post_id integer not null,
-    contributor_id integer not null,
-    title varchar(255) not null,
-    description varchar(1024) not null,
-    status varchar(16) not null,
-    tags varchar(255) not null,
-    date_created_utc varchar(255) not null,
-    foreign key (post_id) references posts(post_id),
-    foreign key (contributor_id) references users(user_id)
-  )
-  """,
-  []
-)
-Sqlx.query!(
-  conn,
-  ~S"""
-  create table if not exists comments (
-    comment_id integer primary key,
-    parent_post_id integer,
-    parent_comment_id integer,
-    content varchar(255) not null,
-    commenter_id integer not null,
-    date_created_utc varchar(255) not null,
-    post_version integer not null,
-  
-    foreign key (commenter_id) references users(user_id),
-    foreign key (parent_post_id) references posts(post_id),
-    foreign key (parent_comment_id) references comments(comment_id)
-  )
-  """,
-  []
-)
-Sqlx.query!(
-  conn,
-  ~S"""
-  create table if not exists commentratings (
-    comment_rating_id integer primary key,
-    voter integer,
-    comment_id integer,
-    upvote bool,
-    foreign key (voter) references users(user_id),
-    foreign key (comment_id) references comments(comment_id)
-  )
-  """,
-  []
-)
-IO.puts "Created Tables"
+createTablesList = [
+  fn -> Exqlite.query!(
+    conn,
+    ~S"""
+    create table if not exists users (
+      user_id integer primary key,
+      name varchar(255) not null,
+      role integer not null
+    )
+    """,
+    []
+  ) end,
+  fn -> Exqlite.query!(
+    conn,
+    ~S"""
+    create table if not exists posts (
+      post_id integer primary key,
+      post_title varchar(255) not null,
+      creator_id integer not null,
+      post_text varchar(2048) not null,
+      foreign key (creator_id) references users(user_id)
+    )
+    """,
+    []
+  ) end,
+  fn -> Exqlite.query!(
+    conn,
+    ~S"""
+    create table if not exists pullrequests (
+      pr_id integer primary key,
+      post_id integer not null,
+      contributor_id integer not null,
+      title varchar(255) not null,
+      description varchar(1024) not null,
+      status varchar(16) not null,
+      tags varchar(255) not null,
+      date_created_utc varchar(255) not null,
+      foreign key (post_id) references posts(post_id),
+      foreign key (contributor_id) references users(user_id)
+    )
+    """,
+    []
+  ) end,
+  fn -> Exqlite.query!(
+    conn,
+    ~S"""
+    create table if not exists comments (
+      comment_id integer primary key,
+      parent_post_id integer nullable,
+      parent_comment_id integer nullable,
+      content varchar(255) not null,
+      commenter_id integer not null,
+      date_created_utc varchar(255) not null,
+      post_version integer not null,
+    
+      foreign key (commenter_id) references users(user_id),
+      foreign key (parent_post_id) references posts(post_id),
+      foreign key (parent_comment_id) references comments(comment_id)
+    )
+    """,
+    []
+  ) end,
+  fn -> Exqlite.query!(
+    conn,
+    ~S"""
+    create table if not exists commentratings (
+      comment_rating_id integer primary key,
+      voter_id integer,
+      comment_id integer,
+      rating integer,
+      foreign key (voter_id) references users(user_id),
+      foreign key (comment_id) references comments(comment_id)
+    )
+    """,
+    []
+  ) end,
+  fn -> IO.puts "Created Tables" end,
+]
+IO.inspect createTablesList
 ```
 
 ## Scenarios
@@ -316,14 +312,14 @@ RunSql.query(conn,[
   """,
 ])
 RunSql.query(conn,[
-  ~S"insert into commentratings values (0, 0, 1, false)",
-  ~S"insert into commentratings values (1, 1, 1, false)",
-  ~S"insert into commentratings values (2, 2, 1, false)",
-  ~S"insert into commentratings values (3, 0, 3, true)",
-  ~S"insert into commentratings values (4, 1, 3, true)",
-  ~S"insert into commentratings values (5, 2, 3, true)",
-  ~S"insert into commentratings values (6, 3, 4, true)",
-  ~S"insert into commentratings values (7, 4, 4, true)",
+  ~S"insert into commentratings values (0, 0, 1, -1)",
+  ~S"insert into commentratings values (1, 1, 1, -1)",
+  ~S"insert into commentratings values (2, 2, 1, -1)",
+  ~S"insert into commentratings values (3, 0, 3, 1)",
+  ~S"insert into commentratings values (4, 1, 3, 1)",
+  ~S"insert into commentratings values (5, 2, 3, 1)",
+  ~S"insert into commentratings values (6, 3, 4, 1)",
+  ~S"insert into commentratings values (7, 4, 4, 1)",
 ])
 # fetch the comments count of a post
 RunSql.query(conn,[
@@ -350,14 +346,14 @@ RunSql.query(conn,[
 # fetch the comments of a post
   ~S"""
   WITH commentsumratings as (
-    SELECT comment_id, SUM(CASE WHEN upvote = 1 THEN 1 ELSE -1 END) as total
+    SELECT comment_id, SUM(CASE WHEN rating = 1 THEN 1 ELSE -1 END) as total
     FROM commentratings
     GROUP BY comment_id
   )
   SELECT
     c.comment_id as id,
     c.content as text,
-    MAX(CASE WHEN r.voter = 0 THEN r.upvote ELSE NULL END) as user_rating,
+    MAX(CASE WHEN r.voter_id = 0 THEN r.rating ELSE 0 END) as user_rating,
     CASE WHEN s.total IS NOT NULL then s.total else 0 end as rating,
     c.date_created_utc as timestamp,
     c.post_version as post_vers,
@@ -374,14 +370,14 @@ RunSql.query(conn,[
 # fetch the replies of a comment
   ~S"""
   WITH commentsumratings as (
-    SELECT comment_id, SUM(CASE WHEN upvote = 1 THEN 1 ELSE -1 END) as total
+    SELECT comment_id, SUM(CASE WHEN rating = 1 THEN 1 ELSE -1 END) as total
     FROM commentratings
     GROUP BY comment_id
   )
   SELECT
     c.comment_id as id,
     c.content as text,
-    MAX(CASE WHEN r.voter = 0 THEN r.upvote ELSE NULL END) as user_rating,
+    MAX(CASE WHEN r.voter_id = 0 THEN r.rating ELSE 0 END) as user_rating,
     s.total as rating,
     c.date_created_utc as timestamp,
     c.post_version as post_vers,
@@ -395,6 +391,7 @@ RunSql.query(conn,[
   where c.parent_comment_id = 1
   group by id
   """,
+  ~S"Select * from comments",
 ])
 
 
