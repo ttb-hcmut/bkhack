@@ -725,11 +725,11 @@ module At_repo_1(S : {
 
 	type t = array((int, string))
 
-	let row  = [@warning "-8"] fun | [|user_id, name, ..._|] =>
+	let row  = [@warning "-8"] fun | [user_id, name, ..._] =>
 		( Float.to_int(Json.decodeNumberExn(user_id)), Json.decodeStringExn(name) );
 
 	let json = {
-		let per_row = row % Json.decodeArrayExn;
+		let per_row = row % Array.to_list % Json.decodeArrayExn;
 		Array.map(per_row) % Json.decodeArrayExn
 	}
 }
@@ -756,11 +756,11 @@ module At_repo_2(S : {
 
 	type t = array((int, string, int, string));
 
-	let  row = [@warning "-8"] fun | [|id, title, creator, text, ..._|] =>
+	let  row = [@warning "-8"] fun | [id, title, creator, text, ..._] =>
 		( Float.to_int(Json.decodeNumberExn(id)), Json.decodeStringExn(title), Float.to_int(Json.decodeNumberExn(creator)), Json.decodeStringExn(text) );
 
 	let json = {
-		let per_row = row % Json.decodeArrayExn;
+		let per_row = row % Array.to_list % Json.decodeArrayExn;
 		Array.map(per_row) % Json.decodeArrayExn
 	}
 }
