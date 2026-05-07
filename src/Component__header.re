@@ -4,8 +4,7 @@
 
 open React
 
-
-let onSubmit = e => {
+let onSubmit = (current_url, e) => {
 	Event.Synthetic.preventDefault(e);
 	let rawstr = Event.Form.target(e)##siteNavigator##value;
 	let u = rawstr->Shell__parse.test_parse;
@@ -20,9 +19,10 @@ let onSubmit = e => {
 	}
 };
 
-let onKeyDown = (setHistoryIndex, e) => {
+let onKeyDown = (setHistoryIndex, onKey, e) => {
 	let key = Event.Keyboard.key(e);
 	let mk_char = s => try (String.get(s, 0)->Option.some) { | Invalid_argument(_) => None }
+	onKey();
 	switch ((key, mk_char(key))) {
 	| ("ArrowUp", _) => setHistoryIndex(it => it - 1)
 	| ("ArrowDown", _) => setHistoryIndex(it => it + 1)
@@ -70,15 +70,32 @@ let make = () => {
 		})
 	);
 	useEffect1(() => {
-		Rlwrap.on_scroll(historyIndex) @@ u =>
-		setBarContent(Option.value(~default="", u)); None
+		Rlwrap.on_scroll(historyIndex) @@ u => {
+			setBarContent(Option.value(~default="", u)); None
+		}
 	}, [|historyIndex|]);
+	let errorBox = useMemo1(() => {
+		Option.is_some(navigatorStyle) ?
+			<dialog open_=true>
+				<div>{"error"->React.string}</div>
+			</dialog>
+		: <> </>
+	}, [|navigatorStyle|])
+	let onKey = () => {
+		setNavigatorStyle(_ => None);
+		()
+	};
+	let url = ReasonReactRouter.useUrl();
 	<>
 	<a className="logo" href="/" />
-	<form onSubmit={e => assert_ @@ _ => onSubmit(e)}> <input placeholder=?placeholder onKeyDown={onKeyDown(setHistoryIndex)} ref={ReactDOM.Ref.domRef(bar)} id="siteNavigator" className={Option.value(~default="", navigatorStyle)} /> </form>
+	<form onSubmit={e => assert_ @@ _ => onSubmit(url, e)}>
+		<input placeholder=?placeholder onKeyDown={onKeyDown(setHistoryIndex, onKey)} ref={ReactDOM.Ref.domRef(bar)} id="siteNavigator" className={Option.value(~default="", navigatorStyle)} />
+		{errorBox}
+	</form>
 	<a className="place projects" href="/projects"></a>
 	<a className="place wiki" href="/wiki"></a>
 	<a className="place notifications"></a>
+	<a className="place settings" href="/settings"></a>
 	<a className="place auth" href="/auth"></a>
 	</>
 }
