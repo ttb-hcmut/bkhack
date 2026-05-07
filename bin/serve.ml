@@ -83,7 +83,7 @@ let main__ () =
   Cmd.make (Cmd.info "bkhack.serve" ~doc:"") @@
   let+ watch = Arg.(required & opt (some bool) None &
     info ["watch"; "w"] ~docv:" Will the JavaScript compiler watch for file changes to hot-reload? ")
-  and+ dist_dir = Arg.(required & opt (some dir) None &
+  and+ dist_dir = Arg.(required & opt (some string) None &
     info ["output"; "o"] ~docv:" Output directory, containing deployable web bundle artifact. ")
     |> Term.map Path.(fun it cwd -> cwd / it)
   in main__ ~watch ~dist_dir ()
