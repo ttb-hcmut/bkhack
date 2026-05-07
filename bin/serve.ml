@@ -18,7 +18,7 @@ let pv_morphism~sw~procm dist_dir =
   B.run_liveserver~sw~procm dist_dir
 
 (** a [morphism] for JavaScript bundles *)
-let morphism_jspages~sw~procm~clock~cwd src_dir dist_dir log_dir =
+let morphism_jspages~sw~procm~clock~cwd ?watch src_dir dist_dir log_dir =
   let jspages =
     List.filter_map (B.is_page' src_dir)
     @@ Path.read_dir src_dir in
@@ -31,7 +31,7 @@ let morphism_jspages~sw~procm~clock~cwd src_dir dist_dir log_dir =
     try P.(dist_dir / B.file_grep_attrib attrib_name refile')
     with Not_found -> raise @@ Missing_mapping_entry_for refile in
   B.output__sync~clock jsfile';
-  B.compile_jsfile~procm~clock ~watch:true out_dir log_dir jsfile'
+  B.compile_jsfile~procm~clock ?watch out_dir log_dir jsfile'
 
 (** a [morphism] for linking static-content files from public dir
     (and other sources) to dist dir *)
@@ -65,7 +65,7 @@ let morphism_static~sw~procm public_dir dist_dir () =
     @raise Missing_mapping_entry_for(pagefile) when a Reason page
     file did not specify a required `[@Bkhack.page s]` attribute.
     Refer to the guide for more details. *)
-let main__ () =
+let main__ ~watch ?(dist_dir = dist_dir) () =
   Eio_main.run @@ fun env ->
   let procm, clock, cwd =
     Stdenv.process_mgr env, Stdenv.clock env, Stdenv.cwd env in
@@ -73,10 +73,22 @@ let main__ () =
     public_dir cwd, dist_dir cwd, log_dir cwd, src_dir cwd in
   Switch.run @@ fun sw ->
   pv_morphism~sw~procm dist_dir;
-  morphism_jspages~sw~procm~clock~cwd src_dir dist_dir log_dir;
+  morphism_jspages~sw~procm~clock~cwd ~watch src_dir dist_dir log_dir;
   morphism_static~sw~procm public_dir dist_dir ()
+
+open Cmdliner
+open Term.Syntax
+
+let main__ () =
+  Cmd.make (Cmd.info "bkhack.serve" ~doc:"") @@
+  let+ watch = Arg.(required & opt (some bool) None &
+    info ["watch"; "w"] ~docv:" Will the JavaScript compiler watch for file changes to hot-reload? ")
+  and+ dist_dir = Arg.(required & opt (some dir) None &
+    info ["output"; "o"] ~docv:" Output directory, containing deployable web bundle artifact. ")
+    |> Term.map Path.(fun it cwd -> cwd / it)
+  in main__ ~watch ~dist_dir ()
 
 (** autorun except in toplevel / interactive mode *)
 let () =
   if !Sys.interactive then () else
-  main__ ()
+  exit @@ Cmd.eval @@ main__ ()
