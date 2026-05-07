@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>BKHack</title>
+    <script type="module" src="index.js"></script>
+		<style>
+@import "/styles/debug.css";
+@import "/styles/reset.css";
+@import "/styles/variables.css";
+@import "/styles/widget-variables.css";
+@import "/styles/components/headerbar.css";
+
+html {
+	font-size: var(--text-base);
+	font-family: system-ui;
+}
+
+#root {
+	background-color: var(--global-bg);
+	min-height: 100vh;
+	padding-bottom: var(--space-a);
+}
+
+		</style>
+  </head>
+  <body>
+    <div id="root" data-tileset="gui"></div>
+  </body>
+</html>

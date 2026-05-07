@@ -30,24 +30,22 @@ module ItemNav = {
 
   [@react.component]
   let make = (~currentTab,~setCurrentTab,~prCount) => {
+		let className = x =>
+			View.to_string(x)++" " ++ (currentTab == x ? "selected" : "");
     <>
-    <button onClick={_ => setCurrentTab(_ => Article)} className={"article " ++ (currentTab == Article ? "selected" : "")}>
-      <label>{React.string("article")}</label>
-    </button>
-    <button onClick={_ => setCurrentTab(_ => Discussion)} className={"discussions " ++ (currentTab == Discussion ? "selected" : "")}>
+    <button onClick={_ => setCurrentTab(_ => Article)} className=className(Article)> <label /> </button>
+    <button onClick={_ => setCurrentTab(_ => Discussion)} className=className(Discussion)>
       <label>{React.string("discussions")}</label>
       <data className="count">{React.int(24)}</data>
     </button>
-    <button onClick={_ => setCurrentTab(_ => Pullrequest)} className={"pullrequests " ++ (currentTab == Pullrequest ? "selected" : "")}>
+    <button onClick={_ => setCurrentTab(_ => Pullrequest)} className=className(Pullrequest)>
       <label>{React.string("pull-requests")}</label>
       <data className="count">{React.int(prCount)}</data>
     </button>
-    <button onClick={_ => setCurrentTab(_ => Log)} className={"log " ++ (currentTab == Log ? "selected" : "")}>
+    <button onClick={_ => setCurrentTab(_ => Log)} className=className(Log)>
       <label>{React.string("history")}</label>
     </button>
-    <button onClick={_ => setCurrentTab(_ => Edit)} className={"edit " ++ (currentTab == Edit ? "selected" : "")}>
-      <label>{React.string("editor")}</label>
-    </button>
+    <button onClick={_ => setCurrentTab(_ => Edit)} className=className(Edit)> <label /> </button>
     </>
   }
 }
@@ -911,6 +909,20 @@ module App =
 					</header>
 					<main className=Printf.sprintf("only %s inspect", View.to_string(Pullrequest))>
 						<PullrequestsInspectBody pullrequests pr_inspect info=postInfo />
+					</main>
+				</>
+				<>
+					<header className=Printf.sprintf("only %s modeline", View.to_string(Edit))>
+						<Item_view__editor.Modeline />
+					</header>
+					<header className=Printf.sprintf("only %s toolbar", View.to_string(Edit))>
+						<Item_view__editor.Toolbar />
+					</header>
+					<aside className=Printf.sprintf("only %s", View.to_string(Edit))>
+						<Item_view__editor.Sidebar />
+					</aside>
+					<main className=Printf.sprintf("only %s", View.to_string(Edit))>
+						<Item_view__editor.Body />
 					</main>
 				</>
 			</main>

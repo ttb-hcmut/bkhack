@@ -1,0 +1,19 @@
+
+#root > main.edit {
+	--margin-a: 2.5rem
+}
+
+#root > main.edit > header.modeline {
+	background-color: var(--card-bg);
+  padding: var(--space-a);
+  display: flex;
+  align-items: center;
+}
+
+#root > main.edit > header.modeline > .logo::before {
+  content: ">_ ";
+}
+
+.mode.insert > label:after {
+  content: "-- INSERT --";
+}
