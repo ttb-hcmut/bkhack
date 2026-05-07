@@ -1,45 +1,94 @@
-# Mock database
+# Setup database
 
 ```elixir
 Mix.install([
   {:kino_db, "~> 0.4.0"},
-  {:exqlite, "~> 0.23.0"}
+  {:exqlite, "~> 0.23.0"},
+  {:postgrex, "~> 0.18"}
 ])
 ```
 
-## Setup
+## Setup mux
 
-<!-- livebook:{"attrs":"eyJkYXRhYmFzZV9wYXRoIjoiZGIiLCJ0eXBlIjoic3FsaXRlIiwidmFyaWFibGUiOiJjb25uIn0","chunks":null,"kind":"Elixir.KinoDB.ConnectionCell","livebook_object":"smart_cell"} -->
+Target 1: local SQLite
 
 ```elixir
-opts = [database: "db"]
-{:ok, conn} = Kino.start_child({Exqlite, opts})
+opts = [database: "/home/kinten/s/bkhack/service/db"]
+{:ok, conn_sqlite} = Kino.start_child({Exqlite, opts})
+alias Exqlite, as: Sqlx_sqlite
 ```
+
+Target 2: Supabase Postgres
+
+```elixir
+opts = [
+  hostname: "db.dojhbipasrejjurzremz.supabase.co",
+  port: 5432,
+  username: "postgres",
+  password: System.fetch_env!("LB_BKHACK_SUPABASE_PASSWORD"),
+  database: "postgres",
+  socket_options: [:inet6]
+]
+{:ok, conn_supabase} = Kino.start_child({Postgrex, opts})
+alias Postgrex, as: Sqlx_supabase
+```
+
+Target 3: Firestore (TBA)
+
+<!-- livebook:{"break_markdown":true} -->
+
+Target 4: local MongoDB (TBA)
+
+<!-- livebook:{"break_markdown":true} -->
+
+Target 5: Mongo Atlas MongoDB (TBA)
+
+<!-- livebook:{"break_markdown":true} -->
+
+Standard libraries
 
 ```elixir
 defmodule RunSql do
-  def query(conn,queryList) do
+  def query(conn, queryList) do
     Enum.map( queryList , fn q -> Exqlite.query!(conn,q) end )
   end
 end
 ```
 
-<!-- livebook:{"attrs":"eyJjYWNoZV9xdWVyeSI6dHJ1ZSwiY29ubmVjdGlvbiI6eyJ0eXBlIjoic3FsaXRlIiwidmFyaWFibGUiOiJjb25uIn0sInF1ZXJ5IjoiU0VMRUNUICogRlJPTSBzcWxpdGVfbWFzdGVyIFdIRVJFIHR5cGU9J3RhYmxlJyIsInJlc3VsdF92YXJpYWJsZSI6InJlc3VsdCIsInRpbWVvdXQiOm51bGx9","chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+## Setup
+
+Choose
 
 ```elixir
-result = Exqlite.query!(conn, ~S"SELECT * FROM sqlite_master WHERE type='table'", [])
+form =
+  Kino.Control.form(
+    [
+      name: Kino.Input.select(
+        "Target", [
+          {:sqlite,    "Target 1: SQLite"},
+          {:supabase,  "Target 2: Supabase"},
+          {:firestore, "Target 3: Firestore"},
+          {:mongodb,   "Target 4: MongoDB"}
+        ])
+    ],
+    submit: "Submit"
+  )
+
+Kino.listen(form, fn event ->
+  IO.inspect(event)
+  case event.data.name do
+    :sqlite -> IO.puts "no"
+    :supabase -> IO.puts "ko"
+  end
+end)
+
+form
 ```
 
-```elixir
-dropTablesList = [
-  fn -> Exqlite.query!(conn, ~S"drop table if exists pullrequests", []) end,
-  fn -> Exqlite.query!(conn, ~S"drop table if exists commentratings", []) end,
-  fn -> Exqlite.query!(conn, ~S"drop table if exists comments", []) end,
-  fn -> Exqlite.query!(conn, ~S"drop table if exists posts", []) end,
-  fn -> Exqlite.query!(conn, ~S"drop table if exists users", []) end,
-  fn -> IO.puts "Dropped Tables" end,
-]
+<!-- livebook:{"attrs":"eyJjYWNoZV9xdWVyeSI6dHJ1ZSwiY29ubmVjdGlvbiI6eyJ0eXBlIjoicG9zdGdyZXMiLCJ2YXJpYWJsZSI6ImNvbm4ifSwicXVlcnkiOiJTRUxFQ1QgKiBGUk9NIHVzZXJzOyIsInJlc3VsdF92YXJpYWJsZSI6InJlc3VsdCIsInRpbWVvdXQiOm51bGx9","chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
 
+```elixir
+result = Postgrex.query!(conn, ~S"SELECT * FROM users;", [])
 ```
 
 ### Relational tables
@@ -50,163 +99,148 @@ Note:
 * DDL statements should be laxed i.e. do only if (not) exists
 
 ```elixir
-createTablesList = [
-  fn -> Exqlite.query!(
-    conn,
-    ~S"""
-    create table if not exists users (
-      user_id integer primary key,
-      name varchar(255) not null,
-      role integer not null
-    )
-    """,
-    []
-  ) end,
-  fn -> Exqlite.query!(
-    conn,
-    ~S"""
-    create table if not exists posts (
-      post_id integer primary key,
-      post_title varchar(255) not null,
-      creator_id integer not null,
-      post_text varchar(2048) not null,
-      foreign key (creator_id) references users(user_id)
-    )
-    """,
-    []
-  ) end,
-  fn -> Exqlite.query!(
-    conn,
-    ~S"""
-    create table if not exists pullrequests (
-      pr_id integer primary key,
-      post_id integer not null,
-      contributor_id integer not null,
-      title varchar(255) not null,
-      description varchar(1024) not null,
-      status varchar(16) not null,
-      tags varchar(255) not null,
-      date_created_utc varchar(255) not null,
-      foreign key (post_id) references posts(post_id),
-      foreign key (contributor_id) references users(user_id)
-    )
-    """,
-    []
-  ) end,
-  fn -> Exqlite.query!(
-    conn,
-    ~S"""
-    create table if not exists comments (
-      comment_id integer primary key,
-      parent_post_id integer nullable,
-      parent_comment_id integer nullable,
-      content varchar(255) not null,
-      commenter_id integer not null,
-      date_created_utc varchar(255) not null,
-      post_version integer not null,
-    
-      foreign key (commenter_id) references users(user_id),
-      foreign key (parent_post_id) references posts(post_id),
-      foreign key (parent_comment_id) references comments(comment_id)
-    )
-    """,
-    []
-  ) end,
-  fn -> Exqlite.query!(
-    conn,
-    ~S"""
-    create table if not exists commentratings (
-      comment_rating_id integer primary key,
-      voter integer,
-      comment_id integer,
-      upvote bool,
-      foreign key (voter) references users(user_id),
-      foreign key (comment_id) references comments(comment_id)
-    )
-    """,
-    []
-  ) end,
-  fn -> IO.puts "Created Tables" end,
-]
-IO.inspect createTablesList
+Sqlx.query!(conn, ~S"drop table if exists pullrequests", [])
+Sqlx.query!(conn, ~S"drop table if exists commentratings", [])
+Sqlx.query!(conn, ~S"drop table if exists comments", [])
+Sqlx.query!(conn, ~S"drop table if exists posts", [])
+Sqlx.query!(conn, ~S"drop table if exists users", [])
+IO.puts "Dropped Tables"
+Sqlx.query!(
+  conn,
+  ~S"""
+  create table if not exists users (
+    user_id integer primary key,
+    name varchar(255) not null,
+    role integer not null
+  )
+  """,
+  []
+)
+Sqlx.query!(
+  conn,
+  ~S"""
+  create table if not exists posts (
+    post_id integer primary key,
+    post_title varchar(255) not null,
+    creator_id integer not null,
+    post_text varchar(2048) not null,
+    foreign key (creator_id) references users(user_id)
+  )
+  """,
+  []
+)
+Sqlx.query!(
+  conn,
+  ~S"""
+  create table if not exists pullrequests (
+    pr_id integer primary key,
+    post_id integer not null,
+    contributor_id integer not null,
+    title varchar(255) not null,
+    description varchar(1024) not null,
+    status varchar(16) not null,
+    tags varchar(255) not null,
+    date_created_utc varchar(255) not null,
+    foreign key (post_id) references posts(post_id),
+    foreign key (contributor_id) references users(user_id)
+  )
+  """,
+  []
+)
+Sqlx.query!(
+  conn,
+  ~S"""
+  create table if not exists comments (
+    comment_id integer primary key,
+    parent_post_id integer,
+    parent_comment_id integer,
+    content varchar(255) not null,
+    commenter_id integer not null,
+    date_created_utc varchar(255) not null,
+    post_version integer not null,
+  
+    foreign key (commenter_id) references users(user_id),
+    foreign key (parent_post_id) references posts(post_id),
+    foreign key (parent_comment_id) references comments(comment_id)
+  )
+  """,
+  []
+)
+Sqlx.query!(
+  conn,
+  ~S"""
+  create table if not exists commentratings (
+    comment_rating_id integer primary key,
+    voter integer,
+    comment_id integer,
+    upvote bool,
+    foreign key (voter) references users(user_id),
+    foreign key (comment_id) references comments(comment_id)
+  )
+  """,
+  []
+)
+IO.puts "Created Tables"
 ```
+
+## Scenarios
+
+### Yaron Minsky's fangirl
 
 ```elixir
-for drop <- dropTablesList do drop.() end
-for create <- createTablesList do create.() end
+Sqlx.query!(conn, ~S"delete from comments", [])
+Sqlx.query!(conn, ~S"delete from pullrequests", []) 
+Sqlx.query!(conn, ~S"delete from posts", [])
+Sqlx.query!(conn, ~S"delete from users", [])
+Sqlx.query!(
+  conn,
+  ~S"""
+  insert into users values (0, 'yminsky_fan', 0)
+  """,
+  []
+)
+Sqlx.query!(
+  conn,
+  ~S"""
+  insert into posts values (77, 'Seven Implementations of Incremental', 0, 'Video from Jane Street Tech Talk
+
+  Incremental là một thư viện FRP (functional reactive programming) dùng để viết hàm tính toán tích hợp đạo hàm ‌và giải tích tự động. Anh em nào đam mê Giải tích 1 2, và thích code React, và thích đại số trừu tượng, thì có thể tham khảo.
+
+  # FRP là gì?
+
+  TBA')
+  """,
+  []
+)
+Sqlx.query!(
+  conn,
+  ~S"""
+  insert into pullrequests values (6, 77, 0, 'Original post edits', 'Sau ngày 9/3/2016, admin bên Jane Street blog có chỉnh nội dung blog ngầm. Mấy này không ảnh hưởng đến integrity của post nhưng mình vẫn nên bump ref cho chính xác.', 'open', 'doc', '2026-04-28T15:18:26Z')
+  """,
+  []
+)
+Sqlx.query!(
+  conn,
+  ~S"""
+  insert into pullrequests values (7, 77, 0, 'Giới thiệu về FRP cho người học mới', 'Post có thể cải thiện thêm bằng cách thêm phần giới thiệu kiến thức. Này mình không có opinion, nhưng OP có thể tham khảo ở đây: https://blog.janestreet.com/breaking-down-frp/', 'closed', 'doc,frp', '2026-03-12T11:08:06Z')
+  """,
+  []
+)
+Sqlx.query!(
+  conn,
+  ~S"""
+  insert into pullrequests values (8, 77, 0, 'Giới thiệu về FRP cho người học mới', 'Post có thể cải thiện thêm bằng cách thêm phần giới thiệu kiến thức. Này mình không có opinion, nhưng OP có thể tham khảo ở đây: https://blog.janestreet.com/breaking-down-frp/', 'merged', '', '2026-03-12T11:08:06Z')
+  """,
+  []
+)
+Sqlx.query!(
+  conn,
+  ~S"select users.name, posts.post_title, posts.post_text from users, posts, pullrequests where users.name = 'yminsky_fan'",
+  []
+)
 ```
 
-### Scenario
-
-```elixir
-result2 = Exqlite.query!(conn, ~S"delete from comments", [])
-result2 = Exqlite.query!(conn, ~S"delete from pullrequests", [])
-result2 = Exqlite.query!(conn, ~S"delete from posts", [])
-result2 = Exqlite.query!(conn, ~S"delete from users", [])
-```
-
-```elixir
-result3 =
-  Exqlite.query!(
-    conn,
-    ~S"""
-    insert into users values (0, 'yminsky_fan')
-    """,
-    []
-  )
-result3 =
-  Exqlite.query!(
-    conn,
-    ~S"""
-    insert into posts values (77, 'Seven Implementations of Incremental', 0, 'Video from Jane Street Tech Talk
-
-    Incremental là một thư viện FRP (functional reactive programming) dùng để viết hàm tính toán tích hợp đạo hàm ‌và giải tích tự động. Anh em nào đam mê Giải tích 1 2, và thích code React, và thích đại số trừu tượng, thì có thể tham khảo.
-
-    # FRP là gì?
-
-    TBA')
-    """,
-    []
-  )
-result3 =
-  Exqlite.query!(
-    conn,
-    ~S"""
-    insert into pullrequests values (6, 77, 0, 'Original post edits', 'Sau ngày 9/3/2016, admin bên Jane Street blog có chỉnh nội dung blog ngầm. Mấy này không ảnh hưởng đến integrity của post nhưng mình vẫn nên bump ref cho chính xác.', 'open', 'doc', '2026-04-28T15:18:26Z')
-    """,
-    []
-  )
-result3 =
-  Exqlite.query!(
-    conn,
-    ~S"""
-    insert into pullrequests values (7, 77, 0, 'Giới thiệu về FRP cho người học mới', 'Post có thể cải thiện thêm bằng cách thêm phần giới thiệu kiến thức. Này mình không có opinion, nhưng OP có thể tham khảo ở đây: https://blog.janestreet.com/breaking-down-frp/', 'closed', 'doc,frp', '2026-03-12T11:08:06Z')
-    """,
-    []
-  )
-
-result3 =
-  Exqlite.query!(
-    conn,
-    ~S"""
-    insert into pullrequests values (8, 77, 0, 'Giới thiệu về FRP cho người học mới', 'Post có thể cải thiện thêm bằng cách thêm phần giới thiệu kiến thức. Này mình không có opinion, nhưng OP có thể tham khảo ở đây: https://blog.janestreet.com/breaking-down-frp/', 'merged', '', '2026-03-12T11:08:06Z')
-    """,
-    []
-  )
-```
-
-<!-- livebook:{"attrs":"eyJjYWNoZV9xdWVyeSI6dHJ1ZSwiY29ubmVjdGlvbiI6eyJ0eXBlIjoic3FsaXRlIiwidmFyaWFibGUiOiJjb25uIn0sInF1ZXJ5Ijoic2VsZWN0IHVzZXJzLm5hbWUsIHBvc3RzLnBvc3RfdGl0bGUsIHB1bGxyZXF1ZXN0cy5kZXNjcmlwdGlvbiBmcm9tIHVzZXJzLCBwb3N0cywgcHVsbHJlcXVlc3RzIHdoZXJlIHVzZXJzLm5hbWUgPSAneW1pbnNreV9mYW4nIiwicmVzdWx0X3ZhcmlhYmxlIjoicmVzdWx0NSIsInRpbWVvdXQiOm51bGx9","chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
-
-```elixir
-result5 =
-  Exqlite.query!(
-    conn,
-    ~S"select users.name, posts.post_title, pullrequests.description from users, posts, pullrequests where users.name = 'yminsky_fan'",
-    []
-  )
-```
-
-### Scenario: Comments
+### Comments
 
 ```elixir
 for drop <- dropTablesList do drop.() end
@@ -365,3 +399,5 @@ RunSql.query(conn,[
 
 
 ```
+
+<!-- livebook:{"offset":10596,"stamp":{"token":"XCP.4IvOtOoGbx37-cdvPzl568YqsDqh8nFAi27MUWEkOERPHZJRivkYYepku-qdt9Cqs5NwGDUc3IfVxbzTonhyx9SLfq1oTBw15ZduZOUlXEETp34jQvNYGGmSnGrhq30T9BMR","version":2}} -->
