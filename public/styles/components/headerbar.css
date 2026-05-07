@@ -14,7 +14,7 @@
 	padding-bottom: 0;
 	height: calc(1.5rem + 2 * var(--space-a));
 	display: grid;
-	grid-template-columns: max-content max-content minmax(0, 1fr) max-content max-content max-content max-content;
+	grid-template-columns: max-content max-content minmax(0, 1fr) max-content max-content max-content max-content max-content;
 	align-items: center;
 	flex-direction: row;
 	z-index:9999;
@@ -57,18 +57,63 @@
 	content: "projects";
 }
 
+#root:lang(vi-VN) > header > a.place.projects::before {
+	content: "dự án nguồn mở";
+}
+
 #root > header > a.place.wiki::before {
 	content: "wiki";
+}
+
+#root:lang(vi-VN) > header > a.place.wiki::before {
+	content: "thư viện";
 }
 
 #root > header > a.place.notifications::before {
 	content: "notifications";
 }
 
+#root:lang(vi-VN) > header > a.place.notifications::before {
+	content: "thông báo";
+}
+
+#root > header > a.place.settings::before {
+	content: "settings";
+}
+
+#root:lang(vi-VN) > header > a.place.settings::before {
+	content: "cài đặt";
+}
+
 #root > header > a.place.auth::before {
 	content: "login";
 }
 
+#root:lang(vi-VN) > header > a.place.auth::before {
+	content: "đăng nhập";
+}
+
 #siteNavigator.error {
 	background-color: red;
+}
+
+dialog {
+	margin: 0;
+	position: relative;
+	height: 0;
+	width: 0;
+	padding: 0;
+	border: 0;
+	transition: none;
+	overflow: visible;
+}
+
+dialog > div {
+	width: 20rem;
+	height: fit-content;
+	max-height: 10rem;
+	overflow-y: auto;
+	background-color: white;
+	border: solid 1px #ddd;
+	border-radius: var(--radius);
 }
