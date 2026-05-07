@@ -725,7 +725,7 @@ module At_repo_1(S : {
 
 	type t = array((int, string))
 
-	let row  = [@warning "-8"] fun | [|user_id, name|] =>
+	let row  = [@warning "-8"] fun | [|user_id, name, ..._|] =>
 		( Float.to_int(Json.decodeNumberExn(user_id)), Json.decodeStringExn(name) );
 
 	let json = {
@@ -756,7 +756,7 @@ module At_repo_2(S : {
 
 	type t = array((int, string, int, string));
 
-	let  row = [@warning "-8"] fun | [|id, title, creator, text|] =>
+	let  row = [@warning "-8"] fun | [|id, title, creator, text, ..._|] =>
 		( Float.to_int(Json.decodeNumberExn(id)), Json.decodeStringExn(title), Float.to_int(Json.decodeNumberExn(creator)), Json.decodeStringExn(text) );
 
 	let json = {
