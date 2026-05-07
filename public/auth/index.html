@@ -18,31 +18,28 @@ html {
 
 #root {
 	background-color: var(--global-bg);
-    /* background-image: url("/assets/BK_pattern.svg"); */
+	max-height: 100vh;
 	min-height: 100vh;
-	/* padding-bottom: var(--space-a); */
-    display: grid;
-    grid-template-columns: auto minmax(10rem, 30rem) auto ;
-    grid-template-rows: min-content min-content max-content min-content;
-    gap: var(--space-a);
+	display: grid;
+	grid-template-columns: auto minmax(10rem, 20rem) auto ;
+	grid-template-rows: 1fr min-content max-content 1fr;
+	gap: var(--space-a);
 }
-
-
-
 
 #root > .logo {
 	width: 10rem;
-    height: 6rem;
-    grid-row: 1/2;
-    grid-column: 2/3;
-    display: grid;
-    justify-self: center;
-    align-self: center;
-    place-items: center;
+	height: 6rem;
+	grid-row: 1/2;
+	grid-column: 2/3;
+	display: grid;
+	justify-self: center;
+	align-self: end;
+	place-items: center;
 }
+
 #root:not([data-tileset="gui"]) > .logo::after {
-	content: "BKHack";
-    font-size: var(--text-2xl);
+	content: "bkhack";
+	font-size: var(--text-2xl);
 }
 #root[data-tileset="gui"] > .logo {
 	content: " ";
@@ -57,43 +54,42 @@ html {
     justify-self: center;
     color: var(--ctp-subtext1)
 }
+
 #root > main{
-	border: 2px solid var(--ctp-mantle);
+	font-size: var(--text-sm);
+	border: 2px solid var(--border);
 	border-radius: var(--radius);
-	background-color: var(--ctp-crust);
+	background-color: var(--card);
 	color: var(--ctp-text);
 	padding:1rem;
-    display: grid;
-    grid-row: 3/4;
-    grid-column: 2/3;
-    gap: var(--space-a);
-
-}
-main > form{
-    display:grid;
-    grid-column:1/3;
-	margin: var(--space-a);
+	display: grid;
+	grid-row: 3/4;
+	grid-column: 2/3;
 	gap: var(--space-a);
 }
-main > form > label{
-    align-self:end;
-    justify-self:start;
+
+main > form{
+	display:grid;
+	grid-column:1/3;
+	gap: var(--space-a);
 }
+
+main > form > label{
+	align-self:end;
+	justify-self:start;
+}
+
 main > form > input{
-    justify-self:center;
-    font-size: var(--text-base);
-    font-family: inherit;
-    color: var(--ctp-text);
-	background-color: var(--ctp-mantle);
+	justify-self:center;
+	font-family: inherit;
+	color: var(--foreground);
+	background-color: var(--input-background);
 	border-radius: var(--radius);
 	border: 0;
-    justify-self:stretch;
+	justify-self:stretch;
 	padding: var(--space-a);
 }
-/* main > form > input:focus{
-    border:0;
-    background-color: red;
-} */
+
 main > form > input::placeholder{
     font-size: var(--text-base);
     font-family: inherit;
@@ -124,12 +120,13 @@ main > span{
     background-color: var(--ctp-mantle)
 }
 main > a{
-    justify-self:center;
-    font-size: var(--text-sm);
-    color: var(--ctp-subtext1);
+	justify-self:center;
+	font-size: var(--text-sm);
+	color: var(--ctp-subtext1);
+	cursor: default;
 }
 main > a:hover{
-    text-decoration:underline;
+	color: var(--primary);
 }
 main > a:active{
 	color: color-mix(in srgb, var(--ctp-subtext1), transparent 50%);
@@ -153,7 +150,6 @@ main.register > form > ul > li.invalid > span{
     text-decoration:none;
     opacity:0;
 }
-
 
 
 /* #root > .footer{
