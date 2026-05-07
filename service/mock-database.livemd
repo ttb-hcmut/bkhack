@@ -10,11 +10,10 @@ Mix.install([
 
 ## Setup mux
 
-<!-- livebook:{"attrs":"eyJkYXRhYmFzZV9wYXRoIjoiYmtoYWNrL3NlcnZpY2UvZGIiLCJ0eXBlIjoic3FsaXRlIiwidmFyaWFibGUiOiJjb25uIn0","chunks":null,"kind":"Elixir.KinoDB.ConnectionCell","livebook_object":"smart_cell"} -->
-
 ```elixir
-opts = [database: "bkhack/service/db"]
-{:ok, conn} = Kino.start_child({Exqlite, opts})
+opts = [database: ""]
+{:ok, conn_sqlite} = Kino.start_child({Exqlite, opts})
+alias Exqlite, as: Sqlx_sqlite
 ```
 
 Target 2: Supabase Postgres
@@ -44,50 +43,32 @@ Target 5: Mongo Atlas MongoDB (TBA)
 
 <!-- livebook:{"break_markdown":true} -->
 
-Standard libraries
-
-```elixir
-defmodule RunSql do
-  def query(conn, queryList) do
-    Enum.map( queryList , fn q -> Exqlite.query!(conn,q) end )
-  end
-end
-```
-
 ## Setup
 
 Choose
 
 ```elixir
-form =
-  Kino.Control.form(
-    [
-      name: Kino.Input.select(
-        "Target", [
-          {:sqlite,    "Target 1: SQLite"},
-          {:supabase,  "Target 2: Supabase"},
-          {:firestore, "Target 3: Firestore"},
-          {:mongodb,   "Target 4: MongoDB"}
-        ])
-    ],
-    submit: "Submit"
-  )
-
-Kino.listen(form, fn event ->
-  IO.inspect(event)
-  case event.data.name do
-    :sqlite -> IO.puts "no"
-    :supabase -> IO.puts "ko"
-  end
-end)
-
-form
+conn = conn_sqlite
+alias Sqlx_sqlite, as: Sqlx
 ```
 
-<!-- livebook:{"attrs":"eyJjYWNoZV9xdWVyeSI6dHJ1ZSwiY29ubmVjdGlvbiI6eyJ0eXBlIjoicG9zdGdyZXMiLCJ2YXJpYWJsZSI6ImNvbm4ifSwicXVlcnkiOiJTRUxFQ1QgKiBGUk9NIHVzZXJzOyIsInJlc3VsdF92YXJpYWJsZSI6InJlc3VsdCIsInRpbWVvdXQiOm51bGx9","chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+Libraries
 
 ```elixir
-result = Postgrex.query!(conn, ~S"SELECT * FROM users;", [])
+defmodule RunSql do
+  def query(conn, queryList) do
+    Enum.map( queryList , fn q -> Sqlx.query!(conn,q, []) end )
+  end
+  def query(conn, queryList, opts) do
+    Enum.map( queryList , fn q -> Sqlx.query!(conn,q, []) end )
+  end
+end
+```
+
+<!-- livebook:{"attrs":"eyJjYWNoZV9xdWVyeSI6dHJ1ZSwiY29ubmVjdGlvbiI6eyJ0eXBlIjoic3FsaXRlIiwidmFyaWFibGUiOiJjb25uIn0sInF1ZXJ5IjoiU0VMRUNUICogRlJPTSB1c2VyczsiLCJyZXN1bHRfdmFyaWFibGUiOiJyZXN1bHQiLCJ0aW1lb3V0IjpudWxsfQ","chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+
+```elixir
+result = Sqlx.query!(conn, ~S"SELECT * FROM users;", [])
 ```
 
 ### Relational tables
@@ -98,8 +79,17 @@ Note:
 * DDL statements should be laxed i.e. do only if (not) exists
 
 ```elixir
+dropTablesList = [
+  fn -> Sqlx.query!(conn, ~S"drop table if exists pullrequests", []) end,
+  fn -> Sqlx.query!(conn, ~S"drop table if exists commentratings", []) end,
+  fn -> Sqlx.query!(conn, ~S"drop table if exists comments", []) end,
+  fn -> Sqlx.query!(conn, ~S"drop table if exists posts", []) end,
+  fn -> Sqlx.query!(conn, ~S"drop table if exists users", []) end,
+  fn -> IO.puts "Dropped tables" end
+]
+IO.inspect dropTablesList
 createTablesList = [
-  fn -> Exqlite.query!(
+  fn -> Sqlx.query!(
     conn,
     ~S"""
     create table if not exists users (
@@ -110,7 +100,7 @@ createTablesList = [
     """,
     []
   ) end,
-  fn -> Exqlite.query!(
+  fn -> Sqlx.query!(
     conn,
     ~S"""
     create table if not exists posts (
@@ -123,7 +113,7 @@ createTablesList = [
     """,
     []
   ) end,
-  fn -> Exqlite.query!(
+  fn -> Sqlx.query!(
     conn,
     ~S"""
     create table if not exists pullrequests (
@@ -141,13 +131,13 @@ createTablesList = [
     """,
     []
   ) end,
-  fn -> Exqlite.query!(
+  fn -> Sqlx.query!(
     conn,
     ~S"""
     create table if not exists comments (
       comment_id integer primary key,
-      parent_post_id integer nullable,
-      parent_comment_id integer nullable,
+      parent_post_id integer,
+      parent_comment_id integer,
       content varchar(255) not null,
       commenter_id integer not null,
       date_created_utc varchar(255) not null,
@@ -160,7 +150,7 @@ createTablesList = [
     """,
     []
   ) end,
-  fn -> Exqlite.query!(
+  fn -> Sqlx.query!(
     conn,
     ~S"""
     create table if not exists commentratings (
@@ -174,7 +164,7 @@ createTablesList = [
     """,
     []
   ) end,
-  fn -> IO.puts "Created Tables" end,
+  fn -> IO.puts "Created tables" end,
 ]
 IO.inspect createTablesList
 ```
@@ -184,6 +174,8 @@ IO.inspect createTablesList
 ### Yaron Minsky's fangirl
 
 ```elixir
+for drop <- dropTablesList do drop.() end
+for create <- createTablesList do create.() end
 Sqlx.query!(conn, ~S"delete from comments", [])
 Sqlx.query!(conn, ~S"delete from pullrequests", []) 
 Sqlx.query!(conn, ~S"delete from posts", [])
@@ -397,4 +389,4 @@ RunSql.query(conn,[
 
 ```
 
-<!-- livebook:{"offset":10596,"stamp":{"token":"XCP.4IvOtOoGbx37-cdvPzl568YqsDqh8nFAi27MUWEkOERPHZJRivkYYepku-qdt9Cqs5NwGDUc3IfVxbzTonhyx9SLfq1oTBw15ZduZOUlXEETp34jQvNYGGmSnGrhq30T9BMR","version":2}} -->
+<!-- livebook:{"offset":10762,"stamp":{"token":"XCP.lwESVj4Tg83EQAsS_shfIPJOmMzKLrhTk0m8pBhrvghnNMdrf_OxUEyu_CrGsc6-mW9rZ96EqeRCJlIeZWHQE5zSa_1wCMLsThH82T6DkjPaXmJPh4yTatvGAE-I607gJWas","version":2}} -->
