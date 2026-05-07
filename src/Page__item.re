@@ -187,14 +187,12 @@ module DiscussionBody = {
       let (content, setContent) = React.useState(()=> "")
       let sendComment = () => {
         setIsBusy(_ => true);
-        open Model.FetchBody;
-        let body = empty()
+        let body = Json__syntax.( empty()
         |> "user_id"  ^^ int    @@ 0
         |> "id"       ^^ int    @@ id
         |> "type"     ^^ string @@ parentType
         |> "content"  ^^ string @@ content
-        |> finish;
-
+        |> finish );
         open Fetch__syntax;
         Fetch.fetchWithInit(
           Env.backend ++"/api/postcomment",
@@ -309,46 +307,38 @@ module DiscussionBody = {
       let (showRep, setShowRep) = React.useState(() => false);
       let (addRep, setAddRep) = React.useState(() => false);
       let pType="comment";
-      let setVote = (action) => {
-        switch (action) {
-          | -1|0|1 =>
-            open Fetch__syntax;
-            open Model.FetchBody;
-            let body = empty()
-            |> "user_id"  ^^ int    @@ 0
-            |> "id"       ^^ int    @@ id
-            |> "type"     ^^ string @@ "comment"
-            |> (d) => {if (userRating == action){
-                setUserRating(_ =>0);
-                d |> "action"   ^^ int    @@ 0
-              }
-              else{
-                setUserRating(_ =>action);
-                d |> "action"   ^^ int    @@ action
-            }}
-            |> finish;
-            Fetch.fetchWithInit(
-              Env.backend ++"/api/setvote",
-              Fetch.RequestInit.make(
-                ~method_=Post,
-                ~body=Fetch.BodyInit.make(Js.Json.stringify(
-                  body
-                )),
-                ~headers=Fetch.HeadersInit.make({
-                  "Content-Type": "application/json"
-                }),
-                ()
-              )
-            )
-            >>= Fetch.Response.json
-            >!= (err => {
-                Js.log(err);
-                Js.Promise.resolve(Js.Json.null)
-              })
-            |> ignore;
-          | _ => ()
-        };
-      };
+      let setVote = React.useCallback1([@warning "-8"] ((-1|0|1) as action) => {
+				open Fetch__syntax;
+				open Json__syntax;
+				let body = empty()
+				|> "user_id"  ^^ int    @@ 0
+				|> "id"       ^^ int    @@ id
+				|> "type"     ^^ string @@ "comment"
+				|> "action"   ^^ int    @@
+					( userRating == action
+					? { setUserRating(_ => 0); 0 }
+					: { setUserRating(_ => action); action })
+				|> finish;
+				Fetch.fetchWithInit(
+					Env.backend ++"/api/setvote",
+					Fetch.RequestInit.make(
+						~method_=Post,
+						~body=Fetch.BodyInit.make(Js.Json.stringify(
+							body
+						)),
+						~headers=Fetch.HeadersInit.make({
+							"Content-Type": "application/json"
+						}),
+						()
+					)
+				)
+				>>= Fetch.Response.json
+				>!= (err => {
+						Js.log(err);
+						Js.Promise.resolve(Js.Json.null)
+					})
+				|> ignore;
+      }, [|userRating|]);
       React.useEffect0(()=>{
         if (nestDepth < autoExpand){
           setShowRep(_=>true);
