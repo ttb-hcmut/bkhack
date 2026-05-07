@@ -43,6 +43,22 @@
 	color: var(--card-fg-highlighted-dimmer);
 }
 
+#root > nav button.article > label:after {
+	content: "article";
+}
+
+#root:lang(vi-VN) > nav button.article > label:after {
+	content: "bài viết";
+}
+
+#root > nav button.edit > label:after {
+	content: "editor";
+}
+
+#root:lang(vi-VN) > nav button.edit > label:after {
+	content: "chỉnh sửa";
+}
+
 #root[data-tileset="gui"] > nav button.article > label::before {
 	content: " ";
 	display: inline-block;
