@@ -374,9 +374,7 @@ module HintPanel = {
 			<div className="logo">
 				<Wifi />
 			</div>
-			<h1>
-				{string("home feed")}
-			</h1>
+			<h1 className="home-feed"> </h1>
 			<div className="sub">
 				<span className="command">{string(command)}</span>
 			</div>
