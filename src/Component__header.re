@@ -4,7 +4,7 @@
 
 open React
 
-let onSubmit = (current_url, e) => {
+let onSubmit = (current_url, ~memo_transition=((_, _, k) => k()), e) => {
 	Event.Synthetic.preventDefault(e);
 	let rawstr = Event.Form.target(e)##siteNavigator##value;
 	let u = rawstr->Shell__parse.test_parse;
@@ -12,6 +12,7 @@ let onSubmit = (current_url, e) => {
 	Rlwrap.do_(rawstr) @@ () => {
 		Dom.Storage.setItem("bkhack.cmd-greeting-shown", "y", Dom.Storage.sessionStorage);
 		let open Js__dom;
+		memo_transition(url, url_args) @@ () =>
 		Window.Location.href_set(url ++ {
 			List.length(url_args) == 0 ? "" : "?" ++ {
 				url_args |> List.map(((a,b)) => a++"="++b) |> String.concat("&")}
@@ -31,7 +32,7 @@ let onKeyDown = (setHistoryIndex, onKey, e) => {
 };
 
 [@react.component]
-let make = () => {
+let make = (~memo_transition=?) => {
 	let bar = useRef(Js.Nullable.null);
 	let (historyIndex, setHistoryIndex) = useState(Rlwrap.index_init);
 	let setHistoryIndex = useCallback1(k => {
@@ -88,7 +89,7 @@ let make = () => {
 	let url = ReasonReactRouter.useUrl();
 	<>
 	<a className="logo" href="/" />
-	<form onSubmit={e => assert_ @@ _ => onSubmit(url, e)}>
+	<form onSubmit={e => assert_ @@ _ => onSubmit(url, ~memo_transition?, e)}>
 		<input placeholder=?placeholder onKeyDown={onKeyDown(setHistoryIndex, onKey)} ref={ReactDOM.Ref.domRef(bar)} id="siteNavigator" className={Option.value(~default="", navigatorStyle)} />
 		{errorBox}
 	</form>

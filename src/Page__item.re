@@ -863,11 +863,19 @@ module App =
 			});
 			y
 		}), (setTab, url));
+		let memo_transition = React.useCallback1((url, url_args, k) => {
+			if (url === "/item/") {
+				let view = List.assoc_opt("view", url_args) |> Option.map(View.of_string) |> Option.value(~default=View.Article);
+				setCurrentTab(_ => view)
+			} else {
+				k ()
+			}
+		}, [|setCurrentTab|]);
 		show(art) @@ (((_, postTitle, _, _) as postInfo, headings, article_body)) =>
 		<>
 			<title>{React.string(postTitle++" | bkhack")}</title>
 			<header>
-				<Component__header />
+				<Component__header memo_transition />
 			</header>	
 			<nav className=sidebarState>
 				<ItemNav post_id={Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id"))} currentTab=tab setCurrentTab prCount=Array.length(pullrequests)/>

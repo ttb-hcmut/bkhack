@@ -11,10 +11,12 @@ let eval = current_url => {
 			url := "/item/";
 			let id = Util.parseQueryParams(current_url.ReasonReactRouter.search)->Js.Dict.get("id")->Option.get;
 			url_args := Util.List.replace_assoc'("id", id, url_args^);
+			url_args := url_args^ |> Util.List.replace_assoc'("id", id) |> Util.List.replace_assoc'("view", "article");
 			aux(next) }
 		| Cons_cmd(`unfetched(["cat", id]), next) => {
 			url := "/item/";
 			url_args := Util.List.replace_assoc'("id", id, url_args^);
+			url_args := url_args^ |> Util.List.replace_assoc'("id", id) |> Util.List.replace_assoc'("view", "article");
 			aux(next) }
 		| Cons_cmd(`unfetched(["discuss", ("$id" | "$ID")]), next) => {
 			url := "/item/";
