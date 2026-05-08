@@ -818,9 +818,9 @@ module App =
 			return @@ ignore @@ setPrs(_ => dict);
 		}));
 		React.useEffect0(React__effect.async @@ () => Fetch__syntax.({
-			let post_id = Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id"));
+			let post_id = Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id")) -> int_of_string;
 			let* posts = X.Fetch.all(module At_repo_2(
-				{ include X.GenSQL; let tgt_post_id = int_of_string(post_id) }))(module Env);
+				{ include X.GenSQL; let tgt_post_id = post_id }))(module Env);
 			let (_, post_title, creator_id, post_text) = posts[0];
 			let* users = X.Fetch.all(module At_repo_1(
 				{ include X.GenSQL; let tgt_user_id = creator_id }))(module Env);
@@ -863,14 +863,22 @@ module App =
 			});
 			y
 		}), (setTab, url));
-		let memo_transition = React.useCallback1((url, url_args, k) => {
-			if (url === "/item/") {
-				let view = List.assoc_opt("view", url_args) |> Option.map(View.of_string) |> Option.value(~default=View.Article);
-				setCurrentTab(_ => view)
-			} else {
-				k ()
-			}
-		}, [|setCurrentTab|]);
+		let memo_transition = React.useCallback2((url, url_args, k) => {
+			(Option.bind(postInfo) @@ ((current_id, _, _, _)) => {
+				if (url === "/item/" && (
+					List.assoc("id", url_args) |> int_of_string |> (x => x == current_id)
+				)) {
+					Some(() => {
+						let view = List.assoc_opt("view", url_args) |> Option.map(View.of_string) |> Option.value(~default=View.Article);
+						setCurrentTab(_ => view)
+					})
+				} else {
+					None
+				}
+			}) |> fun
+				| None => k ()
+				| Some(f) => f ()
+		}, (setCurrentTab, postInfo));
 		show(art) @@ (((_, postTitle, _, _) as postInfo, headings, article_body)) =>
 		<>
 			<title>{React.string(postTitle++" | bkhack")}</title>
