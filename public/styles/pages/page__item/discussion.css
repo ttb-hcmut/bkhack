@@ -92,6 +92,11 @@
 #root > main.discussions > header > .action {
 	background-color: var(--ctp-crust);
 	border: solid 1px var(--ctp-surface0);
+  width: max-content;
+  color: var(--ctp-subtext0);
+}
+#root > main.discussions > header > .action:hover {
+  color: var(--ctp-text);
 }
 
 #root[data-tileset="gui"] > main.discussions > header > .logo {
@@ -225,12 +230,12 @@
 .comments > .content > .add-reply {
   grid-column: 3/4;
   grid-row: 3/4;
-  color: var(--ctp-text);
   width: max-content;
   color: var(--ctp-subtext0);
 }
 .comments > .content > button:hover {
-  color: var(--text-base);
+  box-sizing: border-box;
+  color: var(--ctp-text);
 }
 .comments > .content:has( + .spacer:hover){
   border: 1px solid var(--ctp-surface2);

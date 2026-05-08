@@ -181,9 +181,12 @@ html {
 		overflow: hidden;
 	}
 	#root:has(.state1) > *:not(aside):not(.show-hide-sidebar){
-		/* filter: brightness(50%); */
+    filter: brightness(50%);
 		pointer-events: none;     /* block clicks */
 		user-select: none;
+	}
+	#root:has(.state1){
+		background-color: color-mix(in srgb, var(--global-bg), black 50%);
 	}
 	/* TODO: figure out how to make the track of the scrollbar
 			 invisible but the thumb visible */

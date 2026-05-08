@@ -80,7 +80,7 @@ open Cmdliner
 open Term.Syntax
 
 let main__ () =
-  Cmd.make (Cmd.info "bkhack.serve" ~doc:"") @@
+  Cmd.v (Cmd.info "bkhack.serve" ~doc:"") @@
   let+ watch = Arg.(required & opt (some bool) None &
     info ["watch"; "w"] ~docv:" Will the JavaScript compiler watch for file changes to hot-reload? ")
   and+ dist_dir = Arg.(required & opt (some string) None &

@@ -18,6 +18,7 @@ defmodule BKHack.Mix do
       {:plug, "~> 1.7"},
       {:plug_cowboy, "~> 2.0"},
       {:json, "~> 1.4"},
+      {:utc_datetime, "~> 1.0"},
     ]
   end
 end

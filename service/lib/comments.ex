@@ -20,13 +20,15 @@ end
 
 defmodule Comment
   do use Ecto.Schema
+  @timestamps_opts [type: UTCDateTime]
   @primary_key {:comment_id,:id,autogenerate: true}
   schema "comments" do
     field :parent_post_id    ,:integer
     field :parent_comment_id ,:integer
     field :content           ,:string
     field :commenter_id      ,:integer
-    field :date_created_utc  ,:string
+    timestamps(inserted_at: :date_created_utc, updated_at: false, type: :utc_datetime)
+    # field :date_created_utc  ,:string
     field :post_version      ,:integer
     belongs_to  :the_parent_post    ,Post     ,foreign_key: :parent_post_id    ,references: :post_id     ,define_field: false
     belongs_to  :the_parent_comment ,Comment  ,foreign_key: :parent_comment_id ,references: :comment_id  ,define_field: false
@@ -142,6 +144,19 @@ defmodule DiscussionBE do
       Data0.insert!(%CommentRating{voter_id: voter_id, comment_id: comment_id, rating: action})
     end
 
+  end
+
+  def postComment(parent_id,parent_type,content,commenter_id,post_version) do
+    import Ecto.Query
+    case parent_type do
+      0 -> Data0.insert!(%Comment{
+        parent_post_id:     parent_id, parent_comment_id:  nil, content:            content, commenter_id:       commenter_id, post_version:       post_version
+      })
+      1 -> Data0.insert!(%Comment{
+        parent_post_id:     nil, parent_comment_id:  parent_id, content:            content, commenter_id:       commenter_id, post_version:       post_version
+      })
+      _ -> nil
+    end
   end
 
   def getCommentAll do
