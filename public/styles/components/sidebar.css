@@ -18,6 +18,10 @@
 	top:3rem;
 	right:1rem;
 	padding: var(--space-a);
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: start;
 	background-color: var(--card-bg);
 	border: solid 1px var(--card-border);
 	border-radius: var(--radius);
@@ -39,6 +43,7 @@
 	/* margin-top: var(--space-a); */
 	left: 50%;
 	transform: translate(-50%, 0%);
+  z-index: 90;
 }
 
 #root > aside h2 {

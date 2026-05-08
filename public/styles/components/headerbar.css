@@ -93,8 +93,25 @@
 	content: "đăng nhập";
 }
 
+#siteNavigator {
+  font-size: var(--text-base);
+  font-family: var(--font-mono);
+  outline: none;
+	background-color: var(--ctp-crust);
+  border-radius: var(--radius);
+  border: 1px solid var(--ctp-surface0);
+  color: var(--ctp-text);
+  padding: var(--space-c) var(--space-a);
+}
+#siteNavigator::before{
+  content: "$";
+}
+#siteNavigator:focus {
+  border: 1px solid var(--ctp-surface1);
+}
 #siteNavigator.error {
-	background-color: red;
+  color: var(--ctp-red);
+  border: 1px solid var(--ctp-red);
 }
 
 dialog {

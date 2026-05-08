@@ -89,20 +89,34 @@ defmodule App
     body = conn.body_params
     IO.inspect conn.body_params
     id      = body["id"]
-    user_id = body["user_id"]
     type    = body["type"]
-    content  = body["content"]
+    content = body["content"]
+    user_id = body["user_id"]
+    version = body["post_version"]
 
-    data = "User "<>Integer.to_string(user_id)<>" commented \""<>content<>"\" on "<>type<>" "<>Integer.to_string(id)
+    data = "User "<>Integer.to_string(user_id)<>" commented \""<>content<>"\" on "<>Integer.to_string(type)<>" "<>Integer.to_string(id)
     IO.puts(data);
-    {:ok, sh} = JSON.encode(data)
-    conn
-    # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
-    |> put_resp_header("Access-Control-Allow-Origin", "*")
-    |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
-    |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
-    |> put_resp_content_type("application/json")
-    |> send_resp(201, sh)
+    comment = DiscussionBE.postComment(id, type, content, user_id, version)
+    case comment do
+      nil ->
+        {:ok, sh} = JSON.encode([])
+        conn
+        # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+        |> put_resp_header("Access-Control-Allow-Origin", "*")
+        |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+        |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+        |> put_resp_content_type("application/json")
+        |> send_resp(500, sh)
+      _ ->
+        {:ok, sh} = JSON.encode(comment.comment_id)
+        conn
+        # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+        |> put_resp_header("Access-Control-Allow-Origin", "*")
+        |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+        |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+        |> put_resp_content_type("application/json")
+        |> send_resp(201, sh)
+    end
   end
 
   options "/api/setvote" do

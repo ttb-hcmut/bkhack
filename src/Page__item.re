@@ -127,361 +127,359 @@ module ArticleBody = {
 		</>
 	}
 }
-
-module DiscussionHint = {
-	[@react.component]
-	let make = () => {
-		<>
-			<div className="logo" />
-			<h1>{React.string("discussions")}</h1>
-			<div className="sub">
-				<span className="command">{React.string("discuss $id")}</span>
-				<span className="summary">
-					<data className="n-comments">{React.int(13)}</data>
-					<data className="karma">{React.int(364)}</data>
-				</span>
-			</div>
-			<button className="action">{React.string("new comment")}</button>
-		</>
-	}
-}
-
-module DiscussionFilter = {
-	[@react.component]
-	let make = () => {
-    <input />
-	}
-}
-
-
-module DiscussionBody = {
-  let decodeJson = (json) => {
-    let open Fetch__syntax;
-    json
-    >>= (undecoded => {
-    Js.log(json)
-    let arrayOfDict = undecoded 
-      |> Js.Json.decodeArray
-      |> Option.value(~default=[||])
-      |> Array.map(x => {
-        let newDictNoJson = Js.Dict.empty();
-        x
-        |> Js.Json.decodeObject
-        |> Option.value(~default=Js.Dict.empty())
-        |> Js.Dict.entries
-        |> Array.iter(((key, value)) =>
-          switch (Js.Json.decodeString(value)) {
-          | Some(s) => Js.Dict.set(newDictNoJson, key, s)
-          | None => ()
-          }
-        );
-        newDictNoJson
-      })
-      return(arrayOfDict)
-    })
-  };
-  module AddComment = {
+module DiscussionView = {
+  module DiscussionHint = {
     [@react.component]
-    let make = (~id, ~parentType, ~setShow) => {
-      let (isBusy, setIsBusy) = React.useState(()=> false)
-      let (content, setContent) = React.useState(()=> "")
-      let sendComment = () => {
-        setIsBusy(_ => true);
-        let body = Json__syntax.( empty()
-        |> "user_id"  ^^ int    @@ 0
-        |> "id"       ^^ int    @@ id
-        |> "type"     ^^ string @@ parentType
-        |> "content"  ^^ string @@ content
-        |> finish );
-        open Fetch__syntax;
-        Fetch.fetchWithInit(
-          Env.backend ++"/api/postcomment",
-          Fetch.RequestInit.make(
-            ~method_=Post,
-            ~body=Fetch.BodyInit.make(Js.Json.stringify(
-              body
-            )),
-            ~headers=Fetch.HeadersInit.make({
-              "Content-Type": "application/json"
-            }),
-            ()
-          )
-        )
-        >>= Fetch.Response.json
-        >>= (j => {
-          setIsBusy(_ => false);
-          setShow(_ => false);
-          Js.Promise.resolve(j)
-        })
-        >!= (err => {
-          Js.log(err);
-          setIsBusy(_ => false);
-          Js.Promise.resolve(Js.Json.null)
-        })
-        |> ignore
-      };
-      <div className="comments add-reply">
-        <div className="content">
-          <header>
-            // TODO: [khang] identity provider sth sth somehow
-            <div className="author_name">{React.string("@AuthorName")}</div>
-          </header>
-          <form onSubmit={ e => {
-            React.Event.Form.preventDefault(e);
-            sendComment()
-          }}>
-            <textarea autoFocus=true id="comment-body" className="text" 
-            onChange={ e => setContent( _=> React.Event.Form.target(e)##value)}
-            onKeyDown= { e => {
-              if(React.Event.Keyboard.ctrlKey(e) && React.Event.Keyboard.key(e) === "Enter") sendComment()
-            }}
-            disabled=isBusy
-            value=content/>
-            <div className="text ghost">{React.string(content++"\n")}</div>
-            <button type_="submit" className="submit" 
-            disabled=isBusy>
-              {React.string(isBusy?"Sending":"Send")}
-            </button>
-          </form>
-        </div>
-      </div>
-    }
-  }
-  module LoadingComments = {
-    [@react.component]
-    let make = (~id,~show) => {
-      !show ? 
-      React.null
-      :
-      <li key={"loadingcomment"++string_of_int(id)} className="comments loading" hidden={!show}>
-        <div className="content">
-          <header>
-            <div className="author_name">{React.string("loading")}</div>
-            <div className={"author_role"}>{React.string("loading")}</div>
-            <div className="author_rep" >{React.string("loading")}</div>
-            <div className="timestamp"  >{React.string("loading")}</div>
-            <div className="post_vers"  >{React.string("loading")}</div>
-          </header>
-          <div className="text"       >{React.string("loading loading loading loading")}</div>
-          <div className="rating"     >
-            <button className="up" disabled=true>
-              {React.string(">")}
-            </button>
-            <span>{React.string("loading")}</span>
-            <button className="down" disabled=true>
-              {React.string("<")}
-            </button>
-          </div>
-          <button className="show-replies" disabled=true>
-            {React.string("Show replies")}
-          </button>
-        </div>
-      </li>
-    }
-  }
-  let cRef : ref(option((
-      ~id : int,
-      ~pType : string,
-      ~showRep : bool,
-      ~nestDepth : int
-      ) => React.element)) = ref(None);
-  module Comments = {
-    [@react.component]
-    let make = (
-      ~id           : int,
-      ~text         : string,
-      ~rating       : int,
-      ~user_rating  : int,
-      ~timestamp    : string,
-      ~post_vers    : int,
-      ~author_name  : string,
-      ~author_id    : int,
-      ~author_role  : int,
-      // ~author_rep   : int,
-      ~nestDepth: int
-    ) => {
-      let autoExpand = 1;
-      // kinda have to keep track of if the user has upvoted or downvoted this comment yikes
-      // you know what that means~ more column in the fetching
-      let (userRating,setUserRating) = React.useState(() => user_rating); // "-1" = down, "0" = neutral, "1" = up
-      let (showRep, setShowRep) = React.useState(() => false);
-      let (addRep, setAddRep) = React.useState(() => false);
-      let pType="comment";
-      let setVote = React.useCallback1([@warning "-8"] ((-1|0|1) as action) => {
-				open Fetch__syntax;
-				open Json__syntax;
-				let body = empty()
-				|> "user_id"  ^^ int    @@ 0
-				|> "id"       ^^ int    @@ id
-				|> "type"     ^^ string @@ "comment"
-				|> "action"   ^^ int    @@
-					( userRating == action
-					? { setUserRating(_ => 0); 0 }
-					: { setUserRating(_ => action); action })
-				|> finish;
-				Fetch.fetchWithInit(
-					Env.backend ++"/api/setvote",
-					Fetch.RequestInit.make(
-						~method_=Post,
-						~body=Fetch.BodyInit.make(Js.Json.stringify(
-							body
-						)),
-						~headers=Fetch.HeadersInit.make({
-							"Content-Type": "application/json"
-						}),
-						()
-					)
-				)
-				>>= Fetch.Response.json
-				>!= (err => {
-						Js.log(err);
-						Js.Promise.resolve(Js.Json.null)
-					})
-				|> ignore;
-      }, [|userRating|]);
-      React.useEffect0(()=>{
-        if (nestDepth < autoExpand){
-          setShowRep(_=>true);
-        }
-        None
-      });
-      <li key={"comment"++string_of_int(id)} className="comments">
-        <div className="content">
-          <header>
-            <div className="author_name">{React.string(author_name)}</div>
-            <div className="author_id" hidden=true >{React.int(author_id  )}</div>
-            <div className={"author_role "++ (author_role==0?"student":"prof")}>{React.string(author_role==0?"student":"prof")}</div>
-            // <div className="author_rep" >{React.string("rep: " ++ string_of_int(author_rep) )}</div>
-            <div className="timestamp"  >{React.string(timestamp)}</div>
-            <div className="post_vers"  >{React.string("v: " ++ string_of_int(post_vers))}</div>
-          </header>
-          <div className="text"       >{React.string(text       )}</div>
-          <div className="rating"     >
-            <button className="up"
-            onClick={_ => setVote(1)}>
-              {React.string(">")}
-            </button>
-            <span className={"v"++string_of_int(userRating)}>{{React.int(rating - user_rating + userRating)}}</span>
-            <button className="down"
-            onClick={_ => setVote(-1)}>
-              {React.string("<")}
-            </button>
-          </div>
-          <button className="show-replies"
-          onClick={ _ => setShowRep(a => !a) }>
-            {React.string((showRep?"Hide":"Show") ++ " replies")}
-          </button>
-          <button className="add-reply"
-          onClick={ _ => setAddRep(a => !a)}>
-            {React.string(addRep?"Cancel":"Add Reply")}
-          </button>
-        </div>
-        <span className="spacer" hidden={!showRep && !addRep}/>
-        
-        {!addRep ? 
-        React.null
-        :
-        <AddComment id parentType=pType setShow=setAddRep/>}
-        {switch (cRef.contents) {
-        | None => React.null
-        | Some(comp) => comp(~id, ~pType, ~showRep, ~nestDepth=nestDepth+1)
-        }}
-      </li>
-    }
-  };
-
-  module CommentGroup = {
-    [@react.component]
-    let make = (
-      ~id : int,
-      ~pType : string,
-      ~showRep : bool,
-      ~nestDepth : int
-    ) => {
-      let (comments,setComments) = React.useState(() => [||]);
-      let (showMore, setShowMore) = React.useState(() => true);
-      let (loading, setLoading) = React.useState(() => false);
-      let limit = 3;
-      // opening concept: Js.Promise.()
-      let fetchComments = () => {
-        let open Fetch__syntax;
-        setLoading(_=>true);
-        let fetchType = pType == "post" ? "1" : "2";
-        Fetch.fetch(Env.backend ++ "/api/comment"
-          ++ "?limit="  ++ string_of_int(limit)
-          ++ "&offset=" ++ string_of_int(Array.length(comments))
-          ++ "&user="   ++ "0"
-          ++ "&parent=" ++ string_of_int(id)
-          ++ "&type="   ++ fetchType)
-        >>= Fetch.Response.json
-        >>= Model.Decode.Response.fetchedComments
-        >>= (aod => {
-          setComments( x => Array.append(x,aod));
-          setShowMore( _ => Array.length(aod) < limit ? false : true);
-          setLoading(_=>false);
-          Js.Promise.resolve(aod)
-        })
-        >!= (err => {
-            Js.log(err);
-            setShowMore( _ => false);
-            setLoading(_=>false);
-            return([||])
-          })
-        |> ignore;
-      };
-      let revealReplies = () => {
-        if (Array.length(comments) == 0 && showMore){
-          fetchComments();
-        };
-      };
-      React.useEffect1(()=>{
-        if(showRep) revealReplies();
-        None
-      },[|showRep|]);
+    let make = (~addRep, ~setAddRep) => {
       <>
-      <ol className="replies" hidden={!showRep}>
-        {
-          comments
-          |> Array.map(x => {
-            open Model.FetchedComment;
-            <Comments
-              key         = {string_of_int(x.id)}
-              id          = {x.id          }
-              text        = {x.text        }
-              rating      = {x.rating      }
-              user_rating = {x.user_rating }
-              timestamp   = {x.timestamp   }
-              post_vers   = {x.post_vers   }
-              author_name = {x.author_name }
-              author_id   = {x.author_id   }
-              author_role = {x.author_role }
-              // author_rep  = {x.author_rep  }
-              nestDepth
-            /> 
-            })
-          |> React.array
-        }
-        <LoadingComments id show={showRep && loading} />
-      </ol>
-      <button className="more-replies"
-      onClick={ _ => fetchComments() }
-      hidden={!showRep || !showMore || loading}>
-        {React.string("More replies")}
-      </button>
+        <div className="logo" />
+        <h1>{React.string("discussions")}</h1>
+        <div className="sub">
+          <span className="command">{React.string("discuss $id")}</span>
+          <span className="summary">
+            <data className="n-comments">{React.int(13)}</data>
+            <data className="karma">{React.int(364)}</data>
+          </span>
+        </div>
+        <button className="action"
+            onClick={ _ => setAddRep(a => !a)}>
+              {React.string(addRep?"Cancel":"New Comment")}
+          </button>
       </>
     }
   };
-  let () = cRef := Some((
-    ~id, 
-    ~pType, 
-    ~showRep, 
-    ~nestDepth
-  ) => 
-    <CommentGroup id pType showRep nestDepth />);
-	[@react.component]
-	let make = (~id) => {
-    <CommentGroup id pType="post" showRep=true nestDepth=0 />
-	}
+  module DiscussionFilter = {
+    [@react.component]
+    let make = () => {
+      <input />
+    }
+  };
+  module DiscussionBody = {
+    module AddComment = {
+      [@react.component]
+      let make = (~id, ~parentType, ~setShow) => {
+        let (isBusy, setIsBusy) = React.useState(()=> false)
+        let (content, setContent) = React.useState(()=> "")
+        let sendComment = () => {
+          setIsBusy(_ => true);
+          let body = Json__syntax.( empty()
+          |> "user_id"        ^^ int    @@ 0
+          |> "id"             ^^ int    @@ id
+          |> "type"           ^^ int    @@ (parentType == "post"? 0 : 1)
+          |> "content"        ^^ string @@ content
+          |> "post_version"   ^^ int    @@ 0
+          |> finish );
+          open Fetch__syntax;
+          Fetch.fetchWithInit(
+            Env.backend ++"/api/postcomment",
+            Fetch.RequestInit.make(
+              ~method_=Post,
+              ~body=Fetch.BodyInit.make(Js.Json.stringify(
+                body
+              )),
+              ~headers=Fetch.HeadersInit.make({
+                "Content-Type": "application/json"
+              }),
+              ()
+            )
+          )
+          >>= Fetch.Response.json
+          >>= (j => {
+            setIsBusy(_ => false);
+            setShow(_ => false);
+            Js.Promise.resolve(j)
+          })
+          >!= (err => {
+            Js.log(err);
+            setIsBusy(_ => false);
+            Js.Promise.resolve(Js.Json.null)
+          })
+          |> ignore
+        };
+        <div className="comments add-reply">
+          <div className="content">
+            <header>
+              // TODO: [khang] identity provider sth sth somehow
+              <div className="author_name">{React.string("@AuthorName")}</div>
+            </header>
+            <form onSubmit={ e => {
+              React.Event.Form.preventDefault(e);
+              sendComment()
+            }}>
+              <textarea autoFocus=true id="comment-body" className="text" 
+              onChange={ e => setContent( _=> React.Event.Form.target(e)##value)}
+              onKeyDown= { e => {
+                if(React.Event.Keyboard.ctrlKey(e) && React.Event.Keyboard.key(e) === "Enter") sendComment()
+              }}
+              disabled=isBusy
+              value=content/>
+              <div className="text ghost">{React.string(content++"\n")}</div>
+              <button type_="submit" className="submit" 
+              disabled=isBusy>
+                {React.string(isBusy?"Sending":"Send")}
+              </button>
+            </form>
+          </div>
+        </div>
+      }
+    }
+    module LoadingComments = {
+      [@react.component]
+      let make = (~id,~show) => {
+        !show ? 
+        React.null
+        :
+        <li key={"loadingcomment"++string_of_int(id)} className="comments loading" hidden={!show}>
+          <div className="content">
+            <header>
+              <div className="author_name">{React.string("loading")}</div>
+              <div className={"author_role"}>{React.string("loading")}</div>
+              <div className="author_rep" >{React.string("loading")}</div>
+              <div className="timestamp"  >{React.string("loading")}</div>
+              <div className="post_vers"  >{React.string("loading")}</div>
+            </header>
+            <div className="text"       >{React.string("loading loading loading loading")}</div>
+            <div className="rating"     >
+              <button className="up" disabled=true>
+                {React.string(">")}
+              </button>
+              <span>{React.string("loading")}</span>
+              <button className="down" disabled=true>
+                {React.string("<")}
+              </button>
+            </div>
+            <button className="show-replies" disabled=true>
+              {React.string("Show replies")}
+            </button>
+          </div>
+        </li>
+      }
+    }
+    let cRef : ref(option((
+        ~id : int,
+        ~pType : string,
+        ~showRep : bool,
+        ~nestDepth : int
+        ) => React.element)) = ref(None);
+    module Comments = {
+      [@react.component]
+      let make = (
+        ~id           : int,
+        ~text         : string,
+        ~rating       : int,
+        ~user_rating  : int,
+        ~timestamp    : string,
+        ~post_vers    : int,
+        ~author_name  : string,
+        ~author_id    : int,
+        ~author_role  : int,
+        // ~author_rep   : int,
+        ~nestDepth: int
+      ) => {
+        let autoExpand = 1;
+        // kinda have to keep track of if the user has upvoted or downvoted this comment yikes
+        // you know what that means~ more column in the fetching
+        let (userRating,setUserRating) = React.useState(() => user_rating); // "-1" = down, "0" = neutral, "1" = up
+        let (showRep, setShowRep) = React.useState(() => false);
+        let (addRep, setAddRep) = React.useState(() => false);
+        let pType="comment";
+        let setVote = React.useCallback1([@warning "-8"] ((-1|0|1) as action) => {
+          open Fetch__syntax;
+          open Json__syntax;
+          let body = empty()
+          |> "user_id"  ^^ int    @@ 0
+          |> "id"       ^^ int    @@ id
+          |> "type"     ^^ string @@ "comment"
+          |> "action"   ^^ int    @@
+            ( userRating == action
+            ? { setUserRating(_ => 0); 0 }
+            : { setUserRating(_ => action); action })
+          |> finish;
+          Fetch.fetchWithInit(
+            Env.backend ++"/api/setvote",
+            Fetch.RequestInit.make(
+              ~method_=Post,
+              ~body=Fetch.BodyInit.make(Js.Json.stringify(
+                body
+              )),
+              ~headers=Fetch.HeadersInit.make({
+                "Content-Type": "application/json"
+              }),
+              ()
+            )
+          )
+          >>= Fetch.Response.json
+          >!= (err => {
+              Js.log(err);
+              Js.Promise.resolve(Js.Json.null)
+            })
+          |> ignore;
+        }, [|userRating|]);
+        React.useEffect0(()=>{
+          if (nestDepth < autoExpand){
+            setShowRep(_=>true);
+          }
+          None
+        });
+        <li key={"comment"++string_of_int(id)} className="comments">
+          <div className="content">
+            <header>
+              <div className="author_name">{React.string(author_name)}</div>
+              <div className="author_id" hidden=true >{React.int(author_id  )}</div>
+              <div className={"author_role "++ (author_role==0?"student":"prof")}>{React.string(author_role==0?"student":"prof")}</div>
+              // <div className="author_rep" >{React.string("rep: " ++ string_of_int(author_rep) )}</div>
+              <div className="timestamp"  >{React.string(timestamp)}</div>
+              <div className="post_vers"  >{React.string("v: " ++ string_of_int(post_vers))}</div>
+            </header>
+            <div className="text"       >{React.string(text       )}</div>
+            <div className="rating"     >
+              <button className="up"
+              onClick={_ => setVote(1)}>
+                {React.string(">")}
+              </button>
+              <span className={"v"++string_of_int(userRating)}>{{React.int(rating - user_rating + userRating)}}</span>
+              <button className="down"
+              onClick={_ => setVote(-1)}>
+                {React.string("<")}
+              </button>
+            </div>
+            <button className="show-replies"
+            onClick={ _ => setShowRep(a => !a) }>
+              {React.string((showRep?"Hide":"Show") ++ " replies")}
+            </button>
+            <button className="add-reply"
+            onClick={ _ => setAddRep(a => !a)}>
+              {React.string(addRep?"Cancel":"Add Reply")}
+            </button>
+          </div>
+          <span className="spacer" hidden={!showRep && !addRep}/>
+          
+          {!addRep ? 
+          React.null
+          :
+          <AddComment id parentType=pType setShow=setAddRep/>}
+          {switch (cRef.contents) {
+          | None => React.null
+          | Some(comp) => comp(~id, ~pType, ~showRep, ~nestDepth=nestDepth+1)
+          }}
+        </li>
+      }
+    };
+
+    module CommentGroup = {
+      [@react.component]
+      let make = (
+        ~id : int,
+        ~pType : string,
+        ~showRep : bool,
+        ~nestDepth : int
+      ) => {
+        let (comments,setComments) = React.useState(() => [||]);
+        let (showMore, setShowMore) = React.useState(() => true);
+        let (loading, setLoading) = React.useState(() => false);
+        let limit = 3;
+        // opening concept: Js.Promise.()
+        let fetchComments = () => {
+          let open Fetch__syntax;
+          setLoading(_=>true);
+          let fetchType = pType == "post" ? "1" : "2";
+          Fetch.fetch(Env.backend ++ "/api/comment"
+            ++ "?limit="  ++ string_of_int(limit)
+            ++ "&offset=" ++ string_of_int(Array.length(comments))
+            ++ "&user="   ++ "0"
+            ++ "&parent=" ++ string_of_int(id)
+            ++ "&type="   ++ fetchType)
+          >>= Fetch.Response.json
+          >>= Model.Decode.Response.fetchedComments
+          >>= (aod => {
+            setComments( x => Array.append(x,aod));
+            setShowMore( _ => Array.length(aod) < limit ? false : true);
+            setLoading(_=>false);
+            Js.Promise.resolve(aod)
+          })
+          >!= (err => {
+              Js.log(err);
+              setShowMore( _ => false);
+              setLoading(_=>false);
+              return([||])
+            })
+          |> ignore;
+        };
+        let revealReplies = () => {
+          if (Array.length(comments) == 0 && showMore){
+            fetchComments();
+          };
+        };
+        React.useEffect1(()=>{
+          if(showRep) revealReplies();
+          None
+        },[|showRep|]);
+        <>
+        <ol className="replies" hidden={!showRep}>
+          {
+            comments
+            |> Array.map(x => {
+              open Model.FetchedComment;
+              <Comments
+                key         = {string_of_int(x.id)}
+                id          = {x.id          }
+                text        = {x.text        }
+                rating      = {x.rating      }
+                user_rating = {x.user_rating }
+                timestamp   = {x.timestamp   }
+                post_vers   = {x.post_vers   }
+                author_name = {x.author_name }
+                author_id   = {x.author_id   }
+                author_role = {x.author_role }
+                // author_rep  = {x.author_rep  }
+                nestDepth
+              /> 
+              })
+            |> React.array
+          }
+          <LoadingComments id show={showRep && loading} />
+        </ol>
+        <button className="more-replies"
+        onClick={ _ => fetchComments() }
+        hidden={!showRep || !showMore || loading}>
+          {React.string("More replies")}
+        </button>
+        </>
+      }
+    };
+    let () = cRef := Some((
+      ~id, 
+      ~pType, 
+      ~showRep, 
+      ~nestDepth
+    ) => 
+      <CommentGroup id pType showRep nestDepth />);
+    [@react.component]
+    let make = (~id, ~addRep, ~setAddRep) => {
+      <>
+      {!addRep ? 
+      React.null
+      :
+      <AddComment id parentType="post" setShow=setAddRep/>}
+      <CommentGroup id pType="post" showRep=true nestDepth=0 />
+      </>
+    }
+  };
+  [@react.component]
+  let make = (~post_id : int) => {
+    let (addRep, setAddRep) = React.useState(() => false);
+    <>
+      <header className={"only " ++ View.to_string(Discussion)}>
+        <DiscussionHint addRep setAddRep />
+        <nav>
+          <DiscussionFilter />
+        </nav>
+      </header>
+      <main className={"only " ++ View.to_string(Discussion)}>
+        <DiscussionBody id=post_id addRep setAddRep />
+      </main>
+    </>
+}
 }
 
 module PullrequestsHint = {
@@ -893,15 +891,7 @@ module App =
 					<header className=Printf.sprintf("only %s", View.to_string(Article))><ArticleHeader tags info=postInfo /></header>
 					<div className=Printf.sprintf("innerbody only %s", View.to_string(Article))><ArticleBody headings article_body /></div>
 				</>
-				<>
-					<header className=Printf.sprintf("only %s", View.to_string(Discussion))>
-						<DiscussionHint />
-						<nav>
-							<DiscussionFilter />
-						</nav>
-					</header>
-					<main className=Printf.sprintf("only %s", View.to_string(Discussion))><DiscussionBody id={int_of_string(Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id")))} /></main>
-				</>
+        <DiscussionView post_id= {int_of_string(Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id")))}/>
 				<>
 					<header className=Printf.sprintf("only %s", View.to_string(Pullrequest))>
 						<PullrequestsHint
