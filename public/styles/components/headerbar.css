@@ -101,7 +101,7 @@
   border-radius: var(--radius);
   border: 1px solid var(--ctp-surface0);
   color: var(--ctp-text);
-  padding: var(--space-c) var(--space-a);
+  padding: var(--space-f) var(--space-a);
 }
 #siteNavigator::before{
   content: "$";
