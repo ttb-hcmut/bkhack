@@ -171,7 +171,9 @@ IO.inspect createTablesList
 
 ## Scenarios
 
-### Yaron Minsky's fangirl
+<!-- livebook:{"branch_parent_index":2} -->
+
+## Yaron Minsky's fangirl
 
 ```elixir
 for drop <- dropTablesList do drop.() end
@@ -228,7 +230,9 @@ Sqlx.query!(
 )
 ```
 
-### Comments
+<!-- livebook:{"branch_parent_index":2} -->
+
+## Comments
 
 ```elixir
 for drop <- dropTablesList do drop.() end
