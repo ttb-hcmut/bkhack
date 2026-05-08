@@ -6,6 +6,7 @@ defmodule User1
     field :role, :integer
   end
 end
+
 defmodule Post
   do use Ecto.Schema
   @primary_key {:post_id,:id,autogenerate: true}
@@ -16,6 +17,7 @@ defmodule Post
     belongs_to  :the_creator ,User1 ,foreign_key: :creator_id ,references: :user_id ,define_field: false
   end
 end
+
 defmodule Comment
   do use Ecto.Schema
   @primary_key {:comment_id,:id,autogenerate: true}
@@ -31,6 +33,7 @@ defmodule Comment
     belongs_to  :the_commenter      ,User1    ,foreign_key: :commenter_id      ,references: :user_id     ,define_field: false
   end
 end
+
 defmodule CommentRating
   do use Ecto.Schema
   @primary_key {:comment_rating_id,:id,autogenerate: true}
@@ -42,7 +45,6 @@ defmodule CommentRating
     belongs_to  :the_comment,  Comment, foreign_key: :comment_id, references: :comment_id ,define_field: false
   end
 end
-
 
 defmodule DiscussionBE do
   def getCommentsCount(post_id\\0) do
@@ -66,6 +68,7 @@ defmodule DiscussionBE do
     {:ok,result} = Ecto.Adapters.SQL.query(Data0, query,[post_id])
     result.rows |> List.first() |> List.first()
   end
+
   def getPostComments(user_id\\0,post_id\\0,offset\\0,limit\\10) do
     query = """
       WITH commentsumratings as (
@@ -97,6 +100,7 @@ defmodule DiscussionBE do
     columns = Enum.map(result.columns, fn c -> String.to_atom(c) end)
     result.rows |> Enum.map(fn row -> Enum.zip(columns, row) end)
   end
+
   def getCommentReplies(user_id\\0,comment_id\\0,offset\\0,limit\\10) do
     query = """
       WITH commentsumratings as (
@@ -128,6 +132,7 @@ defmodule DiscussionBE do
     columns = Enum.map(result.columns, fn c -> String.to_atom(c) end)
     result.rows |> Enum.map(fn row -> Enum.zip(columns, row) end)
   end
+
   def setVote(voter_id,comment_id,action) do
     import Ecto.Query
     from(r in CommentRating, where: r.comment_id == ^comment_id and r.voter_id == ^voter_id )
@@ -138,10 +143,12 @@ defmodule DiscussionBE do
     end
 
   end
+
   def getCommentAll do
     import Ecto.Query
     query = from u in Comment, select: u
     xs = Data0.all(query)
     IO.inspect xs
   end
+
 end
