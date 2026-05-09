@@ -25,8 +25,12 @@ let onKeyDown = (setHistoryIndex, onKey, e) => {
 	let mk_char = s => try (String.get(s, 0)->Option.some) { | Invalid_argument(_) => None }
 	onKey();
 	switch ((key, mk_char(key))) {
-	| ("ArrowUp", _) => setHistoryIndex(it => it - 1)
-	| ("ArrowDown", _) => setHistoryIndex(it => it + 1)
+	| ("ArrowUp", _) => {
+		Event.Keyboard.preventDefault(e);
+		setHistoryIndex(it => it - 1) }
+	| ("ArrowDown", _) => {
+		Event.Keyboard.preventDefault(e);
+		setHistoryIndex(it => it + 1) }
 	| _ => ()
 	}
 };
