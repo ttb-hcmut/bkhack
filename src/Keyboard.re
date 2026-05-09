@@ -9,6 +9,12 @@ let onKeyDown = e => {
 		Event.Keyboard.preventDefault(e);
 		sitenav##focus ();
 	}
+	| "Escape" => {
+		let sitenav = ReactDOM.querySelector("#siteNavigator")->Option.get->ReactDOM.domElementToObj;
+		Event.Keyboard.stopPropagation(e);
+		Event.Keyboard.preventDefault(e);
+		sitenav##blur ();
+	}
 	| _ => ()
 	}
 };
