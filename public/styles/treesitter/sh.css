@@ -1,0 +1,25 @@
+/* 
+ * adapted from https://github.com/catppuccin/nvim/blob/main/lua/catppuccin/groups/treesitter.lua
+ */
+.highlight {
+	.function.sh,
+	.function.call.sh {
+		color: var(--ctp-blue);
+	}
+
+	.variable.parameter.sh {
+		color: var(--ctp-maroon);
+	}
+
+	.punctuation.bracket.sh {
+		color: var(--ctp-overlay2);
+	}
+
+	.punctuation.delimiter.sh {
+		color: var(--ctp-overlay2);
+	}
+
+	.operator.sh {
+		color: var(--ctp-sky);
+	}
+}

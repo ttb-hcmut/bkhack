@@ -37,6 +37,7 @@ let onKeyDown = (setHistoryIndex, onKey, e) => {
 
 [@react.component]
 let make = (~memo_transition=?) => {
+	let (content, setContent) = useState(() => "");
 	let bar = useRef(Js.Nullable.null);
 	let (historyIndex, setHistoryIndex) = useState(Rlwrap.index_init);
 	let setHistoryIndex = useCallback1(k => {
@@ -48,7 +49,7 @@ let make = (~memo_transition=?) => {
 		})
 	}, [|setHistoryIndex|])
 	let (navigatorStyle, setNavigatorStyle) = useState(() => None);
-	let setBarContent = (str: string) => {
+	let setBarContent = (bar, str: string) => {
 		let bar = bar.current->Js.Nullable.toOption->Option.get->ReactDOM.domElementToObj;
 		bar##value #= str
 	};
@@ -74,10 +75,18 @@ let make = (~memo_transition=?) => {
 			return()
 		})
 	);
+	let sync = k => {
+		let v = k();
+		let bar = bar.current->Js.Nullable.toOption->Option.get->ReactDOM.domElementToObj;
+		setContent(_ => bar##value);
+		v
+	};
 	useEffect1(() => {
-		Rlwrap.on_scroll(historyIndex) @@ u => {
-			setBarContent(Option.value(~default="", u)); None
-		}
+		Rlwrap.on_scroll(historyIndex) @@ u =>
+		sync @@ () =>
+		bar->setBarContent(
+			u->Option.value(~default=""));
+		None
 	}, [|historyIndex|]);
 	let errorBox = useMemo1(() => {
 		Option.is_some(navigatorStyle) ?
@@ -91,10 +100,14 @@ let make = (~memo_transition=?) => {
 		()
 	};
 	let url = ReasonReactRouter.useUrl();
+	let innerHTML = useMemo2(() =>
+		content === "" ? Option.value(~default="", placeholder)->string :
+		(try (content->Shell__parse__2.test_parse) { | _ => content->string }), (content, placeholder));
 	<>
 	<a className="logo" href="/" />
 	<form onSubmit={e => assert_ @@ _ => onSubmit(url, ~memo_transition?, e)}>
-		<input placeholder=?placeholder onKeyDown={onKeyDown(setHistoryIndex, onKey)} ref={ReactDOM.Ref.domRef(bar)} id="siteNavigator" className={Option.value(~default="", navigatorStyle)} />
+		<input onChange={_ => sync @@ () => ()} onKeyDown={onKeyDown(setHistoryIndex, onKey)} ref={ReactDOM.Ref.domRef(bar)} id="siteNavigator" className={Option.value(~default="", navigatorStyle)} />
+		<div className="displayonly highlight">{innerHTML}</div>
 		{errorBox}
 	</form>
 	<a className="place projects" href="/projects"></a>

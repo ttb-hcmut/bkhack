@@ -1,5 +1,6 @@
 @import "/styles/variables.css";
 @import "/styles/widget-variables.css";
+@import "/styles/treesitter/sh.css";
 
 #root > header {
 	background-color: var(--card-bg);
@@ -101,11 +102,10 @@
   border-radius: var(--radius);
   border: 1px solid var(--ctp-surface0);
   color: var(--ctp-text);
+  caret-color: var(--ctp-text);
   padding: var(--space-f) var(--space-a);
 }
-#siteNavigator::before{
-  content: "$";
-}
+
 #siteNavigator:focus {
   border: 1px solid var(--primary);
 }
@@ -134,3 +134,42 @@ dialog > div {
 	border: solid 1px #ddd;
 	border-radius: var(--radius);
 }
+
+#siteNavigator {
+	color: rgba(0,0,0,0);
+	grid-row: 1 / 2;
+	grid-column: 1 / 2;
+}
+
+#siteNavigator + .displayonly {
+	pointer-events: none;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow-x: hidden;
+	grid-row: 1 / 2;
+	grid-column: 1 / 2;
+}
+
+/* synchronize style with #siteNavigator */
+#siteNavigator + .displayonly {
+  font-size: var(--text-base);
+  font-family: var(--font-mono);
+  padding: var(--space-f) var(--space-a);
+  border: 1px solid rgba(0,0,0,0);
+}
+
+#siteNavigator:focus + .displayonly {
+}
+
+#siteNavigator.error + .displayonly {
+  color: var(--ctp-red);
+}
+
+form:has(> #siteNavigator) {
+	display: grid;
+}
+
+form:has(> #siteNavigator) > * {
+	max-width: 20rem;
+}
+
