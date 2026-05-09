@@ -107,7 +107,7 @@
   content: "$";
 }
 #siteNavigator:focus {
-  border: 1px solid var(--ctp-surface1);
+  border: 1px solid var(--primary);
 }
 #siteNavigator.error {
   color: var(--ctp-red);

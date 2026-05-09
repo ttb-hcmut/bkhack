@@ -27,7 +27,7 @@ let word = {
 	let* x = peek_char;
 	switch (x) {
 	| None => fail("zero length, not a word")
-	| Some(('a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' | '$') as x) => {
+	| Some(('a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' | '$' | '-') as x) => {
 		let* () = advance();
 		let* str = take_while @@ fun
 			| 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' | '_' => true | _ => false;

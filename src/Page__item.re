@@ -755,6 +755,8 @@ module At_repo_2(S : {
 	}
 }
 
+exception Item_not_found
+
 module App =
 {
 	let show = (x, f) => switch (x) { | Some(info) => f(info) | None => { <> </> } };
@@ -815,15 +817,17 @@ module App =
 			let* dict = Js.Promise.all @@ Array.map(join) @@ prs;
 			return @@ ignore @@ setPrs(_ => dict);
 		}));
-		React.useEffect0(React__effect.async @@ () => Fetch__syntax.({
+		React__effect.useAsync0(() => Fetch__syntax.({
 			let post_id = Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id")) -> int_of_string;
 			let* posts = X.Fetch.all(module At_repo_2(
 				{ include X.GenSQL; let tgt_post_id = post_id }))(module Env);
-			let (_, post_title, creator_id, post_text) = posts[0];
-			let* users = X.Fetch.all(module At_repo_1(
-				{ include X.GenSQL; let tgt_user_id = creator_id }))(module Env);
-			let (_, creator_name) = users[0];
-			return @@ ignore @@ setPostInfo(_ => Some((post_id, post_title, creator_name, post_text)))
+			if (posts->Array.length == 0) { raise(Item_not_found) } else {
+				let (_, post_title, creator_id, post_text) = posts[0];
+				let* users = X.Fetch.all(module At_repo_1(
+					{ include X.GenSQL; let tgt_user_id = creator_id }))(module Env);
+				let (_, creator_name) = users[0];
+				return @@ ignore @@ setPostInfo(_ => Some((post_id, post_title, creator_name, post_text)))
+			}
 		}));
 		let on_prs_update_expand = React.useMemo1(((), id) => {
 			switch (List.assoc(id, prsExpand)) {
@@ -870,6 +874,8 @@ module App =
 						let view = List.assoc_opt("view", url_args) |> Option.map(View.of_string) |> Option.value(~default=View.Article);
 						setCurrentTab(_ => view)
 					})
+				} else if (url === "") {
+					Some(() => setCurrentTab(Fun.id))
 				} else {
 					None
 				}
@@ -948,6 +954,21 @@ module App =
 	}
 };
 
+module Error_page(C : Decorator.Component) {
+	open React
+	open ReasonReactErrorBoundary
+
+	let fallback = fun
+	| Item_not_found =>
+		<dialog open_=true>"not_found"->string</dialog>
+	| _ =>
+		<div>"error"->string</div>
+	;
+
+	[@react.component] let make = () =>
+		<ReasonReactErrorBoundary fallback={({ error, _ }) => fallback(error)}> <C /> </ReasonReactErrorBoundary>
+}
+
 module ReactDOM0 = {
 	let querySelector = x =>
 		switch (ReactDOM.querySelector(x)) {
@@ -965,6 +986,7 @@ module App' =
 	val (module App)
 	->React.use(module Language.Make)
 	->React.use(module Keyboard.Make)
+	->React.use(module Error_page)
 )
 
 let () = {

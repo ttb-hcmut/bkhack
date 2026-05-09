@@ -28,8 +28,26 @@ let eval = current_url => {
 			url_args := url_args^ |> Util.List.replace_assoc'("id", id) |> Util.List.replace_assoc'("view", "discussions");
 			aux(next) }
 		| Cons_cmd(`unfetched(["pr", "list", id]), next) => {
+			let id = id == "$id" || id == "$ID" ? Util.parseQueryParams(current_url.ReasonReactRouter.search)->Js.Dict.get("id")->Option.get : id;
 			url := "/item/";
 			url_args := url_args^ |> Util.List.replace_assoc'("id", id) |> Util.List.replace_assoc'("view", "pullrequests");
+			aux(next) }
+		| Cons_cmd(`unfetched(["vi", ("$id" | "$ID")]), next) => {
+			url := "/item/";
+			let id = Util.parseQueryParams(current_url.ReasonReactRouter.search)->Js.Dict.get("id")->Option.get;
+			url_args := url_args^ |> Util.List.replace_assoc'("id", id) |> Util.List.replace_assoc'("view", "edit");
+			aux(next)	}
+		| Cons_cmd(`unfetched(["vi", id]), next) => {
+			url := "/item/";
+			url_args := url_args^ |> Util.List.replace_assoc'("id", id) |> Util.List.replace_assoc'("view", "edit");
+			aux(next)	}
+		| Cons_cmd(`unfetched(["set", "--language", lang_id]), next) => {
+			Dom.Storage.setItem("bkhack.language", lang_id, Dom.Storage.localStorage);
+			let language = Dom.Storage.getItem("bkhack.language", Dom.Storage.localStorage);
+			language |> Option.iter(language => {
+				let root = ReactDOM.querySelector("#root")->Option.get->ReactDOM.domElementToObj;
+				root##"lang" #= language
+			});
 			aux(next) }
 		| Cons_cmd(`unfetched(_), _) => failwith("unknown command")
 		| Cons_subprogram(a, b) => { aux(a); aux(b) }
