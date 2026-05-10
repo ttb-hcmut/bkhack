@@ -8,7 +8,7 @@ Mix.install([
 ])
 ```
 
-## Setup mux
+## Section
 
 ```elixir
 opts = [database: "bkhack/service/db"]
@@ -97,6 +97,8 @@ createTablesList = [
     create table if not exists users (
       user_id integer primary key,
       name varchar(255) not null,
+      password varchar(255) not null,
+      email varchar(255) not null,
       role integer not null
     )
     """,
@@ -175,6 +177,34 @@ IO.inspect createTablesList
 
 <!-- livebook:{"branch_parent_index":2} -->
 
+## Auth
+
+```elixir
+for drop <- dropTablesList do drop.() end
+for create <- createTablesList do create.() end
+RunSql.query(conn,[
+  ~S"delete from comments",
+  ~S"delete from posts",
+  ~S"delete from users",
+  ~S"delete from commentratings",
+])
+RunSql.query(conn,[
+  ~S"insert into users values (0, 'khangalang', 'ballsballs', 'khangalang@bkhack.org', 0)",
+  ~S"insert into users values (1, 'baowo', 'ballsballs', 'baowo@bkhack.org', 0)",
+  ~S"insert into users values (2, 'tungtungtungsahur', 'ballsballs', '3ts@bkhack.org', 0)",
+])
+RunSql.query(conn,[
+    ~S"""
+    insert into posts values (0, 'Seven Implementations of Incremental', 0, 'Video from Jane Street Tech Talk\n\nIncremental là một thư viện FRP (functional reactive programming) dùng để viết hàm tính toán tích hợp đạo hàm ‌và giải tích tự động. Anh em nào đam mê Giải tích 1 2, và thích code React, và thích đại số trừu tượng, thì có thể tham khảo.\n\n# FRP là gì?\n\nTBA')
+    """,
+])
+RunSql.query(conn,[
+  ~S"select * from users",
+])
+```
+
+<!-- livebook:{"branch_parent_index":2} -->
+
 ## Yaron Minsky's fangirl
 
 ```elixir
@@ -246,11 +276,11 @@ RunSql.query(conn,[
   ~S"delete from commentratings",
 ])
 RunSql.query(conn,[
-  ~S"insert into users values (0, 'rhebed rhamma', 0)",
-  ~S"insert into users values (1, 'bukhen bame', 0)",
-  ~S"insert into users values (2, 'tandulm Emberspark', 0)",
-  ~S"insert into users values (3, 'bao Doomforge', 0)",
-  ~S"insert into users values (4, 'nogan kez', 1)",
+  ~S"insert into users values (0, 'rhebed rhamma', 'ballsballs', 'email0@email.email', 0)",
+  ~S"insert into users values (1, 'bukhen bame', 'ballsballs', 'email1@email.email', 0)",
+  ~S"insert into users values (2, 'tandulm Emberspark', 'ballsballs', 'email2@email.email', 0)",
+  ~S"insert into users values (3, 'bao Doomforge', 'ballsballs', 'email3@email.email', 0)",
+  ~S"insert into users values (4, 'nogan kez', 'ballsballs', 'email4@email.email', 1)",
 ])
 RunSql.query(conn,[
     ~S"""

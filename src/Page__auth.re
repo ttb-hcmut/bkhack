@@ -1,13 +1,16 @@
 [@Bkhack.page "/auth"]
 
+open Auth
+
 module Login = {
 	[@react.component]
 	let make = (~setAction) => {
 		let (errorMsg,setErrorMsg) = React.useState(_ => "");
-
+    let url = ReasonReactRouter.useUrl()
 		let (formUsername, setFormUsername) = React.useState(_ => "");
 		let (formPassword, setFormPassword) = React.useState(_ => "");
 
+    let auth = AuthContext.use();
 		let handleSubmit =(event) => {
 			React.Event.Synthetic.preventDefault(event);
 			if (String.length(formUsername) <= 0)
@@ -25,6 +28,44 @@ module Login = {
 				Js.log("Sending form data:");
 				Js.log("username: " ++ formUsername);   
 				Js.log("password: " ++ formPassword);
+        let open Js.Json;
+        let body = Json__syntax.( empty()
+        |> "username" ^^ string @@ formUsername
+        |> "password" ^^ string @@ formPassword
+        |> finish );
+        open Fetch__syntax;
+        Fetch.fetchWithInit(
+          Env.backend ++"/api/auth/login",
+          Fetch.RequestInit.make(
+            ~method_=Post,
+            ~body=Fetch.BodyInit.make(Js.Json.stringify(
+              body
+            )),
+            ~headers=Fetch.HeadersInit.make({
+              "Content-Type": "application/json"
+            }),
+            ()
+          )
+        )
+        >!= (err => {
+          Js.log(err);
+          auth.unsetAuth();
+          Js.Promise.reject(Js.Exn.anyToExnInternal @@ err)
+        })
+        >>= Fetch.Response.json
+        >>= Model.Decode.Response.fetchedAuth
+        >>= (j => {
+          open Model.FetchedAuth;
+          auth.setAuth(j.user_id,j.name);
+          url.search
+          -> Util.parseQueryParams
+          -> Js.Dict.get("redirect")
+          -> Option.value(~default = Js.Global.encodeURI("/"))
+          -> Js.Global.decodeURI
+          -> Js__dom.Window.Location.href_set
+          -> ignore;
+          Js.Promise.resolve(j)
+        }) |> ignore
 			}
 		};
 		<main className="login">
@@ -317,7 +358,6 @@ module App = {
 		let search = url.search;
 		let params = Util.parseQueryParams(search)
 		and params' = Util.parseQueryParams'(search);
-
 		let (action, setAction) = React.useState(() =>
 			switch (Js.Dict.get(params, "action")) {
 				| Some(id) => id
@@ -332,19 +372,19 @@ module App = {
 				verb
 			});
 		}, [|setAction|]);
-    <>
-		<a className="logo" href="/" />
-		<p><span className="command">{React.string("ssh user@bkhack.wiki")}</span></p>
-		{
-			switch (action) {
-				| "login" => <Login key="login" setAction />
-				| "register" => <Register key="register" setAction />
-				| "forgot" => <Forgot key="forgot" setAction />
-				| "reset" => <Reset key="reset" setAction />
-				| _ => <Login key="login" setAction />
-			} 
-		}
-    </>
+    <AuthContext.Provider>
+      <a className="logo" href="/" />
+      <p><span className="command">{React.string("ssh user@bkhack.wiki")}</span></p>
+      {
+        switch (action) {
+          | "login" => <Login key="login" setAction />
+          | "register" => <Register key="register" setAction />
+          | "forgot" => <Forgot key="forgot" setAction />
+          | "reset" => <Reset key="reset" setAction />
+          | _ => <Login key="login" setAction />
+        } 
+      }
+    </AuthContext.Provider>
 	}
 }
 

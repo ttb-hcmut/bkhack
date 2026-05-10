@@ -9,7 +9,7 @@ module Window : {
 		    URL, the current page will not be saved in session history
 		    — meaning the user won't be able to use the back button to
 		    navigate to it. */
-		let href_set : string => unit
+		let href_set : string => 'a
 	}
 
 	external add_event_listener : string => (React.Event.Keyboard.t => unit) => unit = "window.addEventListener"

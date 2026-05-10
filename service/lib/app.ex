@@ -6,30 +6,13 @@ defmodule Data1 do
   use Ecto.Repo, otp_app: :bkhack, adapter: Mongo.Ecto
 end
 
-defmodule User
-  do use Ecto.Schema
-  @primary_key false
-
-  schema "users" do
-    field :user_id, :integer
-    field :name
-  end
-
-  def changeset(user, params \\ %{}) do
-    import Ecto.Changeset
-    user
-    |> cast(params, [:user_id, :name])
-    |> validate_required([:user_id, :name])
-  end
-
-end
-
 defmodule App
   do use Plug.Router
   require Logger
   require Db
   require ReturnChildID
   require DiscussionBE
+  require AuthBE
 
   plug :match
   plug Plug.Parsers,
@@ -37,6 +20,47 @@ defmodule App
     json_decoder: JSON
   plug :fetch_query_params
   plug :dispatch
+
+  options "/api/auth/login" do
+    conn
+    # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+    |> put_resp_header("Access-Control-Allow-Origin", "*")
+    |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+    |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+    |> send_resp(200, "")
+  end
+  post "/api/auth/login" do
+    Logger.info "POST login"
+    body = conn.body_params
+    IO.inspect conn.body_params
+    username  = body["username"]
+    password  = body["password"]
+
+    data = "User "<>username<>" trying to login with password \""<>password
+    IO.puts(data);
+    acc = AuthBE.login(username,password)
+    case acc do
+      nil ->
+        {:ok, sh} = JSON.encode("Wrong login dumb fuck")
+        conn
+        # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+        |> put_resp_header("Access-Control-Allow-Origin", "*")
+        |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+        |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+        |> put_resp_content_type("application/json")
+        |> send_resp(500, sh)
+      info ->
+        {:ok, sh} = JSON.encode(info)
+        conn
+        # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+        |> put_resp_header("Access-Control-Allow-Origin", "*")
+        |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+        |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+        |> put_resp_content_type("application/json")
+        |> send_resp(201, sh)
+    end
+  end
+
 
   get "/api/comment" do
     Logger.info "GET comment"
