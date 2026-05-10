@@ -7,7 +7,7 @@ open React
 let onSubmit = (current_url, ~memo_transition=((_, _, k) => k()), e) => {
 	Event.Synthetic.preventDefault(e);
 	let rawstr = Event.Form.target(e)##siteNavigator##value;
-	let u = rawstr->Shell__parse.test_parse;
+	let u = rawstr->Shell__parse.parse_string->Result.get_ok;
 	let (url, url_args) = Navigation.eval(current_url, u);
 	Rlwrap.do_(rawstr) @@ () => {
 		Dom.Storage.setItem("bkhack.cmd-greeting-shown", "y", Dom.Storage.sessionStorage);
@@ -100,9 +100,11 @@ let make = (~memo_transition=?) => {
 		()
 	};
 	let url = ReasonReactRouter.useUrl();
-	let innerHTML = useMemo2(() =>
-		content === "" ? Option.value(~default="", placeholder)->string :
-		(try (content->Shell__pastel.test_parse) { | _ => content->string }), (content, placeholder));
+	let innerHTML = (content, placeholder) |> useMemo2(() =>
+		content === ""
+		? Option.value(~default="", placeholder)->string
+		: content->Shell__pastel.parse_string->Result.value(~default=content->string)
+	);
 	<>
 	<a className="logo" href="/" />
 	<form onSubmit={e => assert_ @@ _ => onSubmit(url, ~memo_transition?, e)}>

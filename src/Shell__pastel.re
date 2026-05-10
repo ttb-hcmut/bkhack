@@ -1,51 +1,7 @@
 open Melange__containers.Fun
 open Cprg
 open Cprg.Syntax
-
-let ignore = x => x >>| _ => ();
-
-let advance = () => {
-	let ended = ref(false);
-	ignore @@ take_while1(_ => switch (ended^) { | false => { ended := true; true } | true => false })
-}
-
-let string = s => String.to_seq(s) |> Seq.fold_left(
-	(acc, it) =>
-		lift2(
-			(x, y) => { x ++ String.init(1, _ => y) },
-			acc, char(it)
-		),
-		take_while(_ => false)
-)
-
-let (whitespace, whitespace0) = {
-	let is_ws = fun | ' ' | '\t' | '\n' => true | _ => false;
-	(take_while1(is_ws), take_while(is_ws))
-}
-
-let word = {
-	let* x = peek_char;
-	switch (x) {
-	| None => fail("zero length, not a word")
-	| Some(('a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' | '$' | '-') as x) => {
-		let* () = advance();
-		let* str = take_while @@ fun
-			| 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' | '_' => true | _ => false;
-		return(String.init(1, _ => x) ++ str)
-	}
-	| Some(_) => fail("invalid word")
-	}
-}
-
-let pipe = char('|')
-
-let (brak_l, brak_r) = (char('{'), char('}'))
-
-let endl = char(';')
-
-let _and_ = string("&&")
-
-let end_of_seq = endl /* <|> (ignore @@ and_) */
+open Shell__parse__lex
 
 let command = fix @@ command =>
 	{ let* word = word; let* ws = whitespace; let* command = command;
@@ -112,9 +68,5 @@ let chain : code(React.element) = fix @@ impl =>
 	(end_of_input >>| _ => <> </>)
 	or chain_1(impl) or chain_2(impl) or chain_3(impl) or chain_4
 
-exception Parsing(string)
-
-let test_parse =
-	Cprg.parse_string(~consume=`All, chain) %> fun
-		| Ok(it) => it
-		| Error(msg) => raise(Parsing(msg))
+let parse_string =
+	chain->Cprg.parse_string(~consume=`All)
