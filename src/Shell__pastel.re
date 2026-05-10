@@ -49,9 +49,9 @@ let end_of_seq = endl /* <|> (ignore @@ and_) */
 
 let command = fix @@ command =>
 	{ let* word = word; let* ws = whitespace; let* command = command;
-		return @@ [word, ws, ...command]
+		return([word, ws, ...command])
 	}
-	or { let* word = word; return @@ [word] }
+	or { let* word = word; return([word]) }
 
 open React
 
@@ -110,10 +110,7 @@ let chain_4 = {
 
 let chain : code(React.element) = fix @@ impl =>
 	(end_of_input >>| _ => <> </>)
-	or chain_1(impl)
-	or chain_2(impl)
-	or chain_3(impl)
-	or chain_4
+	or chain_1(impl) or chain_2(impl) or chain_3(impl) or chain_4
 
 exception Parsing(string)
 
