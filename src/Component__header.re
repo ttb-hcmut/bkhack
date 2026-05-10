@@ -102,7 +102,7 @@ let make = (~memo_transition=?) => {
 	let url = ReasonReactRouter.useUrl();
 	let innerHTML = useMemo2(() =>
 		content === "" ? Option.value(~default="", placeholder)->string :
-		(try (content->Shell__parse__2.test_parse) { | _ => content->string }), (content, placeholder));
+		(try (content->Shell__pastel.test_parse) { | _ => content->string }), (content, placeholder));
 	<>
 	<a className="logo" href="/" />
 	<form onSubmit={e => assert_ @@ _ => onSubmit(url, ~memo_transition?, e)}>
