@@ -1,13 +1,13 @@
 // let shell = "feed | { split 10 | filter ;} | filter";
 // Js.Console.log("parsing '" ++ shell ++ "'");
 // Js.Console.log(Shell.test_parse(shell));
-
+open Melange__containers.Fun
 open React
 
 let onSubmit = (current_url, ~memo_transition=((_, _, k) => k()), e) => {
 	Event.Synthetic.preventDefault(e);
 	let rawstr = Event.Form.target(e)##siteNavigator##value;
-	let u = rawstr->Shell__parse.parse_string->Result.get_ok;
+	let u = rawstr->Shell__parse.string->Result.get_ok;
 	let (url, url_args) = Navigation.eval(current_url, u);
 	Rlwrap.do_(rawstr) @@ () => {
 		Dom.Storage.setItem("bkhack.cmd-greeting-shown", "y", Dom.Storage.sessionStorage);
@@ -20,22 +20,84 @@ let onSubmit = (current_url, ~memo_transition=((_, _, k) => k()), e) => {
 	}
 };
 
-let onKeyDown = (setHistoryIndex, onKey, e) => {
+let onKeyDown = (setHistoryIndex, completeBarHTMLContent, onKey, e) => {
 	let key = Event.Keyboard.key(e);
-	let mk_char = s => try (String.get(s, 0)->Option.some) { | Invalid_argument(_) => None }
 	onKey();
-	switch ((key, mk_char(key))) {
-	| ("ArrowUp", _) => {
+	switch (key) {
+	| "ArrowUp" => {
 		Event.Keyboard.preventDefault(e);
 		setHistoryIndex(it => it - 1) }
-	| ("ArrowDown", _) => {
+	| "ArrowDown" => {
 		Event.Keyboard.preventDefault(e);
 		setHistoryIndex(it => it + 1) }
+	| "Tab" => {
+		Event.Keyboard.preventDefault(e);
+		completeBarHTMLContent() }
 	| _ => ()
 	}
 };
 
 let wrap_dialog = it => <dialog open_=true>{it}</dialog>;
+
+module Result {
+	include Result
+
+	let lift = (a, b) => map(b, a)
+}
+
+module List {
+	include List
+
+	let last = List.rev %> List.hd;
+
+	let last_opt = it => try (Some(last(it))) { | _ => None }
+
+	let hd_opt = it => try (Some(List.hd(it))) { | _ => None }
+}
+
+let samples_set_languages = [
+	"vi-VN",
+	"en-US"
+]
+
+let samples_set = [
+	"--language"
+]
+
+let samples = [
+	"feed",
+	"discuss",
+	"set"
+]
+
+let match_ = (~cmd, last) => Melange__re.({
+	let doit =
+		Re.exec_opt (
+			Re.compile @@ Re.(seq([bos, str(last), group(
+				any |> rep1
+			), eos]))
+		)
+		%> Option.map (g => Re.Group.get(g, 1))
+		;
+	switch (cmd) {
+	| ["set", "--language", _] =>
+		samples_set_languages |> List.filter_map(doit) |> List.hd_opt
+	| ["set", _] =>
+		samples_set |> List.filter_map(doit) |> List.hd_opt
+	| [_] =>
+		samples |> List.filter_map(doit) |> List.hd_opt
+	| _ =>
+		None
+	}
+});
+
+let extend = (~tree, s) => {
+	let get_unfetched = fun | (`unfetched(cmd)) => Some(cmd) | _ => None;
+	let last_cmd_opt = Shell__lang.Program.cmd__last_opt(tree)->Option.bind(get_unfetched);
+	let last_opt = last_cmd_opt->Option.bind(cmd => {
+		List.last_opt(cmd)->Option.bind(match_(~cmd)) });
+	switch (last_opt) { | None => s | Some(fillin) => s++fillin }
+};
 
 [@react.component]
 let make = (~memo_transition=?) => {
@@ -51,9 +113,9 @@ let make = (~memo_transition=?) => {
 		})
 	}, [|setHistoryIndex|])
 	let (navigatorError, setNavigatorError) = useState(() => None);
-	let setBarHTMLContent = (bar, str: unit => string) => {
+	let setBarHTMLContent = (bar, str: string => string) => {
 		let bar = bar.current->Js.Nullable.toOption->Option.get->ReactDOM.domElementToObj;
-		bar##value #= (str())
+		bar##value #= (str(bar##value))
 	};
 	let assert_ = useCallback1(k => {
 		setNavigatorError @@ prev =>
@@ -80,10 +142,15 @@ let make = (~memo_transition=?) => {
 	useEffect1(() => {
 		Rlwrap.on_scroll(historyIndex) @@ historyContent =>
 		bar->fakeBarSync @@ () =>
-		bar->setBarHTMLContent @@ () =>
+		bar->setBarHTMLContent @@ _ =>
 		historyContent->Option.value(~default="");
 		None
 	}, [|historyIndex|]);
+	let completeBarHTMLContent = useCallback0 @@ () => {
+		bar->fakeBarSync @@ () =>
+		bar->setBarHTMLContent @@ s =>
+		s->Shell__parse.string->Result.lift(tree => extend(~tree, s))->Result.value(~default=s)
+	};
 	let (errorClass, errorBox) = useMemo1(() => {
 		navigatorError
 		|> Option.map(fun
@@ -110,12 +177,12 @@ let make = (~memo_transition=?) => {
 	let innerHTML = (content, placeholder) |> useMemo2(() =>
 		content === ""
 		? Option.value(~default="", placeholder)->string
-		: content->Shell__pastel.parse_string->Result.value(~default=content->string)
+		: content->Shell__pastel.string->Result.value(~default=content->string)
 	);
 	<>
 	<a className="logo" href="/" />
 	<form onSubmit={e => assert_ @@ _ => onSubmit(url, ~memo_transition?, e)}>
-		<input autoComplete="off" autoCapitalize="off" spellCheck=false onChange={_ => bar->fakeBarSync @@ () => ()} onKeyDown={onKeyDown(setHistoryIndex, onKey)} ref={ReactDOM.Ref.domRef(bar)} id="siteNavigator" className=errorClass />
+		<input autoComplete="off" autoCapitalize="off" spellCheck=false onChange={_ => bar->fakeBarSync @@ () => ()} onKeyDown={onKeyDown(setHistoryIndex, completeBarHTMLContent, onKey)} ref={ReactDOM.Ref.domRef(bar)} id="siteNavigator" className=errorClass />
 		<div className="displayonly highlight">{innerHTML}</div>
 		{errorBox}
 	</form>

@@ -18,5 +18,5 @@ let chain : code(program) = fix @@ impl =>
 	or ((brak_l *> whitespace0 *> impl <* whitespace0 <* end_of_seq <* whitespace0 <* brak_r) >>| x => Cons_subprogram(x, Nil))
 	or ((command) >>| x => Cons_cmd(`unfetched(x), Nil))
 
-let parse_string =
+let string =
 	chain->Cprg.parse_string(~consume=`All)

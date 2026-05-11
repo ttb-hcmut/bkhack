@@ -68,5 +68,5 @@ let chain : code(React.element) = fix @@ impl =>
 	(end_of_input >>| _ => <> </>)
 	or chain_1(impl) or chain_2(impl) or chain_3(impl) or chain_4
 
-let parse_string = s =>
+let string = s =>
 	try (Cprg.parse_string(~consume=`All, chain, s)) { | e => Error(Js.String.make(e)) }
