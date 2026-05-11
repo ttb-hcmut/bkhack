@@ -19,6 +19,12 @@ module FetchedComment = {
   , author_role: int
   }
 }
+module FetchedAuth = {
+  type t = 
+  { user_id: int
+  , name: string 
+  }
+}
 module Decode = {
 	open Melange_json;
 
@@ -46,6 +52,12 @@ module Decode = {
   let fetchedComments = json => {
     json |> Of_json.array(fetchedComment)
   }
+  let fetchedAuth = json => {
+    open FetchedAuth;
+    Of_json.
+    { user_id :json |> field("user_id", int)
+    , name    :json |> field("name", string)
+    }}
 	module Response = {
 		open Js;
 
@@ -56,6 +68,8 @@ module Decode = {
       fetchedComment(json) |> Promise.resolve
 
     let fetchedComments = fetchedComments %> Promise.resolve
+
+    let fetchedAuth = fetchedAuth %> Promise.resolve
     
 	};
 };

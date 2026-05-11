@@ -1,5 +1,5 @@
 open Melange__containers.Fun
-include Js.Json
+open Js.Json
 
 let empty = () => Js.Dict.empty()
 

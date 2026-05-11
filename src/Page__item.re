@@ -1,6 +1,7 @@
 [@page "/item"]
 open Melange__containers.Fun
 module Melange__cmarkit = Remark_it
+open Auth
 
 module View = {
 	type t =
@@ -158,12 +159,15 @@ module DiscussionView = {
     module AddComment = {
       [@react.component]
       let make = (~id, ~parentType, ~setShow) => {
+        let auth = AuthContext.use()
         let (isBusy, setIsBusy) = React.useState(()=> false)
         let (content, setContent) = React.useState(()=> "")
         let sendComment = () => {
+          if (!auth.checkAuth()) {auth.forceAuth()}
           setIsBusy(_ => true);
+          let open Js.Json;
           let body = Json__syntax.( empty()
-          |> "user_id"        ^^ int    @@ 0
+          |> "user_id"        ^^ int    @@ Option.value(auth.getUserId(),~default=67)  
           |> "id"             ^^ int    @@ id
           |> "type"           ^^ int    @@ (parentType == "post"? 0 : 1)
           |> "content"        ^^ string @@ content
@@ -200,7 +204,7 @@ module DiscussionView = {
           <div className="content">
             <header>
               // TODO: [khang] identity provider sth sth somehow
-              <div className="author_name">{React.string("@AuthorName")}</div>
+              <div className="author_name">{Option.value(auth.getUserName(),~default="Oops") |> React.string}</div>
             </header>
             <form onSubmit={ e => {
               React.Event.Form.preventDefault(e);
@@ -276,6 +280,7 @@ module DiscussionView = {
         // ~author_rep   : int,
         ~nestDepth: int
       ) => {
+        let auth = AuthContext.use()
         let autoExpand = 1;
         // kinda have to keep track of if the user has upvoted or downvoted this comment yikes
         // you know what that means~ more column in the fetching
@@ -284,10 +289,12 @@ module DiscussionView = {
         let (addRep, setAddRep) = React.useState(() => false);
         let pType="comment";
         let setVote = React.useCallback1([@warning "-8"] ((-1|0|1) as action) => {
+          if(!auth.checkAuth()) {auth.forceAuth()};
           open Fetch__syntax;
+          open Js.Json;
           open Json__syntax;
           let body = empty()
-          |> "user_id"  ^^ int    @@ 0
+          |> "user_id"  ^^ int    @@ Option.value(auth.getUserId(),~default = 67)
           |> "id"       ^^ int    @@ id
           |> "type"     ^^ string @@ "comment"
           |> "action"   ^^ int    @@
@@ -374,6 +381,7 @@ module DiscussionView = {
         ~showRep : bool,
         ~nestDepth : int
       ) => {
+        let auth = AuthContext.use()
         let (comments,setComments) = React.useState(() => [||]);
         let (showMore, setShowMore) = React.useState(() => true);
         let (loading, setLoading) = React.useState(() => false);
@@ -386,7 +394,7 @@ module DiscussionView = {
           Fetch.fetch(Env.backend ++ "/api/comment"
             ++ "?limit="  ++ string_of_int(limit)
             ++ "&offset=" ++ string_of_int(Array.length(comments))
-            ++ "&user="   ++ "0"
+            ++ "&user="   ++ string_of_int(Option.value(auth.getUserId(),~default=-1))
             ++ "&parent=" ++ string_of_int(id)
             ++ "&type="   ++ fetchType)
           >>= Fetch.Response.json
@@ -884,7 +892,7 @@ module App =
 				| Some(f) => f ()
 		}, (setCurrentTab, postInfo));
 		show(art) @@ (((_, postTitle, _, _) as postInfo, headings, article_body)) =>
-		<>
+		<AuthContext.Provider >
 			<title>{React.string(postTitle++" | bkhack")}</title>
 			<header>
 				<Component__header memo_transition />
@@ -950,7 +958,7 @@ module App =
 				<Component__sidebar />
 			</aside>
 			
-		</>
+		</AuthContext.Provider >
 	}
 };
 

@@ -1,6 +1,6 @@
 type window_location_api;
 [@mel.scope "window"] external window_location_api : window_location_api = "location";
-[@mel.set] external window_location_href_set : window_location_api => string => unit = "href";
+[@mel.set] external window_location_href_set : window_location_api => string => 'a = "href";
 
 module Window = {
 	module Location = {
