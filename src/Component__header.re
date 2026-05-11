@@ -3,7 +3,7 @@
 // Js.Console.log(Shell.test_parse(shell));
 
 open React
-
+open Auth
 let onSubmit = (current_url, ~memo_transition=((_, _, k) => k()), e) => {
 	Event.Synthetic.preventDefault(e);
 	let rawstr = Event.Form.target(e)##siteNavigator##value;
@@ -39,6 +39,8 @@ let wrap_dialog = it => <dialog open_=true>{it}</dialog>;
 
 [@react.component]
 let make = (~memo_transition=?) => {
+  let auth = AuthContext.use();
+  let (showLoginButton,setShowLoginButton) = React.useState(()=>true);
 	let (content, setContent) = useState(() => "");
 	let bar = useRef(Js.Nullable.null);
 	let (historyIndex, setHistoryIndex) = useState(Rlwrap.index_init);
@@ -112,6 +114,10 @@ let make = (~memo_transition=?) => {
 		? Option.value(~default="", placeholder)->string
 		: content->Shell__pastel.parse_string->Result.value(~default=content->string)
 	);
+  React.useEffect0(()=>{
+    setShowLoginButton( _ => !auth.checkAuth());
+    None
+  });
 	<>
 	<a className="logo" href="/" />
 	<form onSubmit={e => assert_ @@ _ => onSubmit(url, ~memo_transition?, e)}>
@@ -123,6 +129,11 @@ let make = (~memo_transition=?) => {
 	<a className="place wiki" href="/wiki"></a>
 	<a className="place notifications"></a>
 	<a className="place settings" href="/settings"></a>
-	<a className="place auth" href="/auth"></a>
+
+  { showLoginButton ?
+    <button className="place auth" title="Log in" onClick={_ => auth.forceAuth()}/>
+    :
+    <button className="place" title="Log out" onClick={_ => auth.forceAuth()}>{React.string(Option.value(auth.getUserName(),~default="Guest"))}</button>
+}
 	</>
 }

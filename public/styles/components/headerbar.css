@@ -45,9 +45,10 @@
 	height: 1.7rem;
 }
 
-#root > header > a.place {
+#root > header > button.place {
 	font-size: var(--text-sm);
 	font-family: var(--font-mono);
+  color: var(--ctp-text);
 }
 
 #root > header > a.place:nth-child(3) {
@@ -86,11 +87,11 @@
 	content: "cài đặt";
 }
 
-#root > header > a.place.auth::before {
+#root > header > button.place.auth::before {
 	content: "login";
 }
 
-#root:lang(vi-VN) > header > a.place.auth::before {
+#root:lang(vi-VN) > header > button.place.auth::before {
 	content: "đăng nhập";
 }
 

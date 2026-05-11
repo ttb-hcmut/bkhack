@@ -1,6 +1,6 @@
 [@page "/"]
 open Melange__containers.Fun
-
+open Auth
 module Post = {
 	type t =
 		{ author: string
@@ -365,7 +365,7 @@ module Wifi = {
 
 module HintPanel = {
 
-	let command = "feed --sort=hot --filter";
+	let command = "feed | split 10";
 
 	[@react.component]
 	let make = () => {
@@ -509,7 +509,7 @@ module Dashboard = {
 			return(())
 		}), [|counts|]);
 		let onUpdateCount = React.useCallback0(newVal => setCounts(_ => newVal));
-		<>
+		<AuthContext.Provider>
 			<header>
 				<Component__header />
 			</header>
@@ -557,7 +557,7 @@ module Dashboard = {
 			<aside className=sidebarState>
 				<Component__sidebar />
 			</aside>
-		</>
+		</AuthContext.Provider>
 	}
 };
 
