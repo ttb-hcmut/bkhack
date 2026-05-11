@@ -1,11 +1,44 @@
 defmodule User
   do use Ecto.Schema
+  import Ecto.Changeset
   @primary_key {:user_id, :id, autogenerate: true}
   schema "users" do
     field :name, :string
     field :password, :string
     field :email, :string
     field :role, :integer
+  end
+  def changeset(user, attrs) do
+    user
+    |> cast(attrs, [:email, :name, :password, :role])
+    |> validate_required([:email, :name, :password, :role])
+    |> unique_constraint(:name, name: :users_name_index)
+    |> validate_email()
+    |> validate_username()
+    |> validate_password()
+  end
+  defp validate_email(changeset) do
+    changeset
+    |> validate_format(:email, ~r/^[^\s]+@[^\s]+\.[^\s]+$/,
+        message: "invalid email address"
+      )
+  end
+  defp validate_username(changeset) do
+    changeset
+    |> validate_length(:name,
+        min: 1,
+        message: "username is empty"
+      )
+    |> validate_format(:name, ~r/^[a-z0-9]+$/,
+        message: "username contains characters not allowed"
+      )
+  end
+  defp validate_password(changeset) do
+    changeset
+    |> validate_length(:password,
+        min: 8,
+        message: "password less than 8 characters long"
+      )
   end
 end
 defmodule Post

@@ -96,7 +96,7 @@ createTablesList = [
     ~S"""
     create table if not exists users (
       user_id integer primary key,
-      name varchar(255) not null,
+      name varchar(255) not null unique,
       password varchar(255) not null,
       email varchar(255) not null,
       role integer not null
@@ -183,10 +183,8 @@ IO.inspect createTablesList
 for drop <- dropTablesList do drop.() end
 for create <- createTablesList do create.() end
 RunSql.query(conn,[
-  ~S"delete from comments",
   ~S"delete from posts",
   ~S"delete from users",
-  ~S"delete from commentratings",
 ])
 RunSql.query(conn,[
   ~S"insert into users values (0, 'khangalang', 'ballsballs', 'khangalang@bkhack.org', 0)",
