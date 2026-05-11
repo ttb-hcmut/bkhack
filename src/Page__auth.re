@@ -47,21 +47,22 @@ module Login = {
             ()
           )
         )
+        >>= Fetch.Response.json
+        >>= Model.Decode.Response.fetchedAuth
         >!= (err => {
           Js.log(err);
           auth.unsetAuth();
+          setErrorMsg(_ => "incorrect login details")
           Js.Promise.reject(Js.Exn.anyToExnInternal @@ err)
         })
-        >>= Fetch.Response.json
-        >>= Model.Decode.Response.fetchedAuth
         >>= (j => {
           open Model.FetchedAuth;
           auth.setAuth(j.user_id,j.name);
           url.search
           -> Util.parseQueryParams
           -> Js.Dict.get("redirect")
-          -> Option.value(~default = Js.Global.encodeURI("/"))
-          -> Js.Global.decodeURI
+          -> Option.value(~default = Js.Global.encodeURIComponent("/"))
+          -> Js.Global.decodeURIComponent
           -> Js__dom.Window.Location.href_set
           -> ignore;
           Js.Promise.resolve(j)

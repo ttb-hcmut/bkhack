@@ -26,7 +26,7 @@ module AuthContext = {
       let url = ReasonReactRouter.useUrl();
       let setAuth = (userId:int,userName:string) => {
         // in miliseconds
-        let duration = 24 * 60 * 60 * 1000
+        let duration = 24*60*60 * 1000
         Dom.Storage.localStorage |> Dom.Storage.setItem("bkhack.auth.id", string_of_int(userId));
         Dom.Storage.localStorage |> Dom.Storage.setItem("bkhack.auth.name", userName);
         Dom.Storage.localStorage |> Dom.Storage.setItem("bkhack.auth.timeout", string_of_int(int_of_float(Js.Date.now()) + duration));
@@ -46,11 +46,13 @@ module AuthContext = {
         }
       }
       let forceAuth : unit => 'a = () => {
+        unsetAuth()
+        let redirect = "/" ++ (url.path |> List.map(x =>x ++ "/") |> String.concat @@ "") ++ (if(String.length(url.search)>0){"?" ++ url.search}else{""})
         Js__dom.Window.Location.href_set(
-          "/auth/?redirect=" ++ {
-            (String.concat("/",url.path) ++ "/?" ++ url.search)
-            |> Js.Global.encodeURI
-          }
+          "/auth/?redirect=" ++ (
+            redirect
+            |> Js.Global.encodeURIComponent
+          )
         );
         
       }

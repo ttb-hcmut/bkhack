@@ -132,6 +132,7 @@ module DiscussionView = {
   module DiscussionHint = {
     [@react.component]
     let make = (~addRep, ~setAddRep) => {
+      let auth = AuthContext.use();
       <>
         <div className="logo" />
         <h1>{React.string("discussions")}</h1>
@@ -143,7 +144,9 @@ module DiscussionView = {
           </span>
         </div>
         <button className="action"
-            onClick={ _ => setAddRep(a => !a)}>
+            onClick={ _ => 
+              if(auth.checkAuth()){setAddRep(a => !a)}else{auth.forceAuth()}
+            }>
               {React.string(addRep?"Cancel":"New Comment")}
           </button>
       </>
@@ -200,6 +203,9 @@ module DiscussionView = {
           })
           |> ignore
         };
+        React.useEffect0(()=>{
+          None
+        });
         <div className="comments add-reply">
           <div className="content">
             <header>
@@ -289,7 +295,7 @@ module DiscussionView = {
         let (addRep, setAddRep) = React.useState(() => false);
         let pType="comment";
         let setVote = React.useCallback1([@warning "-8"] ((-1|0|1) as action) => {
-          if(!auth.checkAuth()) {auth.forceAuth()};
+          
           open Fetch__syntax;
           open Js.Json;
           open Json__syntax;
@@ -341,12 +347,12 @@ module DiscussionView = {
             <div className="text"       >{React.string(text       )}</div>
             <div className="rating"     >
               <button className="up"
-              onClick={_ => setVote(1)}>
+              onClick={_ => if(!auth.checkAuth()) {auth.forceAuth()}else{setVote(1)}}>
                 {React.string(">")}
               </button>
               <span className={"v"++string_of_int(userRating)}>{{React.int(rating - user_rating + userRating)}}</span>
               <button className="down"
-              onClick={_ => setVote(-1)}>
+              onClick={_ => if(!auth.checkAuth()) {auth.forceAuth()}else{setVote(-1)}}>
                 {React.string("<")}
               </button>
             </div>
@@ -355,7 +361,9 @@ module DiscussionView = {
               {React.string((showRep?"Hide":"Show") ++ " replies")}
             </button>
             <button className="add-reply"
-            onClick={ _ => setAddRep(a => !a)}>
+            onClick={ _ => {
+              if(auth.checkAuth()){setAddRep(a => !a)}else{auth.forceAuth()}
+            }}>
               {React.string(addRep?"Cancel":"Add Reply")}
             </button>
           </div>
