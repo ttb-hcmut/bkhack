@@ -64,7 +64,7 @@ module Make2 (U : {
 	[@react.component]
 	let make = () => {
 		React.useEffect0(() => {
-			Js__dom.Window.add_event_listener(, onKeyDown);
+			Js__dom.Window.add_event_listener("keydown", onKeyDown);
 			Some(() => {
 				Js__dom.Window.remove_event_listener("keydown", onKeyDown);
 			})
