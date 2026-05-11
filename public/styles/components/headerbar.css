@@ -150,6 +150,11 @@ dialog > div {
 	grid-column: 1 / 2;
 }
 
+#siteNavigator + .displayonly a {
+	pointer-events: auto;
+	cursor: help;
+}
+
 /* synchronize style with #siteNavigator */
 #siteNavigator + .displayonly {
   font-size: var(--text-base);
@@ -173,3 +178,36 @@ form:has(> #siteNavigator) > * {
 	max-width: 20rem;
 }
 
+#siteNavigator.error.unknown-command ~ dialog > div::before {
+	content: "Unknown command '";
+}
+
+#siteNavigator.error.unknown-command ~ dialog > div::after {
+	content: "'";
+}
+
+#root:lang(vi-VN) #siteNavigator.error.unknown-command ~ dialog > div::before {
+	content: "Không biết lệnh '";
+}
+
+#root:lang(vi-VN) #siteNavigator.error.unknown-command ~ dialog > div::after {
+	content: "'";
+}
+
+#siteNavigator.error.invalid-syntax-of-command.cat ~ dialog > div:after {
+	content: "Invalid syntax of the 'cat' command";
+}
+
+#root:lang(vi-VN) #siteNavigator.error.invalid-syntax-of-command.cat ~ dialog > div:after {
+	content: "Sai cú pháp lệnh 'cat' \A cat [ID] ";
+	white-space: pre-wrap;
+}
+
+#siteNavigator.error.invalid-syntax-of-command.feed ~ dialog > div:after {
+	content: "Invalid syntax of the 'feed' command";
+}
+
+#root:lang(vi-VN) #siteNavigator.error.invalid-syntax-of-command.feed ~ dialog > div:after {
+	content: "Sai cú pháp lệnh 'feed' \A feed ";
+	white-space: pre-wrap;
+}

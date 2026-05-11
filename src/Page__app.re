@@ -408,7 +408,7 @@ module Filter = {
 			onUpdateCount(u)
 		};
 		<form ref={ReactDOM.Ref.domRef(submission)} className="dashboard-filter" onSubmit>
-			<input />
+			<input id="feedFilter" />
 			{methods @@ ["hot", "new", "top-voted", "most-discussed", "recent-activity"]}
 			{options @@ [10, 25, 50, 100, 0]}
 		</form>
@@ -605,13 +605,19 @@ module ReactDOM0 = {
 		}
 }
 
+module SecondaryNavigator = {
+	let querySelector = () => {
+		ReactDOM.querySelector("#feedFilter")->Option.get
+	}
+}
+
 open Decorator
 
 module App' =
 (
 	val (module App)
 	->React.use(module Language.Make)
-	->React.use(module Keyboard.Make)
+	->React.use(module Keyboard.Make2(SecondaryNavigator))
 )
 
 let () = {

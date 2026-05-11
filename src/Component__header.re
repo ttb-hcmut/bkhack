@@ -35,6 +35,8 @@ let onKeyDown = (setHistoryIndex, onKey, e) => {
 	}
 };
 
+let wrap_dialog = it => <dialog open_=true>{it}</dialog>;
+
 [@react.component]
 let make = (~memo_transition=?) => {
 	let (content, setContent) = useState(() => "");
@@ -48,21 +50,15 @@ let make = (~memo_transition=?) => {
 			newval
 		})
 	}, [|setHistoryIndex|])
-	let (navigatorStyle, setNavigatorStyle) = useState(() => None);
-	let setBarContent = (bar, str: string) => {
+	let (navigatorError, setNavigatorError) = useState(() => None);
+	let setBarHTMLContent = (bar, str: unit => string) => {
 		let bar = bar.current->Js.Nullable.toOption->Option.get->ReactDOM.domElementToObj;
-		bar##value #= str
+		bar##value #= (str())
 	};
 	let assert_ = useCallback1(k => {
-		setNavigatorStyle(prev => {
-			try ({
-				let () = k(prev);
-				None
-			}) {
-				| _ => Some("error")
-			}
-		})
-	}, [|setNavigatorStyle|]);
+		setNavigatorError @@ prev =>
+		try ({ let () = k(prev); None }) { | e => Some(e) }
+	}, [|setNavigatorError|]);
 	let placeholder = useMemo0(() =>
 		Dom.Storage.getItem("bkhack.cmd-greeting-shown", Dom.Storage.sessionStorage)
 		|> [@warning "-8"] fun | None => Some("Start typing to dismiss or don't show this again.") | Some("y") => None
@@ -75,28 +71,39 @@ let make = (~memo_transition=?) => {
 			return()
 		})
 	);
-	let sync = k => {
+	let fakeBarSync = (bar, k) => {
 		let v = k();
 		let bar = bar.current->Js.Nullable.toOption->Option.get->ReactDOM.domElementToObj;
 		setContent(_ => bar##value);
 		v
 	};
 	useEffect1(() => {
-		Rlwrap.on_scroll(historyIndex) @@ u =>
-		sync @@ () =>
-		bar->setBarContent(
-			u->Option.value(~default=""));
+		Rlwrap.on_scroll(historyIndex) @@ historyContent =>
+		bar->fakeBarSync @@ () =>
+		bar->setBarHTMLContent @@ () =>
+		historyContent->Option.value(~default="");
 		None
 	}, [|historyIndex|]);
-	let errorBox = useMemo1(() => {
-		Option.is_some(navigatorStyle) ?
-			<dialog open_=true>
-				<div>{"error"->React.string}</div>
-			</dialog>
-		: <> </>
-	}, [|navigatorStyle|])
+	let (errorClass, errorBox) = useMemo1(() => {
+		navigatorError
+		|> Option.map(fun
+		| Navigation.Unknown_command(`unfetched([cmd_name, ..._])) => {
+			let k = "error unknown-command";
+			(k, wrap_dialog(<div>{cmd_name->string}</div>))
+		}
+		| Navigation.Invalid_syntax_of_command(cmd) => {
+			let k = "error invalid-syntax-of-command "++cmd;
+			(k, wrap_dialog(<div></div>))
+		}
+		| e => {
+			let k = "error";
+			(k, wrap_dialog(<div>{e->Js.String.make->string}</div>))
+		}
+		)
+		|> Option.value(~default=("", <> </>))
+	}, [|navigatorError|]);
 	let onKey = () => {
-		setNavigatorStyle(_ => None);
+		setNavigatorError(_ => None);
 		()
 	};
 	let url = ReasonReactRouter.useUrl();
@@ -108,7 +115,7 @@ let make = (~memo_transition=?) => {
 	<>
 	<a className="logo" href="/" />
 	<form onSubmit={e => assert_ @@ _ => onSubmit(url, ~memo_transition?, e)}>
-		<input onChange={_ => sync @@ () => ()} onKeyDown={onKeyDown(setHistoryIndex, onKey)} ref={ReactDOM.Ref.domRef(bar)} id="siteNavigator" className={Option.value(~default="", navigatorStyle)} />
+		<input autoComplete="off" autoCapitalize="off" spellCheck=false onChange={_ => bar->fakeBarSync @@ () => ()} onKeyDown={onKeyDown(setHistoryIndex, onKey)} ref={ReactDOM.Ref.domRef(bar)} id="siteNavigator" className=errorClass />
 		<div className="displayonly highlight">{innerHTML}</div>
 		{errorBox}
 	</form>

@@ -32,8 +32,8 @@ let chain_2 = impl => {
 	return (
 	<>
 	{command |> Iter.of_list |> Iter.mapi(fun
-		| 0 => s => <span key=s className="function call sh">{s->string}</span>
-		| _ => s => <span key=s className="variable parameter sh">{s->string}</span> ) |> Iter.to_array |> array}
+		| 0 as i => s => <a href=("/wiki/commands/"++s) key={s++string_of_int(i)} className="function call sh">{s->string}</a>
+		| _ as i => s => <span key={s++string_of_int(i)} className="variable parameter sh">{s->string}</span> ) |> Iter.to_array |> array}
 	{ws0->string}
 	<span className="operator sh">{pipe->char}</span> {ws1->string}
 	{impl}
@@ -58,8 +58,8 @@ let chain_4 = {
 	return (
 	<>
 	{command |> Iter.of_list |> Iter.mapi(fun
-		| 0 => s => <span key=s className="function call sh">{s->string}</span>
-		| _ => s => <span key=s className="variable parameter sh">{s->string}</span> ) |> Iter.to_array |> array}
+		| 0 as i => s => <a href=("/wiki/commands/"++s) key={s++string_of_int(i)} className="function call sh">{s->string}</a>
+		| _ as i => s => <span key={s++string_of_int(i)} className="variable parameter sh">{s->string}</span> ) |> Iter.to_array |> array}
 	</>
 	)
 }
@@ -68,5 +68,5 @@ let chain : code(React.element) = fix @@ impl =>
 	(end_of_input >>| _ => <> </>)
 	or chain_1(impl) or chain_2(impl) or chain_3(impl) or chain_4
 
-let parse_string =
-	chain->Cprg.parse_string(~consume=`All)
+let parse_string = s =>
+	try (Cprg.parse_string(~consume=`All, chain, s)) { | e => Error(Js.String.make(e)) }

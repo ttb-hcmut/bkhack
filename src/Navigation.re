@@ -1,11 +1,18 @@
 open Shell__lang
 
+exception Unknown_command([ `unfetched(list(string)) ])
+
+exception Invalid_syntax_of_command(string)
+
+exception Empty
+
 /** The navigation state machine */
 let eval = current_url => {
 	let url = ref("")
 	let url_args = ref([])
 	let rec aux = fun
 		| Cons_cmd(`unfetched(["feed"]), next) => { url := "/"; aux(next) }
+		| Cons_cmd(`unfetched(["feed", ..._]), _) => raise(Invalid_syntax_of_command("feed"))
 		| Cons_cmd(`unfetched(["split", num]), next) when url^ == "/" => { url_args := Util.List.replace_assoc'("limit", num, url_args^); aux(next) }
 		| Cons_cmd(`unfetched(["cat", ("$id" | "$ID")]), next) => {
 			url := "/item/";
@@ -13,11 +20,12 @@ let eval = current_url => {
 			url_args := Util.List.replace_assoc'("id", id, url_args^);
 			url_args := url_args^ |> Util.List.replace_assoc'("id", id) |> Util.List.replace_assoc'("view", "article");
 			aux(next) }
-		| Cons_cmd(`unfetched(["cat", id]), next) => {
+		| Cons_cmd(`unfetched(["cat", id]), next) when try ({ id->int_of_string->ignore; true }) { | _ => false } => {
 			url := "/item/";
 			url_args := Util.List.replace_assoc'("id", id, url_args^);
 			url_args := url_args^ |> Util.List.replace_assoc'("id", id) |> Util.List.replace_assoc'("view", "article");
 			aux(next) }
+		| Cons_cmd(`unfetched(["cat", ..._]), _) => raise(Invalid_syntax_of_command("cat"))
 		| Cons_cmd(`unfetched(["discuss", ("$id" | "$ID")]), next) => {
 			url := "/item/";
 			let id = Util.parseQueryParams(current_url.ReasonReactRouter.search)->Js.Dict.get("id")->Option.get;
@@ -49,8 +57,15 @@ let eval = current_url => {
 				root##"lang" #= language
 			});
 			aux(next) }
-		| Cons_cmd(`unfetched(_), _) => failwith("unknown command")
+		| Cons_cmd(`unfetched(["set"]), next) => {
+			url := "/settings/";
+			aux(next)	}
+		| Cons_cmd(cmd, _) => raise(Unknown_command(cmd))
 		| Cons_subprogram(a, b) => { aux(a); aux(b) }
 		| Nil => ();
-	s => { aux(s); (url^, url_args^) }
+	s => {
+		switch (s) {
+		| Nil => raise(Empty)
+		| s => aux(s) };
+		(url^, url_args^) }
 }
