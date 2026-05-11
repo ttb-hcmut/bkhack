@@ -341,7 +341,7 @@ module DiscussionView = {
               <div className="author_id" hidden=true >{React.int(author_id  )}</div>
               <div className={"author_role "++ (author_role==0?"student":"prof")}>{React.string(author_role==0?"student":"prof")}</div>
               // <div className="author_rep" >{React.string("rep: " ++ string_of_int(author_rep) )}</div>
-              <div className="timestamp"  >{React.string(timestamp)}</div>
+              <div className="timestamp"  >{React.string(Js__dom.Date.Utc.toRelative(timestamp))}</div>
               <div className="post_vers"  >{React.string("v: " ++ string_of_int(post_vers))}</div>
             </header>
             <div className="text"       >{React.string(text       )}</div>

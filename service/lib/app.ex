@@ -21,6 +21,48 @@ defmodule App
   plug :fetch_query_params
   plug :dispatch
 
+  options "/api/auth/register" do
+    conn
+    # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+    |> put_resp_header("Access-Control-Allow-Origin", "*")
+    |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+    |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+    |> send_resp(200, "")
+  end
+  post "/api/auth/register" do
+    Logger.info "POST register"
+    body = conn.body_params
+    IO.inspect conn.body_params
+    username  = body["username"]
+    password  = body["password"]
+    email     = body["email"]
+
+    data = "Registering "<>username<>" with password "<>password<>" and email "<>email
+    IO.puts(data);
+    isAnythingWrongOfficer = AuthBE.register(username,password,email)
+    IO.puts("--");IO.puts(isAnythingWrongOfficer);
+    case String.length(isAnythingWrongOfficer) do
+      0 ->
+        {:ok, sh} = JSON.encode("")
+        conn
+        # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+        |> put_resp_header("Access-Control-Allow-Origin", "*")
+        |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+        |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+        |> put_resp_content_type("application/json")
+        |> send_resp(201, sh)
+      _ ->
+        {:ok, sh} = JSON.encode(isAnythingWrongOfficer)
+        conn
+        # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+        |> put_resp_header("Access-Control-Allow-Origin", "*")
+        |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+        |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+        |> put_resp_content_type("application/json")
+        |> send_resp(500, sh)
+    end
+  end
+
   options "/api/auth/login" do
     conn
     # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186

@@ -23,11 +23,7 @@ module Login = {
 			}
 			else
 			{
-				//TODO: actually send data to back end
 				setErrorMsg(_ => "");
-				Js.log("Sending form data:");
-				Js.log("username: " ++ formUsername);   
-				Js.log("password: " ++ formPassword);
         let open Js.Json;
         let body = Json__syntax.( empty()
         |> "username" ^^ string @@ formUsername
@@ -97,6 +93,7 @@ module Register = {
 	[@react.component]
 	let make = (~setAction) => {
 		let (errorMsg,setErrorMsg)=React.useState(_ => "");
+    let url = ReasonReactRouter.useUrl()
 
 		let (formEmail, setFormEmail) = React.useState(_ => "");
 		let (formUsername, setFormUsername) = React.useState(_ => "");
@@ -123,10 +120,47 @@ module Register = {
 			{
 				//TODO: actually send data to back end
 				setErrorMsg(_ => "");
-				Js.log("Sending form data:");
-				Js.log("email: " ++ formEmail);   
-				Js.log("username: " ++ formUsername);   
-				Js.log("password: " ++ formPassword);
+        let open Js.Json;
+        let body = Json__syntax.( empty()
+        |> "email"    ^^ string @@ formEmail
+        |> "username" ^^ string @@ formUsername
+        |> "password" ^^ string @@ formPassword
+        |> finish );
+        open Fetch__syntax;
+        Fetch.fetchWithInit(
+          Env.backend ++"/api/auth/register",
+          Fetch.RequestInit.make(
+            ~method_=Post,
+            ~body=Fetch.BodyInit.make(Js.Json.stringify(
+              body
+            )),
+            ~headers=Fetch.HeadersInit.make({
+              "Content-Type": "application/json"
+            }),
+            ()
+          )
+        )
+        >>= Fetch.Response.json
+        >!= (err => {
+          Js.log(err);
+          Js.Promise.reject(Js.Exn.anyToExnInternal @@ err)
+        })
+        >>= (j => {
+          let res = j |> Js.Json.decodeString |> Option.value(~default="")
+          if (String.length(res)!=0) {
+            setErrorMsg(_ => res);
+          }
+          else {
+            Js__dom.Window.Location.href_set("/auth/?action=login&redirect="++
+              url.search
+              -> Util.parseQueryParams
+              -> Js.Dict.get("redirect")
+              -> Option.value(~default = Js.Global.encodeURIComponent("/"))
+            );
+          }
+          
+          Js.Promise.resolve(j)
+        }) |> ignore
 			}
 		};
 		<main className="register">
