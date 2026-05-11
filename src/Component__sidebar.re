@@ -182,29 +182,13 @@ module Activities{
 
 	// placeholder timestamp generators (you'd just fetch the timestamp string when fetching)
 	// XXX(kinten) possibly duplicated with [Page__item.PullrequestsBody.duration]
-	let timeAgo = (ms: int): string => {
-		let seconds = ms / 1000;
-		let minutes = seconds / 60;
-		let hours = minutes / 60;
-		let days = hours / 24;
-		if (seconds < 10) {
-				"just now"
-		} else if (seconds < 60) {
-				string_of_int(seconds) ++ "s ago"
-		} else if (minutes < 60) {
-				string_of_int(minutes) ++ "m ago"
-		} else if (hours < 24) {
-				string_of_int(hours) ++ "h ago"
-		} else {
-				string_of_int(days) ++ "d ago"
-		};
-	};
+	
 
 	// placeholder hot tags list
 	let placeholder = [ //(activity_id,activity_type, author, content, timestamp)
-		(0, "commented","@dr.kim","This is a great resource on getting started with llms",timeAgo(2228449)),
-		(1, "opened issue","@prof.wilson","Link nolonger points to the paper",timeAgo(8422)),
-		(2, "merged PR","@tran.phu","Breakthrough in quantum computing",timeAgo(55636711)),
+		(0, "commented","@dr.kim","This is a great resource on getting started with llms","6h ago"),
+		(1, "opened issue","@prof.wilson","Link nolonger points to the paper","7m ago"),
+		(2, "merged PR","@tran.phu","Breakthrough in quantum computing","5!s ago"),
 	];
 
   [@react.component]
