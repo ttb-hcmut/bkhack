@@ -51,13 +51,27 @@ It'd be nice to have a Reason abstraction for importing static assets. Currently
 2. Reduced-motion encoding (see [^reduced])
 3. The final (graphical) encoding (see [^icon])
 4. The light mode encoding
-5. CSS User-agent (Arc themes, GNOME Web Custom JS/CSS, Tampermonkey extension for Chrome and Firefox)
+5. ( syntax highlighting for some text )
+6. Language encoding (see Language layering)
+7. Keyboard encoding
+8. CSS User-agent (Arc themes, GNOME Web Custom JS/CSS, Tampermonkey extension for Chrome and Firefox)
 
 This architecture was formed based on what we want, plus that we have the right setups to quickly test and report for these layers.
 
 - Layer 2 is usually reported by Kinten (his GNOME machine uses reduced motion and he explicitly requested this feature)
 - Layer 4 duty. Due to their respective daily driver setups, Kinten usually reports for light mode, Khang usually reports for dark mode.
-- Layer 5 duty. Due to their respective daily driver setups, Kinten usually reports for GNOME Web, Khang usually reports for Chrome, Tuong usually reports for Arc.
+- Layer 8 duty. Due to their respective daily driver setups, Kinten usually reports for GNOME Web, Khang usually reports for Chrome, Tuong usually reports for Arc.
+
+Some encodings are not simply style, but also behavior as well. e.g. Language encoding, Keyboard encoding.
+
+```reason
+module App' = Decorator.(
+    val (module App)
+    ->React.use(module Tileset.Make)
+    ->React.use(module Language.Make)
+    ->React.use(module Keyboard.Make)
+)
+```
 
 # Language layering
 
