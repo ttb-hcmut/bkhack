@@ -79,6 +79,7 @@ let match_ = (~cmd, last) => Melange__re.({
 		)
 		%> Option.map (g => Re.Group.get(g, 1))
 		;
+	Js.Console.log2("try to complete", cmd);
 	switch (cmd) {
 	| ["set", "--language", _] =>
 		samples_set_languages |> List.filter_map(doit) |> List.hd_opt
