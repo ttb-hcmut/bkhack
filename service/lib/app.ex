@@ -21,6 +21,46 @@ defmodule App
   plug :fetch_query_params
   plug :dispatch
 
+  options "/api/post/create" do
+    conn
+    # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+    |> put_resp_header("Access-Control-Allow-Origin", "*")
+    |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+    |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+    |> send_resp(200, "")
+  end
+  post "/api/post/create" do
+    Logger.info "POST create post"
+    body = conn.body_params
+    IO.inspect conn.body_params
+    creator_id  = body["id"]
+    title       = body["title"]
+    body        = body["body"]
+
+    data = "User "<>Integer.to_string(creator_id)<>" with title: "<>title<>" and body: "<>body
+    IO.puts(data);
+    postId = PostBE.insertPost(creator_id, title, body)
+    case String.length(isAnythingWrongOfficer) do
+      0 ->
+        {:ok, sh} = JSON.encode(postId)
+        conn
+        # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+        |> put_resp_header("Access-Control-Allow-Origin", "*")
+        |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+        |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+        |> put_resp_content_type("application/json")
+        |> send_resp(201, sh)
+      _ ->
+        {:ok, sh} = JSON.encode(-1)
+        conn
+        # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+        |> put_resp_header("Access-Control-Allow-Origin", "*")
+        |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+        |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+        |> put_resp_content_type("application/json")
+        |> send_resp(500, sh)
+    end
+  end
   options "/api/auth/register" do
     conn
     # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
@@ -215,7 +255,6 @@ defmodule App
   end
 
   post "/api/test/free" do
-    Logger.info conn
     r = Ecto.Adapters.SQL.query!(Data0, conn.query_params["query"], [])
     xs = r.rows
     lol = xs

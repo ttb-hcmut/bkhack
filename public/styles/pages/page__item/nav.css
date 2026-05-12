@@ -1,9 +1,9 @@
 #root > nav {
-  flex-wrap: wrap;
 	border: solid 1px var(--card-border);
   z-index: 9;
   position: relative;
 	display: flex;
+  flex-wrap: wrap;
 	flex-direction: row;
 	border-bottom: 1px solid var(--card-border);
 	border-radius: 0.5rem 0.5rem;
