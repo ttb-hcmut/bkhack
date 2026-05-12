@@ -1,0 +1,45 @@
+@startuml
+rectangle "Dashboard/Home" as home{
+}
+rectangle "Item Page" as item{
+}
+rectangle "Article Tab" as artc{
+}
+rectangle "Discussion Tab" as dscs{
+}
+rectangle "Pull Requests List Tab" as prlt{
+}
+rectangle "View Pull Request" as priv{
+}
+rectangle "History Tab" as hist{
+}
+rectangle "Edit Tab" as edit{
+}
+rectangle "Moderation Manage" as modm{
+}
+rectangle "Login/Signup Page" as logn{
+}
+rectangle "Account Settings Page" as accs{
+}
+/'rectangle "Projects List" as prjl{'/
+/'}'/
+/'rectangle "View Project" as prjv{'/
+/'}'/
+rectangle "Notes" as ntes{
+}
+
+home --> item
+home --> logn
+home --> accs
+/'home --> prjl'/
+home --> ntes
+
+item --> artc
+item --> dscs
+item --> prlt
+item --> hist
+item --> edit
+item --> modm
+
+prlt --> priv
+@enduml

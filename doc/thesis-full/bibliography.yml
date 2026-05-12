@@ -1,0 +1,176 @@
+hacker-news:
+  type: Web
+  url: https://news.ycombinator.com
+  title: Hacker News
+
+lobsters: #footnote("https://lobste.rs")
+  type: Web
+  url: https://lobste.rs
+  title: Lobsters
+
+reddit: #footnote("https://reddit.com/")
+  type: Web
+  url: https://reddit.com/
+  title: Reddit
+
+twitter: #footnote("https://x.com/").
+  type: Web
+  url: https://x.com/
+  title: X (formerly Twitter)
+
+wikigg:
+  type: Web
+  url: https://wiki.gg/
+
+dsa2:
+  type: Book
+  title: Documenting Software Architectures 2nd Edition
+  author: Paul Clements et al
+  publisher: Pearson Education
+  page-total: 592
+  date: 2010-10-5
+#footnote("From the book Documenting Software Architectures 2nd Edition"). By adopting its central advice #footnote("Documenting Software Architecture 2nd edition, page 22: 'Documenting an architecture is a matter of documenting the relevant views and then adding documentation that applies to more than one view.'"), we've selected and drawn the diagrams in this sections which illustrate the most relevant and important characteristics of our system.
+# https://github.com/typst/hayagriva/blob/main/docs/file-format.md
+dsa2-sub:
+  type: chapter
+  title: Documenting an architecture is a matter of documenting the relevant views and then adding documentation that applies to more than one view.
+  page-range: 22
+  parent:
+  - type: Book
+    title: Documenting Software Architectures 2nd Edition
+    author: Paul Clements et al
+    publisher: Pearson Education
+    page-total: 592
+    date: 2010-10-5
+
+reactive-programming:
+  type: Web
+  title: Reactive programming
+  url: https://en.wikipedia.org/wiki/Reactive_programming
+  
+elm-architecture:
+  type: Web
+  title: The Elm Architecture
+  url: https://guide.elm-lang.org/architecture/
+  
+immediate-mode:
+  type: Web
+  title: Immediate mode (computer graphics)
+  url: https://en.wikipedia.org/wiki/Immediate_mode_(computer_graphics)
+#reactive programming #footnote("https://en.wikipedia.org/wiki/Reactive_programming"), the Elm Architecture #footnote("https://guide.elm-lang.org/architecture/"), immediate-mode graphics rendering #footnote("https://en.wikipedia.org/wiki/Immediate_mode_(computer_graphics")
+
+material-design:
+  type: Web
+  title: Material Design
+  url: https://m3.material.io/
+  
+ant-design:
+  type: Web
+  title: Ant Design
+  url: https://ant.design/docs/spec/introduce/
+  
+apple-hig:
+  type: Web
+  title: Apple Human Interface Guidelines
+  url: https://developer.apple.com/design/human-interface-guidelines
+  
+gnome-hig:
+  type: Web
+  title: GNOME Human Interface Guidelines
+  url: https://developer.gnome.org/hig/
+#Material Design#footnote("https://m3.material.io/"), Ant Design#footnote("https://ant.design/docs/spec/introduce/"), Apple Human Interface Guidelines#footnote("https://developer.apple.com/design/human-interface-guidelines"), and GNOME HIG#footnote("https://developer.gnome.org/hig/")
+
+ocaml-doc-guide:
+  type: Web
+  title: OCaml Documentation Guidelines
+  url: https://ocamlverse.net/content/documentation_guidelines.html
+#footnote("https://ocamlverse.net/content/documentation_guidelines.html")
+
+documenting-sa:
+  type: chapter
+  title: Chapter 5.4 Work Assignment Style.
+  page-range: 202
+  parent:
+  # - type: chapter
+  #   title: Chapter 5 Allocation Styles
+  #   page-range: 189
+  #   parent:
+    - type: Book
+      title: Documenting Software Architectures 2nd Edition
+      author: Paul Clements et al
+      publisher: Pearson Education
+      page-total: 592
+      date: 2010-10-5
+#footnote("Documenting Software Architectures, Chapter Allocation Styles # Work Assignment Style")
+
+# harry:
+#     type: Book
+#     title: Harry Potter and the Order of the Phoenix
+#     author: Rowling, J. K.
+#     volume: 5
+#     page-total: 768
+#     date: 2003-06-21
+
+what-is-soa:
+  type: Chapter
+  title: What is SOA?
+  parent:
+  - type: Book
+    title: The Open Group SOA Source Book
+    author: The Open Group
+    publisher: Van Haren
+    date: 2009-04-04
+
+quel:
+  type: Article
+  title: Finally, Safely-Extensible and Efficient Language-Integrated Query
+
+linq:
+  type: Article
+  title: The Optics of Language-Integrated Query
+  authors: [J. López-González, Juan M. Serrano]
+
+ocaml:
+  type: Article
+  title: "Objective ML: An Effective Object-Oriented Extension to ML"
+  authors: [Didier Rémy, Jérôme Vouillon]
+  serial:
+    doi: 10.1145/263699.263707
+
+reason:
+  type: Web
+  title: Reason • Reason lets you write simple, fast and quality type safe code while leveraging both the JavaScript & OCaml ecosystems.
+  url: "https://reasonml.github.io/"
+
+elm:
+  type: Web
+  title: Elm - delightful language for reliable web applications
+  url: "https://elm-lang.org/"
+
+reactjs:
+  type: Web
+  title: React - the library for web and native user interfaces
+  url: "https://react.dev/"
+
+reason-react:
+  type: Web
+  title: ReasonReact • All your ReactJS knowledge, codified.
+  url: "https://reasonml.github.io/reason-react/"
+
+haskell:
+  type: Article
+  title: A gentle introduction to Haskell
+  authors: [Paul Hudak, Joseph H. Fasel]
+  serial:
+    doi: 10.1145/130697.130698
+
+tea:
+  type: Web
+  title: The Elm Architecture - An Introduction to Elm
+  url: https://guide.elm-lang.org/architecture/
+
+giao-trinh-trinh-bien-dich:
+  type: Book
+  title: Giáo trình Trình biên dịch
+  publisher: Nhà xuất bản Đại học Quốc gia Thành phố Hồ Chí Minh
+  author: Phan Thị Tươi

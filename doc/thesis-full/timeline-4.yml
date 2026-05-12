@@ -1,0 +1,20 @@
+show-today: false
+headers:
+  - month
+  - week
+start: 2026-05-03
+end: 2026-06-03
+tasks:
+  - name: Functional Testing
+    intervals:
+      - start: 2026-05-03
+        end: 2026-06-03
+  - name: Service Testing
+    intervals:
+      - start: 2026-05-04
+        end: 2026-06-03
+milestones:
+  - name: Progress Check
+    date: 2026-05-20
+  - name: Review
+    date: 2026-06-30

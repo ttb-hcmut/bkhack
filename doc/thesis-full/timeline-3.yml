@@ -1,0 +1,29 @@
+show-today: false
+headers:
+  - month
+  - week
+start: 2026-04-03
+end: 2026-05-03
+tasks:
+    # The name of the task.
+  - name: Notes
+    intervals:
+      - start: 2026-04-03
+        end: 2026-04-20
+  - name: Moderation
+    intervals:
+      - start: 2026-04-20
+        end: 2026-05-03
+  - name: Functional Testing
+    intervals:
+      - start: 2026-04-28
+        end: 2026-05-03
+  - name: Service Testing
+    intervals:
+      - start: 2026-04-30
+        end: 2026-05-03
+milestones:
+  - name: Progress Check
+    date: 2026-04-20
+  - name: Review
+    date: 2026-05-03

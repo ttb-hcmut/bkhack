@@ -1,0 +1,33 @@
+show-today: false
+headers:
+  - month
+  - week
+start: 2026-03-03
+end: 2026-04-03
+tasks:
+    # The name of the task.
+  - name: Discussion
+    intervals:
+      - start: 2026-03-03
+        end: 2026-03-14
+  - name: Issues
+    intervals:
+      - start: 2026-03-14
+        end: 2026-03-23
+  - name: Pull Requests
+    intervals:
+      - start: 2026-03-23
+        end: 2026-04-03
+  - name: Build Pipeline
+    intervals:
+      - start: 2026-03-10
+        end: 2026-04-03
+  - name: Inline Unit Tests
+    intervals:
+      - start: 2026-03-17
+        end: 2026-04-03
+milestones:
+  - name: Progress Check
+    date: 2026-03-20
+  - name: Review
+    date: 2026-04-03
