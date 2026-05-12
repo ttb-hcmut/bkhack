@@ -60,8 +60,14 @@ let samples_set_languages = [
 	"en-US"
 ]
 
+let samples_set_highlight = [
+	"none",
+	"colorful"
+]
+
 let samples_set = [
-	"--language"
+	"--language",
+	"--highlight",
 ]
 
 let samples = [
@@ -81,6 +87,8 @@ let match_ = (~cmd, last) => Melange__re.({
 		;
 	Js.Console.log2("try to complete", cmd);
 	switch (cmd) {
+	| ["set", "--highlight", _] =>
+		samples_set_highlight |> List.filter_map(doit) |> List.hd_opt
 	| ["set", "--language", _] =>
 		samples_set_languages |> List.filter_map(doit) |> List.hd_opt
 	| ["set", _] =>

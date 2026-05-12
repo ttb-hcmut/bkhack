@@ -618,6 +618,7 @@ module App' =
 	val (module App)
 	->React.use(module Language.Make)
 	->React.use(module Keyboard.Make2(SecondaryNavigator))
+	->React.use(module Command.Make)
 )
 
 let () = {

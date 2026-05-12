@@ -49,6 +49,18 @@ let eval = current_url => {
 			url := "/item/";
 			url_args := url_args^ |> Util.List.replace_assoc'("id", id) |> Util.List.replace_assoc'("view", "edit");
 			aux(next)	}
+		| Cons_cmd(`unfetched(["set", "--highlight", mode]), next) => {
+			Dom.Storage.setItem("bkhack.highlight", mode, Dom.Storage.localStorage);
+			let treesitter = Dom.Storage.getItem("bkhack.highlight", Dom.Storage.localStorage);
+			switch (treesitter) {
+				| None | Some("colorful") => {
+					let root = ReactDOM.querySelector("#root")->Option.get->ReactDOM.domElementToObj;
+					root##"dataset"##"highlight" #= "colorful" }
+				| _ => {
+					let root = ReactDOM.querySelector("#root")->Option.get->ReactDOM.domElementToObj;
+					root##"dataset"##"highlight" #= "none" }
+			};
+			aux(next) }
 		| Cons_cmd(`unfetched(["set", "--language", lang_id]), next) => {
 			Dom.Storage.setItem("bkhack.language", lang_id, Dom.Storage.localStorage);
 			let language = Dom.Storage.getItem("bkhack.language", Dom.Storage.localStorage);

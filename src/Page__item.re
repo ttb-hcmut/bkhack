@@ -1002,6 +1002,7 @@ module App' =
 	val (module App)
 	->React.use(module Language.Make)
 	->React.use(module Keyboard.Make)
+	->React.use(module Command.Make)
 	->React.use(module Error_page)
 )
 

@@ -1,7 +1,7 @@
 /* 
  * adapted from https://github.com/catppuccin/nvim/blob/main/lua/catppuccin/groups/treesitter.lua
  */
-.highlight {
+#root[data-highlight="colorful"] .highlight {
 	.function.sh,
 	.function.call.sh {
 		color: var(--ctp-blue);
@@ -22,4 +22,8 @@
 	.operator.sh {
 		color: var(--ctp-sky);
 	}
+}
+
+a:any-link {
+	color: unset;
 }
