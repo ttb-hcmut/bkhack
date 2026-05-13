@@ -1,19 +1,22 @@
 
-#root > main.edit {
-	--margin-a: 2.5rem
+#root > main.edit *[hidden=true] {
+  display:none;
+}
+/* temp */
+#root > main.edit > .edit *{
+  border: 1px solid var(--card-border);
+  color: var(--ctp-text);
 }
 
-#root > main.edit > header.modeline {
-	background-color: var(--card-bg);
+
+#root > main.edit > .edit {
+  border: 1px solid var(--card-border);
+}
+
+#root > main.edit > .edit > header{
+	display: grid;
+  flex-wrap: wrap;
+	flex-direction: row;
   padding: var(--space-a);
-  display: flex;
-  align-items: center;
-}
-
-#root > main.edit > header.modeline > .logo::before {
-  content: ">_ ";
-}
-
-.mode.insert > label:after {
-  content: "-- INSERT --";
+  border: 1px solid var(--card-border);
 }

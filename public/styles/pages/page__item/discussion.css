@@ -150,12 +150,13 @@
 .comments > .content > header > .author_name {
   grid-row: 1/2;
 }
+.comments > .content > header > .author_name::before {
+  content: "@";
+}
 .comments > .content > header > .author_role {
   grid-row: 1/2;
   font-size: var(--text-xs);
   font-family: var(--font-mono);
-  border: solid 1px red;
-  background-color: red;
   color: var(--card-fg-accent-1);
   padding: 0 var(--space-a);
   border-radius: var(--radius);

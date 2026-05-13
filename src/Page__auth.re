@@ -407,7 +407,7 @@ module App = {
 				verb
 			});
 		}, [|setAction|]);
-    <AuthContext.Provider>
+    <>
       <a className="logo" href="/" />
       <p><span className="command">{React.string("ssh user@bkhack.wiki")}</span></p>
       {
@@ -419,7 +419,7 @@ module App = {
           | _ => <Login key="login" setAction />
         } 
       }
-    </AuthContext.Provider>
+    </>
 	}
 }
 
@@ -433,8 +433,18 @@ module ReactDOM0 = {
 		}
 }
 
+open Decorator
+
+module App' =
+(
+	val (module App)
+	->React.use(module Language.Make)
+	->React.use(module Keyboard.Make)
+  ->React.use(module AuthContext.Provider)
+)
+
 let () = {
 	let element = ReactDOM0.querySelector("#root");
 	let root = ReactDOM.Client.createRoot(element);
-	ReactDOM.Client.render(root, <App />)
+	ReactDOM.Client.render(root, <App' />)
 }

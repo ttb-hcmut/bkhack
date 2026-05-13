@@ -1,12 +1,13 @@
+
+import Ecto.Changeset
 defmodule User
   do use Ecto.Schema
-  import Ecto.Changeset
   @primary_key {:user_id, :id, autogenerate: true}
   schema "users" do
     field :name, :string
     field :password, :string
     field :email, :string
-    field :role, :integer
+    field :role, :integer # 0 => student; 1 => prof
   end
   def changeset(user, attrs) do
     user
@@ -43,12 +44,21 @@ defmodule User
 end
 defmodule Post
   do use Ecto.Schema
+  @timestamps_opts [type: UTCDateTime]
   @primary_key {:post_id, :id, autogenerate: true}
   schema "posts" do
     field :post_title ,:string
     field :creator_id ,:integer
     field :post_text  ,:string
+    field :verified   ,:boolean ,default: false
+    field :public     ,:boolean ,default: false
+    timestamps(inserted_at: :date_created_utc, updated_at: false, type: :utc_datetime)
     belongs_to  :the_creator ,User  ,foreign_key: :creator_id ,references: :user_id ,define_field: false
+  end
+  def insert(post, attrs) do
+    post
+    |> cast(attrs, [:post_title, :creator_id, :post_text, :verified])
+    |> validate_required([:post_title, :creator_id, :post_text])
   end
 end
 defmodule Comment

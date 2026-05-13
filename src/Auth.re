@@ -20,9 +20,9 @@ module AuthContext = {
 
   let ctx = React.createContext(defaultValue);
 
-  module Provider = {
+  module Provider (C : Decorator.Component) = {
     [@react.component]
-    let make = (~children: React.element) => {
+    let make = () => {
       let url = ReasonReactRouter.useUrl();
       let setAuth = (userId:int,userName:string) => {
         // in miliseconds
@@ -42,7 +42,8 @@ module AuthContext = {
         let timeout = Dom.Storage.localStorage |> Dom.Storage.getItem("bkhack.auth.timeout")
         switch (id,name,timeout) {
           | (None,_,_) | (_,None,_) | (_,_,None) => false
-          | (_,_,Some(t)) => int_of_string(t) > int_of_float(Js.Date.now())
+          | (_,_,Some(t)) =>
+            Js.log((id|>Option.value(~default="67"))++(name|>Option.value(~default="67"))++t++" "++ string_of_int(int_of_float(Js.Date.now()))); int_of_string(t) > int_of_float(Js.Date.now())
         }
       }
       let forceAuth : unit => 'a = () => {
@@ -78,7 +79,7 @@ module AuthContext = {
       };
 
       let provider = React.Context.provider(ctx);
-      React.createElement(provider, {"value": ctxValue, "children": children})
+      React.createElement(provider, {"value": ctxValue, "children": <C />})
     };
   };
 

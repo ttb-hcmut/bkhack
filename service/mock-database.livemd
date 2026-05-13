@@ -112,6 +112,9 @@ createTablesList = [
       post_title varchar(255) not null,
       creator_id integer not null,
       post_text varchar(2048) not null,
+      verified boolean not null,
+      public boolean not null,
+      date_created_utc varchar(255) not null,
       foreign key (creator_id) references users(user_id)
     )
     """,
@@ -174,6 +177,30 @@ IO.inspect createTablesList
 ```
 
 ## Scenarios
+
+<!-- livebook:{"branch_parent_index":2} -->
+
+## Post
+
+```elixir
+for drop <- dropTablesList do drop.() end
+for create <- createTablesList do create.() end
+RunSql.query(conn,[
+  ~S"delete from posts",
+  ~S"delete from users",
+])
+RunSql.query(conn,[
+  ~S"insert into users values (0, 'tungtungtungsahur', 'ballsballs', '3ts@bkhack.org', 0)",
+])
+RunSql.query(conn,[
+    ~S"""
+    insert into posts values (0, 'Good Post Title', 0, 'Good Post Body',0,0,'2026-04-28T15:18:26Z')
+    """,
+])
+RunSql.query(conn,[
+  ~S"select * from posts",
+])
+```
 
 <!-- livebook:{"branch_parent_index":2} -->
 

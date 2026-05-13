@@ -418,43 +418,78 @@ module Filter = {
 module Dashboard = {
 	module Card = {
 		[@react.component]
-		let make = (~post_id, ~rank, ~title) => {
-			<>
-				<div className="counter">
-					<span>{React.int(rank)}</span>
-				</div>
-				<header>
-					<a href={"item/?id="++string_of_int(post_id)}>{string(title)}</a>
-				</header>
-				<footer>
-					<div className="has-left-indicator tagline">
-						<span className="tag" title="Algorithm, Optimization">{string("AgAa")}</span>
-					</div>
-					<div className="status">
-						<span>{string("verified")}</span>
-					</div>
-					<div className="activities">
-						<span className="comments">
-							{React.int(12)}
-						</span>
-						<span className="pullrequests">
-							{React.int(12)}
-						</span>
-					</div>
-					<div className="last-activity">
-						<span className="verb">{string("commented")}</span>
-						<span className="agent">{string("@kinten108101")}</span>
-						<span className="theme"></span>
-						<span className="time">{string("2h ago")}</span>
-					</div>
-					<div className="created-from">
-						<span>{string("created ")}</span><span>{string("2d ago")}</span>
-					</div>
-					<div className="ref">
-						<span>{string("2000")}</span>
-					</div>
-				</footer>
-			</>
+		let make = (
+      ~rank
+    , ~id
+    , ~title
+    , ~creator
+    , ~verified
+    , ~public
+    , ~timestamp
+    ) => {
+      let auth = AuthContext.use()
+      let (disCount,setDisCount) = React.useState(() => 0);
+      let fetchCommentCount = (~id) => {
+        let open Fetch__syntax;
+        Fetch.fetch(Env.backend ++ "/api/comment"
+          ++ "?parent="  ++ id
+          ++ "&type="    ++ "0")
+        >>= Fetch.Response.json
+        >!= (err => {
+            Js.log(err);
+            return(Js.Json.number(0.0))
+          })
+        >>= (json => {
+          let x = Js.Json.decodeNumber(json) |> Option.value(~default = 0.0);
+          setDisCount(_ => int_of_float(x));
+          Js.Promise.resolve(json)
+        })
+        |> ignore;
+      };
+      React.useEffect0(()=>{
+        fetchCommentCount(~id=string_of_int(id))
+        None
+      });
+      switch(public,auth.checkAuth(), creator == Option.value(auth.getUserId(),~default = 67)){
+            | (0,true, true) | (1,_, _) => 
+              <li key={string_of_int(id)}>
+                <div className="counter">
+                  <span>{React.int(rank)}</span>
+                </div>
+                <header>
+                  <a href={"item/?id="++string_of_int(id)}>{string(title)}</a>
+                </header>
+                <footer>
+                  <div className="has-left-indicator tagline">
+                    <span className="tag" title="Algorithm, Optimization">{string("AgAa")}</span>
+                  </div>
+                  <div className="status">
+                    <span>{string(verified==1?"verified":"unverified")}</span>
+                  </div>
+                  <div className="activities">
+                    <span className="comments">
+                      {React.int(disCount)}
+                    </span>
+                    <span className="pullrequests">
+                      {React.int(67)}
+                    </span>
+                  </div>
+                  <div className="last-activity">
+                    <span className="verb">{string("commented")}</span>
+                    <span className="agent">{string("@kinten108101")}</span>
+                    <span className="theme"></span>
+                    <span className="time">{string("2h ago")}</span>
+                  </div>
+                  <div className="created-from">
+                    <span>{string("created ")}</span><span>{string(Js__dom.Date.Utc.toRelative(timestamp))}</span>
+                  </div>
+                  <div className="ref">
+                    <span>{string("2000")}</span>
+                  </div>
+                </footer>
+              </li>
+            | (_,_,_) => React.null
+          }
 		}
 	}
 
@@ -478,23 +513,29 @@ module Dashboard = {
 		include At_repo_0'(S)
 		module Json = Js__json
 
-		type t = array((int, string, int, string));
+		type t = array((int, string, int, string,int,int,string));
 
-		let  row = [@warning "-8"] fun | [|id, title, creator, text|] =>
-			( Float.to_int(Json.decodeNumberExn(id)), Json.decodeStringExn(title), Float.to_int(Json.decodeNumberExn(creator)), Json.decodeStringExn(text) );
-
+		let  row = [@warning "-8"] fun | [id, title, creator, text, verified, public, timestamp] =>
+			( id        |> Json.decodeNumber |> Option.value(~default=67.)  |> Float.to_int
+      , title     |> Json.decodeString |> Option.value(~default="someone messed up you shouldn't see this")
+      , creator   |> Json.decodeNumber |> Option.value(~default=67.)  |> Float.to_int
+      , text      |> Json.decodeString |> Option.value(~default="someone messed up you shouldn't see this")
+      , verified  |> Json.decodeNumber |> Option.value(~default=0.)   |> Float.to_int
+      , public    |> Json.decodeNumber |> Option.value(~default=0.)   |> Float.to_int
+      , timestamp |> Json.decodeString |> Option.value(~default="someone messed up you shouldn't see this")
+      )
 		let json = {
-			let per_row = row % Json.decodeArrayExn;
+			let per_row = row % Array.to_list % Json.decodeArrayExn;
 			Array.map(per_row) % Json.decodeArrayExn
 		}
-	}
+	};
 
   [@react.component]
   let make = () => {
 		let (counts, setCounts) = React.useState(() => 10);
 		let (items, setItems) = React.useState(() => [||]);
 		let (sidebarState, setSidebarState) = React.useState( _ => "state0");
-		let ticketParam = ReasonReactRouter.useUrl().search 
+		let ticketParam = ReasonReactRouter.useUrl().search;
 		React.useEffect1(() => {
 			let limit = ticketParam->Util.parseQueryParams->Js.Dict.get("limit");
 			let limit = limit |> Option.map(int_of_string);
@@ -502,14 +543,20 @@ module Dashboard = {
 			None
 		}, [|counts|]);
 		let module X = Bkhack__experimental;
-		React.useEffect1(React__effect.async @@ () => Fetch__syntax.({
-			let* posts = X.Fetch.all(module At_repo_0({
-				include X.GenSQL; let paginate = limit => limit(counts, 0) }))(module Env);
-			setItems(_ => posts)
-			return(())
-		}), [|counts|]);
+		React.useEffect1(React__effect.async @@ () => 
+    Fetch__syntax.({
+			let* posts = X.Fetch.all((
+        module At_repo_0({
+          include X.GenSQL; 
+          let paginate = limit => limit(counts, 0)
+        })
+      ),(module Env));
+      setItems(_ => posts);
+      return(());
+		})
+    , [|counts|]);
 		let onUpdateCount = React.useCallback0(newVal => setCounts(_ => newVal));
-		<AuthContext.Provider>
+		<>
 			<header>
 				<Component__header />
 			</header>
@@ -521,17 +568,17 @@ module Dashboard = {
 			</nav>
 			<main className=sidebarState><ol>
 			{ items
-				|> Array.map(((post_id, title, _creator, _)) => {
+				|> Array.map(((id, title, creator, _text, verified, public, timestamp)) => {
 					let rank = 9;
-					<li
-						key=title
-					>
-						<Card
-							rank
-							title
-							post_id
-						/>
-					</li>
+                <Card
+                  rank
+                  id
+                  title
+                  creator
+                  verified
+                  public
+                  timestamp
+                />
 				})
 				|> React.array
 			}
@@ -557,7 +604,7 @@ module Dashboard = {
 			<aside className=sidebarState>
 				<Component__sidebar />
 			</aside>
-		</AuthContext.Provider>
+		</>
 	}
 };
 
@@ -619,6 +666,7 @@ module App' =
 	->React.use(module Language.Make)
 	->React.use(module Keyboard.Make2(SecondaryNavigator))
 	->React.use(module Command.Make)
+  ->React.use(module AuthContext.Provider)
 )
 
 let () = {

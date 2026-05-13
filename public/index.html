@@ -344,14 +344,15 @@ html {
 #root > main > ol > li > footer {
 	grid-column: 2 / -1;
 	grid-row: 2;
-	display: grid;
-	grid-template-columns: subgrid;
+	display: flex;
+  flex-wrap: wrap;
+	flex-direction: row;
 	font-size: var(--text-xs);
 }
 
 #root > main > ol > li > footer > * {
-	overflow: hidden;
-	text-wrap: nowrap;
+	/* overflow: hidden;
+	text-wrap: nowrap; */
 }
 
 #root > main > ol > li > footer > *:not(:first-child) {
@@ -372,6 +373,7 @@ html {
 
 #root > main > ol > li .activities {
 	display: flex;
+  flex-wrap: wrap;
 	flex-direction: row;
 	color: var(--card-fg);
 	font-family: var(--font-mono);
