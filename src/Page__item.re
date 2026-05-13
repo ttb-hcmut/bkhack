@@ -933,20 +933,7 @@ module App =
 						<PullrequestsInspectBody pullrequests pr_inspect info=postInfo />
 					</main>
 				</>
-				<>
-					<header className=Printf.sprintf("only %s modeline", View.to_string(Edit))>
-						<Item_view__editor.Modeline />
-					</header>
-					<header className=Printf.sprintf("only %s toolbar", View.to_string(Edit))>
-						<Item_view__editor.Toolbar />
-					</header>
-					<aside className=Printf.sprintf("only %s", View.to_string(Edit))>
-						<Item_view__editor.Sidebar />
-					</aside>
-					<main className=Printf.sprintf("only %s", View.to_string(Edit))>
-						<Item_view__editor.Body />
-					</main>
-				</>
+				<Item_view__editor.App className={View.to_string(Edit)}/>
 			</main>
 			<button 
 				className={"show-hide-sidebar " ++ sidebarState}
