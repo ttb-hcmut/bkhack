@@ -4,6 +4,7 @@
 	/* General */
 	--background: var(--ctp-base);
 	--foreground: var(--ctp-text);
+	--foreground-optional: var(--ctp-overlay0);
 
 	--card: var(--ctp-mantle);
 	--card-foreground: var(--ctp-text);

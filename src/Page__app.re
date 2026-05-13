@@ -458,6 +458,7 @@ module Dashboard = {
                 </div>
                 <header>
                   <a href={"item/?id="++string_of_int(id)}>{string(title)}</a>
+									<span className="post_id">{id->React.int}</span>
                 </header>
                 <footer>
                   <div className="has-left-indicator tagline">
@@ -571,6 +572,7 @@ module Dashboard = {
 				|> Array.map(((id, title, creator, _text, verified, public, timestamp)) => {
 					let rank = 9;
                 <Card
+									key={id->string_of_int}
                   rank
                   id
                   title

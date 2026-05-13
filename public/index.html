@@ -323,6 +323,10 @@ html {
 #root > main > ol > li > header {
 	grid-column: 2 / -1;
 	grid-row: 1;
+	display: flex;
+	flex-direction: row;
+	justify-content: start;
+	align-items: center;
 }
 
 #root > main > ol > li > header > a {
@@ -339,6 +343,17 @@ html {
 	#root > main > ol > li > header > a {
 		transition-property: none;
 	}
+}
+
+#root > main > ol > li > header > .post_id {
+	font-family: var(--font-mono);
+	color: var(--foreground-optional);
+	font-size: var(--text-sm);
+	margin-left: var(--space-c);
+}
+
+#root > main > ol > li > header > .post_id::before {
+	content: "#";
 }
 
 #root > main > ol > li > footer {
