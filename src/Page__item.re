@@ -26,7 +26,7 @@ module View = {
 	let of_string = k => List.assoc(k, uu')
 }
 
-module ItemNav = {
+module ItemNav{
 	open View
 
   [@react.component]
@@ -105,29 +105,36 @@ module ArticleHeader = {
 
 let make_html_obj : string => Js.t({ .. __html : string }) = [%mel.raw "function (s) { return { __html : s }; }"]
 
-module ArticleBody = {
-	[@react.component]
-	let make = (~headings, ~article_body) => {
-		<>
-			<nav className="toc">
-				<ol>
-					{headings |> Array.map(x => {
-						let (level, title, id) = x;
-						<li key=id>
-							<a href=Printf.sprintf("#%s", id)>
-								<span>{React.string(level)}</span>
-								<span>{React.string(title)}</span>
-							</a>
-						</li>
-					}) |> React.array}
-				</ol>
-			</nav>
-			<main className="markdown">
-				<div dangerouslySetInnerHTML={make_html_obj @@ article_body} />
-			</main>
-		</>
-	}
+module React{
+	include React
+	open Melange__iter
+	open Melange__containers.Fun
+
+	let iter = array % Iter.to_array
 }
+
+module ArticleBody{
+	open Melange__iter
+	open React
+
+	let heading = ((level, title, id) as _it) =>
+		<li key=id>
+			<a href=("#"++id)>
+				<span>{level->string}</span>
+				<span>{title->string}</span> </a>
+		</li>
+	;
+
+	[@react.component]
+	let make = (~headings, ~article_body) =>
+		<>
+		<nav className="toc">
+			<ol> {headings |> Iter.map(heading) |> React.iter} </ol> </nav>
+		<main className="markdown">
+			<div dangerouslySetInnerHTML={make_html_obj @@ article_body} /> </main>
+		</>
+}
+
 module DiscussionView = {
   module DiscussionHint = {
     [@react.component]
@@ -773,15 +780,16 @@ module At_repo_2(S : {
 
 exception Item_not_found
 
-module App =
-{
+module App{
+	open React
+
 	let show = (x, f) => switch (x) { | Some(info) => f(info) | None => { <> </> } };
 
 	[@react.component]
 	let make = () => {
 		let url = ReasonReactRouter.useUrl();
-		let (prsExpand, setPrsExpand) = React.useState(() => []);
-		let (tab, setTab) = React.useState(() => {
+		let (prsExpand, setPrsExpand) = useState(() => []);
+		let (tab, setTab) = useState(() => {
 			Util.parseQueryParams(url.search)
 			->Js.Dict.get("view")
 			->Option.value(~default=View.to_string(Article))
@@ -808,7 +816,7 @@ module App =
 					| Block.Blocks((xs, _)) => xs |> List.map(s) |> List.flatten
 					| _ => []
 				};
-				let headings = s(block) |> Array.of_list;
+				let headings = s(block) |> Melange__iter.Iter.of_list;
 				(postInfo, headings, Melange__cmarkit.Cmarkit_renderer.doc_to_string(renderer, skel))
 			}) {
 				| Invalid_argument(msg) => { Js.Console.error("rendering error: '" ++ msg ++ "'"); failwith("something bad happened") }
