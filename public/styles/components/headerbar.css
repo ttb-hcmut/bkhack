@@ -49,6 +49,11 @@
 	height: 1.7rem;
 	padding: calc((1.5rem + 2 * var(--space-a) - 1.7rem) / 2) 0;
 }
+@media(prefers-color-scheme: light){
+  #root[data-tileset="gui"] > header > .logo {
+	  background-color: var(--sig-blue);
+  }
+}
 
 #root > header > a.place,
 #root > header > button.place {
