@@ -51,8 +51,6 @@ module List {
 	let last = List.rev %> List.hd;
 
 	let last_opt = it => try (Some(last(it))) { | _ => None }
-
-	let hd_opt = it => try (Some(List.hd(it))) { | _ => None }
 }
 
 let samples_set_languages = [
@@ -76,27 +74,45 @@ let samples = [
 	"set"
 ]
 
-let match_ = (~cmd, last) => Melange__re.({
-	let doit =
+exception Ambiguous_completion(list(string))
+
+let match_ = Melange__re.({
+	let doit = last =>
 		Re.exec_opt (
 			Re.compile @@ Re.(seq([bos, str(last), group(
 				any |> rep1
 			), eos]))
 		)
-		%> Option.map (g => Re.Group.get(g, 1))
 		;
-	Js.Console.log2("try to complete", cmd);
-	switch (cmd) {
-	| ["set", "--highlight", _] =>
-		samples_set_highlight |> List.filter_map(doit) |> List.hd_opt
-	| ["set", "--language", _] =>
-		samples_set_languages |> List.filter_map(doit) |> List.hd_opt
-	| ["set", _] =>
-		samples_set |> List.filter_map(doit) |> List.hd_opt
-	| [_] =>
-		samples |> List.filter_map(doit) |> List.hd_opt
-	| _ =>
-		None
+	let funnel_opt = xs => {
+		switch (xs) {
+		| []  => None
+		| [x] => Some(x)
+		| xs  => raise(Ambiguous_completion(xs |> List.map(g => g->Re.Group.get(0))))
+		}
+	};
+	(last, ~cmd) => {
+		Js.Console.log2("try to complete", cmd);
+		switch (cmd) {
+		| ["set", "--highlight", _] =>
+			samples_set_highlight |> List.filter_map(last->doit) |> funnel_opt
+		| ["set", "--highlight"] =>
+			samples_set_highlight |> List.filter_map(""->doit) |> funnel_opt
+		| ["set", "--language", _] =>
+			samples_set_languages |> List.filter_map(last->doit) |> funnel_opt
+		| ["set", "--language"] =>
+			samples_set_languages |> List.filter_map(""->doit) |> funnel_opt
+		| ["set", _] =>
+			samples_set |> List.filter_map(last->doit) |> funnel_opt
+		| ["set"] =>
+			samples_set |> List.filter_map(""->doit) |> funnel_opt
+		| [_] =>
+			samples |> List.filter_map(last->doit) |> funnel_opt
+		| [] =>
+			samples |> List.filter_map(""->doit) |> funnel_opt
+		| _ =>
+			None
+		}
 	}
 });
 
@@ -105,7 +121,10 @@ let extend = (~tree, s) => {
 	let last_cmd_opt = Shell__lang.Program.cmd__last_opt(tree)->Option.bind(get_unfetched);
 	let last_opt = last_cmd_opt->Option.bind(cmd => {
 		List.last_opt(cmd)->Option.bind(match_(~cmd)) });
-	switch (last_opt) { | None => s | Some(fillin) => s++fillin }
+	last_opt
+	|> Option.map(g =>
+		Melange__re.({ let fillin = g->Re.Group.get(1); s++fillin }))
+	|> Option.value(~default=s)
 };
 
 [@react.component]
@@ -157,11 +176,12 @@ let make = (~memo_transition=?) => {
 		historyContent->Option.value(~default="");
 		None
 	}, [|historyIndex|]);
-	let completeBarHTMLContent = useCallback0 @@ () => {
+	let completeBarHTMLContent = useCallback1(() => {
+		assert_ @@ _ =>
 		bar->fakeBarSync @@ () =>
 		bar->setBarHTMLContent @@ s =>
 		s->Shell__parse.string->Result.lift(tree => extend(~tree, s))->Result.value(~default=s)
-	};
+	}, [|assert_|]);
 	let (errorClass, errorBox) = useMemo1(() => {
 		navigatorError
 		|> Option.map(fun
@@ -172,6 +192,10 @@ let make = (~memo_transition=?) => {
 		| Navigation.Invalid_syntax_of_command(cmd) => {
 			let k = "error invalid-syntax-of-command "++cmd;
 			(k, wrap_dialog(<div></div>))
+		}
+		| Ambiguous_completion(cmds) => {
+			let k = "warning ambiguous-completion";
+			(k, wrap_dialog(<div>{cmds |> Array.of_list |> Array.map(string) |> array}</div>))
 		}
 		| e => {
 			let k = "error";
