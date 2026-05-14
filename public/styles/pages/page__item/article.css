@@ -65,8 +65,37 @@
 	border-top: solid 1px var(--card-border);
 }
 
-#root > main.article > nav.toc {
-	border: solid 1px oklab(61.0324% -.0598051 -.144428 / .2);
+#root > main.article > .innerbody.article > nav.toc {
+	border: solid 1px var(--card-fg-accent-0-20);
 	background-color: var(--ctp-crust);
 	padding: var(--space-a);
+	font-family: var(--font-mono);
+	font-size: var(--text-sm);
+}
+
+#root > main.article > .innerbody.article > nav.toc > ol::before {
+	display: block;
+	content: "contents";
+	margin-bottom: var(--space-e);
+}
+
+#root > main.article > .innerbody.article > nav.toc > ol > li {
+	padding: var(--space-c) var(--space-a) ;
+	transition-property: background-color;
+	transition-duration: 300ms;
+}
+
+@media (prefers-reduced-motion) {
+	#root > main.article > .innerbody.article > nav.toc > ol > li {
+		transition-property: none;
+		transition-duration: 0ms;
+	}
+}
+
+#root > main.article > .innerbody.article > nav.toc > ol > li:hover {
+	background-color: var(--switch-background);
+}
+
+#root > main.article > .innerbody.article > nav.toc > ol > li > a > span:nth-child(2) {
+	margin-left: var(--space-a);
 }

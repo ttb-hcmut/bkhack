@@ -73,6 +73,7 @@
 	--card-fg-highlighted: var(--ctp-text);
 	--card-fg-aux: var(--ctp-overlay0);
 	--card-fg-accent-0: var(--sig-blue);
+	--card-fg-accent-0-20: oklab(from var(--sig-blue) l a b / 0.2);
 	--card-fg-accent-1: var(--ctp-sapphire);
 	--card-fg-accent-1-20: oklab(from var(--ctp-sapphire) l a b / 0.2);
 	--card-fg-accent-1-30: oklab(from var(--ctp-sapphire) l a b / 0.3);
