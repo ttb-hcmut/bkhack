@@ -2,7 +2,7 @@
 
 Our philosophy is that each programmer should have a signature style of writing, we celebrate differences and believe that we can learn from each other to become better code writers and readers.
 
-> [!NOTE] Elsewhere this culture will be discouraged due to maintenance complexity, however our team is small (~4 people) and doesn't grow and we keep a close social social, so for us it's fine.
+> [!NOTE] Elsewhere this culture will be discouraged due to maintenance complexity, however our team is small (~3 people at a time) and doesn't grow and we keep a close social social, so for us it's fine.
 
 Even so, for sane development, we do establish some bare-minimum common grounds:
 
