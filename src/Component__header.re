@@ -201,10 +201,10 @@ let make = (~memo_transition=?) => {
 		<div className="displayonly highlight">{innerHTML}</div>
 		{errorBox}
 	</form>
-	<a className="place projects" href="/projects"></a>
-	<a className="place wiki" href="/wiki"></a>
+	<a className="place projects" href="/projects/"></a>
+	<a className="place wiki" href="/wiki/"></a>
 	<a className="place notifications"></a>
-	<a className="place settings" href="/settings"></a>
+	<a className="place settings" href="/settings/"></a>
 
   { showLoginButton ?
     <button className="place auth" title="Log in" onClick={_ => auth.forceAuth()}/>
