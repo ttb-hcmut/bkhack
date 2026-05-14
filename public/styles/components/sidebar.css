@@ -1,5 +1,9 @@
 @import "/styles/variables.css";
 
+#sidebar-search {
+	display: none !important;
+}
+
 .visually-hidden {
 	position: absolute;
 	width: 1px;
