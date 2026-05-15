@@ -8,7 +8,7 @@ command hints and tips as they are littered about the user interface.
   Stream programming in #bkhack is sh pipelining, with certain flavorful
 differences. The most important difference is that, instead of dealing
 with textual data and lines and files, here we deal with abstract post
-data and post counts. Consider\
+data and post counts. Consider
 #align(center)[```sh feed | split -c 10 ```]
 where ```sh split``` has the option ```sh -c NUM``` where `NUM` is the
 count size of each chunk. Conventionally, the POSIX ```sh split``` command
