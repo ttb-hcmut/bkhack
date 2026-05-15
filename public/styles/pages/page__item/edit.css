@@ -3,20 +3,207 @@
   display:none;
 }
 /* temp */
-#root > main.edit > .edit *{
-  border: 1px solid var(--card-border);
+#root > main.edit > .edit * {
+  /* border: 1px solid var(--card-border); */
+  box-sizing: border-box;
   color: var(--ctp-text);
 }
 
 
-#root > main.edit > .edit {
-  border: 1px solid var(--card-border);
+#root > main.edit > .edit > * {
+  /* border: 1px solid var(--card-border); */
+  padding: var(--space-a);
+  border-bottom: 1px solid var(--card-border);
 }
 
-#root > main.edit > .edit > header{
-	display: grid;
+#root > main.edit > .edit > header {
+	display: flex;
   flex-wrap: wrap;
 	flex-direction: row;
-  padding: var(--space-a);
+  justify-content: flex-end; 
+  gap: var(--space-c);
+  border-bottom: 1px solid var(--card-border);
+  background-color: var(--ctp-mantle);
+}
+#root > main.edit > .edit > header > .save {
+  padding: var(--space-c);
+  border: 1px solid var(--ctp-yellow);
+  color: var(--ctp-yellow);
+  background-color: color-mix(in srgb, var(--ctp-yellow), transparent 75%);
+  border-radius: var(--radius);
+  transition-property: all;
+}
+#root > main.edit > .edit > header > .save:hover {
+  border: 1px solid var(--ctp-yellow);
+  color: white;
+  background-color: var(--ctp-yellow);
+}
+#root > main.edit > .edit > header > .cancel {
+  padding: var(--space-c);
+  border: 1px solid var(--ctp-red);
+  color: var(--ctp-red);
+  background-color: color-mix(in srgb, var(--ctp-red), transparent 75%);
+  border-radius: var(--radius);
+  transition-property: all;
+}
+#root > main.edit > .edit > header > .cancel:hover {
+  border: 1px solid var(--ctp-red);
+  color: white;
+  background-color: var(--ctp-red);
+}
+
+#root > main.edit > .edit > header> .dropdown {
+  padding: var(--space-c);
+  background-color: var(--ctp-crust);
+  border-radius: var(--radius);
+  color: var(--ctp-subtext0)
+}
+#root > main.edit > .edit > header> .dropdown:hover {
+  color: var(--ctp-text)
+}
+#root > main.edit > .edit > header> .settings {
+  padding: var(--space-c);
+  background-color: var(--ctp-crust);
+  border-radius: var(--radius);
+  width:100%;
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-rows: auto auto;
+  gap: var(--space-c);
+}
+#root > main.edit > .edit > header> .settings > * {
+  border: 1px solid var(--ctp-mantle);
+  padding: var(--space-c);
+  border-radius: var(--radius);
+}
+#root > main.edit > .edit > header> .settings > .commit-message {
+  grid-column: 1/2;
+  grid-row: 1/2;
+}
+#root > main.edit > .edit > header> .settings > .tags {
+  grid-column: 1/2;
+  grid-row: 2/3;
+}
+#root > main.edit > .edit > header> .settings > .commit-options {
+  grid-row: 1/3;
+}
+#root > main.edit > .edit > .toolbar {
+  background-color: var(--ctp-crust);
+  gap: var(--space-c);
+	display: flex;
+  flex-wrap: wrap;
+	flex-direction: row;
+}
+#root > main.edit > .edit > .toolbar > label {
+  color: var(--ctp-subtext0);
+  font-size: var(--text-sm);
+  border-left: var(--ctp-mantle);
+}
+#root > main.edit > .edit > .toolbar > #togglePreviewEditing {
+  border-radius: var(--radius);
+  padding: 0 var(--space-c);
+}
+#root > main.edit > .edit > .toolbar > #togglePreviewEditing.previewing {
+  border: 1px solid var(--ctp-blue);
+  color: var(--ctp-blue);
+}#root > main.edit > .edit > .toolbar > #togglePreviewEditing.editing {
+  border: 1px solid var(--ctp-green);
+  color: var(--ctp-green);
+}
+#root > main.edit > .edit > .preview {
+  background-color: var(--ctp-base);
+}
+
+#root > main.edit > .edit > .editing {
+  background-color: var(--ctp-base);
+  display: grid;
+  gap: var(--space-c);
+}
+#root > main.edit > .edit > .editing > .title {
+  padding: var(--space-c);
+  display: grid;
+  background-color: var(--ctp-mantle);
+  border-radius: var(--radius) var(--radius) 0 0;
+  gap: var(--space-c);
   border: 1px solid var(--card-border);
+}
+#root > main.edit > .edit > .editing > .title > label {
+  color: var(--ctp-subtext0);
+  font-size: var(--text-sm);
+  background-color: var(--ctp-mantle);
+  border-radius: var(--radius);
+}
+
+#root > main.edit > .edit > .editing > .title > input {
+  font-size: var(--text-base);
+  outline: none;
+	background-color: var(--ctp-crust);
+  border-radius: var(--radius);
+  border: 1px solid var(--ctp-surface0);
+  color: var(--ctp-text);
+  caret-color: var(--ctp-text);
+  padding: var(--space-a);
+}
+#root > main.edit > .edit > .editing > .body {
+  background-color: var(--ctp-mantle);
+  display: grid;
+  gap: 0;
+  padding: 0;
+  height: calc(30*(var(--text-base)));
+  overflow-y: scroll;
+  scrollbar-color: var(--card-border) transparent;
+  scrollbar-width: thin;
+  border: 1px solid var(--card-border);
+  grid-template-columns: max-content 1fr;
+  grid-template-rows: max-content;
+}
+#root > main.edit > .edit > .editing > .body > .row-number {
+  color: var(--ctp-subtext0);
+  grid-column:1/2;
+  grid-row:1/2;
+  text-align: right;
+  white-space: pre-wrap;
+  word-break: break-word;
+  pointer-events: none;
+  user-select:none;
+  background-color: var(--ctp-base);
+  border-right: 1px solid var(--card-border);
+  padding: 0 var(--space-c);
+}
+#root > main.edit > .edit > .editing > .body > .body-input {
+  grid-column:2/3;
+  grid-row:1/2;
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 100%;
+  width: 100%;
+  outline: none;
+	background-color: var(--ctp-crust);
+  border: 0;
+  padding: 0 var(--space-c);
+  scrollbar-color: var(--card-border) transparent;
+  scrollbar-width: thin;
+	background-color: transparent;
+  resize: none;
+}
+/* #root > main.edit > .edit > .editing > .body > .ghost {
+  grid-column:2/3;
+  grid-row:1/2;
+  z-index: -9;
+  white-space: pre-wrap;
+  word-break: none;
+  pointer-events: none;
+  user-select: none;
+  border: 1px solid var(--card-border);
+  padding: 0 var(--space-c);
+  opacity: 0%;
+} */
+#root > main.edit > .edit > .editing > .body > .text-style {
+  font-size: var(--text-base);
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-normal);
+  line-height: 1.5;
+  font-style: normal;
 }

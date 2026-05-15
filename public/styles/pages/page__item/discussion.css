@@ -285,7 +285,7 @@
 }
 .comments.add-reply > .content > form > .ghost {
   border: 1px solid var(--ctp-surface2);
-  visibility: hidden;
+  opacity: 0%;
   white-space: pre-wrap;
   word-break: break-word;
   pointer-events: none;

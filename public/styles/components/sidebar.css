@@ -44,6 +44,8 @@
 	display:none;
 	width: 80vw;
 	height: calc(100vh - 6rem - var(--space-a));
+  scrollbar-color: var(--card-border) transparent;
+  scrollbar-width: thin;
 	/* margin-top: var(--space-a); */
 	left: 50%;
 	transform: translate(-50%, 0%);

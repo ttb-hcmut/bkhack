@@ -14,4 +14,9 @@ defmodule PostBE do
       {:error, _} -> nil
     end
   end
+  # def updatePost(post_id,content,action)do
+  # end
+  # def deletePost(post_id)do
+  # end
+  # def getPost()
 end
