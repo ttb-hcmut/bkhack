@@ -1,4 +1,6 @@
 #import "/article": *
+#import "./shell__parse.typ"
+#import "./shell__sym.typ"
 #let (bkhack, Bkhack) = ([bkhack], [bkhack])
 #title[= Stream-based programming, as compared to sh]
 For #bkhack, the user gets to familiarize with the concept of _stream-based
@@ -22,14 +24,30 @@ no ```sh cd``` command.
 Introduced by Doughlas, pipelining enables commands to compose with each
 other parsibly simply via textual data. In this composition, there are
 relationships between commands to form the pipeline by parts.\
-  The _source_ is the start of the pipeline. #lorem(40) The rest are
-_cantraps_--commands that.\
+  The _source_ is the start of the pipeline, it exclusively produces
+output. The _sink_ is the end of the pipeline, it exclusively consumes
+the input. #lorem(40) The rest are _cantrips_--commands that don't produce
+output but instead apply an effect onto the current environment.\
   It's worth noting that, even on the conceptual level, the evaluation
 order of the part commands is that all commands start simultaneously when
 a pipeline runs.
 == Function
 A reusable pipeline or grouping of commands would be called a _function_
 . In the #bkhack shell language, #lorem(70)\
-  #lorem(70)
+#lorem(70)
 == Grammar
-
+The grammar of the #bkhack shell language, given in EBNF form in @gr, #lorem(30)
+Notice how the command rule do not distinguish parts into flags or values
+which are expected from most real-world usage. Indeed, the responsibility
+of interpreting these parts, a.k.a. _options_, is left to the higher-level
+_option parser_, such as POSIX `getopts`.
+#place(auto, float: true, scope: "parent")[
+  #figure(caption: [Grammar for the #bkhack shell language], shell__parse.langchain) <gr>
+]
+== Typing
+The typing of the #bkhack shell language, given in @typ, #lorem(30)
+This is useful when shell commands have to be embedded in a statically-typed
+programming language.
+#place(auto, float: true, scope: "parent")[
+  #figure(caption: [Typing for the #bkhack shell language], shell__sym.v) <typ>
+]
