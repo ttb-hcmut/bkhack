@@ -29,4 +29,7 @@ order of the part commands is that all commands start simultaneously when
 a pipeline runs.
 == Function
 A reusable pipeline or grouping of commands would be called a _function_
-. In the #bkhack shell language, 
+. In the #bkhack shell language, #lorem(70)\
+  #lorem(70)
+== Grammar
+
