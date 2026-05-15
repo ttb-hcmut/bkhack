@@ -194,7 +194,7 @@ RunSql.query(conn,[
 ])
 RunSql.query(conn,[
     ~S"""
-    insert into posts values (0, 'Good Post Title', 0, 'Good Post Body',0,0,'2026-04-28T15:18:26Z')
+    insert into posts values (0, 'Good Post Title', 0, 'Good Post Body',false,false,'2026-04-28T15:18:26Z')
     """,
 ])
 RunSql.query(conn,[
