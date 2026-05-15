@@ -43,11 +43,15 @@
 	background-repeat: no-repeat;
 	background-position-x: center;
 	background-position-y: center;
-	background-color: var(--sig-blue-deep);
+	background-color: var(--sig-blue);
 	background-size: 4rem 1.7rem;
 	width: 4rem;
 	height: 1.7rem;
 	padding: calc((1.5rem + 2 * var(--space-a) - 1.7rem) / 2) 0;
+}
+
+@media (prefers-color-scheme: dark) {
+	background-color: var(--sig-blue-deep);
 }
 
 #root > header > a.place,
