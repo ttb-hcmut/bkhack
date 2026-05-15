@@ -1,9 +1,11 @@
 #import "/article": *
 #import "./grammar.typ": *
 
-#let punctuation_delimiter = (fill: color.hsl(0deg, 40%, 60%))
+#let punctuation_delimiter = (
+  fill: color.hsl(0deg, 40%, 60%))
 
-#let punctuation_bracket = (fill: color.hsl(235deg, 40%, 40%))
+#let punctuation_bracket = (
+  fill: color.hsl(235deg, 40%, 40%))
 
 #let (brak_l, brak_r) = (lexeme_0(..punctuation_bracket, "{"), lexeme_0(..punctuation_bracket, "}"))
 
@@ -19,15 +21,19 @@
 
 #let word    = category[word]
 
+#let program_ = Prod(program, {
+  Or[ #command #optional[#pipe #program] ][_Simple program_]
+  Or[ #brak_l #program #end_of_seq #brak_r #optional[#pipe #program] ][_Composite program_]
+  Or[ #parn_l #program #parn_r #optional[#pipe #program] ][_Subshell_]
+})
+
+#let command_ = Prod(command, {
+  Or[#word #optional(command)][]
+})
+
 #let langchain = bnf(
-	Prod(program, {
-    Or[ #command #optional[#pipe #program] ][_Simple program_]
-    Or[ #brak_l #program #end_of_seq #brak_r #optional[#pipe #program] ][_Composite program_]
-    Or[ #parn_l #program #parn_r #optional[#pipe #program] ][_Subshell_]
-  }),
-	Prod(command, {
-    Or[#word #optional(command)][]
-  }),
+  program_,
+  command_,
 	Prod(end_of_seq, {
     Or[#lexeme_0(..punctuation_delimiter, ";")][]
   }),
