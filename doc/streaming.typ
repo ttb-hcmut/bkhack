@@ -1,10 +1,10 @@
 #import "/article": *
 #let (bkhack, Bkhack) = ([bkhack], [bkhack])
 #title[= Stream-based programming, as compared to sh]
-For #bkhack, the user gets to familiarize with the concept of
-_stream-based programming_. Indeed, visitors of the site will often
-catch glance of command hints and tips as they are littered about the
-user interface. #lorem(20)\
+For #bkhack, the user gets to familiarize with the concept of _stream-based
+programming_. Indeed, visitors of the site will often catch glance of
+command hints and tips as they are littered about the user interface.
+#lorem(20)\
   Stream programming in #bkhack is sh pipelining, with certain flavorful
 differences. The most important difference is that, instead of dealing
 with textual data and lines and files, here we deal with abstract post
