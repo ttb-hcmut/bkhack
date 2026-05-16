@@ -100,3 +100,11 @@ We need to inform the build system that for a Reason page file $x$ there is a ma
 [^attributes]: https://ocaml.org/manual/5.3/attributes.html
 
 > One of the most definitive use cases of floating attributes! The OCamldoc system also support floating attributes for manipulating system.
+
+# Diverse implementation
+
+For every module, we have alternative modules that achieve a similar goal using different methods, different algorithms. A list of some of these (we haven't kept track of all):
+
+- For parsing the bkhack shell language, we use two implementations, one based on parser combinators (src/Shell__parse.re) and one based on ocaml re (src/Shell__parse_1.re). Refer to [streaming](./streaming.pdf) for a full technical report on this, and [parsing](./parsing.pdf) for a comparison between parsing techniques.
+- For parsing of the markdown language - as used throughout the project including the article view and pull request view and editor view etc - we use two implementations, one based on Daniel Bünzli's Cmarkit library, one based on Remark. See [markdown](./markdown.pdf) for the full technical report.
+- For database, we use six implementations.
