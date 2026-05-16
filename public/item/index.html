@@ -26,6 +26,9 @@ html {
 #root {
 	background-color: var(--global-bg);
 	min-height: 100vh;
+  display:flex;
+  flex-direction: column;
+  gap: var(--space-a);
 	padding-bottom: var(--space-a);
 }
 
@@ -141,33 +144,6 @@ html {
 		grid-column: 2 / 3;
 		grid-row: 3 / 4;
 	}
-	#root > aside {
-		display: block !important;
-		grid-column: 3 / 4;
-		grid-row: 3 / 7;
-		width: unset;
-		height: unset;
-		margin-top: unset;
-		left: unset;
-		transform: unset;
-	}
-	#root > .show-hide-sidebar{
-    font-family: var(--font-mono);
-		position: unset;
-		grid-column: 3 / 4;
-		grid-row: 2 / 3;
-		padding: var(--space-a);
-  	justify-self: end;
-		background-color: var(--card-bg);
-		border: solid 1px var(--card-border);
-		border-radius: var(--radius);
-		padding: var(--space-a);
-	}
-}
-	
-
-#root .show-hide-sidebar {
-	height: 2rem;
 }
 
 /* Show hide sidebar system */
@@ -175,9 +151,6 @@ html {
 /* if mobile state1 => show, state0 => hide */
 
 @media (max-width: 64rem) {
-	#root > .show-hide-sidebar.state1::after{
-		content: "Hide Sidebar";
-	}
 	body:has(.state1){
 		overflow: hidden;
 	}
@@ -188,18 +161,6 @@ html {
 	}
 	#root:has(.state1){
 		background-color: color-mix(in srgb, var(--global-bg), black 50%);
-	}
-	/* TODO: figure out how to make the track of the scrollbar
-			 invisible but the thumb visible */
-	#root > aside.state1{
-		display: block;
-		position: fixed;
-		overflow-y: auto;
-		/* height: 80vh;*/
-		top: 6rem;
-	}
-	#root > .show-hide-sidebar.state0::after{
-		content: "Show Sidebar";
 	}
 }
 /* if desktop state0 => show, state1 => hide */
@@ -218,13 +179,6 @@ html {
 	#root > footer.state0 {
 		grid-column: 2 / 3;
 	}
-	#root > .show-hide-sidebar.state0::after{
-		content: "Hide Sidebar";
-	}
-	#root > aside.state0 {
-		display: block !important;
-		grid-column: 3 / 4;
-	}
 
 	#root > nav.state1 {
 		grid-column: 2 / 4;
@@ -234,15 +188,6 @@ html {
 	}
 	#root > footer.state1 {
 		grid-column: 2 / 4;
-	}
-	#root > .show-hide-sidebar.state1::after{
-		content: "Show Sidebar";
-	}
-	/* #root > .show-hide-sidebar.state1{
-	} */
-	#root > aside.state1 {
-		display: none !important;
-		grid-column: 3 / 4;
 	}
 	
 

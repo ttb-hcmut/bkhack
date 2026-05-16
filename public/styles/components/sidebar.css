@@ -1,5 +1,78 @@
 @import "/styles/variables.css";
 
+@media (max-width: 64rem) {
+	#root > .show-hide-sidebar.state1:hover::after{
+		content: "Hide Sidebar";
+	}
+	#root > .show-hide-sidebar.state0:hover::after{
+		content: "Show Sidebar";
+	}
+  #root > aside {
+    left: 50%;
+    transform: translate(-50%, 0%);
+  }
+	/* TODO: figure out how to make the track of the scrollbar
+			 invisible but the thumb visible */
+	#root > aside.state1{
+		display: flex !important;
+    flex-direction: column;
+		position: fixed;
+		overflow-y: auto;
+		/* height: 80vh;*/
+		top: 6rem;
+	}
+}
+@media (min-width: 64rem) {
+	#root > .show-hide-sidebar.state0:hover::after{
+		content: "Hide Sidebar";
+	}
+	#root > .show-hide-sidebar.state1:hover::after{
+		content: "Show Sidebar";
+	}
+	#root > aside.state0 {
+		display: flex !important;
+    flex-direction: column;
+		grid-column: 3 / 4;
+	}
+	#root > aside.state1 {
+		display: none !important;
+		grid-column: 3 / 4;
+	}
+  #root > aside {
+		grid-column: 3 / 4;
+		grid-row: 2 / 7;
+		width: unset !important;
+		height: unset !important;
+		left: unset !important;
+		transform: unset !important;
+	}
+}
+#root > .show-hide-sidebar::after{
+  font-size: var(--text-sm);
+  line-height: 1;
+  font-weight: var(--font-weight-normal);
+}
+#root > .show-hide-sidebar{
+  display:grid;
+  grid-template-columns: 1rem;
+  grid-template-rows: 1rem;
+  gap: var(--space-a);
+}
+#root > .show-hide-sidebar > .hamburger{
+  display:grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  height: var(--text-sm);
+  gap: 20%;
+  aspect-ratio: 1;
+}
+#root > .show-hide-sidebar > .hamburger > span{
+  background-color: var(--card-border);
+  height:100%;
+  width:100%;
+}
+
+
 #sidebar-search {
 	display: none !important;
 }
@@ -17,10 +90,11 @@
 }
 
 #root > .show-hide-sidebar{
+  box-sizing: border-box;
   font-size: var(--text-sm);
 	position: fixed;
-	top:3rem;
-	right:1rem;
+	top: calc(1.5rem + 3 * var(--space-a));
+	right:0;
 	padding: var(--space-a);
 	display: flex;
 	flex-direction: row;
@@ -28,7 +102,8 @@
 	justify-content: start;
 	background-color: var(--card-bg);
 	border: solid 1px var(--card-border);
-	border-radius: var(--radius);
+	border-right: 0;
+	border-radius: var(--radius) 0 0 var(--radius);
 	padding: var(--space-a);
 	color: var(--light-b);
 	transition-property: border-radius, background-color;
@@ -46,18 +121,12 @@
 	height: calc(100vh - 6rem - var(--space-a));
   scrollbar-color: var(--card-border) transparent;
   scrollbar-width: thin;
-	/* margin-top: var(--space-a); */
-	left: 50%;
-	transform: translate(-50%, 0%);
+  gap: var(--space-a);
   z-index: 90;
 }
 
 #root > aside h2 {
 	margin: 0;
-}
-
-#root > aside > *:not(:first-child) {
-	margin-top: var(--space-a);
 }
 
 #root > aside > * > h2::before {

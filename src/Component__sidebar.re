@@ -1,5 +1,30 @@
 open React
 
+module ShowHide = {
+  [@react.component]
+  let make = (~sidebarState,~setSidebarState) => {
+    <button 
+      className={"show-hide-sidebar " ++ sidebarState}
+      onClick={_=>{
+        if (sidebarState == "state0")
+        {
+          setSidebarState(_ => "state1");
+        }
+        else
+        {
+          setSidebarState(_ => "state0");
+        }
+      }}
+      >
+      <span className="hamburger">
+        <span className="0"/>
+        <span className="1"/>
+        <span className="2"/>
+      </span>
+    </button>
+  }
+}
+
 module Notes = {
 
 	// placeholder
@@ -225,10 +250,13 @@ module Activities = {
 };
 
 [@react.component]
-let make = () =>
+let make = (~sidebarState:string, ~setSidebarState:(string=>string)=>unit) =>
 	<>
-	<Search />
-	<Notes />
-	<Trending />
-	<Activities />
+  <ShowHide  sidebarState setSidebarState/>
+	<aside className=sidebarState>
+    <Search />
+    <Notes />
+    <Trending />
+    <Activities />
+	</aside>
 	</>

@@ -13,7 +13,6 @@
 	background-color: var(--card-bg-translucent);
 	margin-left: var(--space-a);
 	margin-right: var(--space-a);
-	margin-top: var(--space-a);
 }
 
 #root > nav button {

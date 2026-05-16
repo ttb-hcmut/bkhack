@@ -943,23 +943,8 @@ module App{
 				</>
 				<Item_view__editor.App className={View.to_string(Edit)}/>
 			</main>
-			<button 
-				className={"show-hide-sidebar " ++ sidebarState}
-				onClick={_=>{
-					if (sidebarState == "state0")
-					{
-						setSidebarState(_ => "state1");
-					}
-					else
-					{
-						setSidebarState(_ => "state0");
-					}
-				}}
-				>
-			</button>
-			<aside className=sidebarState>
-				<Component__sidebar />
-			</aside>
+			
+			<Component__sidebar sidebarState setSidebarState />
 			
 		</>
 	}
