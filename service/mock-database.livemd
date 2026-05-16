@@ -248,7 +248,7 @@ Sqlx.query!(conn, ~S"delete from users", [])
 Sqlx.query!(
   conn,
   ~S"""
-  insert into users values (0, 'yminsky_fan', 0)
+  insert into users values (0, 'yminsky_fan', 'ballsballsballs', 'khangalang@bkhack.org', 0)
   """,
   []
 )
@@ -261,7 +261,35 @@ Sqlx.query!(
 
   # FRP là gì?
 
-  TBA')
+  TBA', false, true, '2026-04-28T15:18:26Z')
+  """,
+  []
+)
+Sqlx.query!(
+  conn,
+  ~S"""
+  insert into posts values (78, 'Applicative Programming with Effects', 0, 'Famous paper.', false, true, '2026-04-28T15:18:26Z')
+  """,
+  []
+)
+Sqlx.query!(
+  conn,
+  ~S"""
+  insert into posts values (79, 'Why Terraform chose OCaml', 0, '', false, true, '2026-04-28T15:18:26Z')
+  """,
+  []
+)
+Sqlx.query!(
+  conn,
+  ~S"""
+  insert into posts values (80, 'The Design of a Pretty Printing Library', 0, 'John Hughes là một nhà nghiên cứu khoa học máy tính nổi tiếng!', false, true, '2026-04-28T15:18:26Z')
+  """,
+  []
+)
+Sqlx.query!(
+  conn,
+  ~S"""
+  insert into posts values (81, 'Attention is Not All You Need', 0, '', false, true, '2026-04-28T15:18:26Z')
   """,
   []
 )

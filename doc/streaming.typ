@@ -25,8 +25,9 @@ The original sh language is a user interface for the system shell, which
 itself is an interface for the kernel, as part of the shell-kernel
 architecture @shell-kernel-arch. In comparison, the #bkhack shell
 language is highly abstract and doesn't need a stand-in kernel analogy:
-at most, the #bkhack website's command system emulates the shell-kernel 
-architecture.
+at most, the #bkhack website's command system attempts to emulate the
+shell-kernel architecture, so that the user feels the shell-kernel
+architecture even when it's not really there.
 == Pipeline
 Introduced by Doughlas, pipelining enables commands to compose with each
 other parsibly simply via textual data. In this composition, there are

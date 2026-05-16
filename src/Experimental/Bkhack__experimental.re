@@ -45,4 +45,6 @@ module type S = {
 };
 
 module GenSQL = GenSQL;
+module GenStructuredQuery = GenStructuredQuery;
+module Firebase__with_strqry = Firebase__with_strqry;
 module Fetch = Exprm__fetch;

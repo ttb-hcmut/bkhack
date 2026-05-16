@@ -544,8 +544,31 @@ module Dashboard = {
 			None
 		}, [|counts|]);
 		let module X = Bkhack__experimental;
-		React.useEffect1(React__effect.async @@ () => 
+		React__effect.useAsync1(() => 
     Fetch__syntax.({
+			let* () =
+				try ({
+					let module K = At_repo_0({ include X.GenStructuredQuery; let paginate = limit => limit(counts, 0) });
+					let body = Js.Obj.empty();
+					Js.Console.log(K.q);
+					Js.Console.log(X.Firebase__with_strqry.conv(K.q));
+					body##"structuredQuery" #= K.q->X.Firebase__with_strqry.conv;
+					let* a = Fetch.fetchWithInit(
+						"https://firestore.googleapis.com/v1/projects/bkhack-2eb8c/databases/(default)/documents:runQuery",
+						Fetch.RequestInit.make(
+							~method_=Post,
+							~body=Fetch.BodyInit.make(body->Js.Json.serializeExn),
+							~headers=Fetch.HeadersInit.make({
+								"Content-Type": "application/json",
+							}),
+							()
+						)
+					) >>= Fetch.Response.json;
+					Js.Console.log(a);
+					return()
+				}) {
+					| Failure(x) => { Js.Console.log2("failure", x); return() };
+				};
 			let* posts = X.Fetch.all((
         module At_repo_0({
           include X.GenSQL; 

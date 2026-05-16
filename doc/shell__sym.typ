@@ -16,11 +16,11 @@
 #let cons = rule_0(
   name: [Cons],
   $ x : "Cmd" T $, $ x' : "Program" T $,
-  $ "||"(x, x') : "Program" T $
+  $ x "||%" x' : "Program" T $
 )
 
 #let program = rule_0(
-  name: [Substitute],
+  name: [Subsection],
   $ t : "Program" A $,
   $ "$%"(t) : "Cmd" A $
 )
