@@ -14,3 +14,5 @@ let stringQueryParams' : list((string, string)) => string
 module List : {
 	let replace_assoc' : 'k => 'v => list(('k, 'v)) => list(('k, 'v))
 }
+
+let utcToRelative : string => string

@@ -20,28 +20,6 @@ module Date = {
 		[@mel.send] external date : t => int = "getUTCDate";
 		[@mel.send] external month : t => int = "getUTCMonth";
 		[@mel.send] external full_year : t => int = "getUTCFullYear";
-    
-    let toRelative = (utc:string) =>{
-      let fixed = utc
-      |> Js.Date.fromString  
-      |> Js.Date.valueOf
-      let current = Js.Date.now() 
-      let seconds = int_of_float(current -. fixed) / 1000
-      let minutes = seconds / 60
-      let hours   = minutes / 60
-      let days    = hours / 24
-      let weeks   = days / 7
-      let months  = days / 31
-      let years   = days / 360
-      if        (seconds < 60)  { string_of_int(seconds)  ++ "s ago"
-      } else if (minutes < 60)  { string_of_int(minutes)  ++ "\' ago"
-      } else if (hours < 24)    { string_of_int(hours)    ++ "h ago"
-      } else if (days < 7)      { string_of_int(days)     ++ "d ago"
-      } else if (weeks < 4)     { string_of_int(weeks)    ++ "w ago"
-      } else if (months < 12)   { string_of_int(months)   ++ "m ago"
-      } else                    { string_of_int(years)    ++ "y ago"
-      }
-    }
 	}
 }
 

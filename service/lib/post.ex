@@ -1,12 +1,13 @@
 defmodule PostBE do
   import Ecto.Query
-  def createPost(creator_id,post_title,post_text)do
+  def createPost(creator_id,post_title,post_text,public)do
     query = from u in User, select: u.role, where: u.user_id == ^creator_id
     xs = Data0.one(query)
     changeset = Post.insert(%Post{}, %{
       post_title: post_title,
       creator_id: creator_id,
       post_text:  post_text,
+      public:     public,
       verified:   (xs != 1), # 1 => prof
     })
     case Data0.insert(changeset) do
