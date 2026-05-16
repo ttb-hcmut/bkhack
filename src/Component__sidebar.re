@@ -1,6 +1,6 @@
 open React
 
-module Notes{
+module Notes = {
 
 	// placeholder
 	let placeholder = [
@@ -56,7 +56,7 @@ module Notes{
 	}
 };
 
-module Search{
+module Search = {
 
 	// placeholder filter list
 	let placeholder = [
@@ -131,7 +131,7 @@ module Search{
   }
 };
 
-module Trending{
+module Trending = {
 
 	// placeholder filter list
 	let placeholder = [
@@ -178,7 +178,7 @@ module Trending{
   }
 };
 
-module Activities{
+module Activities = {
 
 	// placeholder timestamp generators (you'd just fetch the timestamp string when fetching)
 	// XXX(kinten) possibly duplicated with [Page__item.PullrequestsBody.duration]

@@ -369,6 +369,8 @@ module HintPanel = {
 
 	[@react.component]
 	let make = () => {
+    let auth = Auth.AuthContext.use()
+    ;
 		<>
 			// <img className="logo" src="/assets/icon__wifi.svg" />
 			<div className="logo">
@@ -378,6 +380,14 @@ module HintPanel = {
 			<div className="sub">
 				<span className="command">{string(command)}</span>
 			</div>
+      <button className="create-post"
+        onClick={_ =>
+          auth.checkAuth()?
+          Js__dom.Window.Location.href_set(
+            "/new/")
+          :
+          auth.forceAuth()
+        }>{string("+ Add post")}</button>
 		</>
 	}
 }

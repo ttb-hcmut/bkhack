@@ -13,6 +13,7 @@ module PostContext = {
   , tagList           : list(string)
   , setTagList        : string => bool
   , unsetTagList      : string => unit
+  , parentId          : int
   };
 
   let defaultValue: t = {
@@ -27,6 +28,7 @@ module PostContext = {
   , tagList           : []
   , setTagList        : (_) => false
   , unsetTagList      : (_) => ()
+  , parentId          : -1
   };
 
   let ctx = React.createContext(defaultValue);
@@ -34,11 +36,21 @@ module PostContext = {
   module Provider = {
     [@react.component]
     let make = (~children: React.element) => {
+      let url = ReasonReactRouter.useUrl()
       let (postBody,setPostBody) = React.useState( () => "");
       let (postTitle,setPostTitle) = React.useState( () => "");
       let (error,setError) = React.useState( () => "");
       let (commitMessage,setCommitMessage) = React.useState( () => "");
       let (tagList,setTagList') = React.useState(()=>[]);
+      let parentId = React.useMemo0(()=>{
+        String.concat("/",url.path) == "new"? 
+        -1 
+        :
+        url.search
+        -> Util.parseQueryParams
+        -> Js.Dict.get("id")
+        -> Option.value(~default = "-1")
+        -> int_of_string});
       
       let unsetTagList= (tag) =>{
         if (List.mem(tag,tagList)){
@@ -73,6 +85,7 @@ module PostContext = {
       , tagList           : tagList
       , setTagList        : setTagList
       , unsetTagList      : unsetTagList
+      , parentId          : parentId
       };
 
       React.useEffect4(() => {
@@ -151,8 +164,15 @@ module App = {
       module CommitOptions = {
         [@react.component]
         let make = () => {
+          let post= PostContext.use()
+          ;
+          post.parentId == -1 ?
+          React.null
+          :
           <div className="commit-options">
-            {React.string("Commit Options")}
+            <label>
+              {React.string("Commit options:")}
+            </label>
           </div>
         }
       };
@@ -195,6 +215,7 @@ module App = {
           open Json__syntax;
           let body = empty()
           |> "id"       ^^ int    @@ Option.value(auth.getUserId(),~default = 67)
+          |> "post-id"  ^^ int    @@ post.parentId
           |> "title"    ^^ string @@ post.postTitle
           |> "body"     ^^ string @@ post.postBody
           |> "public"   ^^ bool   @@ public
