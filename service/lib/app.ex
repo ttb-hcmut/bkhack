@@ -35,14 +35,15 @@ defmodule App
     IO.inspect conn.body_params
     creator_id  = body["id"]
     title       = body["title"]
-    body        = body["body"]
+    post_body   = body["body"]
+    public      = body["public"]
 
-    data = "User "<>Integer.to_string(creator_id)<>" with title: "<>title<>" and body: "<>body
+    data = "User "<>Integer.to_string(creator_id)<>" with title: "<>title<>" and body: "<>post_body
     IO.puts(data);
-    postId = PostBE.insertPost(creator_id, title, body)
-    case String.length(postId) do
-      0 ->
-        {:ok, sh} = JSON.encode(postId)
+    postId = PostBE.createPost(creator_id, title, post_body, public)
+    case postId do
+      p ->
+        {:ok, sh} = JSON.encode(p)
         conn
         # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
         |> put_resp_header("Access-Control-Allow-Origin", "*")
@@ -50,7 +51,7 @@ defmodule App
         |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
         |> put_resp_content_type("application/json")
         |> send_resp(201, sh)
-      _ ->
+      nil ->
         {:ok, sh} = JSON.encode(-1)
         conn
         # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186

@@ -27,7 +27,6 @@ module Date : {
 		let date : t => int
 		let month : t => int
 		let full_year : t => int
-    let toRelative : string => string
 	}
 }
 

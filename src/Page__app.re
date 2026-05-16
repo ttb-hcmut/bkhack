@@ -482,7 +482,7 @@ module Dashboard = {
                     <span className="time">{string("2h ago")}</span>
                   </div>
                   <div className="created-from">
-                    <span>{string("created ")}</span><span>{string(Js__dom.Date.Utc.toRelative(timestamp))}</span>
+                    <span>{string("created ")}</span><span>{string(Util.utcToRelative(timestamp))}</span>
                   </div>
                   <div className="ref">
                     <span>{string("2000")}</span>
