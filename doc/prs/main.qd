@@ -1,0 +1,69 @@
+.docname {Prs}
+.doctype {slides}
+.autopagebreak maxdepth:{2}
+
+# BKHack
+
+![](./logo.png)
+
+# Context (ngữ cảnh)
+
+## Problem
+
+no specialized central platform dedicated to discussions on computer science
+
+## Survey
+
+1. What content are you interested in the most? (hobby, research, entertainment)
+2. How do you usually discover topics you'd expored in-depth (rabbit holes)? (curators, random encounters, adjacency)
+3. What makes a piece of news of information credible to you? (friends, platform brand, references, sponsorship)
+4. What is the most important aspect of a community platform? (content, presentation, community-ness)
+
+## Survey
+
+- Early phase (20 respondents)
+
+## Survey
+
+Answers
+
+1. Vary
+2. Vary
+3. Credibility
+4. Vary
+
+## Goals
+
+- Compsci social news web **in HCMUT**
+- How to direct users to interact on-topic with least manual moderation?
+
+## Scope
+
+- Social news
+- Topic: computer science
+- Audience: students and lecturers **in HCMUT**
+
+# Related systems (hệ thống liên quan)
+
+## Hackernews (news.ycombinator.com)
+
+- Y Combinator's social news, startups and computer science
+- Pros: voting system, mostly about computer science
+- Cons: jobs section, not just in HCMUT
+
+## Lobsters (lobste.rs)
+
+- link aggregation and discussion site very similar in concept to Hacker News
+- Pros: rich tagging
+- Cons: heavy moderation
+
+# Stakeholders
+
+- Personnels in HCMUT
+    - Students
+    - Lecturers
+- Volunteer admins
+
+# That's all of the main parts!
+
+# Appendix: Figma
