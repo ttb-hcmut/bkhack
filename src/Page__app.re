@@ -369,6 +369,8 @@ module HintPanel = {
 
 	[@react.component]
 	let make = () => {
+    let auth = Auth.AuthContext.use()
+    ;
 		<>
 			// <img className="logo" src="/assets/icon__wifi.svg" />
 			<div className="logo">
@@ -378,6 +380,14 @@ module HintPanel = {
 			<div className="sub">
 				<span className="command">{string(command)}</span>
 			</div>
+      <button className="create-post"
+        onClick={_ =>
+          auth.checkAuth()?
+          Js__dom.Window.Location.href_set(
+            "/new/")
+          :
+          auth.forceAuth()
+        }>{string("+ Add post")}</button>
 		</>
 	}
 }
@@ -612,23 +622,7 @@ module Dashboard = {
 				<button>{string("prev")}</button>
 				<button>{string("next")}</button>
 			</footer>
-			<button 
-				className={"show-hide-sidebar " ++ sidebarState}
-				onClick={_=>{
-					if (sidebarState == "state0")
-					{
-						setSidebarState(_ => "state1");
-					}
-					else
-					{
-						setSidebarState(_ => "state0");
-					}
-				}}
-				>
-			</button>
-			<aside className=sidebarState>
-				<Component__sidebar />
-			</aside>
+			<Component__sidebar sidebarState setSidebarState />
 		</>
 	}
 };

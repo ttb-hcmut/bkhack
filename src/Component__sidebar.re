@@ -1,6 +1,31 @@
 open React
 
-module Notes{
+module ShowHide = {
+  [@react.component]
+  let make = (~sidebarState,~setSidebarState) => {
+    <button 
+      className={"show-hide-sidebar " ++ sidebarState}
+      onClick={_=>{
+        if (sidebarState == "state0")
+        {
+          setSidebarState(_ => "state1");
+        }
+        else
+        {
+          setSidebarState(_ => "state0");
+        }
+      }}
+      >
+      <span className="hamburger">
+        <span className="0"/>
+        <span className="1"/>
+        <span className="2"/>
+      </span>
+    </button>
+  }
+}
+
+module Notes = {
 
 	// placeholder
 	let placeholder = [
@@ -56,7 +81,7 @@ module Notes{
 	}
 };
 
-module Search{
+module Search = {
 
 	// placeholder filter list
 	let placeholder = [
@@ -131,7 +156,7 @@ module Search{
   }
 };
 
-module Trending{
+module Trending = {
 
 	// placeholder filter list
 	let placeholder = [
@@ -178,7 +203,7 @@ module Trending{
   }
 };
 
-module Activities{
+module Activities = {
 
 	// placeholder timestamp generators (you'd just fetch the timestamp string when fetching)
 	// XXX(kinten) possibly duplicated with [Page__item.PullrequestsBody.duration]
@@ -225,10 +250,13 @@ module Activities{
 };
 
 [@react.component]
-let make = () =>
+let make = (~sidebarState:string, ~setSidebarState:(string=>string)=>unit) =>
 	<>
-	<Search />
-	<Notes />
-	<Trending />
-	<Activities />
+  <ShowHide  sidebarState setSidebarState/>
+	<aside className=sidebarState>
+    <Search />
+    <Notes />
+    <Trending />
+    <Activities />
+	</aside>
 	</>

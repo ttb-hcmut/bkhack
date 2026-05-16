@@ -1,2 +1,2 @@
 [@react.component]
-let make : unit => React.element;
+let make : (~sidebarState:string, ~setSidebarState:(string=>string)=>unit) => React.element;

@@ -51,6 +51,11 @@
   border-radius: var(--radius);
   transition-property: all;
 }
+#root > main.edit > .edit > header > .save:hover {
+  border: 1px solid var(--ctp-yellow);
+  color: white;
+  background-color: var(--ctp-yellow);
+}
 #root > main.edit > .edit > header > .publish {
   padding: var(--space-c);
   border: 1px solid var(--ctp-green);
@@ -59,10 +64,10 @@
   border-radius: var(--radius);
   transition-property: all;
 }
-#root > main.edit > .edit > header > .save:hover {
-  border: 1px solid var(--ctp-yellow);
+#root > main.edit > .edit > header > .publish:hover {
+  border: 1px solid var(--ctp-green);
   color: white;
-  background-color: var(--ctp-yellow);
+  background-color: var(--ctp-green);
 }
 #root > main.edit > .edit > header > .cancel {
   padding: var(--space-c);
@@ -93,7 +98,7 @@
   border-radius: var(--radius);
   width:100%;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(0,1fr));
   grid-template-rows: auto auto;
   gap: var(--space-c);
 }
@@ -105,11 +110,9 @@
   border-radius: var(--radius);
 }
 #root > main.edit > .edit > header> .settings > .commit-message {
-  grid-column: 1/2;
   grid-row: 1/2;
 }
 #root > main.edit > .edit > header> .settings > .tags {
-  grid-column: 1/2;
   grid-row: 2/3;
 }
 #root > main.edit > .edit > header> .settings > .tags > ul {
