@@ -1,6 +1,6 @@
 #import "/article": *
-#import "./shell__parse.typ"
-#import "./shell__sym.typ"
+#import "./shell-parse.typ"
+#import "./shell-sym.typ"
 #let (bkhack, Bkhack) = ([bkhack], [bkhack])
 #title[= Stream-based programming, as compared to sh]
 For #bkhack, the user gets to familiarize with the concept of _stream-based
@@ -54,14 +54,16 @@ which are expected from most real-world usage. Indeed, the responsibility
 of interpreting these parts, a.k.a. _options_, is left to the higher-level
 _option parser_, such as POSIX `getopts`.
 #place(auto, float: true, scope: "parent")[
-  #figure(caption: [Grammar for the #bkhack shell language], shell__parse.langchain) <gr>
+  #figure(caption: [Grammar for the #bkhack shell language], shell-parse.langchain) <gr>
 ]
 == Typing
 The typing of the #bkhack shell language, given in @typ, #lorem(30)
 This is useful when shell commands have to be embedded in a statically-typed
 programming language.
 #place(auto, float: true, scope: "parent")[
-  #figure(caption: [Typing for the #bkhack shell language], shell__sym.v) <typ>
+  #figure(caption: [Typing for the #bkhack shell language], shell-sym.v) <typ>
 ]
 == Reference
 #bibliography(title: none, "./works.bib")
+
+// vi: set nowrap:
