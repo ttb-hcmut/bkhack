@@ -38,13 +38,13 @@ module Structured_query {
 }
 
 module Firestore {
-	let run_query = q => Fetch__syntax.({
+	let run_query = (~key, q) => Fetch__syntax.({
 		Js.Console.log(q);
 		Js.Console.log(q->Structured_query.conv);
 		let body = Js.Obj.empty();
 		body##"structuredQuery" #= q->Structured_query.conv;
 		let* a = Fetch.fetchWithInit(
-			"https://firestore.googleapis.com/v1/projects/bkhack-2eb8c/databases/(default)/documents:runQuery",
+			"https://firestore.googleapis.com/v1/projects/bkhack-2eb8c/databases/(default)/documents:runQuery?key="++key,
 			Fetch.RequestInit.make(
 				~method_=Post,
 				~body=Fetch.BodyInit.make(body->Js.Json.serializeExn),
@@ -54,13 +54,7 @@ module Firestore {
 			)()
 		);
 		let* json = a->Fetch.Response.json;
-		let x = json |> Js__json.decodeArrayExn |> Array.map(it => {
-			let dict = it |> Js__json.decodeObjectExn;
-			let document = dict->Js.Dict.get("document")->Option.get->Js__json.decodeObjectExn;
-			let fields = document->Js.Dict.get("fields")->Option.get;
-			fields
-		}) |> Js__json.array;
-		return(x)
+		return(json)
 	})
 }
 
@@ -69,7 +63,9 @@ module type Data' {
 }
 
 module type Env {
-
+	module Firebase {
+		let key : string
+	}
 }
 
 module type Data {
@@ -79,6 +75,12 @@ module type Data {
 
 let all = (type t, module Data : Data with type t = t, module Env : Env) => {
 	let open Fetch__syntax;
-	let* a = Firestore.run_query(Data.q);
-	return(a)
+	let* json = Firestore.run_query(~key=Env.Firebase.key, Data.q);
+	let x = json |> Js__json.decodeArrayExn |> Array.map(it => {
+		let dict = it |> Js__json.decodeObjectExn;
+		let document = dict->Js.Dict.get("document")->Option.get->Js__json.decodeObjectExn;
+		let fields = document->Js.Dict.get("fields")->Option.get;
+		fields
+	}) |> Js__json.array;
+	return(x)
 }
