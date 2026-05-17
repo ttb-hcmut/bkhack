@@ -1,4 +1,5 @@
 [@page "/"]
+open Stdlib
 open Melange__containers.Fun
 open Auth
 module Post = {
@@ -504,24 +505,24 @@ module Dashboard = {
 		}
 	}
 
-	module At_repo_0'(S : {
-		include Bkhack__experimental.S;
-		let paginate : 't. ((int, int) => 't) => 't }) =
+	module At_repo_0'(U: {
+		let paginate : 't. ((int, int) => 't) => 't
+	}, S : Bkhack__experimental.S) = 
 	{
 		open S
 		let rec q' = () =>
 			foreach(posts') @@ o =>
-			paginate(limit) @@ () =>
+			U.paginate(limit) @@ () =>
 			yield(o)
 		and posts' = () => table @@ ("posts", posts())
 		let q = observe(q')
 	}
 
-	module At_repo_0(S : {
-		include Bkhack__experimental.S;
-		let paginate : 't. ((int, int) => 't) => 't }) =
+	module At_repo_0(U: {
+		let paginate : 't. ((int, int) => 't) => 't
+	}, S : Bkhack__experimental.S) = 
 	{
-		include At_repo_0'(S)
+		include At_repo_0'(U, S)
 		module Json = Js__json
 
 		type t = array((int, string, int, string,int,int,string));
@@ -541,6 +542,18 @@ module Dashboard = {
 		}
 	};
 
+	let test = counts => task @@ Fetch__syntax.({
+		let module X {
+			include Bkhack__experimental;
+			module Fetch = Firebase__fetch;
+			module Gen = GenStructuredQuery };
+		let* posts = X.Fetch.all((
+			module At_repo_0({ let paginate = limit => limit(counts, 0) }, X.Gen)
+		), (module Env));
+		Js.Console.log(posts);
+		return()
+	});
+
   [@react.component]
   let make = () => {
 		let (counts, setCounts) = React.useState(() => 10);
@@ -556,34 +569,10 @@ module Dashboard = {
 		let module X = Bkhack__experimental;
 		React__effect.useAsync1(() => 
     Fetch__syntax.({
-			ignore @@
-				try ({
-					let module K = At_repo_0({ include X.GenStructuredQuery; let paginate = limit => limit(counts, 0) });
-					let body = Js.Obj.empty();
-					Js.Console.log(K.q);
-					Js.Console.log(X.Firebase__with_strqry.conv(K.q));
-					body##"structuredQuery" #= K.q->X.Firebase__with_strqry.conv;
-					let* a = Fetch.fetchWithInit(
-						"https://firestore.googleapis.com/v1/projects/bkhack-2eb8c/databases/(default)/documents:runQuery",
-						Fetch.RequestInit.make(
-							~method_=Post,
-							~body=Fetch.BodyInit.make(body->Js.Json.serializeExn),
-							~headers=Fetch.HeadersInit.make({
-								"Content-Type": "application/json",
-							}),
-							()
-						)
-					) >>= Fetch.Response.json;
-					Js.Console.log(a);
-					return()
-				}) {
-					| Failure(x) => { Js.Console.log2("failure", x); return() };
-				};
+			test(counts);
+			let module U (S : X.S) = At_repo_0({ let paginate = limit => limit(counts, 0) })(S);
 			let* posts = X.Fetch.all((
-        module At_repo_0({
-          include X.GenSQL; 
-          let paginate = limit => limit(counts, 0)
-        })
+        module At_repo_0({ let paginate = limit => limit(counts, 0) }, X.GenSQL)
       ),(module Env));
       setItems(_ => posts);
       return(());

@@ -1,6 +1,6 @@
 (library
  (modes melange)
- (libraries quel melange-fetch)
+ (libraries quel melange-fetch melange__containers)
  (public_name bkhack.experimental)
  (preprocess (pps melange.ppx))
  (name bkhack__experimental))

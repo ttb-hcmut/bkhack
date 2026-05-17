@@ -1,16 +1,3 @@
-/** vendored */
-module Fetch__syntax = {
-	open Js.Promise
-
-	let ( >>= ) = (x, f) => x |> then_(f)
-
-	let ( >!= ) = (x, f) => x |> catch(f)
-
-	let return  = resolve
-
-	let ( let* ) = ( >>= )
-};
-
 module type Data' = {
 	let q : string;
 };

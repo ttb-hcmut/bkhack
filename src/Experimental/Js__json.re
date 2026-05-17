@@ -5,3 +5,4 @@ and decodeNumberExn = Option.get % decodeNumber
 and decodeStringExn = Option.get % decodeString
 and decodeBooleanExn = Option.get % decodeBoolean
 and decodeObjectExn = Option.get % decodeObject
+

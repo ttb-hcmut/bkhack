@@ -90,38 +90,3 @@ let qry_empty = {
 	qry_limit: None,
 	qry_find_nearest: None
 }
-
-module Option {
-	include Option
-
-	let list_iter = f => fun
-		| [] => ()
-		| xs => f(xs)
-}
-
-let conv_field_ref = t => {
-	let o = Js.Obj.empty();
-	o##"fieldPath" #= t.fldrf_field_path;
-	o
-}
-
-let conv = t => {
-	let o = Js.Obj.empty();
-	t.qry_select |> Option.iter(select => {
-		o##"select" #= Js.Obj.empty();
-		o##"select"##"fields" #= (Array.map(conv_field_ref) @@ Array.of_list @@ select.proj_fields)
-	});
-	t.qry_from |> Option.list_iter(from_ => {
-		o##"from" #= (
-			from_ |> Array.of_list |> Array.map(tbl => {
-				let o = Js.Obj.empty();
-				o##"collectionId" #= tbl.colsel_collection_id;
-				o##"allDescendants" #= tbl.colsel_all_descendants;
-				o
-			})
-		)
-	});
-	t.qry_limit |> Option.iter(limit => { o##"limit" #= limit });
-	t.qry_offset |> Option.iter(offset => { o##"offset" #= offset });
-	o
-}
