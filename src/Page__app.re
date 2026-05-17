@@ -556,7 +556,7 @@ module Dashboard = {
 		let module X = Bkhack__experimental;
 		React__effect.useAsync1(() => 
     Fetch__syntax.({
-			let* () =
+			ignore @@
 				try ({
 					let module K = At_repo_0({ include X.GenStructuredQuery; let paginate = limit => limit(counts, 0) });
 					let body = Js.Obj.empty();
