@@ -43,7 +43,7 @@ a pipeline runs.\
 The grammar expects all commands to unequivocally form a pipeline, as
 evident by @gr, and multiple groups of commands will connect to form
 branching pipelines.
-== Function <fn>
+== Function
 A reusable pipeline or grouping of commands would be called a _function_
 . In the #bkhack shell language, #lorem(70)\
 #lorem(70)
