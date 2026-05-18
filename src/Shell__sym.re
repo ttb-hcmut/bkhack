@@ -17,10 +17,12 @@ module type Sym = {
 	let observe : program => obs
 };
 
-module type SymL = {
+module type SymL {
 	include Sym
 	
 	let feed : cmd
 
-	let split : (~count:int) => unit => cmd
+	module Split_by {
+		let count : int => cmd
+	}
 }

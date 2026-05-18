@@ -35,12 +35,15 @@ module Core = {
 	}
 }
 
+[@alert need_test("Need inline test for Shellgen.Common")]
 module Common {
 	include Core
 
 	let feed = raw_cmd(["feed"])
 
-	and split = (~count, ()) => raw_cmd(["split", "-c", string_of_int(count)])
+	module Split_by {
+		let count = count => raw_cmd(["split", "-c", string_of_int(count)])
+	}
 }
 
 include Common

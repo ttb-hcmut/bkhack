@@ -366,26 +366,21 @@ module Wifi = {
 
 module HintPanel {
 
-	module As__sh (Syntax : Shell__sym.SymL) {
+	module At__sh (Syntax : Shell__sym.SymL) {
 		let command = Syntax.observe @@ Syntax.(
-			feed @| split(~count=10)() @| nil)
+			feed @| Split_by.count(10) @| nil)
 	}
 
 	[@react.component]
 	let make = () => {
-    let auth = Auth.AuthContext.use()
-    ;
+    let auth = Auth.AuthContext.use();
 		<>
-			// <img className="logo" src="/assets/icon__wifi.svg" />
 			<div className="logo">
 				<Wifi />
 			</div>
 			<h1 className="home-feed"> </h1>
 			<div className="sub">
-				{
-					let module K = As__sh(Shellgen);
-					K.command
-				}
+				{ let open At__sh(Shellgen); command }
 			</div>
       <button className="create-post"
         onClick={_ =>

@@ -3,11 +3,15 @@ open Cprg
 open Cprg.Syntax
 open Shell__parse__lex
 
-let command = fix @@ command =>
-	{ let* word = word; let* ws = whitespace; let* command = command;
+let command = fix @@ command => {
+	let part_1 = {
+		let* word = word; let* ws = whitespace; let* command = command;
 		return([word, ws, ...command])
-	}
-	or { let* word = word; return([word]) }
+	} and part_2 = {
+		let* word = word; return([word])
+	};
+	part_1 or part_2
+}
 
 open React
 
@@ -55,18 +59,27 @@ let chain_3 = impl => {
 let chain_4 = {
 	let open Melange__iter;
 	let* command = command;
-	return (
-	<>
-	{command |> Iter.of_list |> Iter.mapi(fun
+	let els = command |> Iter.of_list |> Iter.mapi(fun
 		| 0 as i => s => <a href=("/wiki/commands/"++s) key={s++string_of_int(i)} className="function call sh">{s->string}</a>
-		| _ as i => s => <span key={s++string_of_int(i)} className="variable parameter sh">{s->string}</span> ) |> Iter.to_array |> array}
-	</>
-	)
+		| _ as i => s => <span key={s++string_of_int(i)} className="variable parameter sh">{s->string}</span> ) |> Iter.to_array |> array;
+	return(<> {els} </>)
 }
 
-let chain : code(React.element) = fix @@ impl =>
+let chain' : code(React.element) = fix @@ impl => {
 	(end_of_input >>| _ => <> </>)
 	or chain_1(impl) or chain_2(impl) or chain_3(impl) or chain_4
+}
+
+let chain = {
+	let* x = chain';
+	let* _ = whitespace0;
+	let* u = peek_char;
+	if (Option.is_some(u)) {
+		fail("incomplete parsing")
+	} else {
+		return(x)
+	}
+}
 
 let string = s =>
-	try (Cprg.parse_string(~consume=`All, chain, s)) { | e => Error(Js.String.make(e)) }
+	try (chain->Cprg.parse_string(~consume=`All, s)) { | e => Error(Js.String.make(e)) }
