@@ -364,9 +364,12 @@ module Wifi = {
 	}
 }
 
-module HintPanel = {
+module HintPanel {
 
-	let command = "feed | split 10";
+	module As__sh (Syntax : Shell__sym.SymL) {
+		let command = Syntax.observe @@ Syntax.(
+			feed @| split(~count=10)() @| nil)
+	}
 
 	[@react.component]
 	let make = () => {
@@ -379,7 +382,10 @@ module HintPanel = {
 			</div>
 			<h1 className="home-feed"> </h1>
 			<div className="sub">
-				<span className="command">{string(command)}</span>
+				{
+					let module K = As__sh(Shellgen);
+					K.command
+				}
 			</div>
       <button className="create-post"
         onClick={_ =>
