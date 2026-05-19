@@ -1,0 +1,163 @@
+@import "/styles/variables.css";
+@import "/styles/widget-variables.css";
+.pagination {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: stretch;
+  width: 100%;
+  gap: var(--space-a);
+}
+.pagination > .search {
+  font-size: var(--text-base);
+  font-family: var(--font-mono);
+  outline: none;
+	background-color: var(--ctp-crust);
+  border-radius: var(--radius);
+  border: 1px solid var(--ctp-surface0);
+  color: var(--ctp-text);
+  caret-color: var(--ctp-text);
+  padding: var(--space-f) var(--space-a);
+  min-width: 0;
+  flex-grow: 1;
+}
+.pagination > .search {
+  font-size: var(--text-base);
+  font-family: var(--font-mono);
+  outline: none;
+	background-color: var(--ctp-crust);
+  border-radius: var(--radius);
+  border: 1px solid var(--ctp-surface0);
+  color: var(--ctp-text);
+  caret-color: var(--ctp-text);
+  padding: var(--space-f) var(--space-a);
+  width: auto;
+}
+
+.pagination > .search::placeholder {
+  color: var(--ctp-subtext0);
+}
+.pagination > .dropdown {
+  font-size: var(--text-base);
+  font-family: var(--font-mono);
+  outline: none;
+	background-color: var(--ctp-crust);
+  border-radius: var(--radius);
+  border: 1px solid var(--ctp-surface0);
+  color: var(--ctp-text);
+  height: min-content;
+  padding: var(--space-c);
+  white-space: nowrap;
+}
+.pagination > .dropdown::after{
+  color: var(--ctp-subtext0);
+}
+.pagination > .dropdown > dialog > ol *::after{
+  color: var(--ctp-subtext0);
+}
+.pagination > .dropdown.none::after{
+  content: " ";
+}
+.pagination > .sortby::before{
+  content:"Sorted";
+}
+.pagination > .searchby::before{
+  content:"Search";
+}
+.pagination > .orderby::before{
+  content:"Ordered";
+}
+.pagination > .filterby::before{
+  content:"Filtered";
+}
+.pagination .none::after{
+  content: "Unset";
+}
+.pagination .age::after{
+  content: "Age";
+}
+.pagination .popularity::after{
+  content: "Popularity";
+}
+.pagination .repcount::after{
+  content: "Repcount";
+}
+.pagination .username::after{
+  content: "Username";
+}
+.pagination .comment::after{
+  content: "Comment";
+}
+.pagination .version::after {
+  content: "Version";
+}
+.pagination .ascending::after {
+  content: "Ascending";
+}
+.pagination .descending::after {
+  content: "Descending";
+}
+.pagination .fresh::after {
+  content: "Only newest version";
+}
+.pagination .prof::after {
+  content: "Only prof";
+}
+.pagination .student::after {
+  content: "Only student";
+}
+
+.pagination > .dropdown > dialog{
+  overflow: visible;
+  width: 100%;
+}
+.pagination > .dropdown > dialog > ol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-c);
+  height: fit-content;
+  width: 100%;
+  padding: var(--space-c);
+  border: 1px solid var(--ctp-surface0);
+  border-top: 0;
+  border-radius: 0 0 var(--radius) var(--radius);
+  margin-left: calc(-1*var(--space-c) - 1px);
+  background-color: var(--ctp-crust);
+  z-index: 9999;
+}
+.pagination > .dropdown > dialog > ol > li {
+  height: fit-content;
+  width: 100%;
+}
+.pagination > .dropdown > dialog > ol > li:hover {
+  background-color: var(--ctp-mantle);
+}
+.pagination > .paging {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  grid-template-rows: min-content;
+  gap: var(--space-a);
+}
+.pagination > .paging > span{
+  height: fit-content;
+
+  align-self: center;
+}
+.pagination > .paging > button {
+  font-size: var(--text-base);
+  font-family: var(--font-mono);
+  outline: none;
+	background-color: var(--ctp-crust);
+  border-radius: var(--radius);
+  border: 1px solid var(--ctp-surface0);
+  color: var(--ctp-text);
+  height: min-content;
+  aspect-ratio: 1;
+  padding: var(--space-c);
+}
+.pagination > .paging > .prev-page::before {
+  content: "<";
+}
+.pagination > .paging > .next-page::before {
+  content: ">";
+}
