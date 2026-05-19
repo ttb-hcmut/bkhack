@@ -51,7 +51,9 @@
 }
 
 @media (prefers-color-scheme: dark) {
-	background-color: var(--sig-blue-deep);
+  #root[data-tileset="gui"] > header > .logo {
+	  background-color: var(--sig-blue-deep);
+  }
 }
 
 #root > header > a.place,

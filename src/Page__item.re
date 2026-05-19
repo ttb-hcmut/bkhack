@@ -161,8 +161,24 @@ module DiscussionView = {
   };
   module DiscussionFilter = {
     [@react.component]
-    let make = () => {
-      <input />
+    let make = (~parentId,~setResult) => {
+      let auth = AuthContext.use()
+      ;
+      <Pagination.App 
+        limit=3
+        searchPrompt=true
+        countApi={"/api/comment?parent="++string_of_int(parentId)++"&type=0&"}
+        fetchApi={"/api/comment?parent="++string_of_int(parentId)
+                ++"&user="  ++ string_of_int(Option.value(auth.getUserId(),~default=-1))
+                ++"&type=1&"}
+        filter  ={[
+          ("sortby",  ["age","popularity","repcount"  ])
+        , ("searchby",["comment","username","version" ])
+        , ("orderby", ["ascending","descending"       ])
+        , ("filterby",["none","fresh","prof","student"])
+        ]}
+        setResult
+      />
     }
   };
   module DiscussionBody = {
@@ -391,10 +407,11 @@ module DiscussionView = {
     module CommentGroup = {
       [@react.component]
       let make = (
-        ~id : int,
-        ~pType : string,
-        ~showRep : bool,
-        ~nestDepth : int
+        ~id : int
+      , ~pType : string
+      , ~showRep : bool
+      , ~nestDepth : int
+      , ~result: option(Js.Json.t)=?
       ) => {
         let auth = AuthContext.use()
         let (comments,setComments) = React.useState(() => [||]);
@@ -405,28 +422,51 @@ module DiscussionView = {
         let fetchComments = () => {
           let open Fetch__syntax;
           setLoading(_=>true);
-          let fetchType = pType == "post" ? "1" : "2";
-          Fetch.fetch(Env.backend ++ "/api/comment"
-            ++ "?limit="  ++ string_of_int(limit)
-            ++ "&offset=" ++ string_of_int(Array.length(comments))
-            ++ "&user="   ++ string_of_int(Option.value(auth.getUserId(),~default=-1))
-            ++ "&parent=" ++ string_of_int(id)
-            ++ "&type="   ++ fetchType)
-          >>= Fetch.Response.json
-          >>= Model.Decode.Response.fetchedComments
-          >>= (aod => {
-            setComments( x => Array.append(x,aod));
-            setShowMore( _ => Array.length(aod) < limit ? false : true);
-            setLoading(_=>false);
-            Js.Promise.resolve(aod)
-          })
-          >!= (err => {
-              Js.log(err);
-              setShowMore( _ => false);
-              setLoading(_=>false);
-              return([||])
-            })
-          |> ignore;
+          switch(pType,result){
+            | ("post",None) => ();
+            | (t,r) =>
+              switch(t,r){
+                | ("post",Some(r)) => 
+                  Js.Promise.resolve(r) 
+                  >>= Model.Decode.Response.fetchedComments
+                  >>= (aod => {
+                    setComments( _ => aod);
+                    setShowMore( _ => false);
+                    setLoading(_=>false);
+                    Js.Promise.resolve(aod)
+                  })
+                  >!= (err => {
+                      Js.log(err);
+                      setShowMore( _ => false);
+                      setLoading(_=>false);
+                      return([||])
+                    })
+                  |> ignore;
+                | _ =>
+                  let request = Env.backend ++ "/api/comment"
+                    ++ "?limit="  ++ string_of_int(limit)
+                    ++ "&offset=" ++ string_of_int(Array.length(comments))
+                    ++ "&user="   ++ string_of_int(Option.value(auth.getUserId(),~default=-1))
+                    ++ "&parent=" ++ string_of_int(id)
+                    ++ "&type=2"
+                  Fetch.fetch(request)
+                  >>= Fetch.Response.json 
+                  >>= Model.Decode.Response.fetchedComments
+                  >>= (aod => {
+                    setComments( x => Array.append(x,aod));
+                    setShowMore( _ => Array.length(aod) < limit ? false : true);
+                    setLoading(_=>false);
+                    Js.Promise.resolve(aod)
+                  })
+                  >!= (err => {
+                      Js.log(err);
+                      setShowMore( _ => false );
+                      setLoading( _ => false );
+                      return([||])
+                    })
+                  |> ignore;
+              } 
+          }
         };
         let revealReplies = () => {
           if (Array.length(comments) == 0 && showMore){
@@ -436,7 +476,12 @@ module DiscussionView = {
         React.useEffect1(()=>{
           if(showRep) revealReplies();
           None
-        },[|showRep|]);
+        },[|showRep|])
+        React.useEffect1(()=>{
+          fetchComments();
+          None
+        },[|result|])
+        ;
         <>
         <ol className="replies" hidden={!showRep}>
           {
@@ -478,31 +523,36 @@ module DiscussionView = {
     ) => 
       <CommentGroup id pType showRep nestDepth />);
     [@react.component]
-    let make = (~id, ~addRep, ~setAddRep) => {
+    let make = (~id, ~addRep, ~setAddRep, ~result) => {
       <>
       {!addRep ? 
       React.null
       :
       <AddComment id parentType="post" setShow=setAddRep/>}
-      <CommentGroup id pType="post" showRep=true nestDepth=0 />
+      <CommentGroup id pType="post" showRep=true nestDepth=0 result />
       </>
     }
   };
   [@react.component]
   let make = (~post_id : int) => {
     let (addRep, setAddRep) = React.useState(() => false);
+    let (result, setResult) = React.useState(() => Js.Json.null)
+    React.useEffect1(()=>{
+      None
+    },[|result|])
+    ;
     <>
       <header className={"only " ++ View.to_string(Discussion)}>
         <DiscussionHint addRep setAddRep />
         <nav>
-          <DiscussionFilter />
+          <DiscussionFilter parentId=post_id setResult />
         </nav>
       </header>
       <main className={"only " ++ View.to_string(Discussion)}>
-        <DiscussionBody id=post_id addRep setAddRep />
+        <DiscussionBody id=post_id addRep setAddRep result />
       </main>
     </>
-}
+  }
 }
 
 module PullrequestsHint = {

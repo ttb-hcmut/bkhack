@@ -1,4 +1,5 @@
-
+@import "/styles/variables.css";
+@import "/styles/widget-variables.css";
 #root > main.edit *[hidden=true] {
   display:none;
 }

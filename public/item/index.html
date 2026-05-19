@@ -17,6 +17,7 @@
 @import "/styles/pages/page__item/discussion.css";
 @import "/styles/pages/page__item/pullrequests.css";
 @import "/styles/pages/page__item/edit.css";
+@import "/styles/components/pagination.css";
 
 html {
 	font-size: var(--text-base);
@@ -41,7 +42,7 @@ html {
 	border-right: 1px solid var(--card-border);
 	border-bottom: 1px solid var(--card-border);
 	background-color: var(--card-bg-translucent);
-	margin-top: calc(-2rem);
+  margin-top: calc(-2rem - var(--space-a));
 	padding-top: 2rem;
 }
 
@@ -50,55 +51,7 @@ html {
 	background-color: var(--card-bg);
 }
 
-/* #root > .innerbody.discussions > main > ol > li > article {
-	margin-left: var(--space-a);
-	margin-right: var(--space-a);
-	border: solid 1px var(--card-border);
-	display: grid;
-	grid-template-columns: 3rem minmax(0,1fr);
-	grid-template-rows: min-content min-content min-content;
-	background-color: var(--card-bg);
-}
 
-#root > .innerbody.discussions > main > ol > li > article > header {
-	padding: var(--space-c);
-	grid-row: 1 / 2;
-	grid-column: 1 / -1;
-	border-bottom: solid 1px var(--card-border);
-}
-
-#root > .innerbody.discussions > main > ol > li > article > .content {
-	grid-row: 2 / 3;
-	grid-column: 2 / -1;
-}
-
-#root > .innerbody.discussions > main > ol > li > article > .counter {
-	grid-row: 2 / 3;
-	grid-column: 1 / 2;
-}
-
-#root > .innerbody.discussions > main > ol > li.level-1 > article {
-	margin-left: calc(var(--space-a) + 1rem);
-}
-
-#root > .innerbody.discussions > main > ol > li.level-2 > article {
-	margin-left: calc(var(--space-a) + 2rem);
-}
-
-#root > .innerbody.discussions > main > ol > li.level-3 > article {
-	margin-left: calc(var(--space-a) + 3rem);
-}
-
-#root > .innerbody.discussions > main > ol > li.level-4 > article {
-	margin-left: calc(var(--space-a) + 4rem);
-}
-
-#root > .innerbody.discussions > main > ol > li > article > header {
-	background-color: var(--card-bg-translucent);
-}
-
-#root > .innerbody.discussions > main > ol > li > article > .content {
-} */
 
 #root > main.article > *.only:not(.article),
 #root > main.discussions > *.only:not(.discussions),
