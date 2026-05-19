@@ -81,7 +81,8 @@
 #root[data-tileset="gui"] > nav button.pullrequests > label::before {
 	content: " ";
 	display: inline-block;
-	background-image: url("/assets/icon.pullrequest.green.svg");
+	mask-image: url("/assets/icon.pullrequest.svg");
+	background-color: var(--card-fg-accent-2);
 	background-size: 1em 1em;
 	width: 1em;
 	height: 1em;
@@ -116,9 +117,8 @@
 	filter: grayscale(100%) brightness(100%);
 }
 
-/* FIXME(kinten) */
 #root[data-tileset="gui"] > nav button.pullrequests > label::before {
-	filter: grayscale(100%) brightness(85%);
+	filter: grayscale(100%) brightness(120%);
 }
 
 #root[data-tileset="gui"] > nav button:hover > label::before {
@@ -127,6 +127,10 @@
 
 #root[data-tileset="gui"] > nav button.selected > label::before {
 	filter: grayscale(0%) brightness(80%);
+}
+
+#root[data-tileset="gui"] > nav button.pullrequests.selected > label::before {
+	filter: grayscale(0%) brightness(100%);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -141,6 +145,10 @@
 
 	#root[data-tileset="gui"] > nav button:hover > label::before {
 		filter: grayscale(100%) brightness(120%);
+	}
+
+	#root[data-tileset="gui"] > nav button.pullrequests:hover > label::before {
+		filter: grayscale(100%) brightness(100%);
 	}
 
 	#root[data-tileset="gui"] > nav button.selected > label::before {

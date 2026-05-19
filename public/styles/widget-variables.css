@@ -81,6 +81,7 @@
 	--card-fg-accent-2: var(--ctp-green);
 	--card-fg-accent-2-10: oklab(from var(--ctp-green) l a b / 0.1);
 	--card-fg-accent-2-30: oklab(from var(--ctp-green) l a b / 0.3);
+	--card-fg-accent-2-80: oklab(from var(--ctp-green) l a b / 0.8);
 	--card-fg-accent-3: var(--ctp-mauve);
 	--card-fg-accent-3-10: oklab(from var(--ctp-mauve) l a b / 0.1);
 	--card-fg-accent-3-30: oklab(from var(--ctp-mauve) l a b / 0.3);

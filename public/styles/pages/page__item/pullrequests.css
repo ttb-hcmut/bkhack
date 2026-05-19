@@ -105,7 +105,10 @@
 }
 
 #root[data-tileset="gui"] > main.pullrequests > header > .logo {
-	background-image: url("/assets/icon.pullrequest.green.svg");
+	mask-position: center;
+	mask-repeat: no-repeat;
+	mask-image: url("/assets/icon.pullrequest.svg");
+	background-color: var(--card-fg-accent-2-80);
 	background-size: 1em 1em;
 	width: 1em;
 	height: 1em;
