@@ -1,0 +1,359 @@
+.docname {Final Report}
+.doctype {slides}
+.autopagebreak maxdepth:{2}
+.include {bachkhoa.qd}
+
+.front
+	.frontTitle {`bkhack!`}
+	.frontTitle {A computer-science social news website for HCMUT}
+	.frontBody
+		.frontAuthor
+			.aauthor {.docauthor}
+		.frontContacts
+			Le Nguyen Gia Bao
+			.email {bao.le108101\@hcmut\.edu\.vn}
+		.frontOrigin
+			.align {center}
+				.container
+					Capstone DATN-328
+			.align {center}
+				.container
+					HCMUT-VNUHCM - 29/12/2025
+
+.speakernote
+	reference to Fantastic Beasts lol
+
+## Content
+
+1. About
+2. Motivation
+3. Related works
+4. Analysis
+5. Design
+6. Realization
+7. Timeline
+
+<<<
+
+# About
+
+## Teachers
+
+- Lecturer 1: Dr. Truong Tuan Anh
+- Lecturer 2: ThS. Nguyen Minh Tam
+- Defense: ThS. Mai Duc Trung
+
+## Members
+
+Group: DAGD1-514
+
+ID     | Name                 | Contribution |
+-------|----------------------|--------------|
+2210216|Le Nguyen Gia Bao     | 100%         |
+2252887|Ho Gia Tuong          | 100%         |
+2252295|Le Cong Minh Khang    | 100%         |
+
+# Motivation
+
+- Knowledge fragmentation
+- Knowledge degradation
+
+## Goals
+
+Develop a computer science social news website
+
+- Sharing
+- Learn and discover new stuff
+- Fact-checked
+
+## Survey
+
+What content are you interested in the most?
+
+![](./assets/survey/Q1.svg)
+
+<<<
+
+How do you usually discover topics you'd explored in-depth (rabbit holes/deep dives)?
+
+![](./assets/survey/Q2.svg)
+
+<<<
+
+What makes a piece of news or information credible to you?
+
+![](./assets/survey/Q3.svg)
+
+<<<
+
+What is the most important aspect of a community platform?
+
+![](./assets/survey/Q4.svg)
+
+## About
+
+- Computer-science, developer-oriented from aesthetics to UX
+- Content integrity focused, GitHub-inspired PR system 
+
+![](./assets/bkhack-logo-withbg.png)
+
+## Scope
+
+- Website / web platform
+- In HCMUT
+- Main stakeholders: students and lecturers
+
+# Related works <!-- NOTE: khang -->
+
+## Hackernews
+
+![](./assets/hackernews-item.png)
+
+## Lobsters
+
+![](./assets/lobsters-item.png)
+
+## LMS Forums
+
+![](./assets/lms-item.png)
+
+# Analysis <!-- NOTE: hgt -->
+
+## Actors / stakeholders
+
+- User students
+- User lecturers: additional tags
+- Admin
+
+## Functional requirements
+
+![](./assets_/functional0.png)
+
+## Non-functional requirements
+
+- Performance
+- Reliability and availability
+- Security
+- Usability and accessibility
+- Maintainability and accessibility
+- Documentation and DX
+- Community and ethics
+
+# Design <!-- NOTE: kinten -->
+
+## Design goals
+
+1. How to direct users to act courteously via UX?
+2. How to write clean maintainable code with high performance?
+3. How to minimize layering in architecture?
+
+## Use case
+
+1. Article lifecycle
+2. Authentication & account
+3. Content consumption
+4. Discussions
+5. Issues
+6. Pull requests
+7. Moderation
+8. Notes
+
+<<<
+
+![](./assets/diagrams/UML-usecase-article_lifecycle.svg)
+
+<<<
+
+![](./assets/diagrams/UML-usecase-auth&acc.svg)
+
+<<<
+
+![](./assets/diagrams/UML-usecase-content_consumption.svg)
+
+<<<
+
+![](./assets/diagrams/UML-usecase-discussions.svg)
+
+<<<
+
+![](./assets/diagrams/UML-usecase-issues.svg)
+
+<<<
+
+![](./assets/diagrams/UML-usecase-pr.svg)
+
+<<<
+
+![](./assets/diagrams/UML-usecase-notes.svg)
+
+<<<
+
+![](./assets/diagrams/UML-usecase-mod&admin.svg)
+
+<<<
+
+### Create pull request
+
+![](./assets_/usecasetable1.png)
+
+<<<
+
+.row alignment:{center}
+	.container margin:{-2cm 0cm 0cm 0cm}
+		!(500x_)[](./assets_/usecasetable2.png)
+
+## System architecture
+
+- Service-oriented architecture (SOA)
+- (in next page)
+
+<<<
+
+.row alignment:{center}
+	.container margin:{-2cm 0cm 0cm 0cm}
+		![](./assets/diagrams/system-arch.drawio.svg)
+
+## Front-end
+
+- Model-view-controller (MVC)
+
+<<<
+
+### Module view ("use" diagram)
+
+.row alignment:{center}
+	.container margin:{-1cm 0cm 0cm 0cm}
+		!(500x_)[](./assets/diagrams/UML-module_view.svg)
+
+<<<
+
+### Sitemap
+
+![](./assets/diagrams/UML-sitemap.svg)
+
+<<<
+
+### Pull request states
+
+(in next page)
+
+<<<
+
+.row alignment:{center}
+	.container margin:{-2cm 0cm 0cm 0cm}
+		!(400x_)[](./assets/diagrams/PRState.png)
+
+## ERD
+
+(in next page)
+
+<<<
+
+![](./assets/diagrams/erd.svg)
+
+<<<
+
+## User interface prototypes
+
+(in next pages)
+
+<<<
+
+### Home
+
+![](./assets/bruhhack/main.png)
+
+<<<
+
+### Post
+
+![](./assets/bruhhack/article.png)
+
+# Realization <!-- NOTE: khang -->
+
+## Technologies
+
+- Front-end: Reason & React
+- Back-end: Elixir
+- Front-end Hosting: Firebase
+- Back-end Hosting: Render; Google Cloud
+- Database: Firestore
+
+<<<
+
+### Inline markup
+
+Writing layout markup in same place as application code
+
+```reason
+let makeComponent = () => {
+	let message = "hi";
+	<div className="label">
+		{message}
+	</div>
+}
+```
+
+<<<
+
+### Self-documentation
+
+- Incentivize writing documentations
+- Possibly subjective
+
+## Other
+
+- Design system
+
+# Timeline <!-- NOTE: kinten -->
+
+## Break down tasks
+
+- Based on use cases
+- Based on crosscutting / infra / nonfunctional
+
+<<<
+
+![](./assets_/phase_1.png)
+
+<<<
+
+![](./assets_/phase_2.png)
+
+<<<
+
+![](./assets_/phase_3.png)
+
+<<<
+
+![](./assets_/phase_crosscutting.png)
+
+## Schedule tasks
+
+- 4 months
+- Each module `~`1.5 weeks (`~`1/3 month)
+- Final month is for testing
+
+<<<
+
+![](./assets_/phase_1_schedule.png)
+
+<<<
+
+![](./assets_/phase_2_schedule.png)
+
+<<<
+
+![](./assets_/phase_3_schedule.png)
+
+<<<
+
+![](./assets_/phase_x_schedule.png)
+
+# Conclusion
+
+- Finished design
+- Running web application
+- Next phase planned
+
+# Thank you!
