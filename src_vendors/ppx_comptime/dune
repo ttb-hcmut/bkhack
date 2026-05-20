@@ -1,0 +1,5 @@
+(library
+ (kind ppx_rewriter)
+ (libraries ppxlib ppx_comptime__topcore__evalproc ppx_comptime__topcore__module_name ppx_comptime__topcore__unparse re sexplib)
+ (preprocess (pps ppxlib.metaquot))
+ (name ppx_comptime))

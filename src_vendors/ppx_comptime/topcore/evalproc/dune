@@ -1,0 +1,6 @@
+(library
+ (libraries re ppx_comptime__topcore__unparse unix containers ppx_comptime__topcore__module_name ppxlib)
+ (name ppx_comptime__topcore__evalproc)
+ (flags -open Containers -open Containers.Fun)
+ (preprocess (pps melange.ppx))
+ (modules eval))

@@ -1,0 +1,7 @@
+(library
+ (libraries containers)
+ (wrapped false)
+ (modes byte)
+ (name shell__comptime)
+ (public_name bkhack-compiler.shell)
+ (modules shellgen shell__sym))

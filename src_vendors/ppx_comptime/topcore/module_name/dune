@@ -1,0 +1,4 @@
+(library
+ (libraries re)
+ (name ppx_comptime__topcore__module_name)
+ (modules module_name))

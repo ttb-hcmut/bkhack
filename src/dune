@@ -41,8 +41,10 @@
  (preprocess
   ; The `pps` field is a list of ppx to apply to the sources before generating JavaScript. melange.ppx allows to use Melange attributes [@mel. ...] (https://melange.re/v2.0.0/communicate-with-javascript/#attributes)
   ; reason-react-ppx allows to use JSX for ReasonReact components by using the [@JSX] attributes from Reason: https://reasonml.github.io/docs/en/jsx
-  (pps melange.ppx reason-react-ppx))
+  (pps melange.ppx reason-react-ppx ppx_comptime))
  
  ; Name of library, and is name of package
  (public_name bkhack)
+ (enabled_if
+  (= %{context_name} default))
  (name bkhack))

@@ -9,6 +9,7 @@ module B = Buildlib
 exception Missing_mapping_entry_for of string
 
 let public_dir cwd = P.(cwd / "public")
+and generative_dir cwd = P.(cwd / "generative")
 and dist_dir cwd = P.(cwd / "dist")
 and src_dir cwd = P.(cwd / "src")
 and log_dir cwd = P.(cwd / "log")
@@ -57,12 +58,27 @@ let morphism_static ~sw public_dir dist_dir () =
     P.(dist_dir / path_it)
     ~link_to:P.(public_dir / path_it)
 
+let morphism_generative~sw generative_dir dist_dir =
+  let at_dir dir k = Path.mkdirs ~exists_ok:true ~perm:0o700 dir; k () in
+  let create_index name candidates =
+    let content = candidates |> List.map (Printf.sprintf {|@import "/%s";|}) |> String.concat "\n" in
+    Path.save ~create:(`Exclusive 0o700) P.(dist_dir / name) content in
+  at_dir generative_dir @@ fun () ->
+  let candidates = Path.read_dir generative_dir |> List.filter(fun x -> Filename.extension x = ".css") in
+  at_dir dist_dir @@ fun () ->
+  create_index "generative.css" candidates;
+  candidates |> Fiber.List.iter @@ fun path_it ->
+    B.Path.symlink~sw
+      P.(dist_dir / path_it)
+      ~link_to:P.(generative_dir / path_it)
+
 let () =
   Eio_main.run @@ fun env ->
   let procm, clock, cwd =
     Stdenv.process_mgr env, Stdenv.clock env, Stdenv.cwd env in
-  let public_dir, dist_dir, log_dir, src_dir =
-    public_dir cwd, dist_dir cwd, log_dir cwd, src_dir cwd in
+  let public_dir, generative_dir, dist_dir, log_dir, src_dir =
+    public_dir cwd, generative_dir cwd, dist_dir cwd, log_dir cwd, src_dir cwd in
   Switch.run @@ fun sw ->
   morphism_jspages~sw~procm~clock~cwd src_dir dist_dir log_dir;
-  morphism_static~sw public_dir dist_dir ()
+  morphism_static~sw public_dir dist_dir ();
+  morphism_generative~sw generative_dir dist_dir

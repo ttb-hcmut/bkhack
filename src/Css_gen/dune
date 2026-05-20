@@ -1,0 +1,5 @@
+(library
+ (modes byte)
+ (libraries containers re)
+ (public_name bkhack-compiler.css_gen)
+ (name css_gen))

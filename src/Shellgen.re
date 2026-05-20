@@ -1,5 +1,3 @@
-open Melange__containers.Fun
-
 module Core = {
 	type cmd =
 		| Raw_cmd(list(string)) : cmd
@@ -9,7 +7,7 @@ module Core = {
 		| Cons(cmd, program)   : program
 		| Nil : program
 	
-	and obs = React.element
+	and obs = string
 
 	let raw_cmd = xs => Raw_cmd(xs)
 
@@ -30,8 +28,7 @@ module Core = {
 		and of_cmd = fun
 			| Raw_cmd(xs) => String.concat(" ", xs)
 			| Subsection(prog) => "{ "++of_prog(prog)++" ;}"
-		and span = x => <span className="command">{x}</span>;
-		span % React.string % of_prog
+		of_prog
 	}
 }
 
