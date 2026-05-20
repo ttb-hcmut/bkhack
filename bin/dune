@@ -1,11 +1,13 @@
 (executable
  (libraries eio eio_main buildlib
             cmdliner re containers)
+ (package bkhack)
  (public_name bkhack.bundle)
  (name bundle))
 
 (executable
  (libraries eio eio_main buildlib
             cmdliner re containers)
+ (package bkhack)
  (public_name bkhack.serve)
  (name serve))

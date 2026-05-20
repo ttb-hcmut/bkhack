@@ -366,10 +366,19 @@ module Wifi = {
 
 module HintPanel {
 
-	module At__sh (Syntax : Shell__sym.SymL) {
-		let command = Syntax.observe @@ Syntax.(
-			feed @| Split_by.count(10) @| nil)
-	}
+	let%comptime feed__hint = {
+		module At__sh (Syntax : Shell__sym.SymL) {
+			let command = Syntax.observe @@ Syntax.(
+				feed @| Split_by.count(10) @| nil )
+		}
+
+		open At__sh(Shellgen)
+
+		Css_gen.Stylesheet.format1(~className=__name__, {| 
+			&.command::before { content: ? ;}
+		|}, command)
+
+	};
 
 	[@react.component]
 	let make = () => {
@@ -380,7 +389,7 @@ module HintPanel {
 			</div>
 			<h1 className="home-feed"> </h1>
 			<div className="sub">
-				{ let open At__sh(Shellgen); command }
+				<span className={"command "++feed__hint} />
 			</div>
       <button className="create-post"
         onClick={_ =>

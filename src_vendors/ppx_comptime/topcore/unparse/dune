@@ -1,0 +1,4 @@
+(library
+ (libraries re ppxlib)
+ (name ppx_comptime__topcore__unparse)
+ (modules debug unparse))
