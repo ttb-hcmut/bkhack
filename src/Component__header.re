@@ -53,6 +53,11 @@ module List {
 	let last_opt = it => try (Some(last(it))) { | _ => None }
 }
 
+let samples_set_tilesets = [
+	"gui",
+	"''"
+]
+
 let samples_set_languages = [
 	"vi-VN",
 	"en-US"
@@ -66,6 +71,7 @@ let samples_set_highlight = [
 let samples_set = [
 	"--language",
 	"--highlight",
+	"--tileset"
 ]
 
 let samples = [
@@ -94,6 +100,10 @@ let match_ = Melange__re.({
 	(last, ~cmd) => {
 		Js.Console.log2("try to complete", cmd);
 		switch (cmd) {
+		| ["set", "--tileset", _] =>
+			samples_set_tilesets |> List.filter_map(last->doit) |> funnel_opt
+		| ["set", "--tileset"] =>
+			samples_set_tilesets |> List.filter_map(""->doit) |> funnel_opt
 		| ["set", "--highlight", _] =>
 			samples_set_highlight |> List.filter_map(last->doit) |> funnel_opt
 		| ["set", "--highlight"] =>
