@@ -27,26 +27,25 @@ module HintPanel {
 	};
 
 	[@react.component]
-	let make = () => {
-    let auth = Auth.AuthContext.use();
+	let make = () =>
+    Auth.AuthContext.use() |> auth =>
 		<>
-			<div className="logo">
-				<Wifi />
-			</div>
-			<h1 className="home-feed"> </h1>
-			<div className="sub">
-				<span className={"command "++feed__hint} />
-			</div>
-      <button className="create-post"
-        onClick={_ =>
-          auth.checkAuth()?
-          Js__dom.Window.Location.href_set(
-            "/new/")
-          :
-          auth.forceAuth()
-        }>{string("+ Add post")}</button>
+		<div className="logo"> <Wifi /> </div>
+		<h1 className="home-feed" />
+		<div className="sub">
+			<span className={"command "++feed__hint} />
+		</div>
+		<button className="create-post"
+			onClick={_ =>
+				auth.checkAuth()?
+				Js__dom.Window.Location.href_set(
+					"/new/")
+				:
+				auth.forceAuth()
+			}
+		>{string("+ Add post")}
+		</button>
 		</>
-	}
 }
 
 module Filter {

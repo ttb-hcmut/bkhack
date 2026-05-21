@@ -1,8 +1,5 @@
 open React
-
-module type Component = {
-	[@react.component] let make : unit => React.element
-}
+open Decorator
 
 module Make (C : Component) {
 	[@react.component]
