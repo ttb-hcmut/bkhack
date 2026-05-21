@@ -49,6 +49,11 @@ let eval = current_url => {
 			url := "/item/";
 			url_args := url_args^ |> Util.List.replace_assoc'("id", id) |> Util.List.replace_assoc'("view", "edit");
 			aux(next)	}
+		| Cons_cmd(`unfetched(["set", "--tileset", mode]), next) => {
+			mode->Tileset.save_into_exn(Dom.Storage.localStorage);
+			let root = ReactDOM.querySelector("#root")->Option.get;
+			root->Tileset.sync_from_exn(Dom.Storage.localStorage);
+			aux(next) }
 		| Cons_cmd(`unfetched(["set", "--highlight", mode]), next) => {
 			mode->Command.Highlight.save_into_exn(Dom.Storage.localStorage);
 			let root = ReactDOM.querySelector("#root")->Option.get;

@@ -12,6 +12,7 @@ module App = Keyboard.Make({
 			let o = form.current->Js.Nullable.toOption->Option.get->ReactDOM.domElementToObj;
 			Dom.Storage.setItem("bkhack.language", o##"language"##value, Dom.Storage.localStorage);
 			Dom.Storage.setItem("bkhack.highlight", o##"highlight"##value, Dom.Storage.localStorage);
+			Dom.Storage.setItem("bkhack.tileset", o##"tileset"##value, Dom.Storage.localStorage);
 		};
 		let language = {
 			let selected = {
@@ -30,6 +31,15 @@ module App = Keyboard.Make({
 				<option selected=?(selected("none"))>{"none"->string}</option>
 				<option selected=?(selected("colorful"))>{"colorful"->string}</option>
 			</select>
+		}
+		and tileset = {
+			let selected = {
+				let current = Dom.Storage.localStorage |> Dom.Storage.getItem("bkhack.tileset") |> Option.value(~default="gui");
+				e => (e === current ? Some(true) : None) };
+			<select id="tileset" className="tileset">
+				<option selected=?(selected("gui"))>{"gui"->string}</option>
+				<option selected=?(selected(""))>{""->string}</option>
+			</select>
 		};
 		<>
 		<header> <Component__header /> </header>
@@ -41,6 +51,7 @@ module App = Keyboard.Make({
 			<main>
 				{language}
 				{highlight}
+				{tileset}
 			</main>
 		</form>
 		</>
