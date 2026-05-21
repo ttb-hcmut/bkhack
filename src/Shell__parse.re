@@ -5,6 +5,14 @@ open Shell__parse__lex
 
 let end_of_seq = ignore @@ end_of_seq
 
+let word = {
+	let* w = word();
+	switch (w) {
+	| `raw(w)
+	| `quoted(w, _) => return(w)
+	}
+}
+
 let command = fix @@ command =>
 	(word <* whitespace, command) ||> lift2(List.cons)
 	or (word >>| x => [x])

@@ -3,6 +3,16 @@ open Cprg
 open Cprg.Syntax
 open Shell__parse__lex
 
+let word = {
+	let* w = word();
+	switch (w) {
+	| `raw(w) => return(w)
+	| `quoted(w, ch) => {
+		let ch = String.init(1, _ => ch);
+		return(ch ++ w ++ ch) }
+	}
+}
+
 let command = fix @@ command => {
 	let part_1 = {
 		let* word = word; let* ws = whitespace; let* command = command;
