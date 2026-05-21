@@ -32,6 +32,10 @@
 	font-family: var(--font-mono);
 }
 
+#root:not([data-tileset="gui"]) > header > .logo {
+	margin-left: var(--space-a);
+}
+
 #root:not([data-tileset="gui"]) > header > .logo::after {
 	content: "bkhack";
 }
