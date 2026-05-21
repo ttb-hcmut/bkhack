@@ -61,6 +61,8 @@ val peek_char : char option code
 
 val peek_char_fail : char code
 
+val advance : int -> unit code
+
 val end_of_input : unit code
 
 val bind : 'a code -> ('a -> 'b code) -> 'b code

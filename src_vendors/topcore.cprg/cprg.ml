@@ -1,20 +1,27 @@
 type 'a code =
   { code_parse :
-      time:_time -> peek:(unit -> char) -> advance:(unit -> unit) -> unit -> ('a, string) result }
+      time:time -> peek:(unit -> char) -> advance:(unit -> unit) -> unit -> ('a, string) result }
 
-and _time =
-  { time_save : unit -> _snapshot
-  ; time_restore : _snapshot -> unit
+and time =
+  { time_save : unit -> snapshot
+  ; time_restore : snapshot -> unit
   }
 
-and _snapshot =
+and snapshot =
   { snapshot_i : int }
+
+let advance n =
+  let code_parse ~time:_ ~peek:_ ~advance () =
+    for _ = 0 to (n-1) do
+      advance ()
+    done; Result.ok () in
+  { code_parse }
 
 let take_while pred =
   let rec code_parse' ~time ~peek ~advance () =
     let ch = peek () in
-    if pred ch then (advance (); ch :: (code_parse' ~time ~peek ~advance ()))
-    else [] in
+    if not @@ pred ch then [] else
+    (advance (); ch :: (code_parse' ~time ~peek ~advance ())) in
   let code_parse ~time ~peek ~advance () =
     let char_arr = code_parse' ~time ~peek ~advance () in
     let b = Buffer.create (List.length char_arr) in
