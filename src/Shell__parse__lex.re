@@ -3,11 +3,6 @@ open Cprg.Syntax
 
 let ignore = x => x >>| _ => ();
 
-let advance = () => {
-	let ended = ref(false);
-	ignore @@ take_while1(_ => switch (ended^) { | false => { ended := true; true } | true => false })
-}
-
 let string = s => String.to_seq(s) |> Seq.fold_left(
 	(acc, it) =>
 		lift2(
@@ -22,15 +17,22 @@ let (whitespace, whitespace0) = {
 	(take_while1(is_ws), take_while(is_ws))
 }
 
-let word = {
-	let* x = peek_char;
-	switch (x) {
+let word = () => {
+	let* first_char = peek_char;
+	switch (first_char) {
 	| None => fail("zero length, not a word")
 	| Some(('a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' | '$' | '-') as x) => {
-		let* () = advance();
+		let* () = advance(1);
 		let* str = take_while @@ fun
 			| 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' | '_' => true | _ => false;
-		return(String.init(1, _ => x) ++ str)
+		return(`raw(String.init(1, _ => x) ++ str))
+	}
+	| Some(('\'' | '\"') as x) => {
+		let* () = advance(1);
+		let* str = take_while @@ fun | e when e === x => false | _ => true;
+		let* _ = peek_char_fail;
+		let* () = advance(1);
+		return(`quoted(str, x))
 	}
 	| Some(_) => fail("invalid word")
 	}
