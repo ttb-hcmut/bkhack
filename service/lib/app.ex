@@ -1,7 +1,6 @@
 defmodule Data0 do
   use Ecto.Repo, otp_app: :bkhack, adapter: Ecto.Adapters.SQLite3
 end
-
 defmodule Data1 do
   use Ecto.Repo, otp_app: :bkhack, adapter: Mongo.Ecto
 end
@@ -21,6 +20,49 @@ defmodule App
   plug :fetch_query_params
   plug :dispatch
 
+  get "/api/post/list" do
+    Logger.info "GET postlist"
+    user      = Map.get(conn.params,"user"     ,"-1"        ) |> String.to_integer
+    search    = Map.get(conn.params,"search"   ,""          )
+    searchby  = Map.get(conn.params,"searchby" ,"title"     )
+    sortby    = Map.get(conn.params,"sortby"   ,"age"       )
+    orderby   = Map.get(conn.params,"orderby"  ,"ascending" )
+    offset    = Map.get(conn.params,"offset","0") |> String.to_integer
+    limit     = Map.get(conn.params,"limit","10") |> String.to_integer
+    count     = if(Map.get(conn.params,"count" ,"false") == "true", do: true , else: false)
+
+    data = PostBE.getPostList(
+      user,
+      search,
+      searchby,
+      sortby,
+      orderby,
+      limit,
+      offset,
+      count
+    )
+    # data = ReturnChildID.getChildComments(parent, offset, limit)
+    case data do
+      nil ->
+        {:ok, sh} = JSON.encode([])
+        conn
+        # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+        |> put_resp_header("Access-Control-Allow-Origin", "*")
+        |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+        |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+        |> put_resp_content_type("application/json")
+        |> send_resp(501 , sh)
+      x ->
+        {:ok, sh} = Jason.encode(x)
+        conn
+        # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+        |> put_resp_header("Access-Control-Allow-Origin", "*")
+        |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+        |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+        |> put_resp_content_type("application/json")
+        |> send_resp(200 , sh)
+    end
+  end
   options "/api/post/create" do
     conn
     # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
@@ -36,21 +78,17 @@ defmodule App
     creator_id  = body["id"]
     title       = body["title"]
     post_body   = body["body"]
+    commit_message = body["commit_message"]
     public      = body["public"]
+    post_id     = body["post-id"]
 
     data = "User "<>Integer.to_string(creator_id)<>" with title: "<>title<>" and body: "<>post_body
     IO.puts(data);
-    postId = PostBE.createPost(creator_id, title, post_body, public)
+    postId = case post_id do
+      -1 ->  PostBE.createPost(creator_id, title, post_body, commit_message, public)
+      pid -> PostBE.updatePost(pid, creator_id, title, post_body, commit_message)
+    end
     case postId do
-      p ->
-        {:ok, sh} = JSON.encode(p)
-        conn
-        # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
-        |> put_resp_header("Access-Control-Allow-Origin", "*")
-        |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
-        |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
-        |> put_resp_content_type("application/json")
-        |> send_resp(201, sh)
       nil ->
         {:ok, sh} = JSON.encode(-1)
         conn
@@ -60,6 +98,15 @@ defmodule App
         |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
         |> put_resp_content_type("application/json")
         |> send_resp(500, sh)
+      p ->
+        {:ok, sh} = JSON.encode(p)
+        conn
+        # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+        |> put_resp_header("Access-Control-Allow-Origin", "*")
+        |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+        |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+        |> put_resp_content_type("application/json")
+        |> send_resp(201, sh)
     end
   end
   options "/api/auth/register" do
