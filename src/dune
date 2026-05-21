@@ -36,7 +36,7 @@
  (modes melange)
 
  ; Dependencies of the stanza.
- (libraries reason-react melange-json melange__containers quel bkhack__experimental cprg melange__cmarkit melange__iter melange__re)
+ (libraries reason-react melange-json melange__containers quel bkhack__experimental cprg melange__cmarkit melange__iter melange__re melange.belt)
 
  (preprocess
   ; The `pps` field is a list of ppx to apply to the sources before generating JavaScript. melange.ppx allows to use Melange attributes [@mel. ...] (https://melange.re/v2.0.0/communicate-with-javascript/#attributes)

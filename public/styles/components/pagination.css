@@ -88,6 +88,15 @@
 .pagination .comment::after{
   content: "Comment";
 }
+.pagination .title::after{
+  content: "Title";
+}
+.pagination .body::after{
+  content: "Body";
+}
+.pagination .author::after{
+  content: "Author";
+}
 .pagination .version::after {
   content: "Version";
 }

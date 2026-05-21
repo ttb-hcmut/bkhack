@@ -47,18 +47,38 @@ defmodule Post
   @timestamps_opts [type: UTCDateTime]
   @primary_key {:post_id, :id, autogenerate: true}
   schema "posts" do
-    field :post_title ,:string
-    field :creator_id ,:integer
-    field :post_text  ,:string
-    field :verified   ,:boolean ,default: false
-    field :public     ,:boolean ,default: false
+    field :commit_head_id ,:integer
+    field :post_owner_id  ,:integer
+    field :verified       ,:boolean ,default: false
+    field :public         ,:boolean ,default: false
     timestamps(inserted_at: :date_created_utc, updated_at: false, type: :utc_datetime)
-    belongs_to  :the_creator ,User  ,foreign_key: :creator_id ,references: :user_id ,define_field: false
+    belongs_to  :the_owner  ,User   ,foreign_key: :post_owner_id  ,references: :user_id   ,define_field: false
+    belongs_to  :the_commit ,Commit ,foreign_key: :commit_head    ,references: :commit_id ,define_field: false
   end
-  def insert(post, attrs) do
+  def changeset(post, attrs) do
     post
-    |> cast(attrs, [:post_title, :creator_id, :post_text, :verified])
-    |> validate_required([:post_title, :creator_id, :post_text])
+    |> cast(attrs, [:post_owner_id, :commit_head_id, :verified, :public])
+    |> validate_required([:post_owner_id, :commit_head_id])
+  end
+end
+defmodule Commit
+  do use Ecto.Schema
+  @timestamps_opts [type: UTCDateTime]
+  @primary_key {:commit_id, :id, autogenerate: true}
+  schema "commits" do
+    field :commit_owner_id  ,:integer
+    field :commit_child_id  ,:integer ,default: nil
+    field :commit_message   ,:string
+    field :post_title       ,:string
+    field :post_text        ,:string
+    timestamps(inserted_at: :date_created_utc, updated_at: false, type: :utc_datetime)
+    belongs_to  :the_owner  ,User   ,foreign_key: :commit_owner_id  ,references: :user_id   ,define_field: false
+    belongs_to  :the_child  ,Commit ,foreign_key: :child_commit_id  ,references: :commit_id ,define_field: false
+  end
+  def changeset(commit, attrs) do
+    commit
+    |> cast(attrs, [:commit_owner_id, :commit_child_id, :commit_message, :post_text, :post_title])
+    |> validate_required([:commit_owner_id, :commit_message, :post_title, :post_text])
   end
 end
 defmodule Comment
