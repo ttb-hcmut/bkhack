@@ -68,19 +68,34 @@ module Filter {
 	};
 
 	[@react.component]
-	let make = (~onUpdateCount) =>
-	{ let submission = React.useRef(Js.Nullable.null);
-		let onSubmit = e => {
-			React.Event.Synthetic.preventDefault(e);
-			let u = React.Event.Form.target(e)##showCount##value;
-			onUpdateCount(u)
-		};
-		<form ref={ReactDOM.Ref.domRef(submission)} className="dashboard-filter" onSubmit>
-			<input id="feedFilter" />
-			{methods @@ ["hot", "new", "top-voted", "most-discussed", "recent-activity"]}
-			{options @@ [10, 25, 50, 100, 0]}
-		</form>
-	}
+	let make = (~setResult) =>
+	{ 
+    // let submission = React.useRef(Js.Nullable.null);
+		// let onSubmit = e => {
+		// 	React.Event.Synthetic.preventDefault(e);
+		// 	let u = React.Event.Form.target(e)##showCount##value;
+		// 	onUpdateCount(u)
+		// };
+		// <form ref={ReactDOM.Ref.domRef(submission)} className="dashboard-filter" onSubmit>
+		// 	<input id="feedFilter" />
+		// 	{methods @@ ["hot", "new", "top-voted", "most-discussed", "recent-activity"]}
+		// 	{options @@ [10, 25, 50, 100, 0]}
+		// </form>
+    let auth = AuthContext.use()
+    ;
+    <Pagination.App 
+      limit=3
+      searchPrompt=true
+      countApi={"/api/post/list?count=true" ++ "&user="  ++ string_of_int(Option.value(auth.getUserId(),~default=-1))++"&"}
+      fetchApi={"/api/post/list?user="  ++ string_of_int(Option.value(auth.getUserId(),~default=-1))++"&"}
+      filter  ={[
+        ("searchby",["title","body","author"])
+      , ("sortby",  ["age","active"])
+      , ("orderby", ["ascending","descending"])
+      ]}
+      setResult
+    />
+  }
 }
 
 module Dashboard = {
@@ -94,10 +109,8 @@ module Dashboard = {
     , ~title
     , ~creator
     , ~verified
-    , ~public
     , ~timestamp
     ) => {
-      let auth = AuthContext.use()
       let (disCount,setDisCount) = React.useState(() => 0);
       let fetchCommentCount = (~id) => {
         let open Fetch__syntax;
@@ -119,48 +132,45 @@ module Dashboard = {
       React.useEffect0(()=>{
         fetchCommentCount(~id=string_of_int(id))
         None
-      });
-      switch(public,auth.checkAuth(), creator == Option.value(auth.getUserId(),~default = 67)){
-            | (0,true, true) | (1,_, _) => 
-              <li key={string_of_int(id)}>
-                <div className="counter">
-                  <span>{React.int(rank)}</span>
-                </div>
-                <header>
-                  <a href={"item/?id="++string_of_int(id)}>{string(title)}</a>
-									<span className="post_id">{id->React.int}</span>
-                </header>
-                <footer>
-                  <div className="has-left-indicator tagline">
-                    <span className="tag" title="Algorithm, Optimization">{string("AgAa")}</span>
-                  </div>
-                  <div className="status">
-                    <span>{string(verified==1?"verified":"unverified")}</span>
-                  </div>
-                  <div className="activities">
-                    <span className="comments">
-                      {React.int(disCount)}
-                    </span>
-                    <span className="pullrequests">
-                      {React.int(67)}
-                    </span>
-                  </div>
-                  <div className="last-activity">
-                    <span className="verb">{string("commented")}</span>
-                    <span className="agent">{string("@kinten108101")}</span>
-                    <span className="theme"></span>
-                    <span className="time">{string("2h ago")}</span>
-                  </div>
-                  <div className="created-from">
-                    <span>{string("created ")}</span><span>{string(Util.utcToRelative(timestamp))}</span>
-                  </div>
-                  <div className="ref">
-                    <span>{string("2000")}</span>
-                  </div>
-                </footer>
-              </li>
-            | (_,_,_) => React.null
-          }
+      })
+      ;
+      <li>
+        <div className="counter">
+          <span>{React.int(rank)}</span>
+        </div>
+        <header>
+          <a href={"item/?id="++string_of_int(id)}>{string(title)}</a>
+          <span className="post_id">{id->React.int}</span>
+        </header>
+        <footer>
+          <div className="has-left-indicator tagline">
+            <span className="tag" title="Algorithm, Optimization">{string("AgAa")}</span>
+          </div>
+          <div className="status">
+            <span>{string(verified?"verified":"unverified")}</span>
+          </div>
+          <div className="activities">
+            <span className="comments">
+              {React.int(disCount)}
+            </span>
+            <span className="pullrequests">
+              {React.int(67)}
+            </span>
+          </div>
+          <div className="last-activity">
+            <span className="verb">{string("commented")}</span>
+            <span className="agent">{string("@"++creator)}</span>
+            <span className="theme"></span>
+            <span className="time">{string("2h ago")}</span>
+          </div>
+          <div className="created-from">
+            <span>{string("created ")}</span><span>{string(Util.utcToRelative(timestamp))}</span>
+          </div>
+          <div className="ref">
+            <span>{string("2000")}</span>
+          </div>
+        </footer>
+      </li>
 		}
 	}
 
@@ -215,29 +225,51 @@ module Dashboard = {
 
   [@react.component]
   let make = () => {
-		let (counts, setCounts) = React.useState(() => 10);
+		// let (counts, setCounts) = React.useState(() => 10);
 		let (items, setItems) = React.useState(() => [||]);
+		let (result, setResult) = React.useState(() => Js.Json.null);
 		let (sidebarState, setSidebarState) = React.useState( _ => "state0");
-		let ticketParam = ReasonReactRouter.useUrl().search;
-		React.useEffect1(() => {
-			let limit = ticketParam->Util.parseQueryParams->Js.Dict.get("limit");
-			let limit = limit |> Option.map(int_of_string);
-			ignore( limit |> Option.iter @@ limit => setCounts(_ => limit) );
-			None
-		}, [|counts|]);
-		let module X = Bkhack__experimental;
-		React__effect.useAsync1(() => 
-    Fetch__syntax.({
-			test(counts);
-			let module U (S : X.S) = At_repo_0({ let paginate = limit => limit(counts, 0) })(S);
-			let* posts = X.Fetch.all((
-        module At_repo_0({ let paginate = limit => limit(counts, 0) }, X.GenSQL)
-      ),(module Env));
-      setItems(_ => posts);
-      return(());
-		})
-    , [|counts|]);
-		let onUpdateCount = React.useCallback0(newVal => setCounts(_ => newVal));
+		// let ticketParam = ReasonReactRouter.useUrl().search;
+    
+    let fetchPostList = () => {
+      let open Fetch__syntax;
+      result
+      |> Model.Decode.Response.postListItems
+      >>= (aod => {
+        setItems( _ => aod);
+        return(aod)
+      })
+      >!= (err => {
+          Js.log(err);
+          return([||])
+        })
+      |> ignore;
+    }
+    React.useEffect1(()=>{
+      if (result != Js.Json.null)
+        fetchPostList();
+      None
+    },[|result|])
+		// React.useEffect1(() => {
+		// 	let limit = ticketParam->Util.parseQueryParams->Js.Dict.get("limit");
+		// 	let limit = limit |> Option.map(int_of_string);
+		// 	ignore( limit |> Option.iter @@ limit => setCounts(_ => limit) );
+		// 	None
+		// }, [|counts|]);
+		// let module X = Bkhack__experimental;
+		// React__effect.useAsync1(() => 
+    // Fetch__syntax.({
+		// 	test(counts);
+		// 	let module U (S : X.S) = At_repo_0({ let paginate = limit => limit(counts, 0) })(S);
+		// 	let* posts = X.Fetch.all((
+    //     module At_repo_0({ let paginate = limit => limit(counts, 0) }, X.GenSQL)
+    //   ),(module Env));
+    //   setItems(_ => posts);
+    //   return(());
+		// })
+    // , [|counts|]);
+		// let onUpdateCount = React.useCallback0(newVal => setCounts(_ => newVal))
+    ;
 		<>
 			<header>
 				<Component__header />
@@ -246,21 +278,21 @@ module Dashboard = {
 				<header>
 					<HintPanel />
 				</header>
-				<Filter onUpdateCount />
+				<Filter setResult />
 			</nav>
 			<main className=sidebarState><ol>
 			{ items
-				|> Array.map(((id, title, creator, _text, verified, public, timestamp)) => {
+				|> Array.map( x => {
+          open Model.PostListItem;
 					let rank = 9;
                 <Card
-									key={id->string_of_int}
+									key       ={x.post_id->string_of_int}
                   rank
-                  id
-                  title
-                  creator
-                  verified
-                  public
-                  timestamp
+                  id        ={x.post_id}
+                  title     ={x.title}
+                  creator   ={x.owner_name}
+                  verified  ={x.verified}
+                  timestamp ={x.created}
                 />
 				})
 				|> React.array

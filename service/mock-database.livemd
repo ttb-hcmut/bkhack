@@ -86,6 +86,7 @@ dropTablesList = [
   fn -> Sqlx.query!(conn, ~S"drop table if exists commentratings", []) end,
   fn -> Sqlx.query!(conn, ~S"drop table if exists comments", []) end,
   fn -> Sqlx.query!(conn, ~S"drop table if exists posts", []) end,
+  fn -> Sqlx.query!(conn, ~S"drop table if exists commits", []) end,
   fn -> Sqlx.query!(conn, ~S"drop table if exists users", []) end,
   fn -> IO.puts "Dropped tables" end
 ]
@@ -107,15 +108,32 @@ createTablesList = [
   fn -> Sqlx.query!(
     conn,
     ~S"""
+    create table if not exists commits (
+      commit_id integer primary key,
+      commit_owner_id integer not null,
+      commit_child_id integer,
+      commit_message varchar(255) not null,
+      post_title varchar(255) not null,
+      post_text varchar(2048) not null,
+      date_created_utc varchar(255) not null,
+      foreign key (commit_owner_id) references users(user_id)
+      foreign key (commit_child_id) references commits(commit_id)
+    )
+    """,
+    []
+  ) end,
+  fn -> Sqlx.query!(
+    conn,
+    ~S"""
     create table if not exists posts (
       post_id integer primary key,
-      post_title varchar(255) not null,
-      creator_id integer not null,
-      post_text varchar(2048) not null,
+      commit_head_id integer not null,
+      post_owner_id integer not null,
       verified boolean not null,
       public boolean not null,
       date_created_utc varchar(255) not null,
-      foreign key (creator_id) references users(user_id)
+      foreign key (post_owner_id) references users(user_id),
+      foreign key (commit_head_id) references commits(commit_id)
     )
     """,
     []
@@ -177,6 +195,21 @@ IO.inspect createTablesList
 ```
 
 ## Scenarios
+
+<!-- livebook:{"branch_parent_index":2} -->
+
+## Commits
+
+```elixir
+for drop <- dropTablesList do drop.() end
+for create <- createTablesList do create.() end
+RunSql.query(conn,[
+  ~S"insert into users values (0, 'admin', 'password', 'email@bkhack.org', 0)",
+])
+RunSql.query(conn,[
+  ~S"select * from users",
+])
+```
 
 <!-- livebook:{"branch_parent_index":2} -->
 

@@ -1,9 +1,16 @@
 open Melange__containers.Fun
 
-module Post = {
+module PostListItem = {
 	type t =
-		{ author: string
-		, message: string
+		{
+      post_id    : int
+    , owner_id   : int
+    , owner_name : string
+    , title      : string
+    , version    : int
+    , verified   : bool
+    , created    : string
+    , updated    : string
 		}
 };
 module FetchedComment = {
@@ -28,13 +35,22 @@ module FetchedAuth = {
 module Decode = {
 	open Melange_json;
 
-	let post = json => {
-		open Post;
+	let postListItem = json => {
+		open PostListItem;
 		Of_json.
-		{ author: json |> field("author", string)
-		, message: json |> field("message", string)
+		{ post_id    : json |> field("post_id"   , int)
+    , owner_id   : json |> field("owner_id"  , int)
+    , owner_name : json |> field("owner_name", string)
+    , title      : json |> field("title"     , string)
+    , version    : json |> field("version"   , int)
+    , verified   : json |> field("verified"  , bool)
+    , created    : json |> field("created"   , string)
+    , updated    : json |> field("updated"   , string)
 		};
 	};
+  let postListItems = json => {
+    json |> Of_json.array(postListItem)
+  }
   let fetchedComment = json => {
     open FetchedComment;
     Of_json.
@@ -58,14 +74,15 @@ module Decode = {
     { user_id :json |> field("user_id", int)
     , name    :json |> field("name", string)
     }}
+
 	module Response = {
 		open Js;
 
-		let post = json =>
-			post(json) |> Promise.resolve
+    let postListItem = postListItem %> Promise.resolve
+
+		let postListItems = postListItems %> Promise.resolve
     
-    let fetchedComment = json => 
-      fetchedComment(json) |> Promise.resolve
+    let fetchedComment = fetchedComment %> Promise.resolve
 
     let fetchedComments = fetchedComments %> Promise.resolve
 

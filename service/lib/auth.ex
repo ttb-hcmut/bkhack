@@ -1,6 +1,6 @@
 defmodule AuthBE do
+  import Ecto.Query
   def login(username,password) do
-    import Ecto.Query
     from(u in User, where: u.name == ^username and u.password == ^password, select: %{user_id: u.user_id,name: u.name})
     |> Data0.one
   end
@@ -32,8 +32,7 @@ end
     end
   end
 
-  def getUserAll do
-    import Ecto.Query
+  def getAll do
     query = from u in User, select: u
     xs = Data0.all(query)
     IO.inspect xs

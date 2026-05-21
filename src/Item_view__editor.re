@@ -214,11 +214,12 @@ module App = {
           open Js.Json;
           open Json__syntax;
           let body = empty()
-          |> "id"       ^^ int    @@ Option.value(auth.getUserId(),~default = 67)
-          |> "post-id"  ^^ int    @@ post.parentId
-          |> "title"    ^^ string @@ post.postTitle
-          |> "body"     ^^ string @@ post.postBody
-          |> "public"   ^^ bool   @@ public
+          |> "id"             ^^ int    @@ Option.value(auth.getUserId(),~default = 67)
+          |> "post-id"        ^^ int    @@ post.parentId
+          |> "title"          ^^ string @@ post.postTitle
+          |> "body"           ^^ string @@ post.postBody
+          |> "commit_message" ^^ string @@ post.commitMessage
+          |> "public"         ^^ bool   @@ public
           |> finish;
           Fetch.fetchWithInit(
             Env.backend ++"/api/post/create",

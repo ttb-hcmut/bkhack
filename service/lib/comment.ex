@@ -1,4 +1,5 @@
 defmodule DiscussionBE do
+  import Ecto.Query
   def getCommentsCount(post_id\\0) do
     query = """
       WITH RECURSIVE all_comments AS (
@@ -86,7 +87,6 @@ defmodule DiscussionBE do
   end
 
   def setVote(voter_id,comment_id,action) do
-    import Ecto.Query
     from(r in CommentRating, where: r.comment_id == ^comment_id and r.voter_id == ^voter_id )
     |> Data0.delete_all()
 
@@ -97,7 +97,6 @@ defmodule DiscussionBE do
   end
 
   def postComment(parent_id,parent_type,content,commenter_id,post_version) do
-    import Ecto.Query
     case parent_type do
       0 -> Data0.insert!(%Comment{
         parent_post_id:     parent_id, parent_comment_id:  nil, content:            content, commenter_id:       commenter_id, post_version:       post_version
@@ -110,7 +109,6 @@ defmodule DiscussionBE do
   end
 
   def getCommentAll do
-    import Ecto.Query
     query = from u in Comment, select: u
     xs = Data0.all(query)
     IO.inspect xs
