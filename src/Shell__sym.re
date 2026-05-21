@@ -7,9 +7,7 @@ module type Sym = {
 
 	let cons : cmd => program => program
 
-	/**
-
-	    @canonical {cons} */
+	/** @canonical {cons} */
 	let ( @| ) : cmd => program => program
 
 	let nil : program
