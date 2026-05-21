@@ -21,7 +21,7 @@ module HintPanel {
 		open At__sh(Shellgen)
 
 		Css_gen.Stylesheet.format1(~className=__name__, {| 
-			&.command::before { content: ? ;}
+			&.command::after { content: ? ;}
 		|}, command)
 
 	};
