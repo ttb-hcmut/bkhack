@@ -80,8 +80,7 @@ module Filter {
 		// 	{methods @@ ["hot", "new", "top-voted", "most-discussed", "recent-activity"]}
 		// 	{options @@ [10, 25, 50, 100, 0]}
 		// </form>
-    let auth = AuthContext.use()
-    ;
+    let auth = AuthContext.use();
     <Pagination.App 
       limit=3
       searchPrompt=true
