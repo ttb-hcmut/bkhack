@@ -46,7 +46,11 @@ branching pipelines.
 == Function
 A reusable pipeline or grouping of commands would be called a _function_
 . In the #bkhack shell language, #lorem(70)\
-#lorem(70)
+#lorem(70). Function is a useful abstraction. For example, since feed can be treated as a function simply built-in, it's possible to customize the behavior of ```sh feed``` by overloading it. Indeed, the defaulr ```sh feed``` command in #bkhack, which automatically has limiting of 15 items pagination, is simply a function
+```sh
+feed() { feed | split -c 15 | cut -n1 | sort hot ;}
+```
+which the user can customize. The rest of #bkhack shell commands are exposed like so, hence the settings system.
 == Grammar
 The grammar of the #bkhack shell language, given in EBNF form in @gr, #lorem(30)
 Notice how the command rule do not distinguish parts into flags or values
@@ -63,6 +67,8 @@ programming language.
 #place(auto, float: true, scope: "parent")[
   #figure(caption: [Typing for the #bkhack shell language], shell-sym.v) <typ>
 ]
+// == Naming
+// why are commands named the way they are? this is the same problem in sh. the truth is that there will never be a scheme that everyone can agree on. most names are historical and highly contextual. unix is loved because people like its architecture and they try to adopt the names, not that the names are actually good. indeed, there's so much you can do to appeal to a demographic of people. communication is two-way between the user and the developer.
 == Reference
 #bibliography(title: none, "./works.bib")
 
