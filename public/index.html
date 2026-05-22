@@ -198,8 +198,12 @@ html {
 }
 
 #root > nav {
-	margin-left: var(--space-a);
-	margin-right: var(--space-a);
+	/* margin-left: var(--space-a);
+	margin-right: var(--space-a); */
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-a);
+  gap: var(--space-a);
 }
 
 #root > main {
@@ -217,12 +221,11 @@ html {
 	grid-template-columns: minmax(0,1fr);
 	grid-template-rows: min-content min-content;
 	row-gap: var(--space-e);
-	padding: var(--space-a);
+  column-gap: var(--space-a);
 }
 
 #root[data-tileset="gui"] > nav > header {
-	grid-template-columns: calc(3rem) minmax(0,1fr);
-	padding-left: 0;
+	grid-template-columns: min-content minmax(0,1fr);
 }
 
 #root:not([data-tileset="gui"]) > nav > header > * {
@@ -241,11 +244,13 @@ html {
 	justify-content: center;
 	align-items: center;
 	color: var(--card-fg-suggestive);
+  height: 100%;
+  aspect-ratio: 1;
 }
 
 #root[data-tileset="gui"] > nav > header > .logo > svg {
-	width: 1.3rem;
-	height: auto;
+  height: 100%;
+  aspect-ratio: 1;
 }
 
 #root > nav > header > h1 {
@@ -274,15 +279,17 @@ html {
   width:min-content;
 }
 
-#root > nav > form {
+#root > nav > nav {
+  box-sizing: border-box;
 	background-color: var(--card-bg-translucent);
-	border-top: solid 1px var(--card-border);
+	border: solid 1px var(--card-border);
+  width: 100%;
 	padding: var(--space-a);
 }
 
-#root > nav > form > :not(:first-child) {
+/* #root > nav > form > :not(:first-child) {
 	margin-left: var(--space-a);
-}
+} */
 
 #root > main {
 	/* margin-left: var(--space-a);

@@ -277,7 +277,9 @@ module Dashboard = {
 				<header>
 					<HintPanel />
 				</header>
+        <nav>
 				<Filter setResult />
+        </nav>
 			</nav>
 			<main className=sidebarState><ol>
 			{ items
