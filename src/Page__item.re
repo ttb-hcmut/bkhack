@@ -837,6 +837,7 @@ module App{
 
 	[@react.component]
 	let make = () => {
+    let auth = AuthContext.use()
 		let url = ReasonReactRouter.useUrl();
 		let (prsExpand, setPrsExpand) = useState(() => []);
 		let (tab, setTab) = useState(() => {
@@ -892,16 +893,31 @@ module App{
 			return @@ ignore @@ setPrs(_ => dict);
 		}));
 		React__effect.useAsync0(() => Fetch__syntax.({
-			let post_id = Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id")) -> int_of_string;
-			let* posts = X.Fetch.all(module At_repo_2(
-				{ include X.GenSQL; let tgt_post_id = post_id }))(module Env);
-			if (posts->Array.length == 0) { raise(Item_not_found) } else {
-				let (_, post_title, creator_id, post_text) = posts[0];
-				let* users = X.Fetch.all(module At_repo_1(
-					{ include X.GenSQL; let tgt_user_id = creator_id }))(module Env);
-				let (_, creator_name) = users[0];
-				return @@ ignore @@ setPostInfo(_ => Some((post_id, post_title, creator_name, post_text)))
-			}
+			let post_id = Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id"));
+        Fetch.fetch(Env.backend ++ "/api/post/get/"
+          ++ "?post_id=" ++ post_id
+          ++ "&user_id=" ++ string_of_int(Option.value(auth.getUserId(), ~default= -1))
+          ++ "&v=latest")
+        >>= Fetch.Response.json
+        >>= Model.Decode.Response.fetchedPost
+        >!= (err => {
+            Js.log(err);
+            Js.Promise.reject(Js.Exn.anyToExnInternal @@ err)
+          })
+        >>= (aod => {
+          open Model.FetchedPost;
+          setPostInfo(_ => Some((aod.post_id, aod.title, aod.owner_name, aod.body)));
+          Js.Promise.resolve(())
+        })
+      // X.Fetch.all(module At_repo_2(
+			// 	{ include X.GenSQL; let tgt_post_id = post_id }))(module Env);
+			// if (posts->Array.length == 0) { raise(Item_not_found) } else {
+			// 	let (_, post_title, creator_id, post_text) = posts[0];
+			// 	let* users = X.Fetch.all(module At_repo_1(
+			// 		{ include X.GenSQL; let tgt_user_id = creator_id }))(module Env);
+			// 	let (_, creator_name) = users[0];
+			// 	return @@ ignore @@ setPostInfo(_ => Some((post_id, post_title, creator_name, post_text)))
+			// }
 		}));
 		let on_prs_update_expand = React.useMemo1(((), id) => {
 			switch (List.assoc(id, prsExpand)) {

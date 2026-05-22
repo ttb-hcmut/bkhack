@@ -157,10 +157,10 @@ module Dashboard = {
             </span>
           </div>
           <div className="last-activity">
-            <span className="verb">{string("commented")}</span>
+            // <span className="verb">{string("commented")}</span>
             <span className="agent">{string("@"++creator)}</span>
-            <span className="theme"></span>
-            <span className="time">{string("2h ago")}</span>
+            // <span className="theme"></span>
+            // <span className="time">{string("2h ago")}</span>
           </div>
           <div className="created-from">
             <span>{string("created ")}</span><span>{string(Util.utcToRelative(timestamp))}</span>
