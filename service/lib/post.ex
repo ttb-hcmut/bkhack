@@ -36,6 +36,38 @@ defmodule PostBE do
     end)
     IO.inspect res
   end
+  defp commitDescendantsQuery() do
+    base_query =
+      Commit
+      |> join(:inner, [c], p in Post, on: c.commit_id == p.commit_head_id)
+      |> select([c,p], %{
+        pid:              p.post_id,
+        cid:              c.commit_id,
+        child_id:         c.commit_child_id,
+        commit_owner_id:  c.commit_owner_id,
+        commit_message:   c.commit_message,
+        post_title:       c.post_title,
+        post_text:        c.post_text,
+        date_created_utc: c.date_created_utc
+        })
+    recursive_query =
+      Commit
+      |> join(:inner, [c], ct in "descendants", on: c.commit_id == ct.child_id)
+      |> select([c, ct], %{
+        pid:              ct.pid,
+        cid:              c.commit_id,
+        child_id:         c.commit_child_id,
+        commit_owner_id:  c.commit_owner_id,
+        commit_message:   c.commit_message,
+        post_title:       c.post_title,
+        post_text:        c.post_text,
+        date_created_utc: c.date_created_utc
+        })
+    descendants_query =
+      base_query
+      |> union_all(^recursive_query)
+    descendants_query
+  end
   def getPostList(
       user_id\\-1,
       search\\"",
@@ -46,24 +78,10 @@ defmodule PostBE do
       offset\\0,
       count\\false
     ) do
-    base_query =
-      Commit
-      |> join(:inner, [c], p in Post, on: c.commit_id == p.commit_head_id)
-      |> select([c,p], %{pid: p.post_id,cid: c.commit_id, child_id: c.commit_child_id})
-
-    recursive_query =
-      Commit
-      |> join(:inner, [c], ct in "descendants", on: c.commit_id == ct.child_id)
-      |> select([c, ct], %{pid: ct.pid, cid: c.commit_id, child_id: c.commit_child_id})
-
-    descendants_query =
-      base_query
-      |> union_all(^recursive_query)
-
     res =
       Post
       |> recursive_ctes(true)
-      |> with_cte("descendants", as: ^descendants_query)
+      |> with_cte("descendants", as: ^commitDescendantsQuery())
       |> join(:left,[p],d in "descendants", on: p.post_id == d.pid)
       |> join(:left,[p,d], c in Commit, on: p.commit_head_id == c.commit_id)
       |> join(:left,[p,d,c], u in User, on: p.post_owner_id == u.user_id)
@@ -104,8 +122,50 @@ defmodule PostBE do
           false -> x |> limit(^limit) |> offset(^offset) |> Data0.all
         end)
       end)
-
     res
+  end
+  def getPostHead(post_id, user_id\\-1)do
+    with p <- Post |> select([p],p)|> where([p], p.post_id == ^post_id) |> Data0.one,
+         _good     <- p.public or (p.post_owner_id == user_id and user_id !=-1)
+    do Post
+      |> join(:left,[p], c in Commit, on: p.commit_head_id == c.commit_id)
+      |> join(:left,[p,c], u in User, on: u.user_id == p.post_owner_id)
+      |> select([p,c,u], %{
+        post_id:     p.post_id,
+        title:       c.post_title,
+        body:        c.post_text,
+        owner_name:  u.name
+        })
+      |> where([p,c,u], p.post_id == ^p.post_id)
+      |> Data0.one
+    else
+      nil -> nil
+      false -> nil
+      {:error,_} -> nil
+    end
+  end
+  def getPostVersionList(post_id, user_id)do
+    with {:ok, p } <- Post|> select([p], select: %{public: p.public,owner: p.post_owner_id,head: p.commit_head_id})|> where([p], p.post_id == ^post_id) |> Data0.one,
+         true <-  p.public or p.owner == user_id
+    do
+      from(ct in "descendants")
+      |> recursive_ctes(true)
+      |> with_cte("descendants", as: ^commitDescendantsQuery())
+      |> select([ct], %{
+        commit_id:        ct.cid,
+        commit_owner_id:  ct.commit_owner_id,
+        commit_message:   ct.commit_message,
+        post_title:       ct.post_title,
+        post_text:        ct.post_text,
+        date_created_utc: ct.date_created_utc
+        })
+      |> where([ct], ct.pid == ^post_id)
+      |> Data0.all
+    else
+      nil -> nil
+      false -> nil
+      {:error, _} -> nil
+    end
   end
   def getAll do
     query = from u in Post, select: u
