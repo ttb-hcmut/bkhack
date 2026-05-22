@@ -40,6 +40,7 @@ module App = {
   , ~filter         :option(list((string,list(string))))=?
   , ~refresh        :option(bool)=?
   , ~limit          :int = 10
+  , ~searchBarId    :string = ""
   ) => {
     let url = ReasonReactRouter.useUrl();
     let (search,setSearch) = React.useState(()=>"")
@@ -104,8 +105,7 @@ module App = {
       }
     }
     React.useEffect2(()=>{
-      
-      setOffset(_=> getCurrentOffset);
+      setOffset( _ => getCurrentOffset );
       getPageCount();
       fetch(getCurrentOffset);
       None
@@ -123,6 +123,7 @@ module App = {
         value=search
         onChange={e => setSearch(_ => React.Event.Form.target(e)##value)}
         onKeyDown={e => if(React.Event.Keyboard.key(e) === "Enter"){fetch(getCurrentOffset)}}
+        id=?{ String.length(searchBarId)>0? Some(searchBarId) : None}
         />
       }
       

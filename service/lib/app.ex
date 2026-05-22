@@ -20,6 +20,40 @@ defmodule App
   plug :fetch_query_params
   plug :dispatch
 
+  get "/api/post/get" do
+    Logger.info "GET post"
+    post_id   = Map.get(conn.params,"post_id" ,"-1" ) |> String.to_integer
+    user_id   = Map.get(conn.params,"user_id" ,"-1" ) |> String.to_integer
+    version   = Map.get(conn.params,"v"       ,"latest"  )
+
+
+    data = case version do
+      "latest" -> PostBE.getPostHead(post_id, user_id)
+      _ -> nil
+    end
+    # data = ReturnChildID.getChildComments(parent, offset, limit)
+    case data do
+      nil ->
+        {:ok, sh} = JSON.encode([])
+        conn
+        # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+        |> put_resp_header("Access-Control-Allow-Origin", "*")
+        |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+        |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+        |> put_resp_content_type("application/json")
+        |> send_resp(501 , sh)
+      x ->
+        {:ok, sh} = Jason.encode(x)
+        conn
+        # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+        |> put_resp_header("Access-Control-Allow-Origin", "*")
+        |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+        |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+        |> put_resp_content_type("application/json")
+        |> send_resp(200 , sh)
+    end
+  end
+
   get "/api/post/list" do
     Logger.info "GET postlist"
     user      = Map.get(conn.params,"user"     ,"-1"        ) |> String.to_integer

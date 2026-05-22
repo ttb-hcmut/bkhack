@@ -1,5 +1,13 @@
 open Melange__containers.Fun
 
+module FetchedPost = {
+	type t =
+		{ post_id     : int
+    , owner_name  : string
+    , title       : string
+    , body        : string
+		}
+};
 module PostListItem = {
 	type t =
 		{
@@ -34,6 +42,16 @@ module FetchedAuth = {
 }
 module Decode = {
 	open Melange_json;
+
+  let fetchedPost = json => {
+    open FetchedPost;
+		Of_json.
+		{ post_id    : json |> field("post_id"   , int)
+    , owner_name : json |> field("owner_name", string)
+    , title      : json |> field("title"     , string)
+    , body       : json |> field("body"      , string)
+    }
+  }
 
 	let postListItem = json => {
 		open PostListItem;
@@ -77,6 +95,8 @@ module Decode = {
 
 	module Response = {
 		open Js;
+
+    let fetchedPost = fetchedPost %> Promise.resolve
 
     let postListItem = postListItem %> Promise.resolve
 
