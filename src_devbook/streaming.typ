@@ -3,6 +3,9 @@
 #import "./shell-sym.typ"
 #let (bkhack, Bkhack) = ([bkhack], [bkhack])
 #title[= Stream-based programming, as compared to sh]
+#set heading(numbering: "1.",  outlined: true, supplement: [#text(weight: 900, fill: rgb("#3851A4"))[§]#h(-0.2em)])
+#set cite(style: "alphanumeric")
+// #show cite: it => text(fill: rgb("#3851A4"), it)
 For #bkhack, the user gets to familiarize with the concept of _stream-based
 programming_. Indeed, visitors of the site will often catch glance of
 command hints and tips as they are littered about the user interface.
@@ -27,15 +30,24 @@ architecture @shell-kernel-arch. In comparison, the #bkhack shell
 language is highly abstract and doesn't need a stand-in kernel analogy:
 at most, the #bkhack website's command system attempts to emulate the
 shell-kernel architecture, so that the user feels the shell-kernel
-architecture even when it's not really there.
+architecture even when it's not really there.\
+  #lorem(50)
 == Pipeline
-Introduced by Doughlas, pipelining enables commands to compose with each
-other parsibly simply via textual data. In this composition, there are
-relationships between commands to form the pipeline by parts.\
+Introduced by Douglas McIlroy, pipelining enables commands to compose
+with each other parsibly simply via textual data. In this composition
+, there are relationships between commands to form the pipeline by parts
+. This composition is part of the design patterns in designing Unix
+programs as a whole @taoup-design-patterns.\
   The _source_ is the start of the pipeline, it exclusively produces
 output. The _sink_ is the end of the pipeline, it exclusively consumes
-the input. #lorem(40) The rest are _cantrips_--commands that don't produce
-output but instead apply an effect onto the current environment.\
+the input. In-between are _filters_, where data are passed in-and-out
+and get transformed in the process #fn[in the context of a pipeline-based
+system architecture, these are called _middle-wares_]. So, a simple pipeline is one with
+a structure source-filter-sink. A complex pipeline is one that can "branch"
+; the way to branch is to organize each pipeline branch as each group of
+commands as in @fn, then use special filters to branch on conditions.
+The rest are _cantrips_--commands that don't produce output but instead
+apply an effect onto the current environment.\
   It's worth noting that, even on the conceptual level, the evaluation
 order of the part commands is that all commands start simultaneously when
 a pipeline runs.\
@@ -43,14 +55,15 @@ a pipeline runs.\
 The grammar expects all commands to unequivocally form a pipeline, as
 evident by @gr, and multiple groups of commands will connect to form
 branching pipelines.
-== Function
+== Function <fn>
 A reusable pipeline or grouping of commands would be called a _function_
 . In the #bkhack shell language, #lorem(70)\
 #lorem(70). Function is a useful abstraction. For example, since feed can be treated as a function simply built-in, it's possible to customize the behavior of ```sh feed``` by overloading it. Indeed, the defaulr ```sh feed``` command in #bkhack, which automatically has limiting of 15 items pagination, is simply a function
 ```sh
-feed() { feed | split -c 15 | cut -n1 | sort hot ;}
+feed() { feed | split -c 15 | cut -f1 | sort --hot ;}
 ```
-which the user can customize. The rest of #bkhack shell commands are exposed like so, hence the settings system.
+which the user can customize. The rest of #bkhack shell commands are
+exposed like so, thus the settings system.
 == Grammar
 The grammar of the #bkhack shell language, given in EBNF form in @gr, #lorem(30)
 Notice how the command rule do not distinguish parts into flags or values
