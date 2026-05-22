@@ -1,6 +1,7 @@
 defmodule PostBE do
   import Ecto.Query
-  def createPost(creator_id,post_title,post_text,commit_message,public)do
+
+  def createPost(creator_id,post_title,post_text,commit_message,public) do
     query = from u in User, select: u.role, where: u.user_id == ^creator_id
     role = Data0.one(query)
     res = Data0.transact(fn ->
@@ -20,6 +21,7 @@ defmodule PostBE do
       {:error,cs} -> IO.inspect(cs); nil
     end
   end
+
   def updatePost(post_id,creator_id,post_title,post_text,commit_message) do
     res = Data0.transact(fn ->
       with {:ok, newCommit} <- CommitBE.insertCommit(creator_id,post_title,post_text,commit_message),
@@ -36,6 +38,7 @@ defmodule PostBE do
     end)
     IO.inspect res
   end
+
   def getPostList(
       user_id\\-1,
       search\\"",
@@ -46,6 +49,7 @@ defmodule PostBE do
       offset\\0,
       count\\false
     ) do
+
     base_query =
       Commit
       |> join(:inner, [c], p in Post, on: c.commit_id == p.commit_head_id)
@@ -107,9 +111,11 @@ defmodule PostBE do
 
     res
   end
+
   def getAll do
     query = from u in Post, select: u
     xs = Data0.all(query)
     IO.inspect xs
   end
+
 end
