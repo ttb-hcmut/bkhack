@@ -25,8 +25,10 @@ module Date = {
 
 type document_api;
 external document_api : document_api = "document";
-external document_title_set : document_api => string => unit = "title"
+[@mel.set] external document_title_set : document_api => string => unit = "title"
 
 module Document = {
 	let title_set = document_title_set(document_api);
+	[@mel.scope "document"] external query_selector : string => Js.nullable(Js.t(_)) = "querySelector";
+	[@mel.scope "document"] external query_selector_all : string => Js.array_like(Js.t(_)) = "querySelectorAll";
 }
