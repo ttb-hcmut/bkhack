@@ -1,1 +1,195 @@
-/home/kinten/o/ttb-hcmut/bachkhoa.qd/src/bachkhoa.qd
+.doclang {en}
+.theme {paperwhite}
+
+.numbering
+  - headings: 1.1.1
+
+.pagemargin {bottomleft}
+	.currentpage
+
+.pagemargin {topright}
+	!(60x_)[](./hcmut-withring.svg)
+
+.css
+	.quarkdown nav li {
+		color: white;
+		font-weight: bold;
+	}
+	.quarkdown nav li::before {
+		background-color: blue;
+		padding-left: 12px;
+		padding-right: 12px !important;
+		margin-right: 12px;
+		height: 1.3em;
+		border-radius: 9999px;
+	}
+	.page-margin-top-right img {
+		margin-top: 1em !important;
+		margin-right: 1em !important;
+		background-color: #d7d7d7;
+		outline: solid 8px #d7d7d7;
+		border-radius: 9999px;
+	}
+	.page-margin-bottom-left {
+		margin-bottom: 1em !important;
+		margin-left: 1em !important;
+	}
+	blockquote[data-labeled][class="warning"] {
+		margin-top: 0.5em !important;
+		margin-bottom: 0.5em !important;
+		margin-left: 0.5em !important;
+		margin-right: 0.5em !important;
+		width: 95% !important;
+		border: none !important;
+		padding-left: 0 !important;
+		padding-right: 0 !important;
+		padding-top: 0 !important;
+		padding-bottom: 0 !important;
+	}
+	:root {
+		--qd-warning-foreground-color: red;
+		--qd-warning-background-color: #ffe6e6;
+	}
+	.quarkdown blockquote[data-labeled][class="warning"] > p {
+		padding: 4px 16px 16px 16px;
+	}
+	.quarkdown blockquote[data-labeled][class="warning"] > :first-child::before {
+		display: block;
+		content: var(--quote-type-label);
+		background-color: color-mix(in srgb, var(--box-header-foreground-color) 10%, transparent);
+		margin: -4px -16px 16px -16px;
+		padding: 8px 16px 0px 16px;
+	}
+	.katex-display {
+		padding-top: 0px !important;
+		padding-bottom: 0px !important;
+	}
+	.itemhead {
+		font-weight: bold;
+	}
+	h1, h2, h3 {
+		color: blue !important;
+	}
+	:is(h1,h2,h3)::before {
+		display: none;
+	}
+	:is(h1):last-child {
+		font-size: 1.5em !important;
+		border-bottom: solid 1.5px black;
+	}
+	:is(h1,h2,h3):not(:last-child) {
+		font-size: 1.5em !important;
+	}
+	.frontmatter-h1 {
+		color: blue !important;
+		font-weight: bold;
+		font-size: 2.0em;
+	}
+	a {
+		color: blue !important;
+		text-decoration: none !important;
+	}
+	.front-author {
+		font-weight: bold !important;
+	}
+	.boxdanger {
+		width: 100%;
+		background-color: rgba(255,230,230,10);
+	}
+	.boxdanger-header {
+		width: 100%;
+		background-color: rgba(255,205,205,10);
+	}
+	.boxdanger-header > * {
+		margin-top: 4px !important;
+		margin-bottom: 0px !important;
+	}
+	.boxdanger-header > *:first-child {
+		margin-left: 8px !important;
+	}
+	.boxdanger-title {
+		color: rgb(235,50,50) !important;
+		font-weight: bold !important;
+	}
+	.boxdanger-body {
+		padding-left: 8px;
+		padding-right: 8px;
+		padding-bottom: 0px;
+	}
+	.sidebar {
+		background-color: green;
+	}
+	.quarkdown nav li a .toc-page-number {
+		display: none;
+	}
+	.quarkdown .reveal .progress {
+		background-color: #7cc3f3;
+		color: #0000c8;
+	}
+	.quarkdown .controls-arrow {
+		color: #000;
+	}
+	.front-body {
+		margin-top: 1.3em;
+		margin-bottom: 1.3em;
+	}
+
+.function {front}
+	content:
+	.align {center}
+		.content
+
+.function {frontTitle}
+	titlecontent:
+	.align {center}
+		.text {.titlecontent} classname:{frontmatter-h1}
+
+.function {frontBody}
+	body:
+	.container classname:{front-body}
+		.body
+
+.function {frontAuthor}
+	author:
+	.align {center}
+		.author
+
+.function {aauthor}
+	author:
+	.text {.author} classname:{front-author}
+
+.function {email}
+	email:
+	.text {🖂 .email}
+
+.function {frontOrigin}
+	content:
+	.align {center}
+		.content
+
+.function {frontContacts}
+	content:
+	.align {center}
+		.content
+
+.function {locationtime}
+	location? time?:
+	.align {center}
+		.container
+			.text {.location}
+			on
+			.text {.time}
+			.br
+
+.function {boxdanger}
+	title body:
+	.container classname:{boxdanger}
+		.container classname:{boxdanger-header}
+			.text {.title} classname:{boxdanger-title}
+			.br
+		.container classname:{boxdanger-body}
+			.body
+
+.function {itemhead}
+	content:
+	.text {.content\:} classname:{itemhead}
