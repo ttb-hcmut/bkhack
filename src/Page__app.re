@@ -248,25 +248,6 @@ module Dashboard = {
         fetchPostList();
       None
     },[|result|])
-		// React.useEffect1(() => {
-		// 	let limit = ticketParam->Util.parseQueryParams->Js.Dict.get("limit");
-		// 	let limit = limit |> Option.map(int_of_string);
-		// 	ignore( limit |> Option.iter @@ limit => setCounts(_ => limit) );
-		// 	None
-		// }, [|counts|]);
-		// let module X = Bkhack__experimental;
-		// React__effect.useAsync1(() => 
-    // Fetch__syntax.({
-		// 	test(counts);
-		// 	let module U (S : X.S) = At_repo_0({ let paginate = limit => limit(counts, 0) })(S);
-		// 	let* posts = X.Fetch.all((
-    //     module At_repo_0({ let paginate = limit => limit(counts, 0) }, X.GenSQL)
-    //   ),(module Env));
-    //   setItems(_ => posts);
-    //   return(());
-		// })
-    // , [|counts|]);
-		// let onUpdateCount = React.useCallback0(newVal => setCounts(_ => newVal))
     ;
 		<>
 			<header>

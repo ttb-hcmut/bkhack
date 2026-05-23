@@ -51,10 +51,8 @@ It'd be nice to have a Reason abstraction for importing static assets. Currently
 2. Reduced-motion encoding (see [^reduced])
 3. The final (graphical) encoding (see [^icon])
 4. The light mode encoding
-5. ( syntax highlighting for some text )
-6. Language encoding (see Language layering)
-7. Keyboard encoding
-8. CSS User-agent (Arc themes, GNOME Web Custom JS/CSS, Tampermonkey extension for Chrome and Firefox)
+5. Language encoding (see Language layering)
+6. CSS User-agent (Arc themes, GNOME Web Custom JS/CSS, Tampermonkey extension for Chrome and Firefox)
 
 This architecture was formed based on what we want, plus that we have the right setups to quickly test and report for these layers.
 
