@@ -11,7 +11,7 @@ programming_. Indeed, visitors of the site will often catch glance of
 command hints and tips as they are littered about the user interface.
 #lorem(20)\
   Stream programming in #bkhack is sh pipelining @shlang, with certain flavorful
-differences. The most important difference is that, instead of dealing
+differences #fn["flavorful" here means that the differences are poignant ones that the language writer feels when she transitions between the languages. See more at XXX]. The most important difference is that, instead of dealing
 with textual data and lines and files, here we deal with abstract post
 data and post counts. Consider
 #align(center)[```sh feed | split -c 10 ```]
@@ -38,23 +38,27 @@ with each other parsibly simply via textual data. In this composition
 , there are relationships between commands to form the pipeline by parts
 . This composition is part of the design patterns in designing Unix
 programs as a whole @taoup-design-patterns.\
-  The _source_ is the start of the pipeline, it exclusively produces
+#let ls-sources = [```sh ls```, ```sh cat```, etc]
+#let ls-filters = [```sh grep```, ```sh sort```, ```sh split```, ```sh cut```, etc]
+#let ls-cantrips = [`mv`, `rm`, etc]
+  The _source_ e.g. #ls-sources is the start of the pipeline, it exclusively produces
 output. The _sink_ is the end of the pipeline, it exclusively consumes
-the input. In-between are _filters_, where data are passed in-and-out
+the input. In-between are _filters_ e.g. #ls-filters where data are passed in-and-out
 and get transformed in the process #fn[in the context of a pipeline-based
-system architecture, these are called _middle-wares_]. So, a simple pipeline is one with
-a structure source-filter-sink. A complex pipeline is one that can "branch"
-; the way to branch is to organize each pipeline branch as each group of
-commands as in @fn, then use special filters to branch on conditions.
-The rest are _cantrips_--commands that don't produce output but instead
-apply an effect onto the current environment.\
+system architecture, these are called _middle-wares_]. So, a simple pipeline
+is one with a structure source-filter-sink. A complex pipeline is one that
+can "branch" ; the way to branch is to organize each pipeline branch as
+each group of commands as in @fn, then use special filters to branch on
+conditions using redirections with named pipes #fn[in practice, this is
+rarely done]. The rest are _cantrips_ e.g. #(ls-cantrips)--commands that don't produce output
+but instead apply an effect onto the current environment.\
   It's worth noting that, even on the conceptual level, the evaluation
 order of the part commands is that all commands start simultaneously when
 a pipeline runs.\
   For the #bkhack shell language, pipelining is first-class citizen.
 The grammar expects all commands to unequivocally form a pipeline, as
 evident by @gr, and multiple groups of commands will connect to form
-branching pipelines.
+complex pipelines that branch.
 == Function <fn>
 A reusable pipeline or grouping of commands would be called a _function_
 . In the #bkhack shell language, #lorem(70)\
@@ -82,6 +86,7 @@ programming language.
 ]
 // == Naming
 // why are commands named the way they are? this is the same problem in sh. the truth is that there will never be a scheme that everyone can agree on. most names are historical and highly contextual. unix is loved because people like its architecture and they try to adopt the names, not that the names are actually good. indeed, there's so much you can do to appeal to a demographic of people. communication is two-way between the user and the developer.
+== Exercises
 == Reference
 #bibliography(title: none, "./works.bib")
 

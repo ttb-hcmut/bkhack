@@ -21,5 +21,6 @@ From another dimension, it's important to grasp the _parsing model_.
 == Parsing using regular expression
 == Parsing using parser combinators
 == Parsing in the #bkhack shell implementation
+For #bkhack, the 
 == Reference
 #bibliography("./works.bib", title: none)
