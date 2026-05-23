@@ -161,7 +161,7 @@ module DiscussionView = {
   };
   module DiscussionFilter = {
     [@react.component]
-    let make = (~parentId,~setResult) => {
+    let make = (~parentId,~refresh,~setResult) => {
       let auth = AuthContext.use()
       ;
       <Pagination.App 
@@ -170,13 +170,14 @@ module DiscussionView = {
         countApi={"/api/comment/count?parent="++string_of_int(parentId)++"&type=post&recursive=false&"}
         fetchApi={"/api/comment/get?parent="++string_of_int(parentId)
                 ++"&user="  ++ string_of_int(Option.value(auth.getUserId(),~default=-1))
-                ++"&type=1&"}
+                ++"&type=post&"}
         filter  ={[
           ("sortby",  ["age","popularity","repcount"  ])
         , ("searchby",["comment","username","version" ])
         , ("orderby", ["ascending","descending"       ])
         , ("filterby",["none","fresh","prof","student"])
         ]}
+        refresh
         setResult
       />
     }
@@ -184,7 +185,7 @@ module DiscussionView = {
   module DiscussionBody = {
     module AddComment = {
       [@react.component]
-      let make = (~id, ~parentType, ~setShow) => {
+      let make = (~id, ~parentType, ~setShow, ~signalRefresh) => {
         let auth = AuthContext.use()
         let (isBusy, setIsBusy) = React.useState(()=> false)
         let (content, setContent) = React.useState(()=> "")
@@ -217,6 +218,7 @@ module DiscussionView = {
           >>= (j => {
             setIsBusy(_ => false);
             setShow(_ => false);
+            signalRefresh((!));
             Js.Promise.resolve(j)
           })
           >!= (err => {
@@ -292,7 +294,8 @@ module DiscussionView = {
         ~id : int,
         ~pType : string,
         ~showRep : bool,
-        ~nestDepth : int
+        ~nestDepth : int,
+        ~signalRefresh : (bool => bool) => unit
         ) => React.element)) = ref(None);
     module Comments = {
       [@react.component]
@@ -307,7 +310,8 @@ module DiscussionView = {
         ~author_id    : int,
         ~author_role  : int,
         // ~author_rep   : int,
-        ~nestDepth: int
+        ~nestDepth: int,
+        ~signalRefresh
       ) => {
         let auth = AuthContext.use()
         let autoExpand = 1;
@@ -395,10 +399,10 @@ module DiscussionView = {
           {!addRep ? 
           React.null
           :
-          <AddComment id parentType=pType setShow=setAddRep/>}
+          <AddComment id parentType=pType setShow=setAddRep signalRefresh/>}
           {switch (cRef.contents) {
           | None => React.null
-          | Some(comp) => comp(~id, ~pType, ~showRep, ~nestDepth=nestDepth+1)
+          | Some(comp) => comp(~id, ~pType, ~showRep, ~signalRefresh, ~nestDepth=nestDepth+1)
           }}
         </li>
       }
@@ -411,6 +415,7 @@ module DiscussionView = {
       , ~pType : string
       , ~showRep : bool
       , ~nestDepth : int
+      , ~signalRefresh
       , ~result: option(Js.Json.t)=?
       ) => {
         let auth = AuthContext.use()
@@ -450,7 +455,7 @@ module DiscussionView = {
                   ++ "&offset=" ++ string_of_int(Array.length(comments))
                   ++ "&user="   ++ string_of_int(Option.value(auth.getUserId(),~default=-1))
                   ++ "&parent=" ++ string_of_int(id)
-                  ++ "&type=2"
+                  ++ "&type=comment"
                 Fetch.fetch(request)
                 >>= Fetch.Response.json 
                 >>= Model.Decode.Response.fetchedComments
@@ -505,6 +510,7 @@ module DiscussionView = {
                 author_role = {x.author_role }
                 // author_rep  = {x.author_rep  }
                 nestDepth
+                signalRefresh
               /> 
               })
             |> React.array
@@ -522,18 +528,19 @@ module DiscussionView = {
     let () = cRef := Some((
       ~id, 
       ~pType, 
-      ~showRep, 
-      ~nestDepth
+      ~showRep,
+      ~nestDepth,
+      ~signalRefresh
     ) => 
-      <CommentGroup id pType showRep nestDepth />);
+      <CommentGroup id pType showRep nestDepth signalRefresh />);
     [@react.component]
-    let make = (~id, ~addRep, ~setAddRep, ~result) => {
+    let make = (~id, ~addRep, ~setAddRep, ~result, ~signalRefresh) => {
       <>
       {!addRep ? 
       React.null
       :
-      <AddComment id parentType="post" setShow=setAddRep/>}
-      <CommentGroup id pType="post" showRep=true nestDepth=0 result />
+      <AddComment id parentType="post" setShow=setAddRep signalRefresh/>}
+      <CommentGroup id pType="post" showRep=true nestDepth=0 result signalRefresh />
       </>
     }
   };
@@ -541,6 +548,7 @@ module DiscussionView = {
   let make = (~post_id : int) => {
     let (addRep, setAddRep) = React.useState(() => false);
     let (result, setResult) = React.useState(() => Js.Json.null)
+    let (refresh, signalRefresh) = React.useState(() => false)
     React.useEffect1(()=>{
       None
     },[|result|])
@@ -549,11 +557,11 @@ module DiscussionView = {
       <header className={"only " ++ View.to_string(Discussion)}>
         <DiscussionHint addRep setAddRep />
         <nav>
-          <DiscussionFilter parentId=post_id setResult />
+          <DiscussionFilter parentId=post_id refresh setResult />
         </nav>
       </header>
       <main className={"only " ++ View.to_string(Discussion)}>
-        <DiscussionBody id=post_id addRep setAddRep result />
+        <DiscussionBody id=post_id addRep setAddRep result signalRefresh />
       </main>
     </>
   }

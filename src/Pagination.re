@@ -105,11 +105,16 @@ module App = {
       }
     }
     React.useEffect2(()=>{
+      setResult(_ => Js.Json.array([||]));
       setOffset( _ => getCurrentOffset );
       getPageCount();
       fetch(getCurrentOffset);
       None
     },(refresh,url))
+    React.useEffect1(()=>{
+      Js.log("got told to refresh")
+      None
+    },[|refresh|])
     ;
     <div className="pagination">
       {
