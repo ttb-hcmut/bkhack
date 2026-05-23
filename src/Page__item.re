@@ -37,9 +37,9 @@ module ItemNav{
     let (disCount,setDisCount) = React.useState(() => 0);
     let fetchCommentCount = (~id) => {
       let open Fetch__syntax;
-      Fetch.fetch(Env.backend ++ "/api/comment"
+      Fetch.fetch(Env.backend ++ "/api/comment/count"
         ++ "?parent="  ++ id
-        ++ "&type="    ++ "0")
+        ++ "&type=post&recursive=true")
       >>= Fetch.Response.json
       >!= (err => {
           Js.log(err);
@@ -167,8 +167,8 @@ module DiscussionView = {
       <Pagination.App 
         limit=3
         searchPrompt=true
-        countApi={"/api/comment?parent="++string_of_int(parentId)++"&type=0&"}
-        fetchApi={"/api/comment?parent="++string_of_int(parentId)
+        countApi={"/api/comment/count?parent="++string_of_int(parentId)++"&type=post&recursive=false&"}
+        fetchApi={"/api/comment/get?parent="++string_of_int(parentId)
                 ++"&user="  ++ string_of_int(Option.value(auth.getUserId(),~default=-1))
                 ++"&type=1&"}
         filter  ={[
@@ -421,52 +421,56 @@ module DiscussionView = {
         // opening concept: Js.Promise.()
         let fetchComments = () => {
           let open Fetch__syntax;
-          setLoading(_=>true);
-          switch(pType,result){
+          if(loading){ () }
+          else{
+            setLoading(_=>true);
+            switch(pType,result){
             | ("post",None) => ();
             | (t,r) =>
               switch(t,r){
-                | ("post",Some(r)) => 
-                  Js.Promise.resolve(r) 
-                  >>= Model.Decode.Response.fetchedComments
-                  >>= (aod => {
-                    setComments( _ => aod);
+              | ("post",Some(r)) => 
+                Js.Promise.resolve(r) 
+                >>= Model.Decode.Response.fetchedComments
+                >>= (aod => {
+                  setComments( _ => aod);
+                  setShowMore( _ => false);
+                  setLoading(_=>false);
+                  Js.Promise.resolve(aod)
+                })
+                >!= (err => {
+                    Js.log(err);
                     setShowMore( _ => false);
                     setLoading(_=>false);
-                    Js.Promise.resolve(aod)
+                    return([||])
                   })
-                  >!= (err => {
-                      Js.log(err);
-                      setShowMore( _ => false);
-                      setLoading(_=>false);
-                      return([||])
-                    })
-                  |> ignore;
-                | _ =>
-                  let request = Env.backend ++ "/api/comment"
-                    ++ "?limit="  ++ string_of_int(limit)
-                    ++ "&offset=" ++ string_of_int(Array.length(comments))
-                    ++ "&user="   ++ string_of_int(Option.value(auth.getUserId(),~default=-1))
-                    ++ "&parent=" ++ string_of_int(id)
-                    ++ "&type=2"
-                  Fetch.fetch(request)
-                  >>= Fetch.Response.json 
-                  >>= Model.Decode.Response.fetchedComments
-                  >>= (aod => {
-                    setComments( x => Array.append(x,aod));
-                    setShowMore( _ => Array.length(aod) < limit ? false : true);
-                    setLoading(_=>false);
-                    Js.Promise.resolve(aod)
+                |> ignore;
+              | _ =>
+                let request = Env.backend ++ "/api/comment/get"
+                  ++ "?limit="  ++ string_of_int(limit)
+                  ++ "&offset=" ++ string_of_int(Array.length(comments))
+                  ++ "&user="   ++ string_of_int(Option.value(auth.getUserId(),~default=-1))
+                  ++ "&parent=" ++ string_of_int(id)
+                  ++ "&type=2"
+                Fetch.fetch(request)
+                >>= Fetch.Response.json 
+                >>= Model.Decode.Response.fetchedComments
+                >>= (aod => {
+                  setComments( x => Array.append(x,aod));
+                  setShowMore( _ => Array.length(aod) < limit ? false : true);
+                  setLoading(_=>false);
+                  Js.Promise.resolve(aod)
+                })
+                >!= (err => {
+                    Js.log(err);
+                    setShowMore( _ => false );
+                    setLoading( _ => false );
+                    return([||])
                   })
-                  >!= (err => {
-                      Js.log(err);
-                      setShowMore( _ => false );
-                      setLoading( _ => false );
-                      return([||])
-                    })
-                  |> ignore;
+                |> ignore;
               } 
+            }
           }
+          
         };
         let revealReplies = () => {
           if (Array.length(comments) == 0 && showMore){
