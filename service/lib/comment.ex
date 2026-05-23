@@ -1,25 +1,39 @@
 defmodule DiscussionBE do
   import Ecto.Query
-  def getCommentsCount(post_id\\0) do
-    query = """
-      WITH RECURSIVE all_comments AS (
-        SELECT comment_id, parent_post_id AS post_id
-        FROM comments
-        WHERE parent_post_id IS NOT NULL
+  def fromCommentTree(parent_id\\-1,parent_type\\"post",opts\\%{})do
+    # filter = fn x ->
+    #   x
+    #   |> then(fn xx -> case {opts[:search],opts[:search_by]} do
+    #     {s,"comment"} -> xx |> where([c], like(c.content, ^"%#{s}%"))
+    #     {s,"username"} -> xx |> where([c], like(c.content, ^"%#{s}%"))
+    #   end end)
+    # end
+    base_query =
+      from(c in Comment)
+      |> select([c], c)
+      |> then(fn x -> case {parent_id,parent_type} do
+        {-1,_}         -> x
+        {_,"post"}    -> x |> where([c], c.parent_post_id    == ^parent_id)
+        {_,"comment"} -> x |> where([c], c.parent_comment_id == ^parent_id)
+        {_,_}          -> x
+      end end)
+    recursive_query =
+      from(c in Comment)
+      |> join(:inner, [c], ct in "comment_tree", on: ct.comment_id == c.parent_comment_id)
+      |> select([c, ct], c)
+    comment_tree =
+      base_query
+      |> union(^recursive_query)
 
-        UNION ALL
-
-        SELECT n.comment_id, an.post_id
-        FROM comments n
-        INNER JOIN all_comments an ON n.parent_comment_id = an.comment_id
-      )
-      SELECT
-        COUNT(comment_id) as total_comment_count
-      FROM all_comments
-      where post_id = ?
-    """
-    {:ok,result} = Ecto.Adapters.SQL.query(Data0, query,[post_id])
-    result.rows |> List.first() |> List.first()
+    from(ct in "comment_tree") |> recursive_ctes(true) |> with_cte("comment_tree", as: ^comment_tree)
+  end
+  def getCommentCount(parent_id,parent_type\\"post",recursive\\false) do
+    query = case {parent_type,recursive} do
+      {"post", false} -> from(c in Comment) |> select([c],%{comment_id: c.comment_id}) |> where([c],c.parent_post_id == ^parent_id)
+      {"comment", false} -> from(c in Comment) |> select([c],%{comment_id: c.comment_id}) |> where([c],c.parent_comment_id == ^parent_id)
+      {_, true} -> fromCommentTree(parent_id,parent_type) |> select([ct],%{comment_id: ct.comment_id})
+    end
+    from(n in subquery(query), select: count(n.comment_id)) |> Data0.one |> IO.inspect
   end
 
   def getPostComments(user_id\\0,post_id\\0,offset\\0,limit\\10) do

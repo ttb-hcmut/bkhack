@@ -144,9 +144,9 @@ module App = {
         onClick={_=>moveToPage(-1)}
         disabled={offset<=0}/>
         <span>
-        {React.int(offset)}
+        {React.int(offset+1)}
         {React.string(" / ")}
-        {React.int(count)}
+        {React.int(count+1)}
         </span>
         <button className="next-page"
         onClick={_=>moveToPage( 1)}
