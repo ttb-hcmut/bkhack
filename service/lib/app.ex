@@ -254,7 +254,7 @@ defmodule App
     |> put_resp_content_type("application/json")
         |> send_resp(501 , sh)
       x ->
-        {:ok, sh} = JSON.encode(x)
+        {:ok, sh} = Jason.encode(x)
         conn
     # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
     |> put_resp_header("Access-Control-Allow-Origin", "*")
@@ -266,15 +266,14 @@ defmodule App
   end
   get "/api/comment/get" do
     Logger.info "GET comment"
-    type   = Map.get(conn.params,"type"  ,"0") |> String.to_integer
-    parent = Map.get(conn.params,"parent","0") |> String.to_integer
-    user   = Map.get(conn.params,"user"  ,"-1")|> String.to_integer
-    offset = Map.get(conn.params,"offset","0") |> String.to_integer
-    limit  = Map.get(conn.params,"limit","10") |> String.to_integer
+    type   = Map.get(conn.params,"type"  ,"post")
+    parent = Map.get(conn.params,"parent",nil)
+    user   = Map.get(conn.params,"user"  ,nil)
+    offset = Map.get(conn.params,"offset","0")
+    limit  = Map.get(conn.params,"limit","10")
 
-    data = case type do
-      1 -> DiscussionBE.getPostComments(user,parent,offset,limit)
-      2 -> DiscussionBE.getCommentReplies(user,parent,offset,limit)
+    data = case {parent,type} do
+      {p,t} when not is_nil(p) and t in ["post","comment"]-> DiscussionBE.getPost(parent,type,user,offset,limit)
       _ -> nil
     end
 
@@ -290,7 +289,7 @@ defmodule App
     |> put_resp_content_type("application/json")
         |> send_resp(501 , sh)
       x ->
-        {:ok, sh} = JSON.encode(x)
+        {:ok, sh} = Jason.encode(x)
         conn
     # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
     |> put_resp_header("Access-Control-Allow-Origin", "*")
