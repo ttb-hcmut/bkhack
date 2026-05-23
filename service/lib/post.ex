@@ -78,8 +78,7 @@ defmodule PostBE do
       offset\\0,
       count\\false
     ) do
-    res =
-      Post
+    res = Post
       |> recursive_ctes(true)
       |> with_cte("descendants", as: ^commitDescendantsQuery())
       |> join(:left,[p],d in "descendants", on: p.post_id == d.pid)
@@ -125,8 +124,8 @@ defmodule PostBE do
     res
   end
   def getPostHead(post_id, user_id\\-1)do
-    with p <- Post |> select([p],p)|> where([p], p.post_id == ^post_id) |> Data0.one,
-         _good     <- p.public or (p.post_owner_id == user_id and user_id !=-1)
+    with %Post{} = p <- Post |> select([p],p)|> where([p], p.post_id == ^post_id) |> Data0.one,
+          true     <- p.public or (p.post_owner_id == user_id and user_id !=-1)
     do Post
       |> join(:left,[p], c in Commit, on: p.commit_head_id == c.commit_id)
       |> join(:left,[p,c], u in User, on: u.user_id == p.post_owner_id)
@@ -140,12 +139,10 @@ defmodule PostBE do
       |> Data0.one
     else
       nil -> nil
-      false -> nil
-      {:error,_} -> nil
     end
   end
   def getPostVersionList(post_id, user_id)do
-    with {:ok, p } <- Post|> select([p], select: %{public: p.public,owner: p.post_owner_id,head: p.commit_head_id})|> where([p], p.post_id == ^post_id) |> Data0.one,
+    with %{public: _,owner: _,head: _} = p <- Post|> select([p], select: %{public: p.public,owner: p.post_owner_id,head: p.commit_head_id})|> where([p], p.post_id == ^post_id) |> Data0.one,
          true <-  p.public or p.owner == user_id
     do
       from(ct in "descendants")

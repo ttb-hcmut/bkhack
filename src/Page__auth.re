@@ -68,10 +68,10 @@ module Login = {
 		<main className="login">
 			<form>
 				<label htmlFor="username">{React.string("username:")}</label>
-				<input type_="username" id="username" placeholder="mrbombastic . . ."
+				<input type_="username" id="username" placeholder="username..."
 				value=formUsername onChange={e => setFormUsername(_ => React.Event.Form.target(e)##value)}/>
 				<label htmlFor="password">{React.string("password:")}</label>
-				<input type_="password" id="password" placeholder="tellmefantastic . . ."
+				<input type_="password" id="password" placeholder="password..."
 				value=formPassword onChange={e => setFormPassword(_ => React.Event.Form.target(e)##value)}/>
 				
 				<div className="error" hidden={String.length(errorMsg)==0}>
@@ -162,15 +162,17 @@ module Register = {
           Js.Promise.resolve(j)
         }) |> ignore
 			}
-		};
+		}
+
+    ;
 		<main className="register">
 			<form>
 				<label htmlFor="email">{React.string("email:")}</label>
-				<input type_="email" id="email" placeholder="em@in.em . . ."
+				<input type_="email" id="email" placeholder="email@gmail.com..."
 				value=formEmail onChange={e => setFormEmail(_ =>React.Event.Form.target(e)##value)}/>
 				
 				<label htmlFor="username">{React.string("username:")}</label>
-				<input type_="username" id="username" placeholder="mynameiseminem . . ."
+				<input type_="username" id="username" placeholder="unique_username..."
 				value=formUsername onChange={e => setFormUsername(_ => React.Event.Form.target(e)##value)}/>
 
 				<label htmlFor="password">{React.string("password:")}</label>
