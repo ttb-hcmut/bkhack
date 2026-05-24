@@ -41,6 +41,7 @@ module App = {
   , ~refresh        :option(bool)=?
   , ~limit          :int = 10
   , ~searchBarId    :string = ""
+  , ~setOpts        :option((list((string,string)) => list((string,string))) => unit)=?
   ) => {
     let url = ReasonReactRouter.useUrl();
     let (search,setSearch) = React.useState(()=>"")
@@ -61,24 +62,6 @@ module App = {
         )
 			setOffset(offset => number+offset)
     }
-    let syncPageCount = () => {
-      switch(countApi){
-        | None => ()
-        | Some(a) =>let open Fetch__syntax;
-          Fetch.fetch(Env.backend ++ a)
-          >>= Fetch.Response.json
-          >!= (err => {
-              Js.log(err);
-              return(Js.Json.number(0.0))
-            })
-          >>= (json => {
-            let x = Js.Json.decodeNumber(json) |> Option.value(~default = 0.0);
-            setCount(_ =>Int.max(Js.Math.ceil_int(x/.float_of_int(Int.max(1,limit)))-1,0));
-            Js.Promise.resolve(json)
-          })
-          |> ignore;
-      }
-    }
     let fetch = (offset) => fetchApi |> Option.iter @@ a => {
 			let open Fetch__syntax;
 			let request = Env.backend ++ a
@@ -98,19 +81,52 @@ module App = {
 				})
 			|> ignore;
     }
+    let syncPageCount = () => {
+      switch(countApi){
+        | None => ()
+        | Some(a) =>let open Fetch__syntax;
+          let request = Env.backend ++ a
+            ++ "limit="  ++ string_of_int(limit)
+            ++ "&offset=" ++ string_of_int(offset*limit)
+            ++ ((searchPrompt && search!="")?("&search=" ++ search):"")
+            ++ (switch(filter,dropdownResult |> Util.stringQueryParams'){
+              | (None,_) | (_,"") => ""
+              | (Some(_),v)=> "&" ++ v 
+            })
+          Fetch.fetch(request)
+          >>= Fetch.Response.json
+          >!= (err => {
+              Js.log(err);
+              return(Js.Json.number(0.0))
+            })
+          >>= (json => {
+            let x = Js.Json.decodeNumber(json) |> Option.value(~default = 0.0);
+            setCount(_ =>Int.max(Js.Math.ceil_int(x/.float_of_int(Int.max(1,limit)))-1,0));
+            if(offset>Int.max(Js.Math.ceil_int(x/.float_of_int(Int.max(1,limit)))-1,0))
+            {
+              setOffset(_ =>Int.max(Js.Math.ceil_int(x/.float_of_int(Int.max(1,limit)))-1,0));
+            } else {
+              fetch(offset);
+            }
+            Js.Promise.resolve(json)
+          })
+          |> ignore;
+      }
+    }
     React.useEffect1(()=>{
       setOffset( _ => getCurrentOffset );
       None
     },[|refresh|])
+   
     React.useEffect1(()=>{
+      setOpts |> Option.iter(f =>  f( _ => dropdownResult))
       syncPageCount();
+      None
+    },[|dropdownResult|])
+    React.useEffect1(()=>{
       fetch(offset);
       None
     },[|offset|])
-    React.useEffect1(()=>{
-      Js.log("got told to refresh")
-      None
-    },[|refresh|])
     ;
     <div className="pagination">
       {
@@ -123,7 +139,7 @@ module App = {
         placeholder="Search..."
         value=search
         onChange={e => setSearch(_ => React.Event.Form.target(e)##value)}
-        onKeyDown={e => if(React.Event.Keyboard.key(e) === "Enter"){fetch(getCurrentOffset)}}
+        onKeyDown={e => if(React.Event.Keyboard.key(e) === "Enter") syncPageCount()}
         id=?{ String.length(searchBarId)>0? Some(searchBarId) : None}
         />
       }
