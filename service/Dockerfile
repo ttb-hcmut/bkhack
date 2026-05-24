@@ -6,4 +6,4 @@ RUN  mix compile
 EXPOSE 5000
 # below is for Erlang Port Mapper
 EXPOSE 4369
-CMD  iex --sname bkhack --cookie bkhack-INSERT_ID_HERE -S mix
+CMD  sh -c 'iex -S mix <<< \'App.start; defmodule A do def forever do Process.sleep(1000); forever() end end; A.forever()\''
