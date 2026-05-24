@@ -59,8 +59,9 @@ module App = {
         |> Util.List.replace_assoc'("offset", string_of_int(number+offset)) 
         |> Util.stringQueryParams' )
         )
+			setOffset(offset => number+offset)
     }
-    let getPageCount = () => {
+    let syncPageCount = () => {
       switch(countApi){
         | None => ()
         | Some(a) =>let open Fetch__syntax;
@@ -77,39 +78,35 @@ module App = {
           })
           |> ignore;
       }
-      
     }
-    let fetch = (offset) => {
-      switch(fetchApi){
-        | None => ()
-        | Some(a) => let open Fetch__syntax;
-          let request = Env.backend ++ a
-            ++ "limit="  ++ string_of_int(limit)
-            ++ "&offset=" ++ string_of_int(offset*limit)
-            ++ ((searchPrompt && search!="")?("&search=" ++ search):"")
-            ++ (switch(filter,dropdownResult |> Util.stringQueryParams'){
-              | (None,_) | (_,"") => ""
-              | (Some(_),v)=> "&" ++ v 
-            })
-          Fetch.fetch(request)
-          >>= Fetch.Response.json
-          >>= (json => {
-            setResult(_=>json)
-            Js.Promise.resolve(json)
-          })
-          >!= (err => {
-              Js.log(err);
-              Js.Promise.reject(Js.Exn.anyToExnInternal @@ err)
-            })
-          |> ignore;
-      }
+    let fetch = (offset) => fetchApi |> Option.iter @@ a => {
+			let open Fetch__syntax;
+			let request = Env.backend ++ a
+				++ "limit="  ++ string_of_int(limit)
+				++ "&offset=" ++ string_of_int(offset*limit)
+				++ ((searchPrompt && search!="")?("&search=" ++ search):"")
+				++ (switch(filter,dropdownResult){
+					| (None,_) | (_,[]) => ""
+					| (Some(_),v)=> "&" ++ (v->Util.stringQueryParams')
+				})
+			Fetch.fetch(request)
+			>>= Fetch.Response.json
+			>>= (json => { setResult(_=>json); Js.log("try to set result"); return(json) })
+			>!= (err => {
+					Js.log(err);
+					Js.Promise.reject(Js.Exn.anyToExnInternal @@ err)
+				})
+			|> ignore;
     }
-    React.useEffect2(()=>{
+    React.useEffect1(()=>{
       setOffset( _ => getCurrentOffset );
-      getPageCount();
-      fetch(getCurrentOffset);
       None
-    },(refresh,url))
+    },[|refresh|])
+    React.useEffect1(()=>{
+      syncPageCount();
+      fetch(offset);
+      None
+    },[|offset|])
     React.useEffect1(()=>{
       Js.log("got told to refresh")
       None
