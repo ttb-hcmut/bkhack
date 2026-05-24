@@ -46,6 +46,7 @@ let parse ~loc (t : ir) =
   let (module A) = Ast_builder.make loc in
   match dtype with
   | "string" -> A.estring @@ strip_quotes @@ v
+  | "unit"   -> A.pexp_construct { loc; txt = Lident "()" } None
   | "int"    -> begin try A.eint (int_of_string v) with Failure _ -> raise (Failure (Printf.sprintf "was trying to convert '%s'" v)) end
   | e -> failwith ("not yet '"^e^"'")
 
