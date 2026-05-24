@@ -51,7 +51,7 @@ defmodule Post
     field :post_owner_id  ,:integer
     field :verified       ,:boolean ,default: false
     field :public         ,:boolean ,default: false
-    timestamps(inserted_at: :date_created_utc, updated_at: false, type: :utc_datetime)
+    timestamps(inserted_at: :date_created_utc, updated_at: false, type: :string)
     belongs_to  :the_owner  ,User   ,foreign_key: :post_owner_id  ,references: :user_id   ,define_field: false
     belongs_to  :the_commit ,Commit ,foreign_key: :commit_head    ,references: :commit_id ,define_field: false
   end
@@ -71,7 +71,7 @@ defmodule Commit
     field :commit_message   ,:string
     field :post_title       ,:string
     field :post_text        ,:string
-    timestamps(inserted_at: :date_created_utc, updated_at: false, type: :utc_datetime)
+    timestamps(inserted_at: :date_created_utc, updated_at: false, type: :string)
     belongs_to  :the_owner  ,User   ,foreign_key: :commit_owner_id  ,references: :user_id   ,define_field: false
     belongs_to  :the_child  ,Commit ,foreign_key: :child_commit_id  ,references: :commit_id ,define_field: false
   end
@@ -81,16 +81,22 @@ defmodule Commit
     |> validate_required([:commit_owner_id, :commit_message, :post_title, :post_text])
   end
 end
+defmodule DateTime0 do
+  def now!(mode) do
+    DateTime.now!(mode)
+    |> DateTime.to_string
+  end
+end
 defmodule Comment
   do use Ecto.Schema
-  @timestamps_opts [type: UTCDateTime]
+  @timestamps_opts [type: UTCDateTime, autogenerate: {DateTime0, :now!, ["Etc/UTC"]}]
   @primary_key {:comment_id,:id,autogenerate: true}
   schema "comments" do
     field :parent_post_id    ,:integer
     field :parent_comment_id ,:integer
     field :content           ,:string
     field :commenter_id      ,:integer
-    timestamps(inserted_at: :date_created_utc, updated_at: false, type: :utc_datetime)
+    timestamps(inserted_at: :date_created_utc, updated_at: false, type: :string)
     # field :date_created_utc  ,:string
     field :post_version      ,:integer
     belongs_to  :the_parent_post    ,Post     ,foreign_key: :parent_post_id    ,references: :post_id     ,define_field: false

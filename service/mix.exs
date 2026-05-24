@@ -20,6 +20,7 @@ defmodule BKHack.Mix do
       {:json, "~> 1.4"},
       {:jason, "~> 1.4"},
       {:utc_datetime, "~> 1.0"},
+      {:postgrex, ">= 0.0.0"},
     ]
   end
 end

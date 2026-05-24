@@ -36,7 +36,7 @@ defmodule DiscussionBE do
     from(n in subquery(query), select: count(n.comment_id)) |> Data0.one |> IO.inspect
   end
 
-  def getPost(parent_id,parent_type\\"post",user_id\\nil,offset\\0,limit\\10) do
+  def getPost(parent_id,parent_type\\"post",user_id,offset\\0,limit\\10) do
     query = case parent_type do
       "post"    -> from(c in Comment) |> where([c],c.parent_post_id == ^parent_id)
       "comment" -> from(c in Comment) |> where([c],c.parent_comment_id == ^parent_id)
@@ -58,7 +58,7 @@ defmodule DiscussionBE do
         comment_id: c.comment_id,
         rating: r.rating,
         })
-      |> where([c,r], not is_nil(^user_id) and r.voter_id == ^user_id)
+      |> where([c,r], r.voter_id == ^user_id)
 
     full_query =
       from(c in subquery(query|> select([c],c)))

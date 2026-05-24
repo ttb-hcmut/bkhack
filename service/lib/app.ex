@@ -1,8 +1,11 @@
+# defmodule Data0 do
+#   use Ecto.Repo, otp_app: :bkhack, adapter: Ecto.Adapters.SQLite3
+# end
+# defmodule Data1 do
+#   use Ecto.Repo, otp_app: :bkhack, adapter: Mongo.Ecto
+# end
 defmodule Data0 do
-  use Ecto.Repo, otp_app: :bkhack, adapter: Ecto.Adapters.SQLite3
-end
-defmodule Data1 do
-  use Ecto.Repo, otp_app: :bkhack, adapter: Mongo.Ecto
+  use Ecto.Repo, otp_app: :bkhack, adapter: Ecto.Adapters.Postgres
 end
 
 defmodule App
@@ -326,20 +329,20 @@ defmodule App
       nil ->
         {:ok, sh} = JSON.encode([])
         conn
-    # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
-    |> put_resp_header("Access-Control-Allow-Origin", "*")
-    |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
-    |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
-    |> put_resp_content_type("application/json")
+        # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+        |> put_resp_header("Access-Control-Allow-Origin", "*")
+        |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+        |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+        |> put_resp_content_type("application/json")
         |> send_resp(500, sh)
       _ ->
         {:ok, sh} = JSON.encode(comment.comment_id)
         conn
-    # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
-    |> put_resp_header("Access-Control-Allow-Origin", "*")
-    |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
-    |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
-    |> put_resp_content_type("application/json")
+        # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+        |> put_resp_header("Access-Control-Allow-Origin", "*")
+        |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+        |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+        |> put_resp_content_type("application/json")
         |> send_resp(201, sh)
     end
   end
@@ -489,8 +492,9 @@ defmodule App.Supervisor do
   @impl true
   def init(_init_arg) do
     children = [
-      Data0,
+      # Data0,
       # Data1
+      Data0,
     ]
 
     Supervisor.init(children, strategy: :one_for_one)
