@@ -3,7 +3,7 @@
 #import "./shell-sym.typ"
 #let (bkhack, Bkhack) = ([bkhack], [bkhack])
 #title[= Stream-based programming, as compared to sh]
-#set heading(numbering: "1.",  outlined: true, supplement: [#text(weight: 900, fill: rgb("#3851A4"))[§]#h(-0.4em)])
+#set heading(numbering: it => { [#h(-0.28em)] },  outlined: true, supplement: [#text(weight: 900, fill: rgb("#3851A4"))[§]#h(-0.4em)])
 #show heading: set text(size: 0.85em)
 #set cite(style: "alphanumeric")
 // #show cite: it => text(fill: rgb("#3851A4"), it)
@@ -69,7 +69,7 @@ complex pipelines that branch.
 = Composition via function <fn>
 A reusable pipeline or grouping of commands would be called a _function_
 . In the #bkhack shell language, #lorem(70)\
-#lorem(70). Function is a useful abstraction. For example, since feed can be treated as a function simply built-in, it's possible to customize the behavior of ```sh feed``` by overloading it. Indeed, the defaulr ```sh feed``` command in #bkhack, which automatically has limiting of 15 items pagination, is simply a function
+#lorem(70). Function is a useful abstraction. For example, since feed can be treated as a function simply built-in, it's possible to customize the behavior of ```sh feed``` by overloading it. Indeed, the default ```sh feed``` command in #bkhack, which automatically has limiting of 15 items pagination, is simply a function
 ```sh
 feed() { feed | split -c 15 | cut -f1 | sort --hot ;}
 ```
@@ -84,6 +84,12 @@ _option parser_, such as POSIX `getopts`.
 #place(auto, float: true, scope: "parent")[
   #figure(caption: [Grammar for the #bkhack shell language], shell-parse.langchain) <gr>
 ]
+= Parsing
+Parsing is implemented based on the grammar at @gr. #lorem(30)\
+  In the initial design, we have only one phase for our parser. This is an eager, AST-less, final parser. It is final because effects are eagerly executed as each term is parsed. Eventually, we did make it so that it outputs an AST, for reusability and convenience.\
+  In the next design, we have two phases for our parser. The lexical analysis phase (bộ phân tích từ vựng @giao-trinh-trinh-bien-dich-lexer) #fn[a.k.a. character grouping] and the parsing phase. The lexical analysis phase is to guarantee a minimal schema for the parsers so that they won't diverge from the language spec. This is an implicit structure. In contrast, we could have defined an ADT or GADT to make an explicit structure. However, our parsers won't be final, we would make a compromise on performance. Not only that, an implicit structure allows room for undefined behaviors; each parser can do things in flexible ways that should hopefully achieve desirable results.\
+  Indeed, the lexing phase was added when we branched the parser to support _pastelling_; so, two parsers, a parser and a pastel. A shared lexing phase helps communicating that the two parsers share a structure, even if that structure is only infra-, and ter'es no explicit GADT or signature to explicitly enforce it.\
+  The usefulness of this starts to show when we added a new feature: support for quoted words. Thanks to the two-phase separation, we managed to implement this feature simply by modifying the lexer. We added new parsing rule, and changed the return type of $<"word">$. This cascades into all descendant parsers, requiring them to handle the new feature. Here, they are being rewritten by adding a new $<"word">$ overloading guard before usage.
 = Typing
 The typing of the #bkhack shell language, given in @typ, #lorem(30)
 This is useful when shell commands have to be embedded in a statically-typed
