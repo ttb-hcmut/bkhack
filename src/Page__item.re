@@ -164,7 +164,7 @@ module DiscussionView = {
   };
   module DiscussionFilter = {
     [@react.component]
-    let make = (~parentId,~refresh,~setResult) => {
+    let make = (~parentId,~refresh,~setResult,~setOpts) => {
       let auth = AuthContext.use()
       ;
       <Pagination.App 
@@ -175,13 +175,14 @@ module DiscussionView = {
                 ++"&user="  ++ string_of_int(Option.value(auth.getUserId(),~default=-1))
                 ++"&type=post&"}
         filter  ={[
-          ("sortby",  ["age","popularity","repcount"  ])
-        , ("searchby",["comment","username","version" ])
-        , ("orderby", ["ascending","descending"       ])
-        , ("filterby",["none","fresh","prof","student"])
+          ("searchby",["comment","username"])
+        , ("sortby",  ["age","popularity"])
+        , ("orderby", ["ascending","descending"])
+        , ("filterby",["none","prof","student"])
         ]}
         refresh
         setResult
+        setOpts
       />
     }
   };
@@ -298,7 +299,8 @@ module DiscussionView = {
         ~pType : string,
         ~showRep : bool,
         ~nestDepth : int,
-        ~signalRefresh : (bool => bool) => unit
+        ~signalRefresh : (bool => bool) => unit,
+        ~opts:list((string,string))
         ) => React.element)) = ref(None);
     module Comments = {
       [@react.component]
@@ -314,7 +316,8 @@ module DiscussionView = {
         ~author_role  : int,
         // ~author_rep   : int,
         ~nestDepth: int,
-        ~signalRefresh
+        ~signalRefresh,
+        ~opts
       ) => {
         let auth = AuthContext.use()
         let autoExpand = 1;
@@ -405,7 +408,7 @@ module DiscussionView = {
           <AddComment id parentType=pType setShow=setAddRep signalRefresh/>}
           {switch (cRef.contents) {
           | None => React.null
-          | Some(comp) => comp(~id, ~pType, ~showRep, ~signalRefresh, ~nestDepth=nestDepth+1)
+          | Some(comp) => comp(~id, ~pType, ~showRep, ~signalRefresh, ~nestDepth=nestDepth+1, ~opts)
           }}
         </li>
       }
@@ -430,6 +433,7 @@ module DiscussionView = {
       , ~nestDepth : int
       , ~signalRefresh
       , ~result: option(Js.Json.t)=?
+      , ~opts
       ) => {
         let auth = AuthContext.use()
         let (comments,setComments) = React.useState(() => [||]);
@@ -468,7 +472,11 @@ module DiscussionView = {
                   ++ "&offset=" ++ string_of_int(Array.length(comments))
                   ++ "&user="   ++ string_of_int(Option.value(auth.getUserId(),~default=-1))
                   ++ "&parent=" ++ string_of_int(id)
-                  ++ "&type=comment"
+                  ++ "&type=comment&"
+                  ++ (switch(opts |> Util.stringQueryParams'){
+                    | "" => ""
+                    | v  => "&" ++ v 
+                  })
                 Fetch.fetch(request)
                 >>= Fetch.Response.json 
                 >>= Model.Decode.Response.fetchedComments
@@ -532,6 +540,7 @@ module DiscussionView = {
                 // author_rep  = {x.author_rep  }
                 nestDepth
                 signalRefresh
+                opts
               /> 
               })
             |> React.array
@@ -551,17 +560,18 @@ module DiscussionView = {
       ~pType, 
       ~showRep,
       ~nestDepth,
-      ~signalRefresh
+      ~signalRefresh,
+      ~opts
     ) => 
-      <CommentGroup id pType showRep nestDepth signalRefresh />);
+      <CommentGroup id pType showRep nestDepth signalRefresh opts/>);
     [@react.component]
-    let make = (~id, ~addRep, ~setAddRep, ~result, ~signalRefresh) => {
+    let make = (~id, ~addRep, ~setAddRep, ~result, ~signalRefresh, ~opts) => {
       <>
       {!addRep ? 
       React.null
       :
       <AddComment id parentType="post" setShow=setAddRep signalRefresh/>}
-      <CommentGroup id pType="post" showRep=true nestDepth=0 result signalRefresh />
+      <CommentGroup id pType="post" showRep=true nestDepth=0 result signalRefresh opts/>
       </>
     }
   };
@@ -569,16 +579,17 @@ module DiscussionView = {
   let make = (~post_id : int) => {
     let (addRep, setAddRep) = React.useState(() => false)
     and (result, setResult) = React.useState(() => Js.Json.null)
-    and (refresh, signalRefresh) = React.useState(() => false);
+    and (refresh, signalRefresh) = React.useState(() => false)
+    and (opts, setOpts) = React.useState(() => []);
     <>
       <header className={"only " ++ View.to_string(Discussion)}>
         <DiscussionHint addRep setAddRep />
         <nav>
-          <DiscussionFilter parentId=post_id refresh setResult />
+          <DiscussionFilter parentId=post_id refresh setResult setOpts />
         </nav>
       </header>
       <main className={"only " ++ View.to_string(Discussion)}>
-        <DiscussionBody id=post_id addRep setAddRep result signalRefresh />
+        <DiscussionBody id=post_id addRep setAddRep result signalRefresh opts />
       </main>
     </>
   }

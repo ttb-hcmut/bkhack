@@ -84,10 +84,10 @@ module Filter {
     <Pagination.App 
       limit=3
       searchPrompt=true
-      countApi={"/api/post/list?count=true" ++ "&user="  ++ string_of_int(Option.value(auth.getUserId(),~default=-1))++"&"}
+      countApi={"/api/post/count?user="  ++ string_of_int(Option.value(auth.getUserId(),~default=-1))++"&"}
       fetchApi={"/api/post/list?user="  ++ string_of_int(Option.value(auth.getUserId(),~default=-1))++"&"}
       filter  ={[
-        ("searchby",["title","body","author"])
+        ("searchby",["title","author"])
       , ("sortby",  ["age","active"])
       , ("orderby", ["ascending","descending"])
       ]}

@@ -57,27 +57,18 @@ defmodule App
     end
   end
 
-  get "/api/post/list" do
-    Logger.info "GET postlist"
-    user      = Map.get(conn.params,"user"     ,"-1"        ) |> String.to_integer
-    search    = Map.get(conn.params,"search"   ,""          )
-    searchby  = Map.get(conn.params,"searchby" ,"title"     )
-    sortby    = Map.get(conn.params,"sortby"   ,"age"       )
-    orderby   = Map.get(conn.params,"orderby"  ,"ascending" )
-    offset    = Map.get(conn.params,"offset","0") |> String.to_integer
-    limit     = Map.get(conn.params,"limit","10") |> String.to_integer
-    count     = if(Map.get(conn.params,"count" ,"false") == "true", do: true , else: false)
+  get "/api/post/count" do
+    Logger.info "GET postcount"
+    user      = Map.get(conn.params,"user","-1" ) |> String.to_integer
 
-    data = PostBE.getPostList(
-      user,
-      search,
-      searchby,
-      sortby,
-      orderby,
-      limit,
-      offset,
-      count
-    )
+    opts = %{
+      search:   Map.get(conn.params,"search", nil),
+      searchby: Map.get(conn.params,"searchby", nil),
+      sortby:   Map.get(conn.params,"sortby", nil),
+      orderby:  Map.get(conn.params,"orderby", nil)
+    }
+
+    data = PostBE.getPostCount(user, opts)
     # data = ReturnChildID.getChildComments(parent, offset, limit)
     case data do
       nil ->
@@ -97,6 +88,42 @@ defmodule App
     |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
     |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
     |> put_resp_content_type("application/json")
+        |> send_resp(200 , sh)
+    end
+  end
+  get "/api/post/list" do
+    Logger.info "GET postlist"
+    user      = Map.get(conn.params,"user","-1" ) |> String.to_integer
+    offset    = Map.get(conn.params,"offset","0") |> String.to_integer
+    limit     = Map.get(conn.params,"limit","10") |> String.to_integer
+
+    opts = %{
+      search:   Map.get(conn.params,"search", nil),
+      searchby: Map.get(conn.params,"searchby", nil),
+      sortby:   Map.get(conn.params,"sortby", nil),
+      orderby:  Map.get(conn.params,"orderby", nil)
+    }
+
+    data = PostBE.getPostList(user, limit, offset, opts)
+    # data = ReturnChildID.getChildComments(parent, offset, limit)
+    case data do
+      nil ->
+        {:ok, sh} = JSON.encode([])
+        conn
+        # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+        |> put_resp_header("Access-Control-Allow-Origin", "*")
+        |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+        |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+        |> put_resp_content_type("application/json")
+        |> send_resp(501 , sh)
+      x ->
+        {:ok, sh} = Jason.encode(x)
+        conn
+      # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+      |> put_resp_header("Access-Control-Allow-Origin", "*")
+      |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+      |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+      |> put_resp_content_type("application/json")
         |> send_resp(200 , sh)
     end
   end
@@ -237,11 +264,19 @@ defmodule App
     type      = Map.get(conn.params,"type"     ,nil)
     parent    = Map.get(conn.params,"parent"   ,nil)
     recursive = Map.get(conn.params,"recursive","false")
+    opts = %{
+      search:   Map.get(conn.params,"search", nil),
+      searchby: Map.get(conn.params,"searchby", nil),
+      sortby:   Map.get(conn.params,"sortby", nil),
+      orderby:  Map.get(conn.params,"orderby", nil),
+      filterby: Map.get(conn.params,"filterby", nil)
+    }
     IO.inspect conn.params
     IO.inspect {type,parent,recursive}
     data = case {type,parent} do
-      {"post",p}    -> DiscussionBE.getCommentCount(p |> String.to_integer, "post", recursive=="true")
-      {"comment",p} -> DiscussionBE.getCommentCount(p |> String.to_integer, "comment", recursive=="true")
+      {_, nil} -> nil
+      {"post",p}    -> DiscussionBE.getCommentCount(p |> String.to_integer, "post", recursive=="true" , opts)
+      {"comment",p} -> DiscussionBE.getCommentCount(p |> String.to_integer, "comment", recursive=="true", opts)
       {_,_}-> nil
     end
 
@@ -275,8 +310,16 @@ defmodule App
     offset = Map.get(conn.params,"offset","0")
     limit  = Map.get(conn.params,"limit","10")
 
+    opts = %{
+      search:   Map.get(conn.params,"search", nil),
+      searchby: Map.get(conn.params,"searchby", nil),
+      sortby:   Map.get(conn.params,"sortby", nil),
+      orderby:  Map.get(conn.params,"orderby", nil),
+      filterby: Map.get(conn.params,"filterby", nil)
+    }
+
     data = case {parent,type} do
-      {p,t} when not is_nil(p) and t in ["post","comment"]-> DiscussionBE.getPost(parent,type,user,offset,limit)
+      {p,t} when not is_nil(p) and t in ["post","comment"]-> DiscussionBE.getComment(parent,type,user,offset,limit,opts)
       _ -> nil
     end
 
@@ -285,11 +328,11 @@ defmodule App
       nil ->
         {:ok, sh} = JSON.encode([])
         conn
-    # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
-    |> put_resp_header("Access-Control-Allow-Origin", "*")
-    |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
-    |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
-    |> put_resp_content_type("application/json")
+        # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+        |> put_resp_header("Access-Control-Allow-Origin", "*")
+        |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+        |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+        |> put_resp_content_type("application/json")
         |> send_resp(501 , sh)
       x ->
         {:ok, sh} = Jason.encode(x)
