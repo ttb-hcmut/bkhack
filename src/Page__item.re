@@ -56,20 +56,23 @@ module ItemNav{
       fetchCommentCount(~id=id)
       None
     });
+		let choose = React.useCallback2(kind => {
+			if (kind != currentTab) setCurrentTab(_ => kind)
+		}, (setCurrentTab, currentTab));
     <>
-    <button onClick={_ => setCurrentTab(_ => Article)} className=className(Article)> <label /> </button>
-    <button onClick={_ => setCurrentTab(_ => Discussion)} className=className(Discussion)>
+    <button onClick={_ => choose(Article)} className=className(Article)> <label /> </button>
+    <button onClick={_ => choose(Discussion)} className=className(Discussion)>
       <label>{React.string("discussions")}</label>
       <data className="count">{React.int(disCount)}</data>
     </button>
-    <button onClick={_ => setCurrentTab(_ => Pullrequest)} className=className(Pullrequest)>
+    <button onClick={_ => choose(Pullrequest)} className=className(Pullrequest)>
       <label>{React.string("pull-requests")}</label>
       <data className="count">{React.int(prCount)}</data>
     </button>
-    <button onClick={_ => setCurrentTab(_ => Log)} className=className(Log)>
+    <button onClick={_ => choose(Log)} className=className(Log)>
       <label>{React.string("history")}</label>
     </button>
-    <button onClick={_ => setCurrentTab(_ => Edit)} className=className(Edit)> <label /> </button>
+    <button onClick={_ => choose(Edit)} className=className(Edit)> <label /> </button>
     </>
   }
 }
