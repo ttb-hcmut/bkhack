@@ -84,7 +84,7 @@ defmodule PostBE do
       |> join(:left,[p],d in "descendants", on: p.post_id == d.pid)
       |> join(:left,[p,d], c in Commit, on: p.commit_head_id == c.commit_id)
       |> join(:left,[p,d,c], u in User, on: p.post_owner_id == u.user_id)
-      |> group_by([p,d,c,u], p.post_id)
+      |> group_by([p,d,c,u], [u.name, p.post_id, c.post_title, c.date_created_utc])
       |> select([p,d,c,u], %{
         post_id:    p.post_id,
         owner_id:   p.post_owner_id,
