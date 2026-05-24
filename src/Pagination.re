@@ -105,7 +105,6 @@ module App = {
       }
     }
     React.useEffect2(()=>{
-      setResult(_ => Js.Json.array([||]));
       setOffset( _ => getCurrentOffset );
       getPageCount();
       fetch(getCurrentOffset);

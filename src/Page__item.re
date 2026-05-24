@@ -411,6 +411,16 @@ module DiscussionView = {
       }
     };
 
+		let i = ref(0);
+
+		[@alert deprecated("bao, please use WeakMap")]
+		let getObjectId = o => {
+			ignore(o);
+			let v = i^;
+			i := v + 1;
+			v
+		}
+
     module CommentGroup = {
       [@react.component]
       let make = (
@@ -427,7 +437,7 @@ module DiscussionView = {
         let (loading, setLoading) = React.useState(() => false);
         let limit = 3;
         // opening concept: Js.Promise.()
-        let fetchComments = () => {
+        let fetchComments = result => {
           let open Fetch__syntax;
           if(loading){ () }
           else{
@@ -480,19 +490,27 @@ module DiscussionView = {
           }
           
         };
-        let revealReplies = () => {
+        let revealReplies = result => {
           if (Array.length(comments) == 0 && showMore){
-            fetchComments();
+            fetchComments(result);
           };
         };
-        React.useEffect1(()=>{
-          if(showRep) revealReplies();
+        React.useEffect2(()=>{
+          if(showRep) revealReplies(result);
           None
-        },[|showRep|])
+        },(showRep, result))
         React.useEffect1(()=>{
-          fetchComments();
+          fetchComments(result);
           None
         },[|result|])
+        React.useEffect1(()=>{
+					Js.Console.log("result changed");
+					None
+        },[|result|])
+        React.useEffect1(()=>{
+					Js.Console.log("comments changed");
+					None
+        },[|comments|])
         ;
         <>
         <ol className="replies" hidden={!showRep}>
@@ -501,7 +519,7 @@ module DiscussionView = {
             |> Array.map(x => {
               open Model.FetchedComment;
               <Comments
-                key         = {string_of_int(x.id)}
+                key         = {string_of_int(x.id)++string_of_int(comments->getObjectId)}
                 id          = {x.id          }
                 text        = {x.text        }
                 rating      = {x.rating      }
@@ -521,7 +539,7 @@ module DiscussionView = {
           <LoadingComments id show={showRep && loading} />
         </ol>
         <button className="more-replies"
-        onClick={ _ => fetchComments() }
+        onClick={ _ => fetchComments(result) }
         hidden={!showRep || !showMore || loading}>
           {React.string("More replies")}
         </button>
@@ -549,13 +567,9 @@ module DiscussionView = {
   };
   [@react.component]
   let make = (~post_id : int) => {
-    let (addRep, setAddRep) = React.useState(() => false);
-    let (result, setResult) = React.useState(() => Js.Json.null)
-    let (refresh, signalRefresh) = React.useState(() => false)
-    React.useEffect1(()=>{
-      None
-    },[|result|])
-    ;
+    let (addRep, setAddRep) = React.useState(() => false)
+    and (result, setResult) = React.useState(() => Js.Json.null)
+    and (refresh, signalRefresh) = React.useState(() => false);
     <>
       <header className={"only " ++ View.to_string(Discussion)}>
         <DiscussionHint addRep setAddRep />
