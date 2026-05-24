@@ -6,7 +6,7 @@ import Config
 #   username: "kinten", password: "kinten", hostname: "localhost"
 
 config :bkhack, Data0,
-  hostname: "db.dojhbipasrejjurzremz.supabase.co",
+  hostname: "db.dojhbipasrejjurzremz.supabase.com",
   port: 5432,
   username: "postgres",
   password: System.fetch_env!("BKHACK_SUPABASE_PASSWORD"),
