@@ -3,6 +3,11 @@ open Stdlib
 open Melange__containers.Fun
 open Auth
 
+let%comptime test__basic = assert({
+	let open Shellgen;
+	observe { feed @| Split_by.count(10) @| nil ;} == "feed | split -c 10"
+})
+
 module Wifi {
 	[@react.component]
 	let make = () =>
