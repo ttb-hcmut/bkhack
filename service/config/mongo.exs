@@ -19,3 +19,4 @@ services:
   #     ME_CONFIG_BASICAUTH_ENABLED: true
   #     ME_CONFIG_BASICAUTH_USERNAME: mongoexpressuser
   #     ME_CONFIG_BASICAUTH_PASSWORD: mongoexpresspass
+## vi: set ft=yaml:
