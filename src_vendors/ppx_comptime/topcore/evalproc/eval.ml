@@ -36,9 +36,14 @@ let extract2 : string -> ir =
   )
   %> (fun gr -> (Re.Group.get gr 1, Re.Group.get gr 2))
 
+let is_error =
+  Re.execp @@ Re.compile @@ Re.(alt [str "Exception"; str "Error"; str "Invalid"])
+
 let strip_quotes =
   let u = Re.exec @@ Re.compile @@ Re.(seq [bos; char '"'; group @@ greedy @@ rep @@ any; char '"'; eos]) in
   u %> (fun x -> Re.Group.get x 1)
+
+exception Unknown_value_serialization_of_type of string
 
 let parse ~loc (t : ir) =
   let dtype, v = t in
@@ -46,9 +51,21 @@ let parse ~loc (t : ir) =
   let (module A) = Ast_builder.make loc in
   match dtype with
   | "string" -> A.estring @@ strip_quotes @@ v
+  | "float"  -> A.efloat  @@ v
   | "unit"   -> A.pexp_construct { loc; txt = Lident "()" } None
+  | "bool"   -> A.ebool   @@ bool_of_string v
   | "int"    -> begin try A.eint (int_of_string v) with Failure _ -> raise (Failure (Printf.sprintf "was trying to convert '%s'" v)) end
-  | e -> failwith ("not yet '"^e^"'")
+  | e -> raise @@ Unknown_value_serialization_of_type e
+
+exception Program_exception of string
+
+let test_strip =
+  let ws = Re.(alt [char ' '; char '\n'; char '\t']) in
+  let f = fun g -> Re.Group.get g 1 in
+  Re.replace ~all:true ~f @@ Re.compile @@ Re.(seq [str "OCaml version 5.2.0
+Enter #help;; for help.
+
+#"; ws |> rep; group (any |> rep); ws |> rep |> greedy])
 
 let expression
 ~process_mgr:(module Sys : SYS) ~fs:(module File : FILE)
@@ -69,17 +86,11 @@ pdir_arg : ir =
     sprintf {|%s;;|}
       (Unparse.expression pdir_arg)
     in
-  (* (let s = content in Out_channel.with_open_text "err3.log" @@ fun o -> Printf.fprintf o "%s" s); *)
   File.write_exn tempfile content;
-  let err = ref "" in
-  begin try
-  extract2 @@
-  (fun s -> err := s; (* Out_channel.with_open_text "err2.log" @@ fun o -> Printf.fprintf o "%s" s; *) s) @@
-  extract @@
-  (fun s -> err := s; (* Out_channel.with_open_text "err1.log" @@ fun o -> Printf.fprintf o "%s" s; *) s) @@
-  run (
+  let res = run (
     Printf.sprintf "TEST=%s sh -c '%s < %s'"
-      (Sys.getenv "TEST") args tempfile
-  )
-  with Not_found -> raise (Failure (Printf.sprintf "%s" !err))
-  end
+      (Sys.getenv "TEST") args tempfile) in
+  if is_error res then raise (Program_exception (res |> test_strip)) else
+  let part1 = extract res in
+  let part2 = extract2 part1 in
+  part2

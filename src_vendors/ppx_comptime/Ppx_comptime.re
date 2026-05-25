@@ -27,6 +27,14 @@ module Option {
 	}
 }
 
+module Location {
+	let raise_errorf = Location.raise_errorf
+
+	let raise_error = (~loc, s) => {
+		Location.raise_errorf(~loc, "comptime: %s", s)
+	}
+}
+
 let comptime =
 Context_free.Rule.extension @@
 Extension.declare("comptime", Extension.Context.structure_item, Ast_pattern.(pstr(__))) @@
@@ -45,10 +53,12 @@ Extension.declare("comptime", Extension.Context.structure_item, Ast_pattern.(pst
 					;
 				fun
 				| List([Atom("libraries"), ...xs]) => Some(xs |> List.map(each) |> List.filter_map(Fun.id))
-				| _ => failwith("wads")
+				| _ => Location.raise_error(~loc, "bad spec")
 			});
+			let test =
+				try ({ Sys.getenv("TEST") }) { | _ => Location.raise_error(~loc, "missing env var TEST") };
 			let strats = [
-				() => Containers.IO.File.read(Sys.getenv("TEST")++"/src/dune-compiler") |> Containers.Result.to_opt |> Option.bind'(Sexplib.Sexp.of_string %> get_libraries_opt),
+				() => Containers.IO.File.read(test++"/src/dune-compiler") |> Containers.Result.to_opt |> Option.bind'(Sexplib.Sexp.of_string %> get_libraries_opt),
 				() => List.assoc_opt("comptime.libraries", meta) |> Option.bind'(of_str_list),
 				() => List.assoc_opt("libraries", meta) |> Option.bind'(of_str_list),
 			];
@@ -57,13 +67,21 @@ Extension.declare("comptime", Extension.Context.structure_item, Ast_pattern.(pst
 			let args =
 				args |> Option.map(List.map(x => ["-require", x]) %> List.flatten %> (args => ["utop", ...args]) %> String.concat(" "));
 			let pvb_expr = [%expr { let __name__ = [%e Ast.Exp.constant @@ Ast.Const.string @@ String.concat("__") @@ [sanitize(path), name]]; [%e pvb_expr] }];
-			let pvb_expr' = Eval.expression(~process_mgr=(module Sys), ~fs=(module Containers.IO.File), ~args?, pvb_expr) |> Eval.parse(~loc);
+			let pvb_expr' =
+				try ({
+				Eval.expression(~process_mgr=(module Sys), ~fs=(module Containers.IO.File), ~args?, pvb_expr) |> Eval.parse(~loc);
+				}) {
+					| Failure(s) => Location.raise_error(~loc, "failed to eval expression: '"++s++"'")
+					| Eval.Program_exception(s) => Location.raise_errorf(~loc, "%s", s)
+					| Eval.Unknown_value_serialization_of_type(e) => Location.raise_error(~loc, "don't known how to parse return value of type '"++e++"'")
+					| _ => Location.raise_error(~loc, "failed to eval expression")
+				};
 			{ pstr_loc, pstr_desc: Pstr_value(_recflag, [{ pvb_pat, pvb_expr: pvb_expr', pvb_attributes, pvb_loc }]) }
 		}
-		| _ => Location.raise_errorf(~loc, "must be variable")
+		| _ => Location.raise_error(~loc, "let-binding LHS must be variable pattern")
 	}
 }
-| _ => Location.raise_errorf(~loc, "must be a module")
+| _ => Location.raise_error(~loc, "must be a let-binding (module support is TBA)")
 
 let () = {
 	let rules = [comptime];

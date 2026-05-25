@@ -4,8 +4,16 @@ open Melange__containers.Fun
 open Auth
 
 let%comptime test__basic = assert({
+	Shellgen.observe (Shellgen.({ feed @| nil ;})) == "feed"
+});
+
+let%comptime test__complex = assert({
 	let open Shellgen;
-	observe { feed @| Split_by.count(10) @| nil ;} == "feed | split -c 10"
+	observe {
+		let sub = sub { feed @| Split_by.count(1) @| nil };
+		feed @| sub @| Split_by.count(10) @| nil ;}
+	==
+		"feed | { feed | split -c 1 ;} | split -c 10"
 })
 
 module Wifi {

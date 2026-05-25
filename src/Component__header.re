@@ -1,9 +1,7 @@
-// let shell = "feed | { split 10 | filter ;} | filter";
-// Js.Console.log("parsing '" ++ shell ++ "'");
-// Js.Console.log(Shell.test_parse(shell));
 open Melange__containers.Fun
 open React
 open Auth
+
 let onSubmit = (current_url, ~memo_transition=((_, _, k) => k()), e) => {
 	Event.Synthetic.preventDefault(e);
 	let rawstr = Event.Form.target(e)##siteNavigator##value;
