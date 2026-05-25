@@ -510,7 +510,7 @@ defmodule App
       {:ok, lock} = File.open("lock", [:write])
       :ok = IO.write(lock, :erlang.pid_to_list(pid))
       :ok = File.close(lock)
-      {:ok, _} = Plug.Cowboy.http(__MODULE__, [], port: 5000)
+      {:ok, _} = Plug.Cowboy.http(__MODULE__, [ip: {0, 0, 0, 0}], port: 5000)
       {:ok, msg: "running server"}
     end
   end
