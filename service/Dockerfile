@@ -9,4 +9,4 @@ RUN  mix compile
 EXPOSE 5000
 # below is for Erlang Port Mapper
 EXPOSE 4369
-CMD  ["sh", "-c", "echo 'App.start; defmodule A do def forever do Process.sleep(1000); forever() end end; A.forever()' | iex -S mix"]
+CMD  ["mix", "run", "--no-halt", "-e", "App.start"]
