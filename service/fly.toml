@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for bkhack-wispy-wildflower-6115 on 2026-05-25T03:31:03+07:00
+# fly.toml app configuration file generated for bkhack on 2026-05-25T04:36:34Z
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'bkhack-wispy-wildflower-6115'
+app = 'bkhack'
 primary_region = 'sin'
 
 [build]
@@ -11,19 +11,19 @@ primary_region = 'sin'
   buildpacks = ['https://cnb-shim.herokuapp.com/v1/hashnuke/elixir']
 
 [http_service]
-  internal_port = 8080
+  internal_port = 5000
   force_https = true
   auto_stop_machines = 'stop'
   auto_start_machines = true
   min_machines_running = 0
   processes = ['app']
 
-[[http_service.checks]]
-	grace_period = "100s"
-	interval = "300s"
-	method = "GET"
-	timeout = "50s"
-	path = "/"
+  [[http_service.checks]]
+    interval = '5m0s'
+    timeout = '50s'
+    grace_period = '1m40s'
+    method = 'GET'
+    path = '/'
 
 [[vm]]
   memory = '1gb'
