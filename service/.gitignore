@@ -4,3 +4,5 @@ lock
 lock-book
 log-livebook
 db-shm
+Dockerfile
+_fly_toml
