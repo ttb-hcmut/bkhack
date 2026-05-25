@@ -262,6 +262,7 @@ module DiscussionView = {
         </div>
       }
     }
+
     module LoadingComments = {
       [@react.component]
       let make = (~id,~show) => {
@@ -294,6 +295,7 @@ module DiscussionView = {
         </li>
       }
     }
+
     let cRef : ref(option((
         ~id : int,
         ~pType : string,
@@ -302,6 +304,7 @@ module DiscussionView = {
         ~signalRefresh : (bool => bool) => unit,
         ~opts:list((string,string))
         ) => React.element)) = ref(None);
+
     module Comments = {
       [@react.component]
       let make = (
@@ -328,7 +331,6 @@ module DiscussionView = {
         let (addRep, setAddRep) = React.useState(() => false);
         let pType="comment";
         let setVote = React.useCallback1([@warning "-8"] ((-1|0|1) as action) => {
-          
           open Fetch__syntax;
           open Js.Json;
           open Json__syntax;
@@ -402,12 +404,9 @@ module DiscussionView = {
           </div>
           <span className="spacer" hidden={!showRep && !addRep}/>
           
-          {!addRep ? 
-          React.null
-          :
-          <AddComment id parentType=pType setShow=setAddRep signalRefresh/>}
+          {!addRep ? React.null : <AddComment id parentType=pType setShow=setAddRep signalRefresh/>}
           {switch (cRef.contents) {
-          | None => React.null
+          | None => failwith("this should not happen")
           | Some(comp) => comp(~id, ~pType, ~showRep, ~signalRefresh, ~nestDepth=nestDepth+1, ~opts)
           }}
         </li>
@@ -456,7 +455,7 @@ module DiscussionView = {
                 >>= (aod => {
                   setComments( _ => aod);
                   setShowMore( _ => false);
-                  setLoading(_=>false);
+                  setLoading( _ => false);
                   Js.Promise.resolve(aod)
                 })
                 >!= (err => {
@@ -555,6 +554,7 @@ module DiscussionView = {
         </>
       }
     };
+
     let () = cRef := Some((
       ~id, 
       ~pType, 
@@ -564,6 +564,7 @@ module DiscussionView = {
       ~opts
     ) => 
       <CommentGroup id pType showRep nestDepth signalRefresh opts/>);
+
     [@react.component]
     let make = (~id, ~addRep, ~setAddRep, ~result, ~signalRefresh, ~opts) => {
       <>
@@ -1035,9 +1036,7 @@ module App{
 							num_merged={pullrequests |> Array.fold_left(((acc, ((_, _, _, _, _, it, _, _), _)) => switch (it) { | `Merged => acc + 1 | _ => acc }), 0)}
 							num_closed={pullrequests |> Array.fold_left(((acc, ((_, _, _, _, _, it, _, _), _)) => switch (it) { | `Closed => acc + 1 | _ => acc }), 0)}
 							/>
-						<nav>
-							<PullrequestsFilter />
-						</nav>
+						<nav> <PullrequestsFilter /> </nav>
 					</header>
 					<main className=Printf.sprintf("only %s", View.to_string(Pullrequest))><PullrequestsBody pullrequests prsExpand expand_this=on_prs_update_expand inspect_this=on_prs_update_inspect /></main>
 					<header className=Printf.sprintf("only %s inspect", View.to_string(Pullrequest))>
