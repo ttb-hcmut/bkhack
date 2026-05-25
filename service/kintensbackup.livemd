@@ -1,0 +1,96 @@
+# Kinten's backup
+
+```elixir
+Mix.install([
+  {:kino_db, "~> 0.4.0"},
+  {:exqlite, "~> 0.23.0"},
+  {:postgrex, "~> 0.18"}
+])
+```
+
+## Section
+
+```elixir
+opts = [
+  hostname: "db.dojhbipasrejjurzremz.supabase.co",
+  port: 5432,
+  username: "postgres",
+  password: System.fetch_env!("LB_BKHACK_SUPABASE_PASSWORD"),
+  database: "postgres",
+  socket_options: [:inet6]
+]
+{:ok, conn_supabase} = Kino.start_child({Postgrex, opts})
+alias Postgrex, as: Sqlx_supabase
+```
+
+```elixir
+conn = conn_supabase
+alias Sqlx_supabase, as: Sqlx
+```
+
+```elixir
+defmodule RunSql do
+  def query(conn, queryList) do
+    Enum.map( queryList , fn q -> Sqlx.query!(conn,q, []) end )
+  end
+  def query(conn, queryList, opts) do
+    Enum.map( queryList , fn q -> Sqlx.query!(conn,q, opts) end )
+  end
+end
+```
+
+```elixir
+RunSql.query(conn,[
+  ~S"insert into users values (9, 'kinten108101', 'kintenwenteast123', 'kinten108101@protonmail.com', 0)",
+])
+
+Sqlx.query!(
+  conn,
+  ~S"""
+  insert into commits values (178, 9, null, 'initial', 'Inline testing in bkhack source code', 'Famous paper.', '2026-04-28T15:18:26Z')
+  """
+)
+Sqlx.query!(
+  conn,
+  ~S"""
+  insert into posts values (78, 178, 9, false, true, '2026-04-28T15:18:26Z')
+  """,
+  []
+)
+
+Sqlx.query!(
+  conn,
+  ~S"""
+  insert into commits values (179, 9, null, 'initial', 'Comment filtering in bkhack', 'Famous paper.', '2026-04-28T15:18:26Z')
+  """
+)
+Sqlx.query!(
+  conn,
+  ~S"""
+  insert into posts values (79, 179, 9, false, true, '2026-04-28T15:18:26Z')
+  """,
+  []
+)
+
+Sqlx.query!(
+  conn,
+  ~S"""
+  insert into commits values (180, 9, null, 'initial', 'First deployment of bkhack with Fly.io', 'Famous paper.', '2026-04-28T15:18:26Z')
+  """
+)
+Sqlx.query!(
+  conn,
+  ~S"""
+  insert into posts values (80, 180, 9, false, true, '2026-04-28T15:18:26Z')
+  """,
+  []
+)
+
+Sqlx.query!(
+  conn,
+  ~S"select * from posts",
+  []
+)
+```
+
+<!-- livebook:{"offset":1853,"stamp":{"token":"XCP.-mGThIM_1Y9I2_lOX3_7YvZcFiHNObrDNy32GM4gU3eHqF5_xz5TsFs50E29mgR6YmOHtsWCiSVLC0jw4AcH80kZxvtbfvmV3ioUcT9bYT5utE7-4uXHS7LZVjKQ7aXwUu8B","version":2}} -->

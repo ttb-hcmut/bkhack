@@ -9,7 +9,9 @@ defmodule Data0 do
 end
 
 defmodule App
-  do use Plug.Router
+  do
+  use Plug.Router
+  use Application
   require Logger
   require Db
   require ReturnChildID
@@ -500,6 +502,13 @@ defmodule App
 
   match _ do
     send_resp(conn, 404, "not found")
+  end
+
+  @impl true
+  def start(_type, _args) do
+    {:ok, pid} = App.Supervisor.start_link(:ok)
+    {:ok, _} = Plug.Cowboy.http(__MODULE__, [ip: {0, 0, 0, 0}], port: 5000)
+    {:ok, pid}
   end
 
   def start do

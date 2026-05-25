@@ -23,4 +23,10 @@ defmodule BKHack.Mix do
       {:postgrex, ">= 0.0.0"},
     ]
   end
+
+  def application do
+    [
+      mod: {App, []}
+    ]
+  end
 end
