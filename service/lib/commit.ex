@@ -1,21 +1,21 @@
 defmodule CommitBE do
-  def insertCommit(commit_owner_id,post_title,post_text,commit_message) do
+  def insertCommit(data, commit_owner_id,post_title,post_text,commit_message) do
     changeset = Commit.changeset(%Commit{}, %{
       commit_owner_id:  commit_owner_id,
       post_title:       post_title,
       post_text:        post_text,
       commit_message:   commit_message
     })
-    Data0.insert(changeset)
+    data.insert(changeset)
   end
   def updateCommitChild do
   end
   def getCommit do
   end
-  def getAll do
+  def getAll(data) do
     import Ecto.Query
     query = from u in Commit, select: u
-    xs = Data0.all(query)
+    xs = data.all(query)
     IO.inspect xs
   end
 end

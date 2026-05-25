@@ -1,10 +1,10 @@
 defmodule PostBE do
   import Ecto.Query
-  def createPost(creator_id,post_title,post_text,commit_message,public)do
+  def createPost(data, creator_id,post_title,post_text,commit_message,public)do
     query = from u in User, select: u.role, where: u.user_id == ^creator_id
-    role = Data0.one(query)
-    res = Data0.transact(fn ->
-      with {:ok, commit} <- CommitBE.insertCommit(creator_id,post_title,post_text,commit_message)
+    role = data.one(query)
+    res = data.transact(fn ->
+      with {:ok, commit} <- CommitBE.insertCommit(data, creator_id,post_title,post_text,commit_message)
       do
         changeset = Post.changeset(%Post{}, %{
           post_owner_id:  creator_id,
@@ -12,7 +12,7 @@ defmodule PostBE do
           verified:       (role != 1), # 1 => prof
           public:         public,
         })
-        Data0.insert(changeset)
+        data.insert(changeset)
       end
     end)
     case res do
@@ -20,34 +20,34 @@ defmodule PostBE do
       {:error,cs} -> IO.inspect(cs); nil
     end
   end
-  def updatePost(post_id,creator_id,post_title,post_text,commit_message) do
-    res = Data0.transact(fn ->
-      with {:ok, newCommit} <- CommitBE.insertCommit(creator_id,post_title,post_text,commit_message),
-           post           <- from(u in Post, where: u.post_id == ^post_id) |> Data0.one,
-           commit         <- from(u in Commit, where: u.commit_id == ^newCommit.commit_id) |> Data0.one,
-           _updatedCommit <- commit |> Commit.changeset(%{commit_child_id: post.commit_head_id}) |> Data0.update,
-           _updatedPost   <- post |> Post.changeset(%{commit_head_id: commit.commit_id}) |> Data0.update
+  def updatePost(data, post_id,creator_id,post_title,post_text,commit_message) do
+    res = data.transact(fn ->
+      with {:ok, newCommit} <- CommitBE.insertCommit(data, creator_id,post_title,post_text,commit_message),
+           post           <- from(u in Post, where: u.post_id == ^post_id) |> data.one,
+           commit         <- from(u in Commit, where: u.commit_id == ^newCommit.commit_id) |> data.one,
+           _updatedCommit <- commit |> Commit.changeset(%{commit_child_id: post.commit_head_id}) |> data.update,
+           _updatedPost   <- post |> Post.changeset(%{commit_head_id: commit.commit_id}) |> data.update
       do
         {:ok,:balls}
       else
-        nil -> Data0.rollback(:got_nil)
-        {:error, reason} -> Data0.rollback(reason)
+        nil -> data.rollback(:got_nil)
+        {:error, reason} -> data.rollback(reason)
       end
     end)
     IO.inspect res
   end
-  def getPostCount(user_id\\-1, opts\\ %{}) do
+  def getPostCount(data, user_id\\-1, opts\\ %{}) do
     query = postListQuery(user_id)
     |> postFilter(opts) |> select([c],c)
-    from(n in subquery(query), select: count(n.post_id) ) |> Data0.one
+    from(n in subquery(query), select: count(n.post_id) ) |> data.one
   end
-  def getPostList(user_id\\-1, limit\\10, offset\\0, opts\\%{}) do
+  def getPostList(data, user_id\\-1, limit\\10, offset\\0, opts\\%{}) do
     postListQuery(user_id)
     |> postFilter(opts)
-    |> limit(^limit) |> offset(^offset) |> Data0.all
+    |> limit(^limit) |> offset(^offset) |> data.all
   end
-  def getPostHead(post_id, user_id\\-1)do
-    with %Post{} = p <- Post |> select([p],p)|> where([p], p.post_id == ^post_id) |> Data0.one,
+  def getPostHead(data, post_id, user_id\\-1)do
+    with %Post{} = p <- Post |> select([p],p)|> where([p], p.post_id == ^post_id) |> data.one,
           true     <- p.public or (p.post_owner_id == user_id and user_id !=-1)
     do Post
       |> join(:left,[p], c in Commit, on: p.commit_head_id == c.commit_id)
@@ -59,7 +59,7 @@ defmodule PostBE do
         owner_name:  u.name       ,
         })
       |> where([p,c,u], p.post_id == ^p.post_id)
-      |> Data0.one
+      |> data.one
     else
       nil -> nil
     end
@@ -136,8 +136,8 @@ defmodule PostBE do
       {_,_}                   -> xx
     end end)
   end
-  def getPostVersionList(post_id, user_id)do
-    with %{public: _,owner: _,head: _} = p <- Post|> select([p], select: %{public: p.public,owner: p.post_owner_id,head: p.commit_head_id})|> where([p], p.post_id == ^post_id) |> Data0.one,
+  def getPostVersionList(data, post_id, user_id)do
+    with %{public: _,owner: _,head: _} = p <- Post|> select([p], select: %{public: p.public,owner: p.post_owner_id,head: p.commit_head_id})|> where([p], p.post_id == ^post_id) |> data.one,
          true <-  p.public or p.owner == user_id
     do
       from(ct in "descendants")
@@ -152,16 +152,16 @@ defmodule PostBE do
         date_created_utc: ct.date_created_utc
         })
       |> where([ct], ct.post_id == ^post_id)
-      |> Data0.all
+      |> data.all
     else
       nil -> nil
       false -> nil
       {:error, _} -> nil
     end
   end
-  def getAll do
+  def getAll(data) do
     query = from u in Post, select: u
-    xs = Data0.all(query)
+    xs = data.all(query)
     IO.inspect xs
   end
 end

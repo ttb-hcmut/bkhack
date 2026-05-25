@@ -1,12 +1,14 @@
-# defmodule Data0 do
+# defmodule Data do
 #   use Ecto.Repo, otp_app: :bkhack, adapter: Ecto.Adapters.SQLite3
 # end
 # defmodule Data1 do
 #   use Ecto.Repo, otp_app: :bkhack, adapter: Mongo.Ecto
 # end
-defmodule Data0 do
+defmodule Data2 do
   use Ecto.Repo, otp_app: :bkhack, adapter: Ecto.Adapters.Postgres
 end
+
+alias Data2, as: Data
 
 defmodule App
   do
@@ -33,7 +35,7 @@ defmodule App
 
 
     data = case version do
-      "latest" -> PostBE.getPostHead(post_id, user_id)
+      "latest" -> PostBE.getPostHead(Data, post_id, user_id)
       _ -> nil
     end
     # data = ReturnChildID.getChildComments(parent, offset, limit)
@@ -70,7 +72,7 @@ defmodule App
       orderby:  Map.get(conn.params,"orderby", nil)
     }
 
-    data = PostBE.getPostCount(user, opts)
+    data = PostBE.getPostCount(Data, user, opts)
     # data = ReturnChildID.getChildComments(parent, offset, limit)
     case data do
       nil ->
@@ -106,7 +108,7 @@ defmodule App
       orderby:  Map.get(conn.params,"orderby", nil)
     }
 
-    data = PostBE.getPostList(user, limit, offset, opts)
+    data = PostBE.getPostList(Data, user, limit, offset, opts)
     # data = ReturnChildID.getChildComments(parent, offset, limit)
     case data do
       nil ->
@@ -152,8 +154,8 @@ defmodule App
     data = "User "<>Integer.to_string(creator_id)<>" with title: "<>title<>" and body: "<>post_body
     IO.puts(data);
     postId = case post_id do
-      -1 ->  PostBE.createPost(creator_id, title, post_body, commit_message, public)
-      pid -> PostBE.updatePost(pid, creator_id, title, post_body, commit_message)
+      -1 ->  PostBE.createPost(Data, creator_id, title, post_body, commit_message, public)
+      pid -> PostBE.updatePost(Data, pid, creator_id, title, post_body, commit_message)
     end
     case postId do
       nil ->
@@ -195,7 +197,7 @@ defmodule App
 
     data = "Registering "<>username<>" with password "<>password<>" and email "<>email
     IO.puts(data);
-    isAnythingWrongOfficer = AuthBE.register(username,password,email)
+    isAnythingWrongOfficer = AuthBE.register(Data, username,password,email)
     IO.puts("--");IO.puts(isAnythingWrongOfficer);
     case String.length(isAnythingWrongOfficer) do
       0 ->
@@ -237,7 +239,7 @@ defmodule App
 
     data = "User "<>username<>" trying to login with password \""<>password
     IO.puts(data);
-    acc = AuthBE.login(username,password)
+    acc = AuthBE.login(Data, username,password)
     case acc do
       nil ->
         {:ok, sh} = JSON.encode("Wrong login dumb fuck")
@@ -277,8 +279,8 @@ defmodule App
     IO.inspect {type,parent,recursive}
     data = case {type,parent} do
       {_, nil} -> nil
-      {"post",p}    -> DiscussionBE.getCommentCount(p |> String.to_integer, "post", recursive=="true" , opts)
-      {"comment",p} -> DiscussionBE.getCommentCount(p |> String.to_integer, "comment", recursive=="true", opts)
+      {"post",p}    -> DiscussionBE.getCommentCount(Data, p |> String.to_integer, "post", recursive=="true" , opts)
+      {"comment",p} -> DiscussionBE.getCommentCount(Data, p |> String.to_integer, "comment", recursive=="true", opts)
       {_,_}-> nil
     end
 
@@ -321,7 +323,7 @@ defmodule App
     }
 
     data = case {parent,type} do
-      {p,t} when not is_nil(p) and t in ["post","comment"]-> DiscussionBE.getComment(parent,type,user,offset,limit,opts)
+      {p,t} when not is_nil(p) and t in ["post","comment"]-> DiscussionBE.getComment(Data, parent,type,user,offset,limit,opts)
       _ -> nil
     end
 
@@ -369,7 +371,7 @@ defmodule App
 
     data = "User "<>Integer.to_string(user_id)<>" commented \""<>content<>"\" on "<>Integer.to_string(type)<>" "<>Integer.to_string(id)
     IO.puts(data);
-    comment = DiscussionBE.postComment(id, type, content, user_id, version)
+    comment = DiscussionBE.postComment(Data, id, type, content, user_id, version)
     case comment do
       nil ->
         {:ok, sh} = JSON.encode([])
@@ -411,7 +413,7 @@ defmodule App
 
     data = "User "<>Integer.to_string(user_id)<>" voted "<>Integer.to_string(action)<>" on "<>type<>" "<>Integer.to_string(id)
     IO.puts(data);
-    DiscussionBE.setVote(user_id,id,action)
+    DiscussionBE.setVote(Data, user_id,id,action)
     {:ok, sh} = JSON.encode(data)
     conn
     # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
@@ -423,7 +425,7 @@ defmodule App
   end
 
   post "/api/test/free" do
-    r = Ecto.Adapters.SQL.query!(Data0, conn.query_params["query"], [])
+    r = Ecto.Adapters.SQL.query!(Data, conn.query_params["query"], [])
     xs = r.rows
     lol = xs
     {:ok, sh} = JSON.encode(lol)
@@ -454,7 +456,7 @@ defmodule App
   get "/api/test/users" do
     import Ecto.Query
     query = from u in User, select: u
-    xs = Data0.all(query)
+    xs = Data.all(query)
     lol = xs |> Enum.map(fn it -> [user_id: it.user_id, name: it.name] end)
     {:ok, sh} = JSON.encode(lol)
     conn
@@ -544,9 +546,9 @@ defmodule App.Supervisor do
   @impl true
   def init(_init_arg) do
     children = [
-      # Data0,
+      # Data,
       # Data1
-      Data0,
+      Data,
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

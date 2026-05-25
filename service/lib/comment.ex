@@ -1,17 +1,17 @@
 defmodule DiscussionBE do
   import Ecto.Query
-  def getCommentCount(parent_id,parent_type\\"post",recursive\\false,opts\\%{}) do
+  def getCommentCount(data, parent_id,parent_type\\"post",recursive\\false,opts\\%{}) do
     query = case recursive do
       false -> discussionQuery(parent_id,parent_type,nil)|> discussionFilter(opts) |> select([c],c)
       true  -> fromCommentTree(parent_id,parent_type) |> select([ct],%{id: ct.comment_id})
     end
-    from(n in subquery(query), select: count(n.id)) |> Data0.one
+    from(n in subquery(query), select: count(n.id)) |> data.one
   end
 
-  def getComment(parent_id,parent_type\\"post",user_id\\nil,offset\\0,limit\\10,opts\\%{}) do
+  def getComment(data, parent_id,parent_type\\"post",user_id\\nil,offset\\0,limit\\10,opts\\%{}) do
     discussionQuery(parent_id,parent_type,user_id)
     |> discussionFilter(opts)
-    |> limit(^limit) |> offset(^offset) |> Data0.all
+    |> limit(^limit) |> offset(^offset) |> data.all
   end
 
   defp fromCommentTree(parent_id\\-1,parent_type\\"post")do
@@ -150,7 +150,7 @@ defmodule DiscussionBE do
   #     LIMIT ?
   #     OFFSET ?
   #   """
-  #   {:ok,result} = Ecto.Adapters.SQL.query(Data0, query,[user_id,post_id,limit,offset])
+  #   {:ok,result} = Ecto.Adapters.SQL.query(data, query,[user_id,post_id,limit,offset])
   #   columns = Enum.map(result.columns, fn c -> String.to_atom(c) end)
   #   result.rows |> Enum.map(fn row -> Enum.zip(columns, row) end)
   # end
@@ -182,36 +182,36 @@ defmodule DiscussionBE do
   #     LIMIT ?
   #     OFFSET ?
   #   """
-  #   {:ok,result} = Ecto.Adapters.SQL.query(Data0, query,[user_id,comment_id,limit,offset])
+  #   {:ok,result} = Ecto.Adapters.SQL.query(data, query,[user_id,comment_id,limit,offset])
   #   columns = Enum.map(result.columns, fn c -> String.to_atom(c) end)
   #   result.rows |> Enum.map(fn row -> Enum.zip(columns, row) end)
   # end
 
-  def setVote(voter_id,comment_id,action) do
+  def setVote(data, voter_id,comment_id,action) do
     from(r in CommentRating, where: r.comment_id == ^comment_id and r.voter_id == ^voter_id )
-    |> Data0.delete_all()
+    |> data.delete_all()
 
     if action == -1 || action == 1 do
-      Data0.insert!(%CommentRating{voter_id: voter_id, comment_id: comment_id, rating: action})
+      data.insert!(%CommentRating{voter_id: voter_id, comment_id: comment_id, rating: action})
     end
 
   end
 
-  def postComment(parent_id,parent_type,content,commenter_id,post_version) do
+  def postComment(data, parent_id,parent_type,content,commenter_id,post_version) do
     case parent_type do
-      0 -> Data0.insert!(%Comment{
+      0 -> data.insert!(%Comment{
         parent_post_id:     parent_id, parent_comment_id:  nil, content:            content, commenter_id:       commenter_id, post_version:       post_version
       })
-      1 -> Data0.insert!(%Comment{
+      1 -> data.insert!(%Comment{
         parent_post_id:     nil, parent_comment_id:  parent_id, content:            content, commenter_id:       commenter_id, post_version:       post_version
       })
       _ -> nil
     end
   end
 
-  def getCommentAll do
+  def getCommentAll(data) do
     query = from u in Comment, select: u
-    xs = Data0.all(query)
+    xs = data.all(query)
     IO.inspect xs
   end
 
