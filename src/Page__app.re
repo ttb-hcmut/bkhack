@@ -5,7 +5,7 @@ open Auth
 
 let%comptime test__basic = assert({
 	Shellgen.observe (Shellgen.({ feed @| nil ;})) == "feed"
-});
+})
 
 let%comptime test__complex = assert({
 	let open Shellgen;
