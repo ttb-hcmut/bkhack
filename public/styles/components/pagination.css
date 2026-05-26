@@ -58,6 +58,19 @@
 .pagination > .dropdown.none::after{
   content: " ";
 }
+
+.pagination > .x-limit::before{
+  content:"Limit";
+}
+.pagination .get-10::after{
+  content:"10";
+}
+.pagination .get-15::after{
+  content:"15";
+}
+.pagination .get-30::after{
+  content:"30";
+}
 .pagination > .sortby::before{
   content:"Sorted";
 }

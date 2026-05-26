@@ -43,27 +43,28 @@ module App = {
   , ~searchBarId    :string = ""
   , ~setOpts        :option((list((string,string)) => list((string,string))) => unit)=?
   ) => {
-    let url = ReasonReactRouter.useUrl();
-    let (search,setSearch) = React.useState(()=>"")
+    let url = ReasonReactRouter.useUrl()
+		let searchParams = [|url|]|>React.useMemo1(() => url.search->Util.parseQueryParams');
+    let (search,setSearch) = React.useState(() => List.assoc_opt("search", searchParams) |> Option.value(~default=""))
     let (dropdownResult,setDropdownResult) = React.useState(()=>[])
     let (count,setCount) = React.useState(()=>0)
-    let (offset,setOffset) = React.useState(()=>0)
+    let (offset,setOffset) = React.useState(()=>0);
     let getCurrentOffset = url.search
                 -> Util.parseQueryParams
                 -> Js.Dict.get("offset")
                 -> Option.value(~default = "0")
                 -> int_of_string
     let moveToPage = (number:int) => {
-      ReasonReactRouter.push(String.concat("/",["",...url.path]) ++ "/?"
-      ++( url.search
-        |> Util.parseQueryParams'
-        |> Util.List.replace_assoc'("offset", string_of_int(number+offset)) 
-        |> Util.stringQueryParams' )
-        )
+      ReasonReactRouter.push(
+				String.concat("/",["",...url.path]) ++ "/?"
+				++( url.search
+					|> Util.parseQueryParams'
+					|> Util.List.replace_assoc'("offset", string_of_int(number+offset)) 
+					|> Util.stringQueryParams' )
+			);
 			setOffset(offset => number+offset)
     }
-    let fetch = (offset) => fetchApi |> Option.iter @@ a => {
-			let open Fetch__syntax;
+    let fetch = offset => Option.iter(a => Fetch__syntax.({
 			let request = Env.backend ++ a
 				++ "limit="  ++ string_of_int(limit)
 				++ "&offset=" ++ string_of_int(offset*limit)
@@ -74,45 +75,41 @@ module App = {
 				})
 			Fetch.fetch(request)
 			>>= Fetch.Response.json
-			>>= (json => { setResult(_=>json); Js.log("try to set result"); return(json) })
+			>>= (json => { setResult(_=>json); return(json) })
 			>!= (err => {
 					Js.log(err);
 					Js.Promise.reject(Js.Exn.anyToExnInternal @@ err)
 				})
 			|> ignore;
-    }
-    let syncPageCount = () => {
-      switch(countApi){
-        | None => ()
-        | Some(a) =>let open Fetch__syntax;
-          let request = Env.backend ++ a
-            ++ "limit="  ++ string_of_int(limit)
-            ++ "&offset=" ++ string_of_int(offset*limit)
-            ++ ((searchPrompt && search!="")?("&search=" ++ search):"")
-            ++ (switch(filter,dropdownResult |> Util.stringQueryParams'){
-              | (None,_) | (_,"") => ""
-              | (Some(_),v)=> "&" ++ v 
-            })
-          Fetch.fetch(request)
-          >>= Fetch.Response.json
-          >!= (err => {
-              Js.log(err);
-              return(Js.Json.number(0.0))
-            })
-          >>= (json => {
-            let x = Js.Json.decodeNumber(json) |> Option.value(~default = 0.0);
-            setCount(_ =>Int.max(Js.Math.ceil_int(x/.float_of_int(Int.max(1,limit)))-1,0));
-            if(offset>Int.max(Js.Math.ceil_int(x/.float_of_int(Int.max(1,limit)))-1,0))
-            {
-              setOffset(_ =>Int.max(Js.Math.ceil_int(x/.float_of_int(Int.max(1,limit)))-1,0));
-            } else {
-              fetch(offset);
-            }
-            Js.Promise.resolve(json)
-          })
-          |> ignore;
-      }
-    }
+    }), fetchApi)
+    let syncPageCount = () => Option.iter(a => Fetch__syntax.({
+			let request = Env.backend ++ a
+				++ "limit="  ++ string_of_int(limit)
+				++ "&offset=" ++ string_of_int(offset*limit)
+				++ ((searchPrompt && search!="")?("&search=" ++ search):"")
+				++ (switch(filter,dropdownResult){
+					| (None,_) | (_,[]) => ""
+					| (Some(_),v)=> "&" ++ v->Util.stringQueryParams'
+				})
+			Fetch.fetch(request)
+			>>= Fetch.Response.json
+			>!= (err => {
+					Js.log(err);
+					return(Js.Json.number(0.0))
+				})
+			>>= (json => {
+				let x = Js.Json.decodeNumber(json) |> Option.value(~default = 0.0);
+				setCount(_ =>Int.max(Js.Math.ceil_int(x/.float_of_int(Int.max(1,limit)))-1,0));
+				if(offset>Int.max(Js.Math.ceil_int(x/.float_of_int(Int.max(1,limit)))-1,0))
+				{
+					setOffset(_ =>Int.max(Js.Math.ceil_int(x/.float_of_int(Int.max(1,limit)))-1,0));
+				} else {
+					fetch(offset);
+				}
+				Js.Promise.resolve(json)
+			})
+			|> ignore;
+    }), countApi)
     React.useEffect1(()=>{
       setOffset( _ => getCurrentOffset );
       None
