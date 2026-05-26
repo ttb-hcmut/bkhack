@@ -61,7 +61,7 @@ module Completion{
 
 module Highlight{
 
-	let save_into_exn = (mode, storage) => {
+	let save_into = (mode, storage) => {
 		Dom.Storage.setItem("bkhack.highlight", mode, storage);
 	}
 

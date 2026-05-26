@@ -55,7 +55,7 @@ let eval = current_url => {
 			root->Tileset.sync_from_exn(Dom.Storage.localStorage);
 			aux(next) }
 		| Cons_cmd(`unfetched(["set", "--highlight", mode]), next) => {
-			mode->Command.Highlight.save_into_exn(Dom.Storage.localStorage);
+			mode->Command.Highlight.save_into(Dom.Storage.localStorage);
 			let root = ReactDOM.querySelector("#root")->Option.get;
 			root->Command.Highlight.sync_from_exn(Dom.Storage.localStorage);
 			aux(next) }
