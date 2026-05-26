@@ -52,7 +52,7 @@ let command__extend = (~tree, s) => {
 	let get_unfetched = fun | (`unfetched(cmd)) => Some(cmd) | _ => None;
 	let last_cmd_opt = Shell__lang.Program.cmd__last_opt(tree)->Option.bind(get_unfetched);
 	let last_opt = last_cmd_opt->Option.bind(cmd => {
-		List.last_opt(cmd)->Option.bind(Command.Completion.match_(~cmd)) });
+		List.last_opt(cmd)->Option.bind(Navigation.Completion.match_(~cmd)) });
 	last_opt
 	|> Option.map(g =>
 		Melange__re.({ let fillin = g->Re.Group.get(1); s++fillin }))
@@ -68,7 +68,7 @@ let a = fun
 	let k = "error invalid-syntax-of-command "++cmd;
 	(k, wrap_dialog(<div></div>))
 }
-| Command.Completion.Ambiguous_completion(cmds) => {
+| Navigation.Completion.Ambiguous_completion(cmds) => {
 	let k = "warning ambiguous-completion";
 	(k, wrap_dialog(<div>{cmds |> Array.of_list |> Array.map(string) |> array}</div>))
 }

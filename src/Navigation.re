@@ -6,6 +6,70 @@ exception Invalid_syntax_of_command(string)
 
 exception Empty
 
+module Completion{
+	let samples_set_tilesets = [ "gui", "''" ]
+
+	and samples_set_languages = [ "vi-VN", "en-US" ]
+
+	and samples_set_highlight = [ "none", "colorful" ]
+
+	and samples_set = [ "--language", "--highlight", "--tileset" ]
+
+	and samples_split = [ "-c" ]
+
+	and samples = [ "feed", "discuss", "set", "split" ]
+
+	exception Ambiguous_completion(list(string))
+
+	let match_ = Melange__re.({
+		let doit = last =>
+			Re.exec_opt (
+				Re.compile @@ Re.(seq([bos, str(last), group(
+					any |> rep1
+				), eos]))
+			)
+			;
+		let funnel_opt = xs => {
+			switch (xs) {
+			| []  => None
+			| [x] => Some(x)
+			| xs  => raise(Ambiguous_completion(xs |> List.map(g => g->Re.Group.get(0))))
+			}
+		};
+		(last, ~cmd) => {
+			Js.Console.log2("try to complete", cmd);
+			switch (cmd) {
+			| ["set", "--tileset", _] =>
+				samples_set_tilesets |> List.filter_map(last->doit) |> funnel_opt
+			| ["set", "--tileset"] =>
+				samples_set_tilesets |> List.filter_map(""->doit) |> funnel_opt
+			| ["set", "--highlight", _] =>
+				samples_set_highlight |> List.filter_map(last->doit) |> funnel_opt
+			| ["set", "--highlight"] =>
+				samples_set_highlight |> List.filter_map(""->doit) |> funnel_opt
+			| ["set", "--language", _] =>
+				samples_set_languages |> List.filter_map(last->doit) |> funnel_opt
+			| ["set", "--language"] =>
+				samples_set_languages |> List.filter_map(""->doit) |> funnel_opt
+			| ["set", _] =>
+				samples_set |> List.filter_map(last->doit) |> funnel_opt
+			| ["set"] =>
+				samples_set |> List.filter_map(""->doit) |> funnel_opt
+			| ["split", _] =>
+				samples_split |> List.filter_map(last->doit) |> funnel_opt
+			| ["split"] =>
+				samples_split |> List.filter_map(""->doit) |> funnel_opt
+			| [_] =>
+				samples |> List.filter_map(last->doit) |> funnel_opt
+			| [] =>
+				samples |> List.filter_map(""->doit) |> funnel_opt
+			| _ =>
+				None
+			}
+		}
+	})
+}
+
 /** The navigation state machine */
 let eval = current_url => {
 	let url = ref("")
@@ -13,7 +77,7 @@ let eval = current_url => {
 	let rec aux = fun
 		| Cons_cmd(`unfetched(["feed"]), next) => { url := "/"; aux(next) }
 		| Cons_cmd(`unfetched(["feed", ..._]), _) => raise(Invalid_syntax_of_command("feed"))
-		| Cons_cmd(`unfetched(["split", num]), next) when url^ == "/" => { url_args := Util.List.replace_assoc'("limit", num, url_args^); aux(next) }
+		| Cons_cmd(`unfetched(["split", "-c", num]), next) when url^ == "/" => { url_args := Util.List.replace_assoc'("limit", num, url_args^); aux(next) }
 		| Cons_cmd(`unfetched(["cat", ("$id" | "$ID")]), next) => {
 			url := "/item/";
 			let id = Util.parseQueryParams(current_url.ReasonReactRouter.search)->Js.Dict.get("id")->Option.get;
