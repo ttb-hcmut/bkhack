@@ -141,6 +141,7 @@ module App = {
         onChange={e => setSearch(_ => React.Event.Form.target(e)##value)}
         onKeyDown={e => if(React.Event.Keyboard.key(e) === "Enter") syncPageCount()}
         id=?{ String.length(searchBarId)>0? Some(searchBarId) : None}
+				role="secondaryBar"
         />
       }
       

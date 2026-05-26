@@ -322,7 +322,7 @@ module ReactDOM0 = {
 
 module SecondaryNavigator = {
 	let querySelector = () => {
-		ReactDOM.querySelector("#feedFilter")->Option.get
+		ReactDOM.querySelector("[role=\"secondaryBar\"]")->Option.get
 	}
 }
 
