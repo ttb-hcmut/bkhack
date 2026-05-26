@@ -46,12 +46,8 @@ let morphism_static ~sw public_dir dist_dir () =
   let iter_ondir dirpath_at_public =
     let dirpath_at_dist = P.(dist_dir / dirpath_at_public) in
     Path.mkdirs ~exists_ok:true ~perm:0o700 dirpath_at_dist in
-  let cleantree () =
-    let missing_ok = true in
-    Path.rmtree ~missing_ok dist_dir in
   Fiber.fork ~sw @@ fun () ->
   Switch.run @@ fun sw ->
-  cleantree ();
   [] |> iter ~ondir:iter_ondir @@ fun fpath_at_public ->
   let path_it = String.concat "/" fpath_at_public in
   B.Path.symlink~sw 
@@ -78,7 +74,11 @@ let () =
     Stdenv.process_mgr env, Stdenv.clock env, Stdenv.cwd env in
   let public_dir, generative_dir, dist_dir, log_dir, src_dir =
     public_dir cwd, generative_dir cwd, dist_dir cwd, log_dir cwd, src_dir cwd in
+  let cleantree () =
+    let missing_ok = true in
+    Path.rmtree ~missing_ok dist_dir in
   Switch.run @@ fun sw ->
+  cleantree ();
   morphism_jspages~sw~procm~clock~cwd src_dir dist_dir log_dir;
   morphism_static~sw public_dir dist_dir ();
   morphism_generative~sw generative_dir dist_dir
