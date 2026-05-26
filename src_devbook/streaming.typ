@@ -1,7 +1,6 @@
 #import "/article": *
 #import "./shell-parse.typ"
 #import "./shell-sym.typ"
-#set raw(syntaxes: ("reason.sublime-syntax"))
 #let (bkhack, Bkhack) = ([bkhack], [bkhack])
 #title[= Stream-based programming, as compared to sh]
 #set heading(numbering: "1.",  outlined: true, supplement: [#text(weight: 900, fill: rgb("#3851A4"))[§]#h(-0.4em)])
@@ -113,6 +112,8 @@ programming language.
 == Programming with an embedded shell language
 The combinators are designed based on the typing rules at @typ. #lorem(30)\
   #lorem(50)
+#[
+#set raw(syntaxes: ("reason.sublime-syntax"), theme: "quiet.tmTheme")
 ```reason
 module Feed (Syntax : Shell.Sym)
 { open Syntax
@@ -120,6 +121,7 @@ module Feed (Syntax : Shell.Sym)
   { feed |@ Split_by.count(10) |@ nil ;}
 }
 ```
+]
 // == Naming
 // why are commands named the way they are? this is the same problem in sh. the truth is that there will never be a scheme that everyone can agree on. most names are historical and highly contextual. unix is loved because people like its architecture and they try to adopt the names, not that the names are actually good. indeed, there's so much you can do to appeal to a demographic of people. communication is two-way between the user and the developer.
 = Related works
