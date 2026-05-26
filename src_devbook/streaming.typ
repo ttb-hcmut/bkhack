@@ -1,10 +1,21 @@
 #import "/article": *
 #import "./shell-parse.typ"
 #import "./shell-sym.typ"
+#set raw(syntaxes: ("reason.sublime-syntax"))
 #let (bkhack, Bkhack) = ([bkhack], [bkhack])
 #title[= Stream-based programming, as compared to sh]
-#set heading(numbering: it => { [#h(-0.28em)] },  outlined: true, supplement: [#text(weight: 900, fill: rgb("#3851A4"))[§]#h(-0.4em)])
-#show heading: set text(size: 0.85em)
+#set heading(numbering: "1.",  outlined: true, supplement: [#text(weight: 900, fill: rgb("#3851A4"))[§]#h(-0.4em)])
+#show heading: it => {
+  if it.level == 1 {
+    set text(size: 0.85em)
+    it
+  } else if it.level == 2 {
+    set text(size: 0.75em)
+    it
+  } else {
+    it
+  }
+}
 #set cite(style: "alphanumeric")
 // #show cite: it => text(fill: rgb("#3851A4"), it)
 For #bkhack, the user gets to familiarize with the concept of _stream-based
@@ -76,6 +87,7 @@ feed() { feed | split -c 15 | cut -f1 | sort --hot ;}
 which the user can customize. The rest of #bkhack shell commands are
 exposed like so, thus the settings system.
 = Syntax
+Sometimes, it is needed to parse the shell language from a text.
 The grammar of the #bkhack shell language, given in EBNF form in @gr, #lorem(30)
 Notice how the command rule do not distinguish parts into flags or values
 which are expected from most real-world usage. Indeed, the responsibility
@@ -84,19 +96,30 @@ _option parser_, such as POSIX `getopts`.
 #place(auto, float: true, scope: "parent")[
   #figure(caption: [Grammar for the #bkhack shell language], shell-parse.langchain) <gr>
 ]
-= Parsing
+== Parsing
 Parsing is implemented based on the grammar at @gr. #lorem(30)\
-  In the initial design, we have only one phase for our parser. This is an eager, AST-less, final parser. It is final because effects are eagerly executed as each term is parsed. Eventually, we did make it so that it outputs an AST, for reusability and convenience.\
+  In the initial design, we have only one phase for our parser. This is an eager, AST-less, final a.k.a. _syntax-directed_ parser--effects are eagerly executed as each term is parsed. Eventually, we did make it so that it outputs an AST, for reusability and convenience.\
   In the next design, we have two phases for our parser. The lexical analysis phase (bộ phân tích từ vựng @giao-trinh-trinh-bien-dich-lexer) #fn[a.k.a. character grouping] and the parsing phase. The lexical analysis phase is to guarantee a minimal schema for the parsers so that they won't diverge from the language spec. This is an implicit structure. In contrast, we could have defined an ADT or GADT to make an explicit structure. However, our parsers won't be final, we would make a compromise on performance. Not only that, an implicit structure allows room for undefined behaviors; each parser can do things in flexible ways that should hopefully achieve desirable results.\
   Indeed, the lexing phase was added when we branched the parser to support _pastelling_; so, two parsers, a parser and a pastel. A shared lexing phase helps communicating that the two parsers share a structure, even if that structure is only infra-, and ter'es no explicit GADT or signature to explicitly enforce it.\
   The usefulness of this starts to show when we added a new feature: support for quoted words. Thanks to the two-phase separation, we managed to implement this feature simply by modifying the lexer. We added new parsing rule, and changed the return type of $<"word">$. This cascades into all descendant parsers, requiring them to handle the new feature. Here, they are being rewritten by adding a new $<"word">$ overloading guard before usage.
 = Typing
+Sometimes, it is useful to verify the shell language before evalutation.
 The typing of the #bkhack shell language, given in @typ, #lorem(30)
 This is useful when shell commands have to be embedded in a statically-typed
 programming language.
 #place(auto, float: true, scope: "parent")[
   #figure(caption: [Typing for the #bkhack shell language], shell-sym.v) <typ>
 ]
+== Programming with an embedded shell language
+The combinators are designed based on the typing rules at @typ. #lorem(30)\
+  #lorem(50)
+```reason
+module Feed (Syntax : Shell.Sym)
+{ open Syntax
+  let v = observe @@
+  { feed |@ Split_by.count(10) |@ nil ;}
+}
+```
 // == Naming
 // why are commands named the way they are? this is the same problem in sh. the truth is that there will never be a scheme that everyone can agree on. most names are historical and highly contextual. unix is loved because people like its architecture and they try to adopt the names, not that the names are actually good. indeed, there's so much you can do to appeal to a demographic of people. communication is two-way between the user and the developer.
 = Related works
