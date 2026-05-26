@@ -179,8 +179,8 @@
 }
 
 #root > nav button.selected {
-	color: green;
-	outline: solid 1px green;
+	color: var(--ctp-yellow);
+	outline: solid 1px var(--ctp-yellow);
 }
 
 #root > nav button.article.selected {

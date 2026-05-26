@@ -4,6 +4,7 @@ module FetchedPost = {
 	type t =
 		{ post_id     : int
     , owner_name  : string
+    , owner_id    : int
     , title       : string
     , body        : string
 		}
@@ -48,6 +49,7 @@ module Decode = {
 		Of_json.
 		{ post_id    : json |> field("post_id"   , int)
     , owner_name : json |> field("owner_name", string)
+    , owner_id   : json |> field("owner_id"  , int)
     , title      : json |> field("title"     , string)
     , body       : json |> field("body"      , string)
     }

@@ -30,7 +30,8 @@ module ItemNav{
 	open View
 
   [@react.component]
-  let make = (~post_id, ~currentTab, ~setCurrentTab, ~prCount) => {
+  let make = (~post_id, ~currentTab, ~setCurrentTab, ~prCount, ~owner_id) => {
+    let auth = AuthContext.use();
 		let id = post_id;
 		let className = x =>
 			View.to_string(x)++" " ++ (currentTab == x ? "selected" : "");
@@ -72,7 +73,11 @@ module ItemNav{
     <button onClick={_ => choose(Log)} className=className(Log)>
       <label>{React.string("history")}</label>
     </button>
-    <button onClick={_ => choose(Edit)} className=className(Edit)> <label /> </button>
+    { (auth.getUserId() |> fun | None => true | Some(u) => owner_id != u)?
+      React.null
+      :
+      <button onClick={_ => choose(Edit)} className=className(Edit)> <label /> </button>
+      }
     </>
   }
 }
@@ -80,7 +85,7 @@ module ItemNav{
 module ArticleHeader = {
 	[@react.component]
 	let make = (~tags, ~info) => {
-		let (_id, title, creator_name, _) = info;
+    open Model.FetchedPost;
 		<>
 			<div className="counter">
 				<button className="up">
@@ -91,10 +96,10 @@ module ArticleHeader = {
 					{React.string("down")}
 				</button>
 			</div>
-			<h1>{React.string(title)}</h1>
+			<h1>{React.string(info.title)}</h1>
 			<ul className="tags">{tags |> Array.map(x => <li key=x><span className="tag">{React.string(x)}</span></li>) |> React.array}</ul>
 			<div className="author">
-				<span>{React.string(creator_name)}</span>
+				<span>{React.string(info.owner_name)}</span>
 				<div className="created-from"></div>
 			</div>
 			<div className="actions">
@@ -745,7 +750,7 @@ module PullrequestsInspectBody{
 
 	[@react.component]
 	let make = (~pullrequests, ~pr_inspect, ~info) => {
-		let (_, _, creator_name, _) = info;
+    open Model.FetchedPost;
 		let pullrequest =
 			(pullrequests, pr_inspect) |> useMemo2 @@ () =>
 			pullrequests |> Array.find_map @@ (((id, _, _, _, _, _, _, _), _) as x) =>
@@ -761,7 +766,7 @@ module PullrequestsInspectBody{
 			<section className="reviews">
 				<header className="command">{"pr status"->string}</header>
 				<ul className="content">
-					<li><span className="contributor user">{creator_name->string}</span><span className="unknown"></span></li>
+					<li><span className="contributor user">{info.owner_name->string}</span><span className="unknown"></span></li>
 				</ul>
 			</section>
 		</>
@@ -892,14 +897,15 @@ module App{
 			pr_id |> Option.map(int_of_string)
 		});
 		let (pullrequests, setPrs) = React.useState(() => [||]);
-		let (postInfo, setPostInfo) = React.useState(() => None);
+		let (postInfo, setPostInfo) = React.useState(() : option(Model.FetchedPost.t) => None);
 		let tags = [| "Algorithm", "Rust" |];
 		let renderer = React.useMemo0(() => Melange__cmarkit.Cmarkit_html.renderer(~safe=false, ()));
 		let art = React.useMemo2(() => {
 			open Melange__cmarkit; open Cmarkit;
-			postInfo |> Option.map @@ ((_, _, _, text) as postInfo) =>
+			postInfo |> Option.map @@ (postInfo) =>
 			try ({
-				let skel = text |> Doc.of_string(~strict=false);
+        open Model.FetchedPost;
+				let skel = postInfo.body |> Doc.of_string(~strict=false);
 				let block = Doc.block(skel) 
 				let rec s = { fun
 					| Block.Block_Heading((t, _)) => {
@@ -946,8 +952,7 @@ module App{
             Js.Promise.reject(Js.Exn.anyToExnInternal @@ err)
           })
         >>= (aod => {
-          open Model.FetchedPost;
-          setPostInfo(_ => Some((aod.post_id, aod.title, aod.owner_name, aod.body)));
+          setPostInfo(_ => Some(aod));
           Js.Promise.resolve(())
         })
       // X.Fetch.all(module At_repo_2(
@@ -997,9 +1002,14 @@ module App{
 			y
 		}), (setTab, url));
 		let memo_transition = React.useCallback2((url, url_args, k) => {
-			(Option.bind(postInfo) @@ ((current_id, _, _, _)) => {
+      postInfo
+      |> fun
+      | None => ()
+      | Some(pi) =>
+      {
+			  open Model.FetchedPost;
 				if (url === "/item/" && (
-					List.assoc("id", url_args) |> int_of_string |> (x => x == current_id)
+					List.assoc("id", url_args) |> int_of_string |> (x => x == pi.post_id)
 				)) {
 					Some(() => {
 						let view = List.assoc_opt("view", url_args) |> Option.map(View.of_string) |> Option.value(~default=View.Article);
@@ -1010,18 +1020,18 @@ module App{
 				} else {
 					None
 				}
-			}) |> fun
+			} |> fun
 				| None => k ()
 				| Some(f) => f ()
 		}, (setCurrentTab, postInfo));
-		show(art) @@ (((_, postTitle, _, _) as postInfo, headings, article_body)) =>
+		show(art) @@ ((postInfo, headings, article_body)) =>
 		<>
-			<title>{React.string(postTitle++" | bkhack")}</title>
+			<title>{React.string(postInfo.title++" | bkhack")}</title>
 			<header>
 				<Component__header memo_transition />
 			</header>	
 			<nav className=sidebarState>
-				<ItemNav post_id={Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id"))} currentTab=tab setCurrentTab prCount=Array.length(pullrequests)/>
+				<ItemNav owner_id=postInfo.owner_id post_id={Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id"))} currentTab=tab setCurrentTab prCount=Array.length(pullrequests)/>
 			</nav>
 			<main className={sidebarState ++ " " ++ id}>
 				<>
@@ -1046,7 +1056,12 @@ module App{
 						<PullrequestsInspectBody pullrequests pr_inspect info=postInfo />
 					</main>
 				</>
-				<Item_view__editor.App className={View.to_string(Edit)}/>
+        {
+          (auth.getUserId()|> fun | None => true | Some(u) => postInfo.owner_id != u) ?
+          React.null
+          :
+          <Item_view__editor.App className={View.to_string(Edit)} title=postInfo.title body=postInfo.body />
+        }
 			</main>
 			
 			<Component__sidebar sidebarState setSidebarState />

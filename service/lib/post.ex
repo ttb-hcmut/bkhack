@@ -21,20 +21,20 @@ defmodule PostBE do
     end
   end
   def updatePost(data, post_id,creator_id,post_title,post_text,commit_message) do
-    res = data.transact(fn ->
+    {:ok,res} = data.transact(fn ->
       with {:ok, newCommit} <- CommitBE.insertCommit(data, creator_id,post_title,post_text,commit_message),
-           post           <- from(u in Post, where: u.post_id == ^post_id) |> data.one,
-           commit         <- from(u in Commit, where: u.commit_id == ^newCommit.commit_id) |> data.one,
+           %Post{} = post     <- from(u in Post, where: u.post_id == ^post_id and u.post_owner_id == ^creator_id)|> select([u],u) |> data.one,
+           %Commit{} = commit <- from(u in Commit, where: u.commit_id == ^newCommit.commit_id) |> select([u],u) |> data.one,
            _updatedCommit <- commit |> Commit.changeset(%{commit_child_id: post.commit_head_id}) |> data.update,
            _updatedPost   <- post |> Post.changeset(%{commit_head_id: commit.commit_id}) |> data.update
       do
-        {:ok,:balls}
+        {:ok,post.post_id}
       else
-        nil -> data.rollback(:got_nil)
-        {:error, reason} -> data.rollback(reason)
+        nil -> data.rollback(:got_nil); {:error,-1}
+        {:error, reason} -> data.rollback(reason); {:error,-1}
       end
     end)
-    IO.inspect res
+    res
   end
   def getPostCount(data, user_id\\-1, opts\\ %{}) do
     query = postListQuery(user_id)
@@ -57,6 +57,7 @@ defmodule PostBE do
         title:       c.post_title ,
         body:        c.post_text  ,
         owner_name:  u.name       ,
+        owner_id:    ^p.post_owner_id ,
         })
       |> where([p,c,u], p.post_id == ^p.post_id)
       |> data.one

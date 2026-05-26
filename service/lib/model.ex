@@ -51,7 +51,7 @@ defmodule Post
     field :post_owner_id  ,:integer
     field :verified       ,:boolean ,default: false
     field :public         ,:boolean ,default: false
-    timestamps(inserted_at: :date_created_utc, updated_at: false, type: :string)
+    timestamps(inserted_at: :date_created_utc, updated_at: false)
     belongs_to  :the_owner  ,User   ,foreign_key: :post_owner_id  ,references: :user_id   ,define_field: false
     belongs_to  :the_commit ,Commit ,foreign_key: :commit_head    ,references: :commit_id ,define_field: false
   end
@@ -71,7 +71,7 @@ defmodule Commit
     field :commit_message   ,:string
     field :post_title       ,:string
     field :post_text        ,:string
-    timestamps(inserted_at: :date_created_utc, updated_at: false, type: :string)
+    timestamps(inserted_at: :date_created_utc, updated_at: false)
     belongs_to  :the_owner  ,User   ,foreign_key: :commit_owner_id  ,references: :user_id   ,define_field: false
     belongs_to  :the_child  ,Commit ,foreign_key: :child_commit_id  ,references: :commit_id ,define_field: false
   end
@@ -96,7 +96,7 @@ defmodule Comment
     field :parent_comment_id ,:integer
     field :content           ,:string
     field :commenter_id      ,:integer
-    timestamps(inserted_at: :date_created_utc, updated_at: false, type: :string)
+    timestamps(inserted_at: :date_created_utc, updated_at: false)
     # field :date_created_utc  ,:string
     field :post_version      ,:integer
     belongs_to  :the_parent_post    ,Post     ,foreign_key: :parent_post_id    ,references: :post_id     ,define_field: false

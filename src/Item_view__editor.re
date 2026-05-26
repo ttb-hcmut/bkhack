@@ -14,6 +14,8 @@ module PostContext = {
   , setTagList        : string => bool
   , unsetTagList      : string => unit
   , parentId          : int
+  , defaults          : list((string,string))
+  , resetToDefault    : unit => unit
   };
 
   let defaultValue: t = {
@@ -29,19 +31,27 @@ module PostContext = {
   , setTagList        : (_) => false
   , unsetTagList      : (_) => ()
   , parentId          : -1
+  , defaults          : [("title",""),("body","")]
+  , resetToDefault    : (_) => ()
   };
 
   let ctx = React.createContext(defaultValue);
 
   module Provider = {
     [@react.component]
-    let make = (~children: React.element) => {
+    let make = (~children: React.element, ~title=?,~body=?) => {
       let url = ReasonReactRouter.useUrl()
       let (postBody,setPostBody) = React.useState( () => "");
       let (postTitle,setPostTitle) = React.useState( () => "");
       let (error,setError) = React.useState( () => "");
       let (commitMessage,setCommitMessage) = React.useState( () => "");
       let (tagList,setTagList') = React.useState(()=>[]);
+      let defaults = React.useMemo0(()=>{
+        switch(title,body){
+          | (Some(t),Some(b)) => [("title",t),("body",b)]
+          | _ => [("title",""),("body","")]
+        }
+      });
       let parentId = React.useMemo0(()=>{
         String.concat("/",url.path) == "new"? 
         -1 
@@ -73,6 +83,15 @@ module PostContext = {
         };
       }
 
+      let resetToDefault = () => {
+        switch(List.assoc_opt("title", defaults),List.assoc_opt("body", defaults)){
+        | (Some(t),Some(b)) =>
+          setPostBody(_ => b)
+          setPostTitle(_ => t);
+        | _ => ();
+        }
+      }
+
       let ctxValue: t = {
         postBody          : postBody
       , setPostBody       : (a) => setPostBody(_ => a)
@@ -86,6 +105,8 @@ module PostContext = {
       , setTagList        : setTagList
       , unsetTagList      : unsetTagList
       , parentId          : parentId
+      , defaults          : defaults
+      , resetToDefault    : resetToDefault
       };
 
       React.useEffect4(() => {
@@ -93,6 +114,15 @@ module PostContext = {
         None
       },(postBody,postTitle,commitMessage,tagList));
 
+      React.useEffect1(()=>{
+        switch(List.assoc_opt("title", defaults),List.assoc_opt("body", defaults)){
+        | (Some(t),Some(b)) =>
+          setPostBody(_ => b)
+          setPostTitle(_ => t);
+        | _ => ();
+        }
+        None
+      },[|defaults|])
       let provider = React.Context.provider(ctx);
       React.createElement(provider, {"value": ctxValue, "children": children})
     };
@@ -102,7 +132,7 @@ module PostContext = {
 };
 
 
-module App = {
+module App' = {
   module Header = {
     module Settings = {
       module Tags = {
@@ -254,21 +284,37 @@ module App = {
       }
       ;
       <header>
-        <button className="cancel">
+        <button className="cancel"
+        onClick={_=>
+          post.resetToDefault()
+        }>
           {React.string("Cancel")}
         </button>
-        <button className="save"
-          onClick = {_ =>
-            handleSubmit(~public=false)
-          }>
-          {React.string("Save as a private post")}
-        </button>
-        <button className="publish"
-          onClick = {_ =>
-            handleSubmit(~public=true)
-          }>
-          {React.string("Publish Post")}
-        </button>
+        { 
+          post.parentId == -1 ?
+          <>
+          <button className="save"
+            onClick = {_ =>
+              handleSubmit(~public=false)
+            }>
+            {React.string("Save as a private post")}
+          </button>
+          <button className="publish"
+            onClick = {_ =>
+              handleSubmit(~public=true)
+            }>
+            {React.string("Publish Post")}
+          </button>
+          </>
+          :
+          <button className="publish"
+            onClick = {_ =>
+              handleSubmit(~public=true)
+            }>
+            {React.string("Update Post")}
+          </button>
+        }
+
         <button 
           className={"dropdown "++ (dropdownActive?"true":"false")}
           onClick={_=>setDropdownActive(a => !a)}>
@@ -392,7 +438,7 @@ module App = {
           }
           </div>
           <textarea className="body-input text-style" 
-            content={post.postBody} 
+            value={post.postBody} 
             placeholder="e.g. # details about..."
             onChange={ e => post.setPostBody(React.Event.Form.target(e)##value)}/>
           // <div className="ghost body-input text-style">{React.string(post.postBody++"\n")}</div>
@@ -455,14 +501,21 @@ module App = {
     let cls = className |> Option.value(~default="")
     let (seePreview,setSeePreview) = React.useState(()=>false)
     ;
-    <PostContext.Provider >
-      <div className={"only "++cls}>
-        <Header />
-        <Toolbar seePreview setSeePreview/>
-        <Footer />  
-        <Preview seePreview/>
-        <Editing seePreview/>
-      </div>
+    <div className={"only "++cls}>
+      <Header />
+      <Toolbar seePreview setSeePreview/>
+      <Footer />  
+      <Preview seePreview/>
+      <Editing seePreview/>
+    </div>
+  }
+};
+
+module App{
+  [@react.component]
+  let make = (~className=?,~title=?,~body=?) => {
+    <PostContext.Provider title=?title body=?body >
+    <App' className=?className />
     </PostContext.Provider >
   }
 }

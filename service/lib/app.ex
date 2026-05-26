@@ -1,14 +1,14 @@
-# defmodule Data do
-#   use Ecto.Repo, otp_app: :bkhack, adapter: Ecto.Adapters.SQLite3
-# end
+defmodule Data0 do
+  use Ecto.Repo, otp_app: :bkhack, adapter: Ecto.Adapters.SQLite3
+end
 # defmodule Data1 do
 #   use Ecto.Repo, otp_app: :bkhack, adapter: Mongo.Ecto
 # end
-defmodule Data2 do
-  use Ecto.Repo, otp_app: :bkhack, adapter: Ecto.Adapters.Postgres
-end
+# defmodule Data2 do
+#   use Ecto.Repo, otp_app: :bkhack, adapter: Ecto.Adapters.Postgres
+# end
 
-alias Data2, as: Data
+alias Data0, as: Data
 
 defmodule App
   do
