@@ -3,38 +3,15 @@ open Melange__containers.Fun
 module Melange__cmarkit = Remark_it
 open Auth
 
-module View = {
-	type t =
-		| Article
-		| Discussion
-		| Pullrequest
-		| Log
-		| Edit
-
-	let uu = [
-		( Article, "article" ),
-		( Discussion, "discussions" ),
-		( Pullrequest, "pullrequests" ),
-		( Log, "log" ),
-		( Edit, "edit")
-	]
-
-	let uu' = uu |> List.map(((k, v)) => (v, k))
-
-	let to_string = k => List.assoc(k, uu)
-
-	let of_string = k => List.assoc(k, uu')
-}
-
 module ItemNav{
-	open View
+	open Item.View
 
   [@react.component]
   let make = (~post_id, ~currentTab, ~setCurrentTab, ~prCount, ~owner_id) => {
     let auth = AuthContext.use();
 		let id = post_id;
 		let className = x =>
-			View.to_string(x)++" " ++ (currentTab == x ? "selected" : "");
+			x->Item.View.to_string++" " ++ (currentTab == x ? "selected" : "");
     let (disCount,setDisCount) = React.useState(() => 0);
     let fetchCommentCount = (~id) => {
       let open Fetch__syntax;
@@ -134,13 +111,17 @@ module ArticleBody{
 	;
 
 	[@react.component]
-	let make = (~headings, ~article_body) =>
+	let make = (~headings, ~article_body) => {
+		let toc = (headings, k) => if (headings->Iter.length == 0) { null } else k(headings);
 		<>
-		<nav className="toc">
-			<ol> {headings |> Iter.map(heading) |> React.iter} </ol> </nav>
+		{ toc(headings) @@ headings =>
+			<nav className="toc">
+				<ol> {headings |> Iter.map(heading) |> React.iter} </ol> </nav>
+		}
 		<main className="markdown">
 			<div dangerouslySetInnerHTML={make_html_obj @@ article_body} /> </main>
 		</>
+	}
 }
 
 module DiscussionView = {
@@ -581,6 +562,7 @@ module DiscussionView = {
       </>
     }
   };
+
   [@react.component]
   let make = (~post_id : int) => {
     let (addRep, setAddRep) = React.useState(() => false)
@@ -588,13 +570,13 @@ module DiscussionView = {
     and (refresh, signalRefresh) = React.useState(() => false)
     and (opts, setOpts) = React.useState(() => []);
     <>
-      <header className={"only " ++ View.to_string(Discussion)}>
+      <header className={"only " ++ Item.View.to_string(Discussion)}>
         <DiscussionHint addRep setAddRep />
         <nav>
           <DiscussionFilter parentId=post_id refresh setResult setOpts />
         </nav>
       </header>
-      <main className={"only " ++ View.to_string(Discussion)}>
+      <main className={"only " ++ Item.View.to_string(Discussion)}>
         <DiscussionBody id=post_id addRep setAddRep result signalRefresh opts />
       </main>
     </>
@@ -889,8 +871,8 @@ module App{
 		let (tab, setTab) = useState(() => {
 			Util.parseQueryParams(url.search)
 			->Js.Dict.get("view")
-			->Option.value(~default=View.to_string(Article))
-			->View.of_string
+			->Option.value(~default=Article->Item.View.to_string)
+			->Item.View.of_string
 		});
 		let (pr_inspect, pr_inspect_set) = React.useState(() => {
 			let pr_id = Util.parseQueryParams(url.search)->Js.Dict.get("pr_id");
@@ -921,9 +903,9 @@ module App{
 				| Js.Exn.Error(x) => { Js.Console.error("js error: '" ++ Option.value(~default="", Js.Exn.message(x)) ++ "'"); failwith("sdf") }
 			}
 		}, (renderer, postInfo));
-		let id = React.useMemo2(() => switch (tab) { | View.Pullrequest as tab => {
-			View.to_string(tab) ++ " " ++ (pr_inspect |> Option.map(_ => "inspect") |> Option.value(~default=""))
-		} | tab => View.to_string(tab) }, (tab, pr_inspect));
+		let id = React.useMemo2(() => switch (tab) { | Item.View.Pullrequest as tab => {
+			Item.View.to_string(tab) ++ " " ++ (pr_inspect |> Option.map(_ => "inspect") |> Option.value(~default=""))
+		} | tab => Item.View.to_string(tab) }, (tab, pr_inspect));
 		let (sidebarState, setSidebarState) = React.useState( _ => "state0");
 		let module X = Bkhack__experimental;
 		let join = ((_, _, contributor_id, _, _, _, _, _) as it) => Fetch__syntax.({
@@ -997,7 +979,7 @@ module App{
 			let y = f(x);
 			ReasonReactRouter.push(String.concat("/", ["", ...url.path]) ++ {
 				let dict = Util.parseQueryParams'(url.search);
-				"/?" ++ ( dict |> Util.List.replace_assoc'("view", View.to_string(y)) |> Util.stringQueryParams' )
+				"/?" ++ ( dict |> Util.List.replace_assoc'("view", y->Item.View.to_string) |> Util.stringQueryParams' )
 			});
 			y
 		}), (setTab, url));
@@ -1012,7 +994,7 @@ module App{
 					List.assoc("id", url_args) |> int_of_string |> (x => x == pi.post_id)
 				)) {
 					Some(() => {
-						let view = List.assoc_opt("view", url_args) |> Option.map(View.of_string) |> Option.value(~default=View.Article);
+						let view = List.assoc_opt("view", url_args) |> Option.map(Item.View.of_string) |> Option.value(~default=Item.View.Article);
 						setCurrentTab(_ => view)
 					})
 				} else if (url === "") {
@@ -1035,12 +1017,12 @@ module App{
 			</nav>
 			<main className={sidebarState ++ " " ++ id}>
 				<>
-					<header className=Printf.sprintf("only %s", View.to_string(Article))><ArticleHeader tags info=postInfo /></header>
-					<div className=Printf.sprintf("innerbody only %s", View.to_string(Article))><ArticleBody headings article_body /></div>
+					<header className=("only "++Article->Item.View.to_string)><ArticleHeader tags info=postInfo /></header>
+					<div className=("innerbody only "++Article->Item.View.to_string)><ArticleBody headings article_body /></div>
 				</>
         <DiscussionView post_id= {int_of_string(Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id")))}/>
 				<>
-					<header className=Printf.sprintf("only %s", View.to_string(Pullrequest))>
+					<header className=("only "++Pullrequest->Item.View.to_string)>
 						<PullrequestsHint
 							num_open={pullrequests |> Array.fold_left(((acc, ((_, _, _, _, _, it, _, _), _)) => switch (it) { | `Open => acc + 1 | _ => acc }), 0)}
 							num_merged={pullrequests |> Array.fold_left(((acc, ((_, _, _, _, _, it, _, _), _)) => switch (it) { | `Merged => acc + 1 | _ => acc }), 0)}
@@ -1048,20 +1030,24 @@ module App{
 							/>
 						<nav> <PullrequestsFilter /> </nav>
 					</header>
-					<main className=Printf.sprintf("only %s", View.to_string(Pullrequest))><PullrequestsBody pullrequests prsExpand expand_this=on_prs_update_expand inspect_this=on_prs_update_inspect /></main>
-					<header className=Printf.sprintf("only %s inspect", View.to_string(Pullrequest))>
+					<main className=("only "++Pullrequest->Item.View.to_string)><PullrequestsBody pullrequests prsExpand expand_this=on_prs_update_expand inspect_this=on_prs_update_inspect /></main>
+					<header className=("only "++Pullrequest->Item.View.to_string++" inspect")>
 						<PullrequestsInspectHint pullrequests pr_inspect inspect_back_this=on_prs_update_inspect_back />
 					</header>
-					<main className=Printf.sprintf("only %s inspect", View.to_string(Pullrequest))>
+					<main className=("only "++Pullrequest->Item.View.to_string++" inspect")>
 						<PullrequestsInspectBody pullrequests pr_inspect info=postInfo />
 					</main>
 				</>
-        {
-          (auth.getUserId()|> fun | None => true | Some(u) => postInfo.owner_id != u) ?
-          React.null
-          :
-          <Item_view__editor.App className={View.to_string(Edit)} title=postInfo.title body=postInfo.body />
-        }
+        			{
+				(auth.getUserId()|> fun | None => true | Some(u) => postInfo.owner_id != u) ?
+				React.null
+				:
+				<Item_view__editor.App className={Edit->Item.View.to_string} title=postInfo.title body=postInfo.body />
+        			}
+				<>
+					<Item_view__log.Listview className={Log->Item.View.to_string} />
+					<Item_view__log.Inspectview className={Log->Item.View.to_string} />
+				</>
 			</main>
 			
 			<Component__sidebar sidebarState setSidebarState />
