@@ -16,7 +16,7 @@ let shellHook =
 		dune_3
 		pnpm
 		opam
-		nodejs
+		nodejs_20
 	];
 in
 	nixpkgs.mkShell {

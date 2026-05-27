@@ -9,74 +9,228 @@ The following paper provides more details:
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lê Nguyễn Gia Bảo, Lê Công Minh Khang, and Hồ Gia Tường  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Undergraduate Thesis 2026  
 
-[bkhack-paper]: https://baorepo.web.app/~ttb-hcmut/bkhack.pdf
+- Project Repository: https://github.com/ttb-hcmut/bkhack
+- Thesis Paper (PDF): https://baorepo.web.app/~ttb-hcmut/bkhack.pdf
+- Live Deployment: https://bkhack-2eb8c.web.app
 
-## Installation
+---
 
-1. Add the [ttb-hcmut/bkhack][bkhack-repo] repository:
-   ```sh
-   opam remote add bkhack git+https://github.com/ttb-hcmut/bkhack
-   ```
+# Repository Structure
 
-2. Install the `bkhack` package:
-   ```sh
-   opam install bkhack
-   ```
+```text
+src/         Frontend source code
+service/     Backend service
+build_aux/   Docker and auxiliary tooling
+doc/         Thesis and documentation
+```
 
-[bkhack-repo]: https://github.com/ttb-hcmut/bkhack
+---
 
-## Usage
+# Installation
 
-`bkhack` is distributed as a library and a suite of bundling tools. Once you've installed the package, you can use the library in the composition of your own application.
+Add the repository to OPAM:
 
-```dune
+```sh
+opam remote add bkhack git+https://github.com/ttb-hcmut/bkhack
+```
+
+Install the package:
+
+```sh
+opam install bkhack
+```
+
+---
+
+# Usage
+
+`bkhack` is distributed as both:
+
+- a reusable OCaml/Melange library
+- a suite of frontend bundling tools
+
+You can integrate it into your own Melange application:
+
+```lisp
 (melange.emit
  ; ...
  (libraries bkhack))
 ```
 
-Bundle your application as a web package
+Bundle the application for deployment:
 
 ```sh
-export BKHACK_BACKEND_ADDRESS='http://localhost:5000' # configure a back-end server to plug in
+export BKHACK_BACKEND_ADDRESS='http://localhost:5000'
 bkhack.bundle ./ -o dist
 ```
 
-You will get a `dist` folder with the necessary static HTML and JavaScript bundles for deployment e.g. Firebase Hosting, Netlify.
+This produces a `dist/` directory containing static HTML and JavaScript bundles
+suitable for deployment platforms such as Firebase Hosting or Netlify.
 
-## Development using Nix shell
+---
 
-Start nix shell
+# Development Setup
+
+`bkhack` supports two development environments:
+
+| Environment | Recommended For |
+|---|---|
+| Native Linux / WSL2 | Linux users and WSL2 users |
+| Windows + Docker | Windows users wanting isolated tooling |
+
+---
+
+## Prerequisites
+
+### Native Linux / WSL2
+
+Install:
+
+- Git
+- Nix
+- OPAM
+- Node.js + pnpm
+
+Recommended:
+
+- direnv
+
+### Windows + Docker
+
+Install:
+
+- Docker Desktop
+- WSL2 (enabled in Docker Desktop)
+- Git
+
+Recommended:
+
+- Windows Terminal
+
+---
+
+# Development using Nix Shell
+
+> Docker users:
+>
+> First start the development container:
+>
+> ```sh
+> docker compose -f build_aux/docker-compose.yml up -d
+> ```
+>
+> Then enter the container:
+>
+> ```sh
+> docker exec -it bkhack-shell sh
+> ```
+>
+> Then continue with the same `nix-shell` workflow below.
+
+Enter the project shell:
 
 ```sh
 nix-shell
 ```
+---
 
-Assume you've successfully entered nix shell. Prepare
+## Initial Setup
 
 ```sh
-[ -d ~/.opam ] && opam init
+[ ! -d ~/.opam ] && opam init
+eval $(opam env)
+
 pnpm install
 pnpm run init
 ```
 
-Run dev server
+> Docker note:
+>
+> If OPAM sandboxing fails inside Docker, choose `y` to disable sandboxing.
+> This is expected in containerized environments.
+
+---
+
+## Start the frontend development server:
 
 ```sh
 pnpm dev
 ```
 
-Voila!
+Voilà!
 
-## Development using Nix shell from Docker (courtesy of Tung)
+---
+
+# Backend Service
+
+Open another shell:
 
 ```sh
-docker-compose up -d
-docker exec -it bkhack bash
+cd service
+nix-shell
 ```
 
-The rest, follows the *Nix shell* section.
+> Docker users:
+>
+> Open another shell inside the container instead:
+>
+> ```sh
+> docker exec -it bkhack-shell sh
+> cd /service
+> nix-shell
+> ```
 
-## Try it out
+Install Elixir dependencies:
 
-Currently hosted at https://bkhack-2eb8c.web.app
+```sh
+mix deps.get
+```
+
+Start interactive backend server:
+
+```sh
+iex -S mix
+```
+
+Inside IEx:
+
+```elixir
+App.start
+# [info] running server
+# => :ok
+```
+
+Stop the server:
+
+```elixir
+App.stop
+# [info] stopped server
+# => :ok
+```
+
+Backend runs at:
+
+```text
+http://localhost:5000
+```
+
+---
+
+# Production Build
+
+Bundle frontend assets:
+
+```sh
+export BKHACK_BACKEND_ADDRESS='http://localhost:5000'
+bkhack.bundle ./ -o dist
+```
+
+Deploy the generated `dist/` directory to your preferred static hosting provider.
+
+---
+
+# Try It Out
+
+The current deployment is available at:
+
+https://bkhack-2eb8c.web.app

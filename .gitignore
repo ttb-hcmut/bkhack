@@ -6,6 +6,7 @@ deps
 dist/
 dist__serve/
 log/
+.pnpm-store
 
 *storybook.log
 storybook-static
