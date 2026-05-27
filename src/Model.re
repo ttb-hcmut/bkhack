@@ -1,5 +1,17 @@
 open Melange__containers.Fun
 
+module FetchedCommit = {
+	type t =
+		{ from_head       : int
+    , commit_id       : int
+    , owner_name      : string
+    , owner_id        : int
+    , commit_message  : string
+    , post_title      : string
+    , post_text       : string
+    , timestamp       : string
+		}
+};
 module FetchedPost = {
 	type t =
 		{ post_id     : int
@@ -24,26 +36,39 @@ module PostListItem = {
 };
 module FetchedComment = {
   type t = 
-  { id: int
-  , text: string
-  , user_rating: int
-  , rating: int
-  , timestamp: string
-  , post_vers: int 
-  , author_name: string
-  , author_id: int
-  , author_role: int
+  { id          : int
+  , text        : string
+  , user_rating : int
+  , rating      : int
+  , timestamp   : string
+  , post_vers   : int 
+  , author_name : string
+  , author_id   : int
+  , author_role : int
   }
-}
+};
 module FetchedAuth = {
   type t = 
   { user_id: int
   , name: string 
   }
-}
+};
 module Decode = {
 	open Melange_json;
-
+  let fetchedCommit = json =>{
+		open FetchedCommit;
+    Of_json.
+    { from_head       : json |> field("from_head"      , int)
+    , commit_id       : json |> field("commit_id"      , int)
+    , owner_name      : json |> field("owner_name"     , string)
+    , owner_id        : json |> field("owner_id"       , int)
+    , commit_message  : json |> field("commit_message" , string)
+    , post_title      : json |> field("post_title"     , string)
+    , post_text       : json |> field("post_text"      , string)
+    , timestamp       : json |> field("timestamp"      , string)
+		}
+  }
+  let fetchedCommits = json =>{ json |> Of_json.array(fetchedCommit) }
   let fetchedPost = json => {
     open FetchedPost;
 		Of_json.
@@ -74,15 +99,15 @@ module Decode = {
   let fetchedComment = json => {
     open FetchedComment;
     Of_json.
-    { id: json          |> field("id", int)
-    , text: json        |> field("text", string)
-    , user_rating: json |> field("user_rating", int)
-    , rating: json      |> field("rating", int)
-    , timestamp: json   |> field("timestamp", string)
-    , post_vers: json   |> field("post_vers", int ) 
-    , author_name: json |> field("author_name", string)
-    , author_id: json   |> field("author_id", int)
-    , author_role: json |> field("author_role", int)
+    { id          : json |> field("id", int)
+    , text        : json |> field("text", string)
+    , user_rating : json |> field("user_rating", int)
+    , rating      : json |> field("rating", int)
+    , timestamp   : json |> field("timestamp", string)
+    , post_vers   : json |> field("post_vers", int ) 
+    , author_name : json |> field("author_name", string)
+    , author_id   : json |> field("author_id", int)
+    , author_role : json |> field("author_role", int)
     }
   }
   let fetchedComments = json => {
@@ -97,6 +122,9 @@ module Decode = {
 
 	module Response = {
 		open Js;
+    let fetchedCommit = fetchedCommit %> Promise.resolve
+
+    let fetchedCommits = fetchedCommits %> Promise.resolve
 
     let fetchedPost = fetchedPost %> Promise.resolve
 

@@ -224,7 +224,6 @@ module DiscussionView = {
         <div className="comments add-reply">
           <div className="content">
             <header>
-              // TODO: [khang] identity provider sth sth somehow
               <div className="author_name">{Option.value(auth.getUserName(),~default="Oops") |> React.string}</div>
             </header>
             <form onSubmit={ e => {
@@ -496,14 +495,14 @@ module DiscussionView = {
           fetchComments(result);
           None
         },[|result|])
-        React.useEffect1(()=>{
-					Js.Console.log("result changed");
-					None
-        },[|result|])
-        React.useEffect1(()=>{
-					Js.Console.log("comments changed");
-					None
-        },[|comments|])
+        // React.useEffect1(()=>{
+				// 	Js.Console.log("result changed");
+				// 	None
+        // },[|result|])
+        // React.useEffect1(()=>{
+				// 	Js.Console.log("comments changed");
+				// 	None
+        // },[|comments|])
         ;
         <>
         <ol className="replies" hidden={!showRep}>
@@ -1045,8 +1044,7 @@ module App{
 				<Item_view__editor.App className={Edit->Item.View.to_string} title=postInfo.title body=postInfo.body />
         			}
 				<>
-					<Item_view__log.Listview className={Log->Item.View.to_string} />
-					<Item_view__log.Inspectview className={Log->Item.View.to_string} />
+					<Item_view__log.App className={Log->Item.View.to_string} parentId=postInfo.post_id />
 				</>
 			</main>
 			

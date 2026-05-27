@@ -27,6 +27,76 @@ defmodule App
   plug :fetch_query_params
   plug :dispatch
 
+  get "/api/history/count" do
+    Logger.info "GET historycount"
+    postid = Map.get(conn.params,"postid", nil) |> then(fn x -> if is_nil(x) do nil else x |> String.to_integer end end)
+    opts = %{
+      search:   Map.get(conn.params,"search", "") |> URI.decode,
+      searchby: Map.get(conn.params,"searchby", nil),
+      sortby:   Map.get(conn.params,"sortby", nil),
+      orderby:  Map.get(conn.params,"orderby", nil)
+    }
+
+    data = CommitBE.getPostHistoryCount(Data, postid, opts)
+    # data = ReturnChildID.getChildComments(parent, offset, limit)
+    case data do
+      nil ->
+        {:ok, sh} = JSON.encode([])
+        conn
+    # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+    |> put_resp_header("Access-Control-Allow-Origin", "*")
+    |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+    |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+    |> put_resp_content_type("application/json")
+        |> send_resp(501 , sh)
+      x ->
+        {:ok, sh} = Jason.encode(x)
+        conn
+    # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+    |> put_resp_header("Access-Control-Allow-Origin", "*")
+    |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+    |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+    |> put_resp_content_type("application/json")
+        |> send_resp(200 , sh)
+    end
+  end
+  get "/api/history/list" do
+    Logger.info "GET historylist"
+    postid = Map.get(conn.params,"postid", nil) |> then(fn x -> if is_nil(x) do nil else x |> String.to_integer end end)
+    offset = Map.get(conn.params,"offset","0") |> String.to_integer
+    limit  = Map.get(conn.params,"limit","10") |> String.to_integer
+
+    opts = %{
+      search:   Map.get(conn.params,"search", "") |> URI.decode,
+      searchby: Map.get(conn.params,"searchby", nil),
+      sortby:   Map.get(conn.params,"sortby", nil),
+      orderby:  Map.get(conn.params,"orderby", nil)
+    }
+
+    data = CommitBE.getPostHistoryList(Data, postid, limit, offset, opts)
+    # data = ReturnChildID.getChildComments(parent, offset, limit)
+    case data do
+      nil ->
+        {:ok, sh} = JSON.encode([])
+        conn
+        # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+        |> put_resp_header("Access-Control-Allow-Origin", "*")
+        |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+        |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+        |> put_resp_content_type("application/json")
+        |> send_resp(501 , sh)
+      x ->
+        {:ok, sh} = Jason.encode(x)
+        conn
+      # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
+      |> put_resp_header("Access-Control-Allow-Origin", "*")
+      |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
+      |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+      |> put_resp_content_type("application/json")
+        |> send_resp(200 , sh)
+    end
+  end
+
   get "/api/post/get" do
     Logger.info "GET post"
     post_id   = Map.get(conn.params,"post_id" ,"-1" ) |> String.to_integer
@@ -66,7 +136,7 @@ defmodule App
     user      = Map.get(conn.params,"user","-1" ) |> String.to_integer
 
     opts = %{
-      search:   Map.get(conn.params,"search", nil),
+      search:   Map.get(conn.params,"search", "") |> URI.decode,
       searchby: Map.get(conn.params,"searchby", nil),
       sortby:   Map.get(conn.params,"sortby", nil),
       orderby:  Map.get(conn.params,"orderby", nil)
@@ -102,7 +172,7 @@ defmodule App
     limit     = Map.get(conn.params,"limit","10") |> String.to_integer
 
     opts = %{
-      search:   Map.get(conn.params,"search", nil),
+      search:   Map.get(conn.params,"search", "") |> URI.decode,
       searchby: Map.get(conn.params,"searchby", nil),
       sortby:   Map.get(conn.params,"sortby", nil),
       orderby:  Map.get(conn.params,"orderby", nil)
@@ -269,7 +339,7 @@ defmodule App
     parent    = Map.get(conn.params,"parent"   ,nil)
     recursive = Map.get(conn.params,"recursive","false")
     opts = %{
-      search:   Map.get(conn.params,"search", nil),
+      search:   Map.get(conn.params,"search", "") |> URI.decode,
       searchby: Map.get(conn.params,"searchby", nil),
       sortby:   Map.get(conn.params,"sortby", nil),
       orderby:  Map.get(conn.params,"orderby", nil),
@@ -315,7 +385,7 @@ defmodule App
     limit  = Map.get(conn.params,"limit","10")
 
     opts = %{
-      search:   Map.get(conn.params,"search", nil),
+      search:   Map.get(conn.params,"search", "") |> URI.decode,
       searchby: Map.get(conn.params,"searchby", nil),
       sortby:   Map.get(conn.params,"sortby", nil),
       orderby:  Map.get(conn.params,"orderby", nil),

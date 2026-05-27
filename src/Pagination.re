@@ -68,7 +68,7 @@ module App = {
 			let request = Env.backend ++ a
 				++ "limit="  ++ string_of_int(limit)
 				++ "&offset=" ++ string_of_int(offset*limit)
-				++ ((searchPrompt && search!="")?("&search=" ++ search):"")
+				++ ((searchPrompt && search!="")?("&search=" ++ (search |> Js.Global.encodeURIComponent)):"")
 				++ (switch(filter,dropdownResult){
 					| (None,_) | (_,[]) => ""
 					| (Some(_),v)=> "&" ++ (v->Util.stringQueryParams')
