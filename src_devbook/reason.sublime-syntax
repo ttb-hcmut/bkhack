@@ -73,7 +73,7 @@ contexts:
     - match: '"'
       scope: punctuation.definition.string.begin
       push:
-      - meta_scope: string.quoted.double
+      - meta_scope: variable.other # string.quoted.double
       - match: \\.
         scope: constant.character.escape
       - match: '"'
@@ -120,7 +120,7 @@ contexts:
       # highlighting as entity.name.namespace (our module). We don't want
       # variant and modules confused
       # scope: entity.name.union
-      scope: variable.function variable.other
+      scope: variable.other
     - match: '(#)[a-zA-Z][0-9a-zA-Z_]*\b'
       captures:
         1: punctuation.definition.keyword
@@ -188,11 +188,11 @@ contexts:
   # Foo.Bar.Baz where Baz is actually a module, not a constructor
   moduleAccessEndsWithModule:
     - match: '{{RE_MODULE_IDENT}}'
-      scope: entity.name.namespace
+      scope: variable.other # entity.name.namespace
     - match: '(\.)({{RE_MODULE_IDENT}})'
       captures:
         1: punctuation.accessor
-        2: entity.name.namespace
+        2: variable.other # entity.name.namespace
 
   moduleAccessEndsWithModuleThenPop:
     - include: moduleAccessEndsWithModule
@@ -202,7 +202,7 @@ contexts:
   moduleAccess:
     - match: '\b({{RE_MODULE_IDENT}})(\.)'
       captures:
-        1: entity.name.namespace
+        1: variable.other # entity.name.namespace
         2: punctuation.accessor
 
   functorParameter:
@@ -232,13 +232,13 @@ contexts:
         1: keyword
         2: keyword
         3: keyword
-        4: entity.name.namespace
+        4: variable.other # entity.name.namespace
       push:
         # and then an optional type signature is matched. Hopefully this regex
         # doesn't accidentally match something else
         - match: '\s*:\s*({{RE_MODULE_IDENT}})'
           captures:
-            1: entity.name.namespace
+            1: variable.other # entity.name.namespace
         - match: '\s*:\s*(\{)'
           captures:
             1: punctuation.section.braces.begin
