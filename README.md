@@ -14,8 +14,6 @@ The following paper provides more details:
 - Thesis Paper (PDF): https://baorepo.web.app/~ttb-hcmut/bkhack.pdf
 - Live Deployment: https://bkhack-2eb8c.web.app
 
----
-
 # Repository Structure
 
 ```text
@@ -24,8 +22,6 @@ service/     Backend service
 build_aux/   Docker and auxiliary tooling
 doc/         Thesis and documentation
 ```
-
----
 
 # Installation
 
@@ -43,8 +39,6 @@ opam install bkhack
 ```
 
 [bkhack-repo]: https://github.com/ttb-hcmut/bkhack
-
----
 
 # Usage
 
@@ -68,8 +62,6 @@ bkhack.bundle ./ -o dist
 This produces a `dist/` directory containing static HTML and JavaScript bundles
 suitable for deployment platforms such as Firebase Hosting or Netlify.
 
----
-
 # Development setup
 
 `bkhack` supports two development environments:
@@ -78,8 +70,6 @@ suitable for deployment platforms such as Firebase Hosting or Netlify.
 |---|---|
 | Native Linux / WSL2 | Linux users and WSL2 users |
 | Windows + Docker | Windows users wanting isolated tooling |
-
----
 
 ## Prerequisites
 
@@ -108,8 +98,6 @@ Recommended:
 
 - Windows Terminal
 
----
-
 # Development using Nix Shell
 
 > Docker users:
@@ -134,7 +122,6 @@ Update channels and enter the project shell:
 nix-channel --update
 nix-shell
 ```
----
 
 ## Initial setup
 
@@ -151,8 +138,6 @@ pnpm run init
 > If OPAM sandboxing fails inside Docker, choose `y` to disable sandboxing.
 > This is expected in containerized environments.
 
----
-
 Start the frontend development server:
 
 ```sh
@@ -160,8 +145,6 @@ pnpm dev
 ```
 
 Voilà!
-
----
 
 # Backend service
 
@@ -215,8 +198,6 @@ Backend runs at:
 ```text
 http://localhost:5000
 ```
-
----
 
 # Production build
 
