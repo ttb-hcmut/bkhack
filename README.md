@@ -46,7 +46,7 @@ opam install bkhack
 
 You can integrate it into your own Melange application:
 
-```lisp
+```dune
 (melange.emit
  ; ...
  (libraries bkhack))
