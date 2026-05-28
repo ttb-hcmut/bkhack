@@ -127,9 +127,10 @@ Recommended:
 >
 > Then continue with the same `nix-shell` workflow below.
 
-Enter the project shell:
+Update channels and enter the project shell:
 
 ```sh
+nix-channel --update
 nix-shell
 ```
 ---

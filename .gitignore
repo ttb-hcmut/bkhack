@@ -10,3 +10,6 @@ log/
 
 *storybook.log
 storybook-static
+
+bkhack-compiler.opam
+bkhack.opam

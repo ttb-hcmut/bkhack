@@ -12,11 +12,13 @@ let shellHook =
 	}
 	'';
 	pkgs = with nixpkgs; [
+		elixir
+		erlang
 		nixd
 		dune_3
 		pnpm
 		opam
-		nodejs_20
+		nodejs
 	];
 in
 	nixpkgs.mkShell {
