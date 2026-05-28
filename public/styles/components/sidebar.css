@@ -219,25 +219,124 @@
     display: inline-block; 
 	transform:rotate(90deg);
 } */
+
+.truncated .text-style {
+	white-space: nowrap;       
+	min-width: 0;
+	overflow-y: hidden;          
+	text-overflow: ellipsis;
+  max-height: calc(3*var(--text-sm));
+}
+
+.truncated .text-style:focus {
+	white-space: unset;       
+	min-width: unset;
+	overflow-y: unset;          
+	text-overflow: unset;
+  max-height: unset;
+}
+.truncated :focus+.text-style {
+	white-space: unset;       
+	min-width: unset;
+	overflow-y: unset;          
+	text-overflow: unset;
+  max-height: unset;
+}
+
 #root > aside > section#sidebar-notes > ul {
 	grid-column: 1/3;
 	grid-row: 2/3;
 	display:grid;
 	gap: var(--space-a);
+  scrollbar-gutter: stable;
+  overflow-y: scroll; 
+  scrollbar-color: var(--card-border) transparent;
+  scrollbar-width: thin;
+  box-sizing: border-box;
+  max-height: calc(15*var(--space-a));
+}
+#root > aside > section#sidebar-notes > ul.expanded {
+  max-height: calc(30*var(--space-a));
 }
 
 #root > aside > section#sidebar-notes > ul > li {
-	border-left: 2px solid var(--ctp-yellow);
-	padding: 0 var(--space-a);
+  display: grid;
+  grid-template-columns: min-content auto;
+  grid-template-rows: min-content min-content ;
+  column-gap: var(--space-c);
 }
-
-.truncated {
-	white-space: nowrap;       
-	min-width: 0;
-	overflow: hidden;          
-	text-overflow: ellipsis;   
+#root > aside > section#sidebar-notes > ul > li > span {
+	width: 2px;
+  height: 100%;
+  background-color: var(--ctp-yellow);
+  grid-column: 1/2;
+  grid-row: 1/3;
 }
-
+#root > aside > section#sidebar-notes > ul > li > .controls {
+  grid-column: 2/3;
+  grid-row: 1/2;
+  display:flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--space-c)
+}
+#root > aside > section#sidebar-notes > ul > li > .controls > button{
+  padding: var(--space-f) var(--space-a);
+  border-radius: var(--radius);
+}
+#root > aside > section#sidebar-notes > ul > li > .controls > button:hover {
+  background-color: var(--ctp-surface0);
+}
+#root > aside > section#sidebar-notes > ul > li > .controls > button > span {
+  color: var(--ctp-subtext0);
+  transform: rotate(90deg);
+  display: inline-block; 
+}
+#root > aside > section#sidebar-notes > ul > li > .body {
+  grid-column: 2/3;
+  grid-row: 2/3;
+  padding: var(--space-c);
+  border-radius: var(--radius);
+	background-color: transparent;
+  display: grid;
+  gap: var(--space-a);
+  width: 95%;
+}
+#root > aside > section#sidebar-notes > ul > li > .body:has(:focus) {
+  background-color: var(--ctp-surface0);
+}
+#root > aside > section#sidebar-notes > ul > li > .body > textarea {
+  color: var(--ctp-text);
+  background-color: var(--ctp-crust);
+  grid-column: 1/-1;
+  grid-row: 1/2;
+  resize: none ;
+  overflow: hidden;
+  outline: none;
+  width: 100%;
+}
+#root > aside > section#sidebar-notes > ul > li > .body > .ghost {
+  opacity: 0%;
+  pointer-events: none;
+  user-select: none;
+  grid-column: 1/-1;
+  grid-row: 1/2;
+  width: 100%;
+}
+#root > aside > section#sidebar-notes > ul > li > .body > .text-style {
+  background-color: transparent;
+  text-wrap: wrap;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: var(--text-sm);
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-normal);
+  line-height: 1;
+  font-style: normal;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
 #root > aside > section#sidebar-notes > .addnote {
 	grid-column: 1/3;
 	grid-row: 3/4;

@@ -125,9 +125,9 @@ module Dashboard = {
       let (disCount,setDisCount) = React.useState(() => 0);
       let fetchCommentCount = (~id) => {
         let open Fetch__syntax;
-        Fetch.fetch(Env.backend ++ "/api/comment"
+        Fetch.fetch(Env.backend ++ "/api/comment/count"
           ++ "?parent="  ++ id
-          ++ "&type="    ++ "0")
+          ++ "&type=post&recursive=true")
         >>= Fetch.Response.json
         >!= (err => {
             Js.log(err);
