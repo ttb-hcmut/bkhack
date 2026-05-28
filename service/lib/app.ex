@@ -233,11 +233,8 @@ defmodule App
     end
   end
 
-  options "/api/auth/login" do
-    conn
-    |> put_resp_free
-    |> send_resp(200, "")
-  end
+  options "/api/auth/login", do: conn |> put_resp_free |> send_resp(200, "")
+
   post "/api/auth/login" do
     Logger.info "POST login"
     body = conn.body_params
@@ -334,11 +331,8 @@ defmodule App
     end
   end
 
-  options "/api/postcomment" do
-    conn
-    |> put_resp_free
-    |> send_resp(200, "")
-  end
+  options "/api/postcomment", do: conn |> put_resp_free |> send_resp(200, "")
+  
   post "/api/postcomment" do
     Logger.info "POST comment"
     body = conn.body_params
@@ -366,11 +360,8 @@ defmodule App
     end
   end
 
-  options "/api/setvote" do
-    conn
-    |> put_resp_free
-    |> send_resp(200, "")
-  end
+  options "/api/setvote", do: conn |> put_resp_free |> send_resp(200, "")
+
   post "/api/setvote" do
     Logger.info "POST vote"
     body = conn.body_params
@@ -487,9 +478,7 @@ defmodule App
 defmodule App.Supervisor do
   use Supervisor
 
-  def start_link(args) do
-    Supervisor.start_link(__MODULE__, args, name: __MODULE__)
-  end
+  def start_link(args), do: Supervisor.start_link(__MODULE__, args, name: __MODULE__)
 
   @impl true
   def init(_init_arg) do
@@ -498,7 +487,6 @@ defmodule App.Supervisor do
       # Data1
       Data,
     ]
-
     Supervisor.init(children, strategy: :one_for_one)
   end
 end
@@ -527,9 +515,7 @@ defmodule App.Book do
     {:ok, msg: "stopped server book"}
   end
 
-  def start_link(args) do
-    GenServer.start_link(__MODULE__, args)
-  end
+  def start_link(args), do: GenServer.start_link(__MODULE__, args)
 
   @impl true
   def init(_state) do
