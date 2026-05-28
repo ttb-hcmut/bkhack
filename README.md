@@ -70,7 +70,7 @@ suitable for deployment platforms such as Firebase Hosting or Netlify.
 
 ---
 
-# Development Setup
+# Development setup
 
 `bkhack` supports two development environments:
 
@@ -136,7 +136,7 @@ nix-shell
 ```
 ---
 
-## Initial Setup
+## Initial setup
 
 ```sh
 [ ! -d ~/.opam ] && opam init
@@ -153,7 +153,7 @@ pnpm run init
 
 ---
 
-## Start the frontend development server:
+Start the frontend development server:
 
 ```sh
 pnpm dev
@@ -163,7 +163,7 @@ Voilà!
 
 ---
 
-# Backend Service
+# Backend service
 
 Open another shell:
 
@@ -218,7 +218,7 @@ http://localhost:5000
 
 ---
 
-# Production Build
+# Production build
 
 Bundle frontend assets:
 
@@ -231,7 +231,7 @@ Deploy the generated `dist/` directory to your preferred static hosting provider
 
 ---
 
-# Try It Out
+# Try it out
 
 The current deployment is available at:
 
