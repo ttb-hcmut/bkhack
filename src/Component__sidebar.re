@@ -24,25 +24,62 @@ module ShowHide = {
     </button>
   }
 }
-
+module Notes__Card = {
+  [@react.component]
+  let make = (~index,~text,~updateNote,~swapNoteIndices,~deleteNote) => {
+    let (value,setValue) = React.useState(()=>text)
+    ;
+    <li className={"note"}>
+      <span/>
+      <div className="controls">
+        <button className="up"
+          onClick={_=>swapNoteIndices(index,index+1)}>
+          <span>{React.string("<")}</span>
+        </button>
+        <button className="down"
+          onClick={_=>swapNoteIndices(index,index-1)}>
+          <span>{React.string(">")}</span>
+        </button>
+      </div>
+      <div className="body">
+        <textarea
+          value
+          className="text-style"
+          onKeyDown={e => {
+            switch(React.Event.Keyboard.key(e)){
+              | "Escape" => 
+                React.Event.Keyboard.target(e)##blur()
+              | "Enter"  => 
+                if(React.Event.Keyboard.ctrlKey(e)){
+                  if(String.length(value)==0)
+                    deleteNote(index)
+                  else
+                  updateNote(index,value)
+                }
+              | _ => ()
+            }
+          }}
+          onChange={e => setValue(_ => React.Event.Form.target(e)##value)}
+          onBlur={_ => updateNote(index,value)}
+        />
+        <div className="ghost text-style">
+        {React.string(value++"\n.")}
+        </div>
+      </div>
+    </li>
+  }
+}
 module Notes = {
-
-	// placeholder
-	let placeholder = [
-		"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed convallis quis sapien pellentesque viverra. Donec efficitur eleifend tortor eget pulvinar.",
-		"Fibonacci heap practical considerations",
-		"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed convallis quis sapien pellentesque viverra. Donec efficitur eleifend tortor eget pulvinar."
-	];
-
-	// TODO: Some implementation to add a new note
-	let createNewNote =  _ => ();
-
+  type note = {
+    index : int,
+    text  : string,
+  };
 	[@react.component]
 	let make = () => {
-		let (noteList, setNoteList) = useState(()=>[]);
+		let (noteList: list(note), setNoteList) = React.useState(() => []);
 		let (expanded, setExpanded) = useState(() => false);
 		let filter = [|expanded|] |> useMemo1 @@ () =>
-			if (List.length(noteList)>2)
+			if (true)
 			{	
 				<button className="expand" onClick={ _ => setExpanded( _ => !expanded ) }>
 					<span className={expanded ? "expanded":""}>{string(">")}</span> 
@@ -50,33 +87,120 @@ module Notes = {
 			}
 			else
 			{ <> </> };
-		let noteList = (expanded, noteList) |> useMemo2 @@ () =>
-			if (List.length(noteList) <=0 )
-			{
-				<div>{string("Add note to start taking notes")}</div>
-			}
-			else
-			{
-				<ul>
-				{
-					noteList
-					|> List.take(expanded?10:2)
-					|> List.mapi((index,item) => <li key=string_of_int(index) className={expanded?"":"truncated"}> {string(item)} </li>)
-					|> Array.of_list
-					|> array
-				}
-				</ul>
-			};
+
+    let decoder = (json: Js.Json.t): note => {
+	    open Melange_json;
+      Of_json.
+      { index : json |> field("index", int)
+      , text  : json |> field("text", string)
+      };
+    };
+    let insertNote = () => {
+      setNoteList(l => [{index: List.length(noteList), text: "New note"},...l] )
+    }
+    let updateNote = (index , text) => {
+      setNoteList(l => 
+        l
+        |> List.map((n)=>{
+          n.index
+          |> fun
+          | x when x == index => {index:n.index,text:text}
+          | _ => n
+        })
+      )
+    }
+    let swapNoteIndices = ( a:int , b:int ) => {
+      if( a >= 0 && a < List.length(noteList) && b >= 0 && b < List.length(noteList))
+      setNoteList(l => 
+        l
+        |> List.map((n)=>{
+          n.index
+          |> fun
+          | x when x == a => {index:b,text:n.text}
+          | x when x == b => {index:a,text:n.text}
+          | _ => n
+        })
+        |> List.sort((b, a) => a.index - b.index)
+      )
+    }
+    let normalizeList = (l) => {
+      l
+      |> List.mapi((i,n)=>{index:List.length(l)-i-1,text:n.text})
+    }
+    let deleteNote = ( i:int) => {
+      setNoteList(l => 
+        l
+        |> List.filter(n => n.index != i)
+        |> normalizeList
+      )
+    }
+    let loadNoteList = () => {
+      let fromStorage= Dom.Storage.localStorage |> Dom.Storage.getItem("bkhack.sidebar.notes") |> Option.value(~default="{}")
+      setNoteList(_ => {
+        try {
+          Js.Json.parseExn(fromStorage) 
+          |> Melange_json.Of_json.list(decoder)
+          |> normalizeList
+        }{
+        | _ => {
+            Dom.Storage.localStorage 
+            |> Dom.Storage.setItem("bkhack.sidebar.notes")
+            @@ (Js.Json.objectArray([||])
+            |> Js.Json.stringify);
+            []
+          }
+        }
+      })
+    }
+    let saveNoteList = () => {
+      let json = noteList
+      |> List.sort((b, a) => a.index - b.index)
+      |> List.map( (n) =>{
+        let dict = Js.Dict.empty();
+        Js.Dict.set(dict, "index" , n.index |> float_of_int  |> Js.Json.number)
+        Js.Dict.set(dict, "text", n.text  |> Js.Json.string)
+        dict
+      })
+      |> Array.of_list
+      Dom.Storage.localStorage 
+      |> Dom.Storage.setItem("bkhack.sidebar.notes")
+      @@ (json
+      |> Js.Json.objectArray
+      |> Js.Json.stringify)
+    }
+    
 		useEffect0(() => {
-			// TODO: fetch notes here
-			setNoteList(_ => placeholder);
-			None;
-		});
+      loadNoteList();
+			None
+		})
+		useEffect1(() => {
+      saveNoteList();
+			None
+		},[|noteList|])
+    ;
 		<section id="sidebar-notes">
 			<header> {string("My Notes")} </header>
 			{filter}
-			{noteList}
-			<button className="addnote" onClick={createNewNote}>{string("+ Add note")}</button>
+				<ul className={expanded?"expanded":"truncated"}>
+				{
+					noteList
+					|> List.map(note =>
+              <Notes__Card key={"note"++(note.index|>string_of_int)++"-"++note.text} 
+              index=note.index
+              text=note.text
+              updateNote
+              swapNoteIndices
+              deleteNote/>
+            )
+					|> Array.of_list
+          |> array
+				}
+				</ul>
+			<button className="addnote" 
+      onClick={ _ =>{
+      insertNote();
+      }
+    }>{string("+ Add note")}</button>
 		</section>
 	}
 };

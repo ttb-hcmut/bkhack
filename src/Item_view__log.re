@@ -45,7 +45,7 @@ module Listview__Filter = {
       />
 	}
 };
-
+[@alert warning("Bao, what the  is a subgrid")]
 module Listview__Body_Card = {
 	[@react.component]
   let make = (
@@ -125,7 +125,8 @@ module Listview__Body = {
       open Model.FetchedCommit;
       items
       |> Array.map(x => {
-        <Listview__Body_Card key={"listviewbodycard"++(x.commit_id |> string_of_int)}
+        <Listview__Body_Card 
+          key={"listviewbodycard"++(x.commit_id |> string_of_int)}
           commit_id      = {x.commit_id      }
           commit_message = {x.commit_message }
           owner_name     = {x.owner_name     }
@@ -147,7 +148,7 @@ module Listview = {
     ;
     <>
       <header className=("only listview "++cls)>
-        <Listview__Hint/>
+        <Listview__Hint />
         <nav> 
           <Listview__Filter setResult parentId /> 
         </nav>
