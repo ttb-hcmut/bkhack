@@ -37,7 +37,7 @@ defmodule DiscussionBE do
   defp discussionFilter(x, opts\\%{}) do
     from(c in subquery(x))
       |> then(fn xx -> case {opts[:search],opts[:searchby]} do
-        {s,o} when is_nil(s) or is_nil(o) -> xx
+        {s,o} when is_nil(s) or length(s) == 0 or is_nil(o) -> xx
         {s,"comment"}   -> xx |> where([c], like(c.text, ^"%#{s}%"))
         {s,"username"}  -> xx |> where([c], like(c.author_name, ^"%#{s}%"))
         # {s,"version"} when Integer.parse(s) == {int,""}   -> xx |> where([c], c.post_vers == ^String.to_int(s))

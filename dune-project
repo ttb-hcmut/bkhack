@@ -17,6 +17,7 @@
   (containers (>= 3.16))
   (iter (>= 1.9))
   (re (>= 1.14.0))
+  (opam-check-npm-deps (>= 4.1.0))
  ))
 
 (package
@@ -24,8 +25,11 @@
  (synopsis "bkhack compile time tools")
  (description "bkhack compile time tools")
  (depends
-  (ocaml (>= 5.2.0)) (reason (>= 3.1.30))
+  (ocaml (>= 5.2.0))
+  (reason (>= 3.1.30))
   (containers (>= 3.16))
   (utop (>= 2.16.0))
   (sexplib (>= 0.17.0))
- ))
+  (eio (>= 1.3))
+  (eio_main (>= 1.3))
+  ))

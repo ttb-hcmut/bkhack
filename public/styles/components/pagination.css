@@ -38,12 +38,13 @@
   color: var(--ctp-subtext0);
 }
 .pagination > .dropdown {
+  box-sizing: border-box;
   font-size: var(--text-base);
   font-family: var(--font-mono);
   outline: none;
 	background-color: var(--ctp-crust);
   border-radius: var(--radius);
-  border: 1px solid var(--ctp-surface0);
+  background-color: var(--ctp-surface0);
   color: var(--ctp-text);
   height: min-content;
   padding: var(--space-c);
@@ -128,10 +129,16 @@
 .pagination .student::after {
   content: "Only student";
 }
+.pagination .message::after {
+  content: "Commit message";
+}
+.pagination .merge::after {
+  content: "Merge order";
+}
 
 .pagination > .dropdown > dialog{
   overflow: visible;
-  width: 100%;
+  width: fit-content;
 }
 .pagination > .dropdown > dialog > ol {
   display: flex;
@@ -140,15 +147,15 @@
   height: fit-content;
   width: 100%;
   padding: var(--space-c);
-  border: 1px solid var(--ctp-surface0);
+  background-color: var(--ctp-surface0);
   border-top: 0;
   border-radius: 0 0 var(--radius) var(--radius);
-  margin-left: calc(-1*var(--space-c) - 1px);
-  background-color: var(--ctp-crust);
+  margin-left: calc(-1*(var(--space-c)));
   z-index: 9999;
 }
 .pagination > .dropdown > dialog > ol > li {
   height: fit-content;
+  background-color: var(--ctp-surface0);
   width: 100%;
 }
 .pagination > .dropdown > dialog > ol > li:hover {

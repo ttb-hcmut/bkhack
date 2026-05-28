@@ -12,6 +12,8 @@ let shellHook =
 	}
 	'';
 	pkgs = with nixpkgs; [
+		elixir
+		erlang
 		nixd
 		dune_3
 		pnpm

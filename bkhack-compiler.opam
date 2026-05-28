@@ -12,6 +12,8 @@ depends: [
   "containers" {>= "3.16"}
   "utop" {>= "2.16.0"}
   "sexplib" {>= "0.17.0"}
+  "eio" {>= "1.3"}
+  "eio_main" {>= "1.3"}
   "odoc" {with-doc}
 ]
 build: [
