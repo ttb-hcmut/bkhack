@@ -9,6 +9,7 @@ The following paper provides more details:
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lê Nguyễn Gia Bảo, Lê Công Minh Khang, and Hồ Gia Tường  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Undergraduate Thesis 2026  
 
+[bkhack-paper]: https://baorepo.web.app/~ttb-hcmut/bkhack.pdf
 - Project Repository: https://github.com/ttb-hcmut/bkhack
 - Thesis Paper (PDF): https://baorepo.web.app/~ttb-hcmut/bkhack.pdf
 - Live Deployment: https://bkhack-2eb8c.web.app
@@ -28,17 +29,20 @@ doc/         Thesis and documentation
 
 # Installation
 
-Add the repository to OPAM:
+Add the [bkhack-repo] repository to OPAM:
 
 ```sh
 opam remote add bkhack git+https://github.com/ttb-hcmut/bkhack
 ```
+
 
 Install the package:
 
 ```sh
 opam install bkhack
 ```
+
+[bkhack-repo]: https://github.com/ttb-hcmut/bkhack
 
 ---
 
