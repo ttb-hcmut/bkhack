@@ -4,11 +4,11 @@
 
 == Literature
 
-#header[Replit] is #lorem(50)
+// #header[Replit] is #lorem(50)
 
-#header[GitHub] has a search #lorem(50)
+// #header[GitHub] has a search #lorem(50)
 
-#header[Fly.io] is #lorem(50)
+// #header[Fly.io] is #lorem(50)
 
 // wireframe
 // https://github.com/stefanjudis/awesome-command-palette
