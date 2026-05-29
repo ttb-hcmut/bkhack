@@ -26,7 +26,7 @@ module ShowHide = {
 }
 module Notes__Card = {
   [@react.component]
-  let make = (~index,~text,~updateNote,~swapNoteIndices,~deleteNote) => {
+  let make = (~index,~text,~updateNote,~swapNoteIndices) => {
     let (value,setValue) = React.useState(()=>text)
     ;
     <li className={"note"}>
@@ -190,7 +190,7 @@ module Notes = {
               text=note.text
               updateNote
               swapNoteIndices
-              deleteNote/>
+              />
             )
 					|> Array.of_list
           |> array
