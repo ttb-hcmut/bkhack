@@ -53,9 +53,6 @@
 .pagination > .dropdown::after{
   color: var(--ctp-subtext0);
 }
-.pagination > .dropdown > dialog > ol *::after{
-  color: var(--ctp-subtext0);
-}
 .pagination > .dropdown.none::after{
   content: " ";
 }
@@ -136,9 +133,20 @@
   content: "Merge order";
 }
 
+dialog {
+	margin: 0;
+	position: relative;
+	height: 0;
+	width: 0;
+	padding: 0;
+	border: 0;
+	transition: none;
+	overflow: visible;
+}
+
 .pagination > .dropdown > dialog{
   overflow: visible;
-  width: fit-content;
+  width: 100%;
 }
 .pagination > .dropdown > dialog > ol {
   display: flex;
@@ -152,6 +160,9 @@
   border-radius: 0 0 var(--radius) var(--radius);
   margin-left: calc(-1*(var(--space-c)));
   z-index: 9999;
+}
+.pagination > .dropdown > dialog > ol *::after{
+  color: var(--ctp-subtext0);
 }
 .pagination > .dropdown > dialog > ol > li {
   height: fit-content;

@@ -5,6 +5,8 @@
 		[ReasonReactRouter.useUrl().search];
 	- When using [Js], search can be obtained via
  */
+let rgbaIntToHexString : int => string
+
 let parseQueryParams : string => Js.dict(string)
 
 let parseQueryParams' : string => list((string, string))

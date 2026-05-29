@@ -1,5 +1,19 @@
 open Melange__containers.Fun
 
+module TagButTheColorIsAString = {
+	type t =
+		{ tag_id    : int
+    , tag_name  : string
+    , tag_color : string
+		}
+};
+module Tag = {
+	type t =
+		{ tag_id    : int
+    , tag_name  : string
+    , tag_color : int
+		}
+};
 module FetchedCommit = {
 	type t =
 		{ from_head       : int
@@ -55,6 +69,15 @@ module FetchedAuth = {
 };
 module Decode = {
 	open Melange_json;
+  let tag = json =>{
+    open Tag;
+    Of_json.
+    { tag_id    : json |> field("tag_id"    , int)
+    , tag_name  : json |> field("tag_name"  , string)
+    , tag_color : json |> field("tag_color" , int)
+    }
+  }
+  let tags = json =>{ json |> Of_json.array(tag) }
   let fetchedCommit = json =>{
 		open FetchedCommit;
     Of_json.
@@ -122,6 +145,8 @@ module Decode = {
 
 	module Response = {
 		open Js;
+    let tags = tags %> Promise.resolve
+    
     let fetchedCommit = fetchedCommit %> Promise.resolve
 
     let fetchedCommits = fetchedCommits %> Promise.resolve

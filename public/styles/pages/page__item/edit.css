@@ -136,14 +136,57 @@
   grid-template-columns: min-content min-content;
   white-space: nowrap;
   font-size: var(--text-xs);
-  padding: 0 var(--space-c);
-  border: 1px solid var(--ctp-peach);
-  color: var(--ctp-peach);
-  border-radius: var(--space-c);
+  padding: var(--space-f) var(--space-c);
+  border: 1px solid var(--ctp-text);
+  color: var(--ctp-text);
+  border-radius: var(--radius);
   height: min-content;
 }
 #root > main.edit > .edit > header> .settings > .tags > ul > li:hover {
   cursor:pointer;
+}
+dialog {
+	margin: 0;
+	position: relative;
+	height: 0;
+	width: 0;
+	padding: 0;
+	border: 0;
+	transition: none;
+	overflow: visible;
+}
+#root > main.edit > .edit > header> .settings > .tags > dialog{
+  overflow: visible;
+  width: 100%;
+}
+#root > main.edit > .edit > header> .settings > .tags > dialog > ol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-c);
+  height: fit-content;
+  width: 100%;
+  padding: var(--space-c);
+  background-color: var(--ctp-surface0);
+  border-radius: var(--radius);
+  z-index: 9999;
+}
+#root > main.edit > .edit > header> .settings > .tags > dialog > ol {
+  max-height: calc(15*var(--space-a));
+  overflow-y: scroll;
+  scrollbar-color: var(--card-border) transparent;
+  scrollbar-width: thin;
+  overflow-wrap: break-word;
+}
+#root > main.edit > .edit > header> .settings > .tags > dialog > ol > li {
+  height: fit-content;
+  color: var(--ctp-subtext0);
+  border-radius: var(--radius);
+  width: 100%;
+}
+#root > main.edit > .edit > header> .settings > .tags > dialog > ol > li:hover {
+  color: var(--ctp-text);
+  text-decoration: underline;
+  cursor: pointer;
 }
 #root > main.edit > .edit > header> .settings > .commit-options {
   grid-row: 1/3;
