@@ -51,9 +51,6 @@ module Notes__Card = {
                 React.Event.Keyboard.target(e)##blur()
               | "Enter"  => 
                 if(React.Event.Keyboard.ctrlKey(e)){
-                  if(String.length(value)==0)
-                    deleteNote(index)
-                  else
                   updateNote(index,value)
                 }
               | _ => ()
@@ -99,7 +96,10 @@ module Notes = {
       setNoteList(l => [{index: List.length(noteList), text: "New note"},...l] )
     }
     let updateNote = (index , text) => {
-      setNoteList(l => 
+      if(String.length(text)==0)
+        deleteNote(index)
+      else
+        setNoteList(l => 
         l
         |> List.map((n)=>{
           n.index
