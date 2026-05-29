@@ -17,8 +17,7 @@
     "bundle": "eval `opam env` && dune exec bin/bundle.exe",
     "serve": "eval `opam env` && dune exec bin/serve.exe -- --watch=false --output=dist__serve",
     "serve-watch": "eval `opam env` && dune exec bin/serve.exe -- --watch=true --output=dist__serve",
-    "dev": "npm-run-all --parallel watch serve-watch",
-    "storybook": "storybook dev -p 6006",
+    "dev": "npm run watch & npm run serve-watch; wait",    "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "deploy": "firebase deploy"
   },

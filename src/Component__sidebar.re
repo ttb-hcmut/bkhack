@@ -95,20 +95,6 @@ module Notes = {
     let insertNote = () => {
       setNoteList(l => [{index: List.length(noteList), text: "New note"},...l] )
     }
-    let updateNote = (index , text) => {
-      if(String.length(text)==0)
-        deleteNote(index)
-      else
-        setNoteList(l => 
-        l
-        |> List.map((n)=>{
-          n.index
-          |> fun
-          | x when x == index => {index:n.index,text:text}
-          | _ => n
-        })
-      )
-    }
     let swapNoteIndices = ( a:int , b:int ) => {
       if( a >= 0 && a < List.length(noteList) && b >= 0 && b < List.length(noteList))
       setNoteList(l => 
@@ -132,6 +118,20 @@ module Notes = {
         l
         |> List.filter(n => n.index != i)
         |> normalizeList
+      )
+    }
+    let updateNote = (index , text) => {
+      if(String.length(text)==0)
+        deleteNote(index)
+      else
+        setNoteList(l => 
+        l
+        |> List.map((n)=>{
+          n.index
+          |> fun
+          | x when x == index => {index:n.index,text:text}
+          | _ => n
+        })
       )
     }
     let loadNoteList = () => {
