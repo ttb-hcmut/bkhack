@@ -311,11 +311,11 @@ module Inline = struct
   type t +=
   | Autolink of Autolink.t node
   | Break of Break.t node
-  | Code_span of Code_span.t node
-  | Emphasis of Emphasis.t node
+  | Inline_Code_span of Code_span.t node
+  | Inline_Emphasis of Emphasis.t node
   | Image of Link.t node
   | Inlines of t list node
-  | Link of Link.t node
+  | Inline_Link of Link.t node
   | Raw_html of Raw_html.t node
   | Strong_emphasis of Emphasis.t node
   | Text of Text.t node
@@ -353,20 +353,20 @@ module Inline = struct
 
   let ext_none _ = invalid_arg err_unknown
   let meta ?(ext = ext_none) = function
-  | Autolink (_, m) | Break (_, m) | Code_span (_, m) | Emphasis (_, m)
-  | Image (_, m) | Inlines (_, m) | Link (_, m) | Raw_html (_, m)
+  | Autolink (_, m) | Break (_, m) | Inline_Code_span (_, m) | Inline_Emphasis (_, m)
+  | Image (_, m) | Inlines (_, m) | Inline_Link (_, m) | Raw_html (_, m)
   | Strong_emphasis (_, m)  | Text (_, m) -> m
   | Ext_strikethrough (_, m) -> m | Ext_math_span (_, m) -> m
   | i -> ext i
 
   let rec normalize ?(ext = ext_none) = function
-  | Autolink _ | Break _ | Code_span _ | Raw_html _ | Text _
+  | Autolink _ | Break _ | Inline_Code_span _ | Raw_html _ | Text _
   | Inlines ([], _) | Ext_math_span _ as i -> i
   | Image (l, m) -> Image ({ l with text = normalize ~ext l.text }, m)
-  | Link (l, m) -> Link ({ l with text = normalize ~ext l.text }, m)
+  | Inline_Link (l, m) -> Inline_Link ({ l with text = normalize ~ext l.text }, m)
   | Inlines ([i], _) -> i
-  | Emphasis (e, m) ->
-      Emphasis ({ e with inline = normalize ~ext e.inline}, m)
+  | Inline_Emphasis (e, m) ->
+      Inline_Emphasis ({ e with inline = normalize ~ext e.inline}, m)
   | Strong_emphasis (e, m) ->
       Strong_emphasis ({ e with inline = normalize ~ext e.inline}, m)
   | Inlines (i :: is, m) ->
@@ -401,13 +401,13 @@ module Inline = struct
     | Break ({ type' = `Soft }, _) :: is ->
         let acc = if break_on_soft then newline acc else (push " " acc) in
         loop ~break_on_soft acc is
-    | Code_span (cs, _) :: is ->
+    | Inline_Code_span (cs, _) :: is ->
         loop ~break_on_soft (push (Code_span.code cs) acc) is
-    | Emphasis ({ inline }, _) :: is | Strong_emphasis ({ inline }, _) :: is ->
+    | Inline_Emphasis ({ inline }, _) :: is | Strong_emphasis ({ inline }, _) :: is ->
         loop ~break_on_soft acc (inline :: is)
     | Inlines (is', _) :: is ->
         loop ~break_on_soft acc (List.rev_append (List.rev is') is)
-    | Link (l, _) :: is | Image (l, _) :: is ->
+    | Inline_Link (l, _) :: is | Image (l, _) :: is ->
         loop ~break_on_soft acc (l.text :: is)
     | Raw_html _ :: is ->
         loop ~break_on_soft acc is
@@ -642,13 +642,13 @@ module Block = struct
   | Blank_line of Layout.blanks node
   | Block_quote of Block_quote.t node
   | Blocks of t list node
-  | Code_block of Code_block.t node
+  | Block_Code_block of Code_block.t node
   | Block_Heading of Heading.t node
-  | Html_block of Html_block.t node
+  | Block_Html_block of Html_block.t node
   | Link_reference_definition of Link_definition.t node
   | List of List'.t node
   | Block_Paragraph of Paragraph.t node
-  | Thematic_break of Thematic_break.t node
+  | Block_Thematic_break of Thematic_break.t node
 
   let empty = Blocks ([], Meta.none)
 
@@ -744,16 +744,16 @@ module Block = struct
 
   let ext_none _ = invalid_arg err_unknown
   let meta ?(ext = ext_none) = function
-  | Blank_line (_, m) | Block_quote (_, m) | Blocks (_, m) | Code_block (_, m)
-  | Block_Heading (_, m) | Html_block (_, m) | Link_reference_definition (_, m)
-  | List (_, m) | Block_Paragraph (_, m) | Thematic_break (_, m)
+  | Blank_line (_, m) | Block_quote (_, m) | Blocks (_, m) | Block_Code_block (_, m)
+  | Block_Heading (_, m) | Block_Html_block (_, m) | Link_reference_definition (_, m)
+  | List (_, m) | Block_Paragraph (_, m) | Block_Thematic_break (_, m)
   | Ext_math_block (_, m) | Ext_table (_, m)
   | Ext_footnote_definition (_, m) -> m
   | b -> ext b
 
   let rec normalize ?(ext = ext_none) = function
-  | Blank_line _ | Code_block _ | Block_Heading _ | Html_block _
-  | Link_reference_definition _ | Block_Paragraph _ | Thematic_break _
+  | Blank_line _ | Block_Code_block _ | Block_Heading _ | Block_Html_block _
+  | Link_reference_definition _ | Block_Paragraph _ | Block_Thematic_break _
   | Blocks ([], _) | Ext_math_block _ | Ext_table _ as b -> b
   | Block_quote (b, m) ->
       let b = { b with block = normalize ~ext b.block } in
@@ -780,8 +780,8 @@ module Block = struct
   let rec defs
       ?(ext = fun b defs -> invalid_arg err_unknown) ?(init = Label.Map.empty)
     = function
-    | Blank_line _ | Code_block _ | Block_Heading _ | Html_block _
-    | Block_Paragraph _ | Thematic_break _
+    | Blank_line _ | Block_Code_block _ | Block_Heading _ | Block_Html_block _
+    | Block_Paragraph _ | Block_Thematic_break _
     | Ext_math_block _ | Ext_table _ -> init
     | Block_quote (b, _) -> defs ~ext ~init (Block_quote.block b)
     | Blocks (bs, _) -> List.fold_left (fun init b -> defs ~ext ~init b) init bs
@@ -1287,7 +1287,7 @@ module Inline_struct = struct
     let textloc = textloc_of_lines p ~first ~last ~first_line ~last_line in
     let code_layout = raw_tight_block_lines p ~rev_spans in
     let meta = meta p textloc in
-    let cs = Inline.Code_span ({ backtick_count = count; code_layout }, meta) in
+    let cs = Inline.Inline_Code_span ({ backtick_count = count; code_layout }, meta) in
     Inline { start = first; inline = cs; endline = last_line; next = last + 1 }
 
   let autolink_token p line ~first ~last ~is_email =
@@ -1311,14 +1311,14 @@ module Inline_struct = struct
   let link_token p ~first ~last ~first_line ~last_line ~image link =
     let textloc = textloc_of_lines p ~first ~last ~first_line ~last_line in
     let link = link, meta p textloc in
-    let inline = if image then Inline.Image link else Inline.Link link in
+    let inline = if image then Inline.Image link else Inline.Inline_Link link in
     Inline { start = first; inline; endline = last_line; next = last + 1 }
 
   let emphasis_token p ~first ~last ~first_line ~last_line ~strong emph =
     let textloc = textloc_of_lines p ~first ~last ~first_line ~last_line in
     let delim = p.i.[first] in
     let e = { Inline.Emphasis.delim; inline = emph}, meta p textloc in
-    let i = if strong then Inline.Strong_emphasis e else Inline.Emphasis e in
+    let i = if strong then Inline.Strong_emphasis e else Inline.Inline_Emphasis e in
     Inline { start = first; inline = i ; endline = last_line; next = last + 1 }
 
   let ext_strikethrough_token p ~first ~last ~first_line ~last_line s =
@@ -2064,11 +2064,11 @@ module Block_struct = struct
   | Blank_line of space_pad * line_span
   | Code_block of code_block
   | Block_Heading of heading
-  | Html_block of html_block
+  | Block_Html_block of html_block
   | List of list'
   | Linkref_def of Link_definition.t node
   | Block_Paragraph of paragraph
-  | Thematic_break of Layout.indent * line_span (* including trailing blanks *)
+  | Block_Thematic_break of Layout.indent * line_span (* including trailing blanks *)
   | Ext_table of Layout.indent * (line_span * line_span (* trail blanks *)) list
   | Ext_footnote of Layout.indent * (Label.t * Label.t option) * t list
 
@@ -2098,7 +2098,7 @@ module Block_struct = struct
   let thematic_break p ~indent ~last:_ =
     let last = p.current_line_last_char (* let's keep everything *) in
     let break = current_line_span p ~first:p.current_char ~last in
-    Thematic_break (indent, break)
+    Block_Thematic_break (indent, break)
 
   let atx_heading p ~indent ~level ~after_open ~first_content ~last_content =
     let heading = current_line_span p ~first:first_content ~last:last_content in
@@ -2141,7 +2141,7 @@ module Block_struct = struct
       if Match.html_block_end p.i ~end_cond ~last ~start:p.current_char
       then None (* We are already closed *) else Some end_cond
     in
-    Html_block { end_cond; html = [current_line_span p ~first ~last] }
+    Block_Html_block { end_cond; html = [current_line_span p ~first ~last] }
 
   let paragraph p ~start =
     let last = p.current_line_last_char in
@@ -2321,9 +2321,9 @@ module Block_struct = struct
 
   let end_doc_close_html p h bs = match h.html with
   | l :: html when l.first > l.last (* empty line *) ->
-      Blank_line (0, l) :: Html_block { end_cond = None; html } :: bs
+      Blank_line (0, l) :: Block_Html_block { end_cond = None; html } :: bs
   | _ ->
-      Html_block { h with end_cond = None } :: bs
+      Block_Html_block { h with end_cond = None } :: bs
 
   let rec end_doc p = function
   | Block_quote (indent, marker, bq) :: bs ->
@@ -2332,9 +2332,9 @@ module Block_struct = struct
   | Block_Paragraph par :: bs -> close_paragraph p par bs
   | Code_block (`Indented ls) :: bs -> close_indented_code_block p ls bs
   | Code_block (`Fenced f) :: bs -> end_doc_close_fenced_code_block p f bs
-  | Html_block html :: bs -> end_doc_close_html p html bs
+  | Block_Html_block html :: bs -> end_doc_close_html p html bs
   | Ext_footnote (i, l, blocks) :: bs -> close_footnote p i l blocks bs
-  | (Thematic_break _ | Block_Heading _ | Blank_line _ | Linkref_def _
+  | (Block_Thematic_break _ | Block_Heading _ | Blank_line _ | Linkref_def _
     | Ext_table _ ) :: _ | [] as bs -> bs
 
   (* Adding lines to blocks *)
@@ -2562,17 +2562,17 @@ module Block_struct = struct
           Code_block (`Fenced { b with fence }) :: bs
 
   let try_add_to_html_block p b bs = match b.end_cond with
-  | None -> add_open_blocks p (Html_block { b with end_cond = None} :: bs)
+  | None -> add_open_blocks p (Block_Html_block { b with end_cond = None} :: bs)
   | Some end_cond ->
       let start = p.current_char and last = p.current_line_last_char in
       let l = current_line_span p ~first:start ~last in
       if not (Match.html_block_end p.i ~end_cond ~last ~start)
-      then Html_block { b with html = l :: b.html } :: bs else
+      then Block_Html_block { b with html = l :: b.html } :: bs else
       match end_cond with
       | `End_blank | `End_blank_7 ->
-          blank_line p :: Html_block { b with end_cond = None } :: bs
+          blank_line p :: Block_Html_block { b with end_cond = None } :: bs
       | _ ->
-          Html_block { end_cond = None; html = l :: b.html } :: bs
+          Block_Html_block { end_cond = None; html = l :: b.html } :: bs
 
   let rec try_lazy_continuation p ~indent_start = function
   | Block_Paragraph par :: bs -> Some (add_paragraph_line p ~indent_start par bs)
@@ -2683,13 +2683,13 @@ module Block_struct = struct
 
   and add_line p = function
   | Block_Paragraph par :: bs -> try_add_to_paragraph p par bs
-  | ((Thematic_break _ | Block_Heading _ | Blank_line _ | Linkref_def _) :: _)
+  | ((Block_Thematic_break _ | Block_Heading _ | Blank_line _ | Linkref_def _) :: _)
   | [] as bs -> add_open_blocks p bs
   | List list :: bs -> try_add_to_list_item p list bs
   | Code_block (`Indented ls) :: bs -> try_add_to_indented_code_block p ls bs
   | Code_block (`Fenced f) :: bs -> try_add_to_fenced_code_block p f bs
   | Block_quote (ind, marker, bq) :: bs -> try_add_to_block_quote p ind bq marker bs
-  | Html_block html :: bs -> try_add_to_html_block p html bs
+  | Block_Html_block html :: bs -> try_add_to_html_block p html bs
   | Ext_table (ind, rows) :: bs -> try_add_to_table p ind rows bs
   | Ext_footnote (i, l, blocks) :: bs -> try_add_to_footnote p i l blocks bs
 
@@ -2762,7 +2762,7 @@ let block_struct_to_code_block p = function
       let start = Meta.textloc (snd (List.hd code)) in
       meta p (Textloc.set_last start ~last_byte ~last_line)
     in
-    Block.Code_block ({layout; info_string; code}, meta)
+    Block.Block_Code_block ({layout; info_string; code}, meta)
 | `Fenced { Block_struct.fence; code = ls } ->
     let layout =
       let opening_fence = layout_clean_raw_span p fence.opening_fence in
@@ -2784,7 +2784,7 @@ let block_struct_to_code_block p = function
     let cb = {Block.Code_block.layout = `Fenced layout; info_string; code} in
     if p.exts && Block.Code_block.is_math_block info_string
     then Block.Ext_math_block (cb, meta)
-    else Block.Code_block (cb, meta)
+    else Block.Block_Code_block (cb, meta)
 
 let block_struct_to_heading p = function
 | `Atx { Block_struct.indent; level; after_open; heading; layout_after } ->
@@ -2831,7 +2831,7 @@ let block_struct_to_html_block p (b : Block_struct.html_block) =
   let lines = List.rev_map (clean_raw_span p) b.html in
   let start_loc = Meta.textloc (snd (List.hd lines)) in
   let meta = meta p (Textloc.set_last start_loc ~last_byte ~last_line) in
-  Block.Html_block (lines, meta)
+  Block.Block_Html_block (lines, meta)
 
 let block_struct_to_paragraph p par =
   let layout, inline = Inline_struct.parse p par.Block_struct.lines in
@@ -2841,7 +2841,7 @@ let block_struct_to_paragraph p par =
 
 let block_struct_to_thematic_break p indent span =
   let layout, meta = (* not layout because of loc *) clean_raw_span p span in
-  Block.Thematic_break ({ indent; layout }, meta)
+  Block.Block_Thematic_break ({ indent; layout }, meta)
 
 let block_struct_to_table p indent rows =
   let rec loop p col_count last_was_sep acc = function
@@ -2969,10 +2969,10 @@ and block_struct_to_block p = function
     block_struct_to_block_quote p ind marker bs
 | Block_struct.List list -> block_struct_to_list p list
 | Block_struct.Block_Paragraph par -> block_struct_to_paragraph p par
-| Block_struct.Thematic_break (i, br) -> block_struct_to_thematic_break p i br
+| Block_struct.Block_Thematic_break (i, br) -> block_struct_to_thematic_break p i br
 | Block_struct.Code_block cb -> block_struct_to_code_block p cb
 | Block_struct.Block_Heading h -> block_struct_to_heading p h
-| Block_struct.Html_block html -> block_struct_to_html_block p html
+| Block_struct.Block_Html_block html -> block_struct_to_html_block p html
 | Block_struct.Blank_line (pad, span) -> block_struct_to_blank_line p pad span
 | Block_struct.Linkref_def r -> Block.Link_reference_definition r
 | Block_struct.Ext_table (i, rows) -> block_struct_to_table p i rows
@@ -3047,17 +3047,17 @@ module Mapper = struct
   | `Default ->
       let open Inline in
       match i with
-      | Autolink _ | Break _ | Code_span _ | Raw_html _
+      | Autolink _ | Break _ | Inline_Code_span _ | Raw_html _
       | Text _ | Ext_math_span _ as i -> Some i
       | Image (l, meta) ->
           let text = Option.value ~default:Inline.empty (map_inline m l.text) in
           Some (Image ({ l with text }, meta))
-      | Link (l, meta) ->
+      | Inline_Link (l, meta) ->
           let* text = map_inline m l.text in
-          Some (Link ({ l with text }, meta))
-      | Emphasis (e, meta) ->
+          Some (Inline_Link ({ l with text }, meta))
+      | Inline_Emphasis (e, meta) ->
           let* inline = map_inline m e.inline in
-          Some (Emphasis ({ e with inline }, meta))
+          Some (Inline_Emphasis ({ e with inline }, meta))
       | Strong_emphasis (e, meta) ->
           let* inline = map_inline m e.inline in
           Some (Strong_emphasis ({ e with inline}, meta))
@@ -3074,8 +3074,8 @@ module Mapper = struct
   | `Default ->
       let open Block in
       match b with
-      | Blank_line _ | Code_block _ | Html_block _
-      | Link_reference_definition _ | Thematic_break _
+      | Blank_line _ | Block_Code_block _ | Block_Html_block _
+      | Link_reference_definition _ | Block_Thematic_break _
       | Ext_math_block _ as b -> Some b
       | Block_Heading (h, meta) ->
           let inline = match map_inline m (Block.Heading.inline h) with
@@ -3166,10 +3166,10 @@ module Folder = struct
   | `Default ->
       let open Inline in
       match i with
-      | Autolink _ | Break _ | Code_span _ | Raw_html _ | Text _
+      | Autolink _ | Break _ | Inline_Code_span _ | Raw_html _ | Text _
       | Ext_math_span _ -> acc
-      | Image (l, _) | Link (l, _) -> fold_inline f acc l.text
-      | Emphasis ({ inline }, _) -> fold_inline f acc inline
+      | Image (l, _) | Inline_Link (l, _) -> fold_inline f acc l.text
+      | Inline_Emphasis ({ inline }, _) -> fold_inline f acc inline
       | Strong_emphasis ({ inline }, _) -> fold_inline f acc inline
       | Inlines (is, _) -> List.fold_left (fold_inline f) acc is
       | Ext_strikethrough (inline, _) -> fold_inline f acc inline
@@ -3180,8 +3180,8 @@ module Folder = struct
   | `Default ->
       let open Block in
       match b with
-      | Blank_line _ | Code_block _ | Html_block _
-      | Link_reference_definition _ | Thematic_break _ | Ext_math_block _ -> acc
+      | Blank_line _ | Block_Code_block _ | Block_Html_block _
+      | Link_reference_definition _ | Block_Thematic_break _ | Ext_math_block _ -> acc
       | Block_Heading (h, _) -> fold_inline f acc (Block.Heading.inline h)
       | Block_quote (bq, _) -> fold_block f acc bq.block
       | Blocks (bs, _) -> List.fold_left (fold_block f) acc bs

@@ -272,11 +272,11 @@ let math_span c ms =
 let inline c = function
 | Inline.Autolink (a, _) -> autolink c a; true
 | Inline.Break (b, _) -> break c b; true
-| Inline.Code_span (cs, _) -> code_span c cs; true
-| Inline.Emphasis (e, _) -> emphasis c e; true
+| Inline.Inline_Code_span (cs, _) -> code_span c cs; true
+| Inline.Inline_Emphasis (e, _) -> emphasis c e; true
 | Inline.Image (i, _) -> image c i; true
 | Inline.Inlines (is, _) -> inlines c is; true
-| Inline.Link (l, _) -> link c l; true
+| Inline.Inline_Link (l, _) -> link c l; true
 | Inline.Raw_html (html, _) -> raw_html c html; true
 | Inline.Strong_emphasis (e, _) -> strong_emphasis c e; true
 | Inline.Text (t, _) -> text c t; true
@@ -423,14 +423,14 @@ let block c = function
 | Block.Blank_line (l, _) -> blank_line c l; true
 | Block.Block_quote (b, _) -> block_quote c b; true
 | Block.Blocks (bs, _) -> List.iter (C.block c) bs; true
-| Block.Code_block (cb, _) -> code_block c cb; true
+| Block.Block_Code_block (cb, _) -> code_block c cb; true
 | Block.Block_Heading (h, _) -> heading c h; true
-| Block.Html_block (h, _) -> html_block c h; true
+| Block.Block_Html_block (h, _) -> html_block c h; true
 | Block.Link_reference_definition (ld, _) ->
     link_reference_definition c ld; true
 | Block.List (l, _) -> list c l; true
 | Block.Block_Paragraph (p, _) -> paragraph c p; true
-| Block.Thematic_break (t, _) -> thematic_break c t; true
+| Block.Block_Thematic_break (t, _) -> thematic_break c t; true
 | Block.Ext_math_block (cb, _) -> code_block c cb; true
 | Block.Ext_table (t, _) -> table c t; true
 | Block.Ext_footnote_definition (t, _) -> footnote c t; true

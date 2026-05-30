@@ -817,11 +817,11 @@ module Inline : sig
   type t +=
   | Autolink of Autolink.t node
   | Break of Break.t node
-  | Code_span of Code_span.t node
-  | Emphasis of Emphasis.t node
+  | Inline_Code_span of Code_span.t node
+  | Inline_Emphasis of Emphasis.t node
   | Image of Link.t node
   | Inlines of t list node (** Splicing *)
-  | Link of Link.t node
+  | Inline_Link of Link.t node
   | Raw_html of Raw_html.t node
   | Strong_emphasis of Emphasis.t node
   | Text of Text.t node (** *)
@@ -1195,15 +1195,15 @@ module Block : sig
   | Blank_line of Blank_line.t node
   | Block_quote of Block_quote.t node
   | Blocks of t list node (** Splicing *)
-  | Code_block of Code_block.t node
+  | Block_Code_block of Code_block.t node
   | Block_Heading of Heading.t node
-  | Html_block of Html_block.t node
+  | Block_Html_block of Html_block.t node
   | Link_reference_definition of Link_definition.t node
     (** {{:https://spec.commonmark.org/0.31.2/#link-reference-definitions}
         Link reference definitions}, kept for layout *)
   | List of List'.t node
   | Block_Paragraph of Paragraph.t node
-  | Thematic_break of Thematic_break.t node
+  | Block_Thematic_break of Thematic_break.t node
     (** {{:https://spec.commonmark.org/0.31.2/#paragraphs}Thematic break} *)
   (** The CommonMark {{:https://spec.commonmark.org/0.31.2/#leaf-blocks}leaf}
       and {{:https://spec.commonmark.org/0.31.2/#container-blocks}container}

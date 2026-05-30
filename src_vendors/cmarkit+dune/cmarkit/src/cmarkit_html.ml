@@ -261,11 +261,11 @@ let math_span c ms =
 let inline c = function
 | Inline.Autolink (a, _) -> autolink c a; true
 | Inline.Break (b, _) -> break c b; true
-| Inline.Code_span (cs, _) -> code_span c cs; true
-| Inline.Emphasis (e, _) -> emphasis c e; true
+| Inline.Inline_Code_span (cs, _) -> code_span c cs; true
+| Inline.Inline_Emphasis (e, _) -> emphasis c e; true
 | Inline.Image (i, _) -> image c i; true
 | Inline.Inlines (is, _) -> List.iter (C.inline c) is; true
-| Inline.Link (l, _) -> link c l; true
+| Inline.Inline_Link (l, _) -> link c l; true
 | Inline.Raw_html (html, _) -> raw_html c html; true
 | Inline.Strong_emphasis (e, _) -> strong_emphasis c e; true
 | Inline.Text (t, _) -> html_escaped_string c t; true
@@ -430,12 +430,12 @@ let table c t =
 let block c = function
 | Block.Block_quote (bq, _) -> block_quote c bq; true
 | Block.Blocks (bs, _) -> List.iter (C.block c) bs; true
-| Block.Code_block (cb, _) -> code_block c cb; true
+| Block.Block_Code_block (cb, _) -> code_block c cb; true
 | Block.Block_Heading (h, _) -> heading c h; true
-| Block.Html_block (h, _) -> html_block c h; true
+| Block.Block_Html_block (h, _) -> html_block c h; true
 | Block.List (l, _) -> list c l; true
 | Block.Block_Paragraph (p, _) -> paragraph c p; true
-| Block.Thematic_break (_, _) -> thematic_break c; true
+| Block.Block_Thematic_break (_, _) -> thematic_break c; true
 | Block.Ext_math_block (cb, _) -> math_block c cb; true
 | Block.Ext_table (t, _) -> table c t; true
 | Block.Blank_line _
@@ -446,7 +446,7 @@ let block c = function
 (* XHTML rendering *)
 
 let xhtml_block c = function
-| Block.Thematic_break _ -> C.string c "<hr />\n"; true
+| Block.Block_Thematic_break _ -> C.string c "<hr />\n"; true
 | b -> block c b
 
 let xhtml_inline c = function
