@@ -4,6 +4,7 @@ module Unified {
 	[@mel.module "unified"] external make : unit => t = "unified";
 
 	[@mel.send] external use : t => middleware => t = "use";
+	[@mel.send] external use2 : t => middleware => 'opt => t = "use";
 	[@mel.send] external parse : t => string => Js.t({ .. }) = "parse";
 	[@mel.send] external stringify : t => 'a => string = "stringify";
 	[@mel.send] external process : t => string => Js.promise(file) = "process";
@@ -12,12 +13,27 @@ module Unified {
 
 module Rehype {
 	[@mel.module "rehype-sanitize"] external sanitize : Unified.middleware = "default"
+	[@mel.module "rehype-react"] external react : Unified.middleware = "default"
 	[@mel.module "rehype-stringify"] external stringify : Unified.middleware = "default"
 }
 
 module Remark {
 	[@mel.module "remark-parse"] external parse : Unified.middleware = "default"
 	[@mel.module "remark-rehype"] external rehype : Unified.middleware = "default"
+	[@mel.module "remark-gfm"] external gfm : Unified.middleware = "default"
+}
+
+module React {
+	include React
+
+	module JsxRuntime {
+		type t;
+		[@mel.module "react/jsx-runtime"] external production : t = "default"
+	}
+
+	module UFile {
+		[@mel.get] external result : Unified.file => React.element = "result"
+	}
 }
 
 external string : 'a => string = "String"
