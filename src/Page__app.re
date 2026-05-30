@@ -243,18 +243,7 @@ module Dashboard = {
 		// let ticketParam = ReasonReactRouter.useUrl().search;
     
     let fetchPostList = () => {
-      let open Fetch__syntax;
-      result
-      |> Model.Decode.Response.postListItems
-      >>= (aod => {
-        setItems( _ => aod);
-        return(aod)
-      })
-      >!= (err => {
-          Js.log(err);
-          return([||])
-        })
-      |> ignore;
+      setItems(_ => result |> Model.Decode.postListItems)
     }
     React.useEffect1(()=>{
       if (result != Js.Json.null)

@@ -26,7 +26,7 @@ module ShowHide = {
 }
 module Notes__Card = {
   [@react.component]
-  let make = (~index,~text,~updateNote,~swapNoteIndices,~deleteNote) => {
+  let make = (~index,~text,~updateNote,~swapNoteIndices) => {
     let (value,setValue) = React.useState(()=>text)
     ;
     <li className={"note"}>
@@ -51,9 +51,6 @@ module Notes__Card = {
                 React.Event.Keyboard.target(e)##blur()
               | "Enter"  => 
                 if(React.Event.Keyboard.ctrlKey(e)){
-                  if(String.length(value)==0)
-                    deleteNote(index)
-                  else
                   updateNote(index,value)
                 }
               | _ => ()
@@ -98,17 +95,6 @@ module Notes = {
     let insertNote = () => {
       setNoteList(l => [{index: List.length(noteList), text: "New note"},...l] )
     }
-    let updateNote = (index , text) => {
-      setNoteList(l => 
-        l
-        |> List.map((n)=>{
-          n.index
-          |> fun
-          | x when x == index => {index:n.index,text:text}
-          | _ => n
-        })
-      )
-    }
     let swapNoteIndices = ( a:int , b:int ) => {
       if( a >= 0 && a < List.length(noteList) && b >= 0 && b < List.length(noteList))
       setNoteList(l => 
@@ -132,6 +118,20 @@ module Notes = {
         l
         |> List.filter(n => n.index != i)
         |> normalizeList
+      )
+    }
+    let updateNote = (index , text) => {
+      if(String.length(text)==0)
+        deleteNote(index)
+      else
+        setNoteList(l => 
+        l
+        |> List.map((n)=>{
+          n.index
+          |> fun
+          | x when x == index => {index:n.index,text:text}
+          | _ => n
+        })
       )
     }
     let loadNoteList = () => {
@@ -190,7 +190,7 @@ module Notes = {
               text=note.text
               updateNote
               swapNoteIndices
-              deleteNote/>
+              />
             )
 					|> Array.of_list
           |> array

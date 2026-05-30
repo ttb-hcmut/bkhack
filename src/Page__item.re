@@ -74,7 +74,21 @@ module ArticleHeader = {
 				</button>
 			</div>
 			<h1>{React.string(info.title)}</h1>
-			<ul className="tags">{tags |> Array.map(x => <li key=x><span className="tag">{React.string(x)}</span></li>) |> React.array}</ul>
+			<ul className="tags">
+      { open Model.TagButTheColorIsAString;
+        tags 
+        |> List.map(x => 
+        <li key={string_of_int(x.tag_id)}>
+          <span className="tag" 
+          style={ReactDOM.Style.make(
+            ~color           = x.tag_color
+          , ~borderColor     = x.tag_color
+          , ~backgroundColor = "color-mix(in srgb, "++x.tag_color++", transparent 75%)"
+          , ())}>
+            {React.string(x.tag_name)}
+          </span>
+        </li>) |> Array.of_list |> React.array}
+      </ul>
 			<div className="author">
 				<span>{React.string(info.owner_name)}</span>
 				<div className="created-from"></div>
@@ -431,25 +445,13 @@ module DiscussionView = {
           else{
             setLoading(_=>true);
             switch(pType,result){
-            | ("post",None) => ();
+            | ("post",x) when x == Js.Json.null => ();
             | (t,r) =>
               switch(t,r){
-              | ("post",Some(r)) => 
-                Js.Promise.resolve(r) 
-                >>= Model.Decode.Response.fetchedComments
-                >>= (aod => {
-                  setComments( _ => aod);
-                  setShowMore( _ => false);
-                  setLoading( _ => false);
-                  Js.Promise.resolve(aod)
-                })
-                >!= (err => {
-                    Js.log(err);
-                    setShowMore( _ => false);
-                    setLoading(_=>false);
-                    return([||])
-                  })
-                |> ignore;
+              | ("post",r) when r != Js.Json.null => 
+                setComments( _ => r |> Model.Decode.fetchedComments);
+                setShowMore( _ => false);
+                setLoading( _ => false);
               | _ =>
                 let request = Env.backend ++ "/api/comment/get"
                   ++ "?limit="  ++ string_of_int(limit)
@@ -488,11 +490,11 @@ module DiscussionView = {
           };
         };
         React.useEffect2(()=>{
-          if(showRep) revealReplies(result);
+          if(showRep) revealReplies(result |> Option.value(~default=Js.Json.null));
           None
         },(showRep, result))
         React.useEffect1(()=>{
-          fetchComments(result);
+          fetchComments(result |> Option.value(~default=Js.Json.null));
           None
         },[|result|])
         // React.useEffect1(()=>{
@@ -532,7 +534,7 @@ module DiscussionView = {
           <LoadingComments id show={showRep && loading} />
         </ol>
         <button className="more-replies"
-        onClick={ _ => fetchComments(result) }
+        onClick={ _ => fetchComments(result |> Option.value(~default=Js.Json.null)) }
         hidden={!showRep || !showMore || loading}>
           {React.string("More replies")}
         </button>
@@ -877,9 +879,10 @@ module App{
 			let pr_id = Util.parseQueryParams(url.search)->Js.Dict.get("pr_id");
 			pr_id |> Option.map(int_of_string)
 		});
-		let (pullrequests, setPrs) = React.useState(() => [||]);
+		let (pullrequests, setPrs)  = React.useState(() => [||]);
 		let (postInfo, setPostInfo) = React.useState(() : option(Model.FetchedPost.t) => None);
-		let tags = [| "Algorithm", "Rust" |];
+		let (postTag, setPostTag)   = React.useState(() : list(Model.TagButTheColorIsAString.t) => []);
+		// let tags = [| "Algorithm", "Rust" |];
 		let renderer = React.useMemo0(() => Melange__cmarkit.Cmarkit_html.renderer(~safe=false, ()));
 		let art = React.useMemo2(() => {
 			open Melange__cmarkit; open Cmarkit;
@@ -922,20 +925,43 @@ module App{
 		}));
 		React__effect.useAsync0(() => Fetch__syntax.({
 			let post_id = Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id"));
-        Fetch.fetch(Env.backend ++ "/api/post/get/"
-          ++ "?post_id=" ++ post_id
-          ++ "&user_id=" ++ string_of_int(Option.value(auth.getUserId(), ~default= -1))
-          ++ "&v=latest")
-        >>= Fetch.Response.json
-        >>= Model.Decode.Response.fetchedPost
-        >!= (err => {
-            Js.log(err);
-            Js.Promise.reject(Js.Exn.anyToExnInternal @@ err)
-          })
-        >>= (aod => {
-          setPostInfo(_ => Some(aod));
-          Js.Promise.resolve(())
+      Fetch.fetch(Env.backend ++ "/api/tag/get"
+        ++ "?postid=" ++ post_id)
+      >>= Fetch.Response.json
+      >>= Model.Decode.Response.tags
+      >!= (err => {
+          Js.log(err);
+          Js.Promise.reject(Js.Exn.anyToExnInternal @@ err)
         })
+      >>= (aod => {
+        open Model.Tag;
+        setPostTag(
+            _ => aod
+            |> Array.map((d) => 
+              { Model.TagButTheColorIsAString.tag_id    : d.tag_id
+              , Model.TagButTheColorIsAString.tag_name  : d.tag_name
+              , Model.TagButTheColorIsAString.tag_color : d.tag_color |> Util.rgbaIntToHexString
+              } 
+            )
+            |> Array.to_list
+        );
+        return(aod)
+      })
+      |> ignore
+      Fetch.fetch(Env.backend ++ "/api/post/get/"
+        ++ "?post_id=" ++ post_id
+        ++ "&user_id=" ++ string_of_int(Option.value(auth.getUserId(), ~default= -1))
+        ++ "&v=latest")
+      >>= Fetch.Response.json
+      >>= Model.Decode.Response.fetchedPost
+      >!= (err => {
+          Js.log(err);
+          Js.Promise.reject(Js.Exn.anyToExnInternal @@ err)
+        })
+      >>= (aod => {
+        setPostInfo(_ => Some(aod));
+        return(())
+      })
       // X.Fetch.all(module At_repo_2(
 			// 	{ include X.GenSQL; let tgt_post_id = post_id }))(module Env);
 			// if (posts->Array.length == 0) { raise(Item_not_found) } else {
@@ -1016,7 +1042,7 @@ module App{
 			</nav>
 			<main className={sidebarState ++ " " ++ id}>
 				<>
-					<header className=("only "++Article->Item.View.to_string)><ArticleHeader tags info=postInfo /></header>
+					<header className=("only "++Article->Item.View.to_string)><ArticleHeader tags=postTag info=postInfo /></header>
 					<div className=("innerbody only "++Article->Item.View.to_string)><ArticleBody headings article_body /></div>
 				</>
         <DiscussionView post_id= {int_of_string(Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id")))}/>
@@ -1041,11 +1067,10 @@ module App{
 				(auth.getUserId()|> fun | None => true | Some(u) => postInfo.owner_id != u) ?
 				React.null
 				:
-				<Item_view__editor.App className={Edit->Item.View.to_string} title=postInfo.title body=postInfo.body />
-        			}
-				<>
+				<Item_view__editor.App className={Edit->Item.View.to_string} title=postInfo.title body=postInfo.body 
+        tag={open Model.TagButTheColorIsAString;
+          postTag |> List.map((a)=>a.tag_id)} />}
 					<Item_view__log.App className={Log->Item.View.to_string} parentId=postInfo.post_id />
-				</>
 			</main>
 			
 			<Component__sidebar sidebarState setSidebarState />
@@ -1061,8 +1086,10 @@ module Error_page(C : Decorator.Component) {
 	let fallback = fun
 	| Item_not_found =>
 		<dialog open_=true>"not_found"->string</dialog>
-	| _ =>
-		<div>"error"->string</div>
+	| e => {
+    Js.Console.error2("damn", e);
+		<div>("error")->string</div>
+  }
 	;
 
 	[@react.component] let make = () =>

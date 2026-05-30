@@ -1,10 +1,11 @@
 defmodule PostBE do
   import Ecto.Query
-  def createPost(data, creator_id,post_title,post_text,commit_message,public)do
+  def createPost(data, creator_id,post_title,post_text,commit_message,public,tag)do
     query = from u in User, select: u.role, where: u.user_id == ^creator_id
     role = data.one(query)
     res = data.transact(fn ->
-      with {:ok, commit} <- CommitBE.insertCommit(data, creator_id,post_title,post_text,commit_message)
+      with {:ok, commit} <- CommitBE.insertCommit(data, creator_id,post_title,post_text,commit_message),
+           {:ok, _}      <- TagBE.addCommitTags(data, commit.commit_id, tag)
       do
         changeset = Post.changeset(%Post{}, %{
           post_owner_id:  creator_id,
@@ -20,11 +21,12 @@ defmodule PostBE do
       {:error,cs} -> IO.inspect(cs); nil
     end
   end
-  def updatePost(data, post_id,creator_id,post_title,post_text,commit_message) do
+  def updatePost(data, post_id,creator_id,post_title,post_text,commit_message, tag) do
     {:ok,res} = data.transact(fn ->
       with {:ok, newCommit} <- CommitBE.insertCommit(data, creator_id,post_title,post_text,commit_message),
            %Post{} = post     <- from(u in Post, where: u.post_id == ^post_id and u.post_owner_id == ^creator_id)|> select([u],u) |> data.one,
            %Commit{} = commit <- from(u in Commit, where: u.commit_id == ^newCommit.commit_id) |> select([u],u) |> data.one,
+           {:ok, _}       <- TagBE.addCommitTags(data, newCommit.commit_id, tag),
            _updatedCommit <- commit |> Commit.changeset(%{commit_child_id: post.commit_head_id}) |> data.update,
            _updatedPost   <- post |> Post.changeset(%{commit_head_id: commit.commit_id}) |> data.update
       do

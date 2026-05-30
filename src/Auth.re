@@ -1,4 +1,3 @@
-
 module AuthContext = {
   type t = {
     getUserId   : unit => option(int)

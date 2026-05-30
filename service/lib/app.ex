@@ -33,7 +33,39 @@ defmodule App
     |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
     |> put_resp_content_type("application/json")
   end
-
+  get "/api/tag/get" do
+    Logger.info "GET tag"
+    postid = Map.get(conn.params,"postid", nil) |> then(fn x -> if is_nil(x) do nil else x |> String.to_integer end end)
+    data = TagBE.getPostTag(Data,postid)
+    case data do
+      nil ->
+        {:ok, sh} = JSON.encode([])
+        conn
+        |> put_resp_free
+        |> send_resp(501 , sh)
+      x ->
+        {:ok, sh} = Jason.encode(x)
+        conn
+        |> put_resp_free
+        |> send_resp(200 , sh)
+    end
+  end
+  get "/api/tag/list" do
+    Logger.info "GET taglist"
+    data = TagBE.getTagAll(Data)
+    case data do
+      nil ->
+        {:ok, sh} = JSON.encode([])
+        conn
+        |> put_resp_free
+        |> send_resp(501 , sh)
+      x ->
+        {:ok, sh} = Jason.encode(x)
+        conn
+        |> put_resp_free
+        |> send_resp(200 , sh)
+    end
+  end
   get "/api/history/count" do
     Logger.info "GET historycount"
     postid = Map.get(conn.params,"postid", nil) |> then(fn x -> if is_nil(x) do nil else x |> String.to_integer end end)
@@ -182,12 +214,13 @@ defmodule App
     commit_message = body["commit_message"]
     public      = body["public"]
     post_id     = body["post-id"]
+    tag         = body["tag"]
 
     data = "User "<>Integer.to_string(creator_id)<>" with title: "<>title<>" and body: "<>post_body
     IO.puts(data);
     postId = case post_id do
-      -1 ->  PostBE.createPost(Data, creator_id, title, post_body, commit_message, public)
-      pid -> PostBE.updatePost(Data, pid, creator_id, title, post_body, commit_message)
+      -1 ->  PostBE.createPost(Data, creator_id, title, post_body, commit_message, public, tag)
+      pid -> PostBE.updatePost(Data, pid, creator_id, title, post_body, commit_message, tag)
     end
     case postId do
       nil ->
@@ -332,7 +365,7 @@ defmodule App
   end
 
   options "/api/postcomment", do: conn |> put_resp_free |> send_resp(200, "")
-  
+
   post "/api/postcomment" do
     Logger.info "POST comment"
     body = conn.body_params

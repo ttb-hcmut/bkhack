@@ -1,4 +1,3 @@
-
 import Ecto.Changeset
 defmodule User
   do use Ecto.Schema
@@ -113,5 +112,23 @@ defmodule CommentRating
     field :rating     ,:integer
     belongs_to  :the_voter    ,User    ,foreign_key: :voter_id   ,references: :user_id    ,define_field: false
     belongs_to  :the_comment  ,Comment ,foreign_key: :comment_id ,references: :comment_id ,define_field: false
+  end
+end
+defmodule Tag
+  do use Ecto.Schema
+  @primary_key {:tag_id, :id, autogenerate: true}
+  schema "tags" do
+    field :tag_name  ,:string
+    field :tag_color ,:integer
+  end
+end
+defmodule CommitTag
+  do use Ecto.Schema
+  @primary_key {:committags_id,:id,autogenerate: true}
+  schema "committags" do
+    field :tag_id    ,:integer
+    field :commit_id ,:integer
+    belongs_to  :the_tag    ,Tag    ,foreign_key: :tag_id     ,references: :tag_id    ,define_field: false
+    belongs_to  :the_commit ,Commit ,foreign_key: :commit_id  ,references: :commit_id ,define_field: false
   end
 end

@@ -86,12 +86,25 @@ dropTablesList = [
   fn -> Sqlx.query!(conn, ~S"drop table if exists commentratings", []) end,
   fn -> Sqlx.query!(conn, ~S"drop table if exists comments", []) end,
   fn -> Sqlx.query!(conn, ~S"drop table if exists posts", []) end,
+  fn -> Sqlx.query!(conn, ~S"drop table if exists committags", []) end,
   fn -> Sqlx.query!(conn, ~S"drop table if exists commits", []) end,
   fn -> Sqlx.query!(conn, ~S"drop table if exists users", []) end,
+  fn -> Sqlx.query!(conn, ~S"drop table if exists tags", []) end,
   fn -> IO.puts "Dropped tables" end
 ]
 IO.inspect dropTablesList
 createTablesList = [
+  fn -> Sqlx.query!(
+    conn,
+    ~S"""
+    create table if not exists tags (
+      tag_id integer primary key,
+      tag_name varchar(255) not null ,
+      tag_color integer not null
+    )
+    """,
+    []
+  ) end,
   fn -> Sqlx.query!(
     conn,
     ~S"""
@@ -134,6 +147,19 @@ createTablesList = [
       date_created_utc varchar(255) not null,
       foreign key (post_owner_id) references users(user_id),
       foreign key (commit_head_id) references commits(commit_id)
+    )
+    """,
+    []
+  ) end,
+  fn -> Sqlx.query!(
+    conn,
+    ~S"""
+    create table if not exists committags (
+      committags_id integer primary key,
+      tag_id integer,
+      commit_id integer,
+      foreign key (commit_id) references commits(commit_id),
+      foreign key (tag_id) references tags(tag_id)
     )
     """,
     []
@@ -195,6 +221,44 @@ IO.inspect createTablesList
 ```
 
 ## Scenarios
+
+<!-- livebook:{"branch_parent_index":2} -->
+
+## Tags
+
+```elixir
+for drop <- dropTablesList do drop.() end
+for create <- createTablesList do create.() end
+RunSql.query(conn,[
+  ~S"insert into users values (0, 'admin', 'password', 'email@bkhack.org', 0)",
+])
+RunSql.query(conn,[
+  ~S"insert into commits values (
+      0,
+      0,
+      null,
+      'first commit',
+      'post title',
+      'post body',
+      '2026-05-29T08:20:14Z')",
+  ~S"insert into posts values (
+      0,
+      0,
+      0,
+      false,
+      true,
+      '2026-05-29T08:20:14Z')",
+])
+RunSql.query(conn,[
+  ~S"insert into tags values (0, 'first tag', 0xff69ffff )",
+])
+RunSql.query(conn,[
+  ~S"select * from users",
+  ~S"select * from posts",
+  ~S"select * from commits",
+  ~S"select * from tags",
+])
+```
 
 <!-- livebook:{"branch_parent_index":2} -->
 

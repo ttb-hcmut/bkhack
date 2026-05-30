@@ -108,14 +108,7 @@ module Listview__Body = {
     let (items,setItems) = React.useState(() => [||])
     React.useEffect1(()=>{
       if(result != Js.Json.null){
-        open Fetch__syntax;
-        result
-        |> Model.Decode.Response.fetchedCommits
-        >>= (aod => {
-          setItems(_ => aod)
-          return(aod)
-        })
-        |> ignore;
+        setItems(_ => result |> Model.Decode.fetchedCommits)
       }
       None
     },[|result|])
@@ -126,7 +119,7 @@ module Listview__Body = {
       items
       |> Array.map(x => {
         <Listview__Body_Card 
-          key={"listviewbodycard"++(x.commit_id |> string_of_int)}
+          key={x.commit_id |> string_of_int}
           commit_id      = {x.commit_id      }
           commit_message = {x.commit_message }
           owner_name     = {x.owner_name     }
@@ -162,6 +155,6 @@ module Listview = {
 module App = {
   [@react.component]
   let make = (~className=?, ~parentId) => {
-    <Listview className=?className parentId/>
+    <Listview className=?className parentId />
   }
-}
+};
