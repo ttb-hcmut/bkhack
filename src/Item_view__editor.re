@@ -181,7 +181,7 @@ module App' = {
                   , ())}
                   onClick={_=>post.unsetTagList(a)}
                   >
-                    {React.string(tag.tag_name)} 
+                    {React.string("#"++tag.tag_name)} 
                   </li>
                 })
                 |> Array.of_list
@@ -191,7 +191,7 @@ module App' = {
             }
             </ul>
             <input type_="text"
-              placeholder="type to search for tags"
+              placeholder="type to search for tags..."
               value=tagInput
               onChange={e => setTagInput(_=>React.Event.Form.target(e)##value)}
             />

@@ -445,25 +445,13 @@ module DiscussionView = {
           else{
             setLoading(_=>true);
             switch(pType,result){
-            | ("post",None) => ();
+            | ("post",x) when x == Js.Json.null => ();
             | (t,r) =>
               switch(t,r){
-              | ("post",Some(r)) => 
-                Js.Promise.resolve(r) 
-                >>= Model.Decode.Response.fetchedComments
-                >>= (aod => {
-                  setComments( _ => aod);
-                  setShowMore( _ => false);
-                  setLoading( _ => false);
-                  Js.Promise.resolve(aod)
-                })
-                >!= (err => {
-                    Js.log(err);
-                    setShowMore( _ => false);
-                    setLoading(_=>false);
-                    return([||])
-                  })
-                |> ignore;
+              | ("post",r) when r != Js.Json.null => 
+                setComments( _ => r |> Model.Decode.fetchedComments);
+                setShowMore( _ => false);
+                setLoading( _ => false);
               | _ =>
                 let request = Env.backend ++ "/api/comment/get"
                   ++ "?limit="  ++ string_of_int(limit)
@@ -502,11 +490,11 @@ module DiscussionView = {
           };
         };
         React.useEffect2(()=>{
-          if(showRep) revealReplies(result);
+          if(showRep) revealReplies(result |> Option.value(~default=Js.Json.null));
           None
         },(showRep, result))
         React.useEffect1(()=>{
-          fetchComments(result);
+          fetchComments(result |> Option.value(~default=Js.Json.null));
           None
         },[|result|])
         // React.useEffect1(()=>{
@@ -546,7 +534,7 @@ module DiscussionView = {
           <LoadingComments id show={showRep && loading} />
         </ol>
         <button className="more-replies"
-        onClick={ _ => fetchComments(result) }
+        onClick={ _ => fetchComments(result |> Option.value(~default=Js.Json.null)) }
         hidden={!showRep || !showMore || loading}>
           {React.string("More replies")}
         </button>
@@ -1082,9 +1070,7 @@ module App{
 				<Item_view__editor.App className={Edit->Item.View.to_string} title=postInfo.title body=postInfo.body 
         tag={open Model.TagButTheColorIsAString;
           postTag |> List.map((a)=>a.tag_id)} />}
-				<>
 					<Item_view__log.App className={Log->Item.View.to_string} parentId=postInfo.post_id />
-				</>
 			</main>
 			
 			<Component__sidebar sidebarState setSidebarState />
