@@ -33,8 +33,25 @@ defmodule App
     |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
     |> put_resp_content_type("application/json")
   end
-  get "/api/tag/get" do
-    Logger.info "GET tag"
+  get "/api/tag/commit" do
+    Logger.info "GET committag"
+    commitid = Map.get(conn.params,"commitid", nil) |> then(fn x -> if is_nil(x) do nil else x |> String.to_integer end end)
+    data = TagBE.getCommitTag(Data,commitid)
+    case data do
+      nil ->
+        {:ok, sh} = JSON.encode([])
+        conn
+        |> put_resp_free
+        |> send_resp(501 , sh)
+      x ->
+        {:ok, sh} = Jason.encode(x)
+        conn
+        |> put_resp_free
+        |> send_resp(200 , sh)
+    end
+  end
+  get "/api/tag/post" do
+    Logger.info "GET posttag"
     postid = Map.get(conn.params,"postid", nil) |> then(fn x -> if is_nil(x) do nil else x |> String.to_integer end end)
     data = TagBE.getPostTag(Data,postid)
     case data do

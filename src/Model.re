@@ -4,6 +4,7 @@ module TagButTheColorIsAString = {
 	type t =
 		{ tag_id    : int
     , tag_name  : string
+    , tag_nick  : string
     , tag_color : string
 		}
 };
@@ -11,6 +12,7 @@ module Tag = {
 	type t =
 		{ tag_id    : int
     , tag_name  : string
+    , tag_nick  : string
     , tag_color : int
 		}
 };
@@ -74,6 +76,7 @@ module Decode = {
     Of_json.
     { tag_id    : json |> field("tag_id"    , int)
     , tag_name  : json |> field("tag_name"  , string)
+    , tag_nick  : json |> field("tag_nick"  , string)
     , tag_color : json |> field("tag_color" , int)
     }
   }

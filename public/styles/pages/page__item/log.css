@@ -184,6 +184,16 @@
   display: grid;
   gap: var(--space-c);
 }
+#root > main.log > .log > ol> .card > main > .tags::before {
+  content: "Tags: "
+}
+#root > main.log > .log > ol> .card > main > .tags {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  column-gap: var(--space-f);
+  background-color: var(--ctp-mantle);
+}
 #root > main.log > .log > ol> .card > main > .title {
   display: grid;
   background-color: var(--ctp-mantle);

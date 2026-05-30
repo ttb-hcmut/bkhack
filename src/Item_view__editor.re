@@ -134,6 +134,7 @@ module PostContext = {
             |> Array.map((d) => 
               { Model.TagButTheColorIsAString.tag_id    : d.tag_id
               , Model.TagButTheColorIsAString.tag_name  : d.tag_name
+              , Model.TagButTheColorIsAString.tag_nick  : d.tag_nick
               , Model.TagButTheColorIsAString.tag_color : d.tag_color |> Util.rgbaIntToHexString
               } 
             )
@@ -172,16 +173,19 @@ module App' = {
                   |> fun
                   | None => React.null
                   | Some(tag) =>
-                  <li key={"taglist"++string_of_int(a)}
-                  title="Click to remove tag"
-                  style={ReactDOM.Style.make(
-                    ~color           = tag.tag_color
-                  , ~borderColor     = tag.tag_color
-                  , ~backgroundColor = "color-mix(in srgb, "++tag.tag_color++", transparent 75%)"
-                  , ())}
+                  <li key={string_of_int(a)}
                   onClick={_=>post.unsetTagList(a)}
                   >
-                    {React.string("#"++tag.tag_name)} 
+                    <span className="tag"
+                    title="Click to remove tag"
+                    style={ReactDOM.Style.make(
+                      ~color           = tag.tag_color
+                    , ~borderColor     = tag.tag_color
+                    , ~backgroundColor = "color-mix(in srgb, "++tag.tag_color++", transparent 75%)"
+                    , ())}>
+                      {React.string(tag.tag_name)} 
+                      
+                    </span>
                   </li>
                 })
                 |> Array.of_list

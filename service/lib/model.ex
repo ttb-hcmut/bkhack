@@ -119,6 +119,7 @@ defmodule Tag
   @primary_key {:tag_id, :id, autogenerate: true}
   schema "tags" do
     field :tag_name  ,:string
+    field :tag_nick  ,:string
     field :tag_color ,:integer
   end
 end
