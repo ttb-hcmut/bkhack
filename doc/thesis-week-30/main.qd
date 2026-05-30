@@ -92,8 +92,11 @@ What is the most important aspect of a community platform?
 - Computer-science, developer-oriented from aesthetics to UX
 - Content integrity focused, GitHub-inspired PR system 
 
-![](./assets/bkhack-logo-withbg.png)
-
+.row alignment:{center}
+    .container background:{#1488DB} padding:{24px} radius:{16px}
+        !(_x100)[](./assets/logo-full.svg)
+    .container margin:{0cm 0cm 0cm 3cm}
+        !(_x150)[](./assets/logo.svg)
 ## Scope
 
 - Website / web platform
