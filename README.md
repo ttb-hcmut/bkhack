@@ -139,7 +139,7 @@ nix-shell
 ## Initial setup
 
 ```sh
-[ ! -d ~/.opam ] && opam init
+[ ! -d _opam ] && opam init
 eval $(opam env)
 
 pnpm install
