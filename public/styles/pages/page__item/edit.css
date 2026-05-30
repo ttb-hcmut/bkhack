@@ -327,14 +327,14 @@ dialog {
   font-weight: var(--font-weight-normal);
 }
 #root > main.edit > .edit > footer > .stats > .char::before {
-  content: "$ wc -m ";
+  content: "$ wc -m # => ";
   color: var(--ctp-subtext0);
 }
 #root > main.edit > .edit > footer > .stats > .char {
   color: var(--ctp-pink);
 }
 #root > main.edit > .edit > footer > .stats > .word::before {
-  content: "$ wc -w ";
+  content: "$ wc -w # => ";
   color: var(--ctp-subtext0);
 }
 #root > main.edit > .edit > footer > .stats > .word {
