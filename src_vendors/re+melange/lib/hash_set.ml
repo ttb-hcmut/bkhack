@@ -53,7 +53,7 @@ let[@inline] should_grow t =
   slots = 0 || (t.size > 0 && slots / t.size < 2)
 ;;
 
-let absent = -1
+let absent = -16711681
 
 let () =
   let x = Array.make_absent 1 in
