@@ -38,7 +38,7 @@ module Location {
 let comptime =
 Context_free.Rule.extension @@
 Extension.declare("comptime", Extension.Context.structure_item, Ast_pattern.(pstr(__))) @@
-(~loc, ~path) => fun | [{ pstr_loc, pstr_desc: Pstr_value(_recflag, [{ pvb_pat: { ppat_desc: u, _ } as pvb_pat, pvb_expr, pvb_attributes, pvb_loc }]) }, ..._] => {
+(~loc, ~path) => fun | [{ pstr_loc, pstr_desc: Pstr_value(_recflag, [{ pvb_pat: { ppat_desc: u, _ } as pvb_pat, pvb_expr, pvb_attributes, pvb_loc, _ } as kkk]) }, ..._] => {
 	switch (u) {
 		| Ppat_var({ txt: name, _ }) => {
 			let meta = List.map (({ attr_name: { loc: _, txt: attr_name }, attr_payload, attr_loc: _ }) => (attr_name, attr_payload), pvb_attributes);
@@ -76,7 +76,8 @@ Extension.declare("comptime", Extension.Context.structure_item, Ast_pattern.(pst
 					| Eval.Unknown_value_serialization_of_type(e) => Location.raise_error(~loc, "don't known how to parse return value of type '"++e++"'")
 					| _ => Location.raise_error(~loc, "failed to eval expression")
 				};
-			{ pstr_loc, pstr_desc: Pstr_value(_recflag, [{ pvb_pat, pvb_expr: pvb_expr', pvb_attributes, pvb_loc }]) }
+			[@warning "-23"]
+			{ pstr_loc, pstr_desc: Pstr_value(_recflag, [{ ...kkk, pvb_pat, pvb_expr: pvb_expr', pvb_attributes, pvb_loc }]) }
 		}
 		| _ => Location.raise_error(~loc, "let-binding LHS must be variable pattern")
 	}
