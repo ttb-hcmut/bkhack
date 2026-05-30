@@ -57,6 +57,37 @@ module Listview__Body_Card = {
   , ~timestamp      
   ) => {
     let (expand,setExpand) = React.useState(()=> false)
+    let (tags,setTags) = React.useState(()=> [||])
+    let fetchTags = (~id) => {
+      let open Fetch__syntax;
+      open Model.Tag;
+      Fetch.fetch(Env.backend ++ "/api/tag/commit"
+        ++ "?commitid="  ++ string_of_int(id))
+      >>= Fetch.Response.json
+      >>= Model.Decode.Response.tags
+      >!= (err => {
+          Js.log(err);
+          Js.Promise.reject(Js.Exn.anyToExnInternal @@ err)
+        })
+      >>= (aod => {
+        setTags(
+          _ => aod
+          |> Array.map((d) => 
+            { Model.TagButTheColorIsAString.tag_id    : d.tag_id
+            , Model.TagButTheColorIsAString.tag_name  : d.tag_name
+            , Model.TagButTheColorIsAString.tag_nick  : d.tag_nick
+            , Model.TagButTheColorIsAString.tag_color : d.tag_color |> Util.rgbaIntToHexString
+            } 
+          )
+        )
+        Js.Promise.resolve(aod)
+      })
+      |> ignore;
+    };
+    React.useEffect0(()=>{
+      fetchTags(~id=commit_id);
+      None
+    })
     ;
     <li className={"card " ++ (expand?"expand":"")}>
         <header>
@@ -72,6 +103,21 @@ module Listview__Body_Card = {
           <span className="timestamp">{React.string(Util.utcToRelative(timestamp))}</span>
         </header>
         <main hidden={!expand}>
+          <ul className="tags">
+          { open Model.TagButTheColorIsAString;
+            tags 
+            |> Array.map(x => 
+            <li key={string_of_int(x.tag_id)}>
+              <span className="tag" 
+              style={ReactDOM.Style.make(
+                ~color           = x.tag_color
+              , ~borderColor     = x.tag_color
+              , ~backgroundColor = "color-mix(in srgb, "++x.tag_color++", transparent 75%)"
+              , ())}>
+                {React.string(x.tag_name)}
+              </span>
+            </li>) |> React.array}
+          </ul>
           <div className="title">
             <input
               type_="text" 

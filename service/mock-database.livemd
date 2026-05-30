@@ -100,6 +100,7 @@ createTablesList = [
     create table if not exists tags (
       tag_id integer primary key,
       tag_name varchar(255) not null ,
+      tag_nick varchar(255) not null ,
       tag_color integer not null
     )
     """,
@@ -250,7 +251,10 @@ RunSql.query(conn,[
       '2026-05-29T08:20:14Z')",
 ])
 RunSql.query(conn,[
-  ~S"insert into tags values (0, 'first tag', 0xff69ffff )",
+  ~S"insert into tags values (0, 'first tag', 'ft', 0xff69ffff )",
+  ~S"insert into tags values (1, 'Artificial Inteligence', 'ai', 0xaa0000ff )",
+  ~S"insert into tags values (2, 'Functional Programming', 'fp', 0x00aa00ff )",
+  ~S"insert into tags values (3, 'Academic', 'ac', 0x0000AAff )",
 ])
 RunSql.query(conn,[
   ~S"select * from users",

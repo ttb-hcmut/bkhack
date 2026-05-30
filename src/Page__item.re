@@ -925,7 +925,7 @@ module App{
 		}));
 		React__effect.useAsync0(() => Fetch__syntax.({
 			let post_id = Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id"));
-      Fetch.fetch(Env.backend ++ "/api/tag/get"
+      Fetch.fetch(Env.backend ++ "/api/tag/post"
         ++ "?postid=" ++ post_id)
       >>= Fetch.Response.json
       >>= Model.Decode.Response.tags
@@ -940,6 +940,7 @@ module App{
             |> Array.map((d) => 
               { Model.TagButTheColorIsAString.tag_id    : d.tag_id
               , Model.TagButTheColorIsAString.tag_name  : d.tag_name
+              , Model.TagButTheColorIsAString.tag_nick  : d.tag_nick
               , Model.TagButTheColorIsAString.tag_color : d.tag_color |> Util.rgbaIntToHexString
               } 
             )

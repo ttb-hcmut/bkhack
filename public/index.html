@@ -409,6 +409,12 @@ html {
 	color: var(--card-fg-accent-1);
 	font-family: var(--font-mono); /* FIXME(kinten): we already rely on span.tag to set mono font. but for some reasons that isnt enough, the font will be mono but baseline is wrong. had to also set mono font here to get correct baseline */
 }
+#root > main > ol > li .tagline > ul {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  column-gap: var(--space-c);
+}
 
 #root > main > ol > li .status {
 	color: var(--card-fg-accent-1);

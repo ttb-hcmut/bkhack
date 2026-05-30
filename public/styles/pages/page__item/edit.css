@@ -130,7 +130,7 @@
   scrollbar-width: thin;
 	background-color: transparent;
 }
-#root > main.edit > .edit > header> .settings > .tags > ul > li {
+#root > main.edit > .edit > header> .settings > .tags > ul > li > span{
 	display: grid;
   grid-auto-flow: row;
   grid-template-columns: min-content min-content;
@@ -142,7 +142,7 @@
   border-radius: var(--radius);
   height: min-content;
 }
-#root > main.edit > .edit > header> .settings > .tags > ul > li:hover {
+#root > main.edit > .edit > header> .settings > .tags > ul > li > span:hover {
   cursor:pointer;
 }
 dialog {

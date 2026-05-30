@@ -24,9 +24,14 @@ defmodule TagBE do
     |> select([ct,t],%{
       tag_id:    t.tag_id,
       tag_name:  t.tag_name,
+      tag_nick:  t.tag_nick,
       tag_color: t.tag_color
     })
     |> where([ct,t],ct.commit_id == ^commit_id)
+  end
+  def getCommitTag(data,commit_id) do
+    getCommitTagQuery(commit_id)
+    |> data.all
   end
   def getPostTag(data,post_id) do
     with %Post{} = p <- Post|>select([p],p)|>where([p],p.post_id==^post_id)|>data.one
@@ -40,6 +45,7 @@ defmodule TagBE do
     |> select([t],%{
       tag_id: t.tag_id,
       tag_name: t.tag_name,
+      tag_nick:  t.tag_nick,
       tag_color: t.tag_color
       })
     |> then(fn x -> case name do
@@ -48,9 +54,10 @@ defmodule TagBE do
     end end)
     |> data.all
   end
-  def createTag(data,name,color\\0xffffffff) do
+  def createTag(data,name,nick,color\\0xffffffff) do
     row = data.insert!(%Tag{
         tag_name:     name,
+        tag_nick:     nick,
         tag_color:    color
       })
     IO.inspect row

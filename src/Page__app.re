@@ -123,6 +123,7 @@ module Dashboard = {
     , ~timestamp
     ) => {
       let (disCount,setDisCount) = React.useState(() => 0);
+      let (tags,setTags) = React.useState(() => [||]);
       let fetchCommentCount = (~id) => {
         let open Fetch__syntax;
         Fetch.fetch(Env.backend ++ "/api/comment/count"
@@ -140,8 +141,35 @@ module Dashboard = {
         })
         |> ignore;
       };
+      let fetchTags = (~id) => {
+        let open Fetch__syntax;
+        open Model.Tag;
+        Fetch.fetch(Env.backend ++ "/api/tag/post"
+          ++ "?postid="  ++ id)
+        >>= Fetch.Response.json
+        >>= Model.Decode.Response.tags
+        >!= (err => {
+            Js.log(err);
+            Js.Promise.reject(Js.Exn.anyToExnInternal @@ err)
+          })
+        >>= (aod => {
+          setTags(
+            _ => aod
+            |> Array.map((d) => 
+              { Model.TagButTheColorIsAString.tag_id    : d.tag_id
+              , Model.TagButTheColorIsAString.tag_name  : d.tag_name
+              , Model.TagButTheColorIsAString.tag_nick  : d.tag_nick
+              , Model.TagButTheColorIsAString.tag_color : d.tag_color |> Util.rgbaIntToHexString
+              } 
+            )
+          )
+          Js.Promise.resolve(aod)
+        })
+        |> ignore;
+      };
       React.useEffect0(()=>{
         fetchCommentCount(~id=string_of_int(id))
+        fetchTags(~id=string_of_int(id))
         None
       })
       ;
@@ -155,7 +183,21 @@ module Dashboard = {
         </header>
         <footer>
           <div className="has-left-indicator tagline">
-            <span className="tag" title="Algorithm, Optimization">{string("AgAa")}</span>
+            <ul>
+            { open Model.TagButTheColorIsAString;
+              tags 
+              |> Array.map(x => 
+              <li key={string_of_int(x.tag_id)}>
+                <span className="tag" 
+                title={x.tag_name}
+                style={ReactDOM.Style.make(
+                  ~color           = x.tag_color
+                , ())}>
+                  {React.string(x.tag_nick)}
+                </span>
+              </li>) |> React.array}
+            </ul>
+            // <span className="tag" "Algorithm, Optimization">{string("AgAa")}</span>
           </div>
           <div className="status">
             <span>{string(verified?"verified":"unverified")}</span>
