@@ -52,12 +52,12 @@ module Cmarkit_renderer {
 }
 
 module Cmarkit {
+
 	module Link_definition {
 		include M.Link_definition
 
-		let parse = s => {
-			M.Link_definition.make(~dest=(s, M.Meta.none), ())
-		}
+		let parse = s =>
+		M.Link_definition.make(~dest=(s, M.Meta.none), ())
 	}
 
 	module InlineCore {
@@ -117,9 +117,7 @@ module Cmarkit {
 	module Inline {
 		include InlineExt
 
-		let rec parse' = skel => {
-			skel->parse(parse')
-		}
+		let rec parse' = skel => skel->parse(parse')
 
 		let parse = parse'
 	}
@@ -170,7 +168,6 @@ module Cmarkit {
 
 		and parse_block_lines = skel =>
 			skel##"value" |> String.split_on_char('\n') |> List.map(x => (x, M.Meta.none))
-
 	}
 
 	module Doc {
@@ -183,8 +180,6 @@ module Cmarkit {
 			((Block.parse(skel), s) : doc)
 		}
 
-		let block = ((skel, _s)) => {
-			skel
-		}
+		let block = ((skel, _s)) => skel
 	}
 }
