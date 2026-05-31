@@ -44,7 +44,20 @@ It'd be nice to have a Reason abstraction for importing static assets. Currently
 
 [^jfp]: totally has nothing to do with initial vs. final encoding from theory of algebraic specification
 
+# Layered architecture
+
+At various "scales" of perspective, the system can be split into layers.
+
+For the front-end, there is a separation where the Reason code + HTML implements the "functional" layout, and the CSS implements the style (see Style layering).
+
+It is necessary to distinguish which belongs to layout and which belongs to style. The general definition is that the layout is the functional stuff, while the style is the decorative stuff. For our system, the rule of thumb is to try shifting as much stuff to styling as possible. It has got to the point where certain things which are traditionally associated with "layout" are instead grouped into "style" in our system. For example, translations and i18n. Traditionally, i18n is implemented in the application code as a kind of overloaded string in a programming language. In our system, translation is done instead in CSS, because all label elements are CSS `::before { content }` attributes instead of string values in application code.
+
+Our architecture is also modular. We try to best-effort organize so that each module syntactically map to each functional feature. The module / functor system of Reason / OCaml also greatly helps this, as a "code file module" can be represented as a language-level module, and a language-level functor can be seen a "code file function".
+
 # Style layering
+
+> [!NOTE]
+> This is implemented _entirely_ in CSS.
 
 0. CSS reset
 1. The initial encoding
