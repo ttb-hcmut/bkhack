@@ -12,13 +12,10 @@ let shellHook =
 	}
 	'';
 	pkgs = with nixpkgs; [
-		elixir
-		erlang
+		elixir erlang
+		pnpm nodejs
 		nixd
-		pnpm
-		opam
-		nodejs
-		rsync
+		opam rsync
 	];
 in
 	nixpkgs.mkShell {
