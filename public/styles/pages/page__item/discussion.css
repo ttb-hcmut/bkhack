@@ -70,6 +70,10 @@
 #root > main.discussions > header > .sub > .summary > .karma::after {
 	content: " karma";
 }
+#root:lang(vi-VN) > main.discussions > header > .sub > .summary > .karma {
+	&::before { content: "danh +"; }
+	&::after { content: ""; }
+}
 
 #root > main.discussions > header {
 	& > :first-child {
