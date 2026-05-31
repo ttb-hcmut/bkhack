@@ -1,4 +1,5 @@
 open Auth;
+module Melange__cmarkit = Remark_it
 
 module PostContext = {
   type t = {
@@ -412,10 +413,9 @@ module App' = {
     let make = (~seePreview) => {
       let post = PostContext.use()
       let auth = AuthContext.use()
-      let make_html_obj : string => Js.t({ .. __html : string }) = [%mel.raw "function (s) { return { __html : s }; }"]
       let show = (x, f) => switch (x) { | Some(info) => f(info) | None => { <> </> } };
 		  let (postInfo, setPostInfo) = React.useState(() => None);
-      let renderer = React.useMemo0(() => Melange__cmarkit.Cmarkit_html.renderer(~safe=false, ()));
+      let renderer = React.useMemo0 @@ () => Melange__cmarkit.Cmarkit_html.renderer'(~safe=false, ());
       let art = React.useMemo2(() => {
         open Melange__cmarkit; open Cmarkit;
         postInfo->Option.bind(((_, _, _, text) as postInfo) =>
@@ -430,7 +430,7 @@ module App' = {
             | _ => []
           };
           let headings = s(block) |> Melange__iter.Iter.of_list;
-          Some((postInfo, headings, Melange__cmarkit.Cmarkit_renderer.doc_to_string(renderer, skel)))
+          Some((postInfo, headings, Melange__cmarkit.Cmarkit_renderer.doc_to_string'(renderer, skel)))
         }) {
           | Failure(msg) | Invalid_argument(msg) => { post.setError("rendering error: '" ++ msg ++ "'"); None}
           | Js.Exn.Error(x) => { post.setError("js error: '" ++ Option.value(~default="", Js.Exn.message(x)) ++ "'"); None}
@@ -446,7 +446,9 @@ module App' = {
       show(art) @@ (((_, _postTitle, _, _) as _postInfo, _headings, article_body)) =>
 
       <main className="markdown" hidden={!seePreview}>
-			  <div dangerouslySetInnerHTML={make_html_obj @@ article_body} />
+			  <div>
+					{article_body}
+				</div>
       </main>
     }
   };
