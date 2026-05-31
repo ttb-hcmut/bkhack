@@ -1029,7 +1029,9 @@ module App{
 		let () = Keyboard.Mneumonics.use(module Js__dom.Window) @@ React.useCallback1(fun
 			| "a" => Option.some @@ _ => setCurrentTab'(~push=ReasonReactRouter.replace) @@ _ => Item.View.Article
 			| "b" => Option.some @@ _ => setCurrentTab'(~push=ReasonReactRouter.replace) @@ _ => Item.View.Discussion
-			| "c" => Option.some @@ _ => setCurrentTab'(~push=ReasonReactRouter.replace) @@ _ => Item.View.Discussion
+			| "c" => Option.some @@ _ => setCurrentTab'(~push=ReasonReactRouter.replace) @@ _ => Item.View.Pullrequest
+			| "d" => Option.some @@ _ => setCurrentTab'(~push=ReasonReactRouter.replace) @@ _ => Item.View.Log
+			| "e" => Option.some @@ _ => setCurrentTab'(~push=ReasonReactRouter.replace) @@ _ => Item.View.Edit
 			| _ => Option.none
 		, [|setCurrentTab'|])
 		show(art) @@ ((postInfo, headings, article_body)) =>

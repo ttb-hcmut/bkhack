@@ -228,7 +228,13 @@
 }
 
 #root > nav button > .mneumonics {
-	display: none;
+	overflow: hidden;
+	transition-property: max-width; /* NOTE(kinten) we could use either width or max-width. Prefer max-width here because for some reasons em unit works more consistently with it. */
+	transition-duration: 300ms;
+}
+
+#root > nav button > .mneumonics {
+	max-width: 0px;
 }
 
 #root > nav button > .mneumonics::before {
@@ -243,8 +249,20 @@
 	content: "[b]";
 }
 
+#root > nav button.pullrequests > .mneumonics::before {
+	content: "[c]";
+}
+
+#root > nav button.log > .mneumonics::before {
+	content: "[d]";
+}
+
+#root > nav button.edit > .mneumonics::before {
+	content: "[e]";
+}
+
 #root[data-mneumonics-visibility="visible"] > nav button > .mneumonics {
-	display: block;
+	max-width: 3em;
 }
 
 #root > nav button > data.count {
