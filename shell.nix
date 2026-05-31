@@ -15,10 +15,10 @@ let shellHook =
 		elixir
 		erlang
 		nixd
-		dune_3
 		pnpm
 		opam
 		nodejs
+		rsync
 	];
 in
 	nixpkgs.mkShell {

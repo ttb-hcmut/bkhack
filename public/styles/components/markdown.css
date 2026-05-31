@@ -1,17 +1,43 @@
 @import "/styles/variables.css";
 @import "/styles/widget-variables.css";
 
-.markdown > *{
- font-size: var(--text-base);
- color: var(--ctp-text);
- line-height: 1.5;
- padding: 0;
- margin: 0;
+.markdown *{
+  font-weight: var(--font-weight-normal);
+  font-size: var(--text-base);
+  color: var(--ctp-text);
+  line-height: 1.5;
+  padding: 0;
+  margin: 0;
+  height: fit-content;
 }
-.markdown > h{
- font-size: var(--text-2xl);
+.markdown h1{
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-2xl);
+  line-height: 2;
 }
-.markdown > a{
- color: var(--sig-blue);
- text-decoration: underline;
+.markdown h2{
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-xl);
+  line-height: 2;
+}
+.markdown h3{
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-lg);
+  line-height: 2;
+}
+.markdown a{
+  color: var(--sig-blue) !important;
+  text-decoration: underline;
+}
+.markdown strong{
+  font-weight: var(--font-weight-medium);
+}
+.markdown pre{
+  padding: var(--space-a);
+  border-radius: var(--radius);
+  border: 1px solid var(--card-border);
+  background-color: var(--ctp-crust);
+}
+.markdown pre > code{
+  font-family: var(--font-mono);
 }
