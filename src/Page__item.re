@@ -38,23 +38,20 @@ module ItemNav{
 			if (kind != currentTab) setCurrentTab(_ => kind)
 		}, (setCurrentTab, currentTab));
     <>
-    <button onClick={_ => choose(Article)} className=className(Article)> <label /> </button>
+    <button onClick={_ => choose(Article)} className=className(Article)> <label /> <div className="mneumonics" /> </button>
     <button onClick={_ => choose(Discussion)} className=className(Discussion)>
-      <label>{React.string("discussions")}</label>
-      <data className="count">{React.int(disCount)}</data>
+      <label /> <div className="mneumonics" /> <data className="count">{React.int(disCount)}</data>
     </button>
     <button onClick={_ => choose(Pullrequest)} className=className(Pullrequest)>
-      <label>{React.string("pull-requests")}</label>
-      <data className="count">{React.int(prCount)}</data>
+      <label /> <div className="mneumonics" /> <data className="count">{React.int(prCount)}</data>
     </button>
-    <button onClick={_ => choose(Log)} className=className(Log)>
-      <label>{React.string("history")}</label>
-    </button>
+    <button onClick={_ => choose(Log)} className=className(Log)> <label /> <div className="mneumonics" /> </button>
     { (auth.getUserId() |> fun | None => true | Some(u) => owner_id != u)?
       React.null
       :
       <button onClick={_ => choose(Edit)} className=className(Edit)> <label /> </button>
       }
+			<div className="mneumonics" />
     </>
   }
 }
@@ -141,7 +138,7 @@ module DiscussionView = {
       let auth = AuthContext.use();
       <>
         <div className="logo" />
-        <h1>{React.string("discussions")}</h1>
+        <h1 />
         <div className="sub">
           <span className="command">{React.string("discuss $id")}</span>
           <span className="summary">
@@ -865,7 +862,7 @@ module App{
     let auth = AuthContext.use()
 		let url = ReasonReactRouter.useUrl();
 		let (prsExpand, setPrsExpand) = useState(() => []);
-		let (tab, setTab) = useState(() => {
+		let (tab, setCurrentTab) = useState(() => {
 			Util.parseQueryParams(url.search)
 			->Js.Dict.get("view")
 			->Option.value(~default=Article->Item.View.to_string)
@@ -997,14 +994,15 @@ module App{
 			});
 			pr_inspect_set(_ => None)
 		}, [|pr_inspect_set|])
-		let setCurrentTab = React.useCallback2(f => setTab(x => {
+		let setCurrentTab' = React.useCallback2((~push=?, f) => setCurrentTab(x => {
 			let y = f(x);
-			ReasonReactRouter.push(String.concat("/", ["", ...url.path]) ++ {
+			let reasonreactrouter_push = push->Option.value(~default=ReasonReactRouter.push)
+			reasonreactrouter_push(String.concat("/", ["", ...url.path]) ++ {
 				let dict = Util.parseQueryParams'(url.search);
 				"/?" ++ ( dict |> Util.List.replace_assoc'("view", y->Item.View.to_string) |> Util.stringQueryParams' )
 			});
 			y
-		}), (setTab, url));
+		}), (setCurrentTab, url));
 		let memo_transition = React.useCallback2((url, url_args, k) => {
       postInfo
       |> fun
@@ -1017,10 +1015,10 @@ module App{
 				)) {
 					Some(() => {
 						let view = List.assoc_opt("view", url_args) |> Option.map(Item.View.of_string) |> Option.value(~default=Item.View.Article);
-						setCurrentTab(_ => view)
+						setCurrentTab'(_ => view)
 					})
 				} else if (url === "") {
-					Some(() => setCurrentTab(Fun.id))
+					Some(() => setCurrentTab'(Fun.id))
 				} else {
 					None
 				}
@@ -1028,6 +1026,12 @@ module App{
 				| None => k ()
 				| Some(f) => f ()
 		}, (setCurrentTab, postInfo));
+		let () = Keyboard.Mneumonics.use(module Js__dom.Window) @@ React.useCallback1(fun
+			| "a" => Option.some @@ _ => setCurrentTab'(~push=ReasonReactRouter.replace) @@ _ => Item.View.Article
+			| "b" => Option.some @@ _ => setCurrentTab'(~push=ReasonReactRouter.replace) @@ _ => Item.View.Discussion
+			| "c" => Option.some @@ _ => setCurrentTab'(~push=ReasonReactRouter.replace) @@ _ => Item.View.Discussion
+			| _ => Option.none
+		, [|setCurrentTab'|])
 		show(art) @@ ((postInfo, headings, article_body)) =>
 		<>
 			<title>{React.string(postInfo.title++" | bkhack")}</title>
@@ -1035,7 +1039,7 @@ module App{
 				<Component__header memo_transition />
 			</header>	
 			<nav className=sidebarState>
-				<ItemNav owner_id=postInfo.owner_id post_id={Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id"))} currentTab=tab setCurrentTab prCount=Array.length(pullrequests)/>
+				<ItemNav owner_id=postInfo.owner_id post_id={Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id"))} currentTab=tab setCurrentTab=(e => setCurrentTab'(e)) prCount=Array.length(pullrequests)/>
 			</nav>
 			<main className={sidebarState ++ " " ++ id}>
 				<>

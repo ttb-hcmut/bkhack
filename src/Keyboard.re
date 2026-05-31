@@ -62,6 +62,61 @@ let onKeyDown = e => {
 	}
 };
 
+module Mneumonics {
+	open React
+
+	module type Window {
+		let add_event_listener: (string, Event.Keyboard.t => unit) => unit
+		let remove_event_listener: (string, Event.Keyboard.t => unit) => unit
+	}
+
+	let onKeyDown = (state, f, e) => {
+		let key = Event.Keyboard.key(e);
+		Js.Console.log2("Mneumonics.onKeyDown", key);
+		let justFound = ref(None);
+		switch (key) {
+		| "Alt" => 
+			let root = ReactDOM.querySelector("#root")->Option.get->ReactDOM.domElementToObj;
+			Event.Keyboard.preventDefault(e);
+			root##"dataset"##"mneumonicsVisibility" #= "visible";
+			state.current = true
+		| k when state.current == true && switch (f(k)) {
+			| Some(f) => justFound := Some(f); true
+			| None => false
+		} =>
+			Event.Keyboard.preventDefault(e);
+			let f = (justFound^)->Option.get; f(e)
+		| _ => ()
+		}
+	}
+
+	let onKeyUp = (state, e) => {
+		let key = Event.Keyboard.key(e);
+		Js.Console.log2("Mneumonics.onKeyUp", key);
+		switch (key) {
+		| "Alt" =>
+			let root = ReactDOM.querySelector("#root")->Option.get->ReactDOM.domElementToObj;
+			Event.Keyboard.preventDefault(e);
+			root##"dataset"##"mneumonicsVisibility" #= "";
+			state.current = false
+		| _ => ()
+		}
+	};
+
+	let use = (module Window : Window, f : (string => option(Event.Keyboard.t => unit))) => {
+		let isAlt = useRef(false);
+		[|f|]|>useEffect1(() => {
+			let onKeyDown = isAlt->onKeyDown(f) and onKeyUp = isAlt->onKeyUp;
+			Window.add_event_listener("keydown", onKeyDown);
+			Window.add_event_listener("keyup", onKeyUp);
+			Some(() => {
+				Window.remove_event_listener("keydown", onKeyDown);
+				Window.remove_event_listener("keyup", onKeyUp);
+			})
+		})
+	}
+}
+
 module Make (C : {
 	[@react.component]
 	let make : unit => React.element

@@ -47,7 +47,31 @@
 }
 
 #root:lang(vi-VN) > nav button.article > label:after {
-	content: "bài viết";
+	content: "nội-dung";
+}
+
+#root > nav button.discussions > label:after {
+	content: "discussions";
+}
+
+#root:lang(vi-VN) > nav button.discussions > label:after {
+	content: "thảo-luận";
+}
+
+#root > nav button.pullrequests > label:after {
+	content: "pull-requests";
+}
+
+#root:lang(vi-VN) > nav button.pullrequests > label:after {
+	content: "yêu-cầu-chỉnh";
+}
+
+#root > nav button.log > label:after {
+	content: "history";
+}
+
+#root:lang(vi-VN) > nav button.log > label:after {
+	content: "lịch sử";
 }
 
 #root > nav button.edit > label:after {
@@ -203,6 +227,26 @@
 	outline: solid 1px var(--card-fg-accent-3);
 }
 
+#root > nav button > .mneumonics {
+	display: none;
+}
+
+#root > nav button > .mneumonics::before {
+	margin-left: var(--space-c);
+}
+
+#root > nav button.article > .mneumonics::before {
+	content: "[a]";
+}
+
+#root > nav button.discussions > .mneumonics::before {
+	content: "[b]";
+}
+
+#root[data-mneumonics-visibility="visible"] > nav button > .mneumonics {
+	display: block;
+}
+
 #root > nav button > data.count {
 	font-size: var(--text-xs);
 	padding: 0.1rem 0.3rem;
@@ -228,3 +272,4 @@
 #root > nav button > data.count::after {
 	content: "]";
 }
+
