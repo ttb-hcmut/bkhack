@@ -23,7 +23,6 @@ module Wifi {
 }
 
 module HintPanel {
-	open React
 
 	let%comptime feed__hint = {
 		module At__sh (Syntax : Shell__sym.SymL) {
@@ -55,9 +54,7 @@ module HintPanel {
 					"/new/")
 				:
 				auth.forceAuth()
-			}
-		>{string("+ Add post")}
-		</button>
+			} />
 		</>
 }
 
