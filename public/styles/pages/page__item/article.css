@@ -23,10 +23,38 @@
 
 #root > main.article > header > .counter > button {
   color: var(--ctp-text);
-  width: unset;
-  height: unset;
   align-content: center;
   text-align: center;
+}
+
+.counter > .up::before {
+	font-family: var(--font-mono);
+	content: "upvote";
+}
+
+#root[data-tileset="gui"] .counter > .up::before {
+	content: " ";
+	display: inline-block;
+	background-image: url("/assets/icon.arrow-up.svg");
+	background-repeat: no-repeat;
+	background-size: 1em 1em;
+	width: 1em;
+	height: 1em;
+}
+
+.counter > .down::before {
+	font-family: var(--font-mono);
+	content: "downvote";
+}
+
+#root[data-tileset="gui"] .counter > .down::before {
+	content: " ";
+	display: inline-block;
+	background-image: url("/assets/icon.arrow-down.svg");
+	background-repeat: no-repeat;
+	background-size: 1em 1em;
+	width: 1em;
+	height: 1em;
 }
 
 #root > main.article > header > .actions { 

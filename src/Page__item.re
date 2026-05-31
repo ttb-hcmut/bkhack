@@ -65,13 +65,9 @@ module ArticleHeader = {
     open Model.FetchedPost;
 		<>
 			<div className="counter">
-				<button className="up">
-					{React.string("up")}
-				</button>
+				<button className="up" />
 				<span>{React.int(330)}</span>
-				<button className="down">
-					{React.string("down")}
-				</button>
+				<button className="down" />
 			</div>
 			<h1>{React.string(info.title)}</h1>
 			<ul className="tags">
