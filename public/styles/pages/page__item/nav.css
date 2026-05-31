@@ -233,6 +233,13 @@
 	transition-duration: 300ms;
 }
 
+@media (prefers-reduced-motion) {
+	#root > nav button > .mneumonics {
+		transition-property: none;
+		transition-duration: unset;
+	}
+}
+
 #root > nav button > .mneumonics {
 	max-width: 0px;
 }
