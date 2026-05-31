@@ -432,7 +432,7 @@ module App' = {
           let headings = s(block) |> Melange__iter.Iter.of_list;
           Some((postInfo, headings, Melange__cmarkit.Cmarkit_renderer.doc_to_string(renderer, skel)))
         }) {
-          | Invalid_argument(msg) => { post.setError("rendering error: '" ++ msg ++ "'"); None}
+          | Failure(msg) | Invalid_argument(msg) => { post.setError("rendering error: '" ++ msg ++ "'"); None}
           | Js.Exn.Error(x) => { post.setError("js error: '" ++ Option.value(~default="", Js.Exn.message(x)) ++ "'"); None}
         })
       }, (renderer, postInfo))
