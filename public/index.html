@@ -182,15 +182,6 @@ html {
 	padding-left: var(--space-a);
 }
 
-button.create-post::before {
-	content: "+";
-	margin-right: var(--space-c);
-}
-
-button.create-post::after {
-	content: "new-post";
-}
-
 #root {
 	background-color: var(--global-bg);
 	min-height: 100vh;
@@ -281,7 +272,7 @@ button.create-post::after {
 	content: var(--page-command);
 }
 
-#root > nav > header > .create-post {
+#root > nav > header > button.create-post {
   border: 1px solid var(--ctp-green);
   color: var(--ctp-green);
   background-color: color-mix(in srgb, var(--ctp-green), transparent 75%);
@@ -291,6 +282,20 @@ button.create-post::after {
   grid-column: 3/4;
   grid-row: 1/3;
   width:min-content;
+}
+
+
+#root > nav > header > button.create-post::before {
+	content: "+";
+	margin-right: var(--space-c);
+}
+
+#root > nav > header > button.create-post::after {
+	content: "new-post";
+}
+
+#root:lang(vi-VN) > nav > header > button.create-post::after {
+	content: "đăng-bài";
 }
 
 #root > nav > nav {
