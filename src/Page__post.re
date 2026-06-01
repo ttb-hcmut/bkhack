@@ -76,16 +76,19 @@ module DiscussionView = {
 exception Item_not_found
 
 module App{
+  open React
 
 	let show = (x, f) => switch (x) { | Some(info) => f(info) | None => { <> </> } };
 
 	[@react.component]
 	let make = () => {
-		let (sidebarState, setSidebarState) = React.useState( _ => "state0");
+		let (sidebarState, setSidebarState) = useState(() => "state0");
+    let (_showHelp, setShowHelp) = useState(() => false);
+    let on_help = x => setShowHelp(_ => x);
 		<>
 			<title>{React.string("Creating a new post")}</title>
 			<header>
-				<Component__header />
+				<Component__header on_help />
 			</header>	
 			<nav className=sidebarState>
 				<ItemNav currentTab={View.Edit} />

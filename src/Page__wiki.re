@@ -1,10 +1,14 @@
 [@Bkhack.page "/wiki"]
 
 module App'{
+  open React
+
 	[@react.component]
 	let make =()=> {
+    let (_showHelp, setShowHelp) = useState(() => false);
+    let on_help = x => setShowHelp(_ => x);
 		<>
-		<header> <Component__header /> </header>
+		<header> <Component__header on_help /> </header>
 		</>
 	}
 }

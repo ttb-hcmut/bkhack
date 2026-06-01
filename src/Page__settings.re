@@ -7,6 +7,8 @@ module App = Keyboard.Make({
 	[@react.component]
 	let make = () => {
 		let form = useRef(Js.Nullable.null);
+    let (_showHelp, setShowHelp) = useState(() => false);
+    let on_help = x => setShowHelp(_ => x);
 		let onSubmit = e => {
 			Event.Synthetic.preventDefault(e);
 			let o = form.current->Js.Nullable.toOption->Option.get->ReactDOM.domElementToObj;
@@ -42,7 +44,7 @@ module App = Keyboard.Make({
 			</select>
 		};
 		<>
-		<header> <Component__header /> </header>
+		<header> <Component__header on_help /> </header>
 		<form onSubmit ref={form->ReactDOM.Ref.domRef} role="main">
 			<header>
 				<input type_="submit" className="save"></input>

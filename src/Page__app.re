@@ -277,6 +277,7 @@ module Dashboard = {
   let make = () => {
 		// let (counts, setCounts) = React.useState(() => 10);
 		let (items, setItems) = React.useState(() => [||]);
+    let (_showHelp, setShowHelp) = React.useState(() => false);
 		let (result, setResult) = React.useState(() => Js.Json.null);
 		let (sidebarState, setSidebarState) = React.useState( _ => "state0");
 		// let ticketParam = ReasonReactRouter.useUrl().search;
@@ -284,6 +285,7 @@ module Dashboard = {
     let fetchPostList = () => {
       setItems(_ => result |> Model.Decode.postListItems)
     }
+    let on_help = x => setShowHelp(_ => x);
     React.useEffect1(()=>{
       if (result != Js.Json.null)
         fetchPostList();
@@ -292,7 +294,7 @@ module Dashboard = {
     ;
 		<>
 			<header>
-				<Component__header />
+				<Component__header on_help />
 			</header>
 			<nav className=sidebarState>
 				<header>

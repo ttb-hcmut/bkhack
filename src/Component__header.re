@@ -13,11 +13,11 @@ module Greetings {
 	}
 }
 
-let onSubmit = (current_url, ~memo_transition=((_, _, k) => k()), e) => {
+let onSubmit = (current_url, ~on_help, ~memo_transition=((_, _, k) => k()), e) => {
 	Event.Synthetic.preventDefault(e);
 	let rawstr = Event.Form.target(e)##siteNavigator##value;
 	let u = rawstr->Shell__parse.string->Result.get_ok;
-	let (url, url_args) = Navigation.eval(current_url, u);
+	let (url, url_args) = Navigation.eval(~on_help, current_url, u);
 	Rlwrap.do_(rawstr) @@ () => {
 		Greetings.flag(Dom.Storage.sessionStorage);
 		let open Js__dom;
@@ -79,7 +79,7 @@ let a = fun
 ;
 
 [@react.component]
-let make = (~memo_transition=?) => {
+let make = (~on_help: bool => unit, ~memo_transition=?) => {
   let
 		auth = AuthContext.use() and
 		url = ReasonReactRouter.useUrl();
@@ -148,9 +148,10 @@ let make = (~memo_transition=?) => {
 		bar##focus();
 		return()
 	});
+  let on_help = [|on_help|]|>useCallback1 @@ () => { on_help(true); };
 	<>
 	<a className="logo" href="/" />
-	<form onSubmit={e => assert_ @@ _ => onSubmit(url, ~memo_transition?, e)}>
+	<form onSubmit={e => assert_ @@ _ => url->onSubmit(~on_help, ~memo_transition?, e)}>
 		<input autoComplete="off" autoCapitalize="off" spellCheck=false onChange={_ => bar->fakeBarSync @@ () => ()} onKeyDown={onKeyDown(setHistoryIndex, completeBarHTMLContent, onKey)} ref={ReactDOM.Ref.domRef(bar)} id="siteNavigator" className=errorClass />
 		<div className="displayonly highlight">{innerHTML}</div>
 		{errorBox}

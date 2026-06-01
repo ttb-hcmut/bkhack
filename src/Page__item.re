@@ -138,20 +138,22 @@ module DiscussionView = {
       let auth = AuthContext.use();
       <>
         <div className="logo" />
-        <h1 />
-        <div className="sub">
-          <span className="command">{React.string("discuss $id")}</span>
-          <span className="summary">
-            <data className="n-comments">{React.int(13)}</data>
-            <data className="karma">{React.int(364)}</data>
-          </span>
-        </div>
+        <>
+          <h1 />
+          <div className="sub">
+            <span className="command">{React.string("discuss $id")}</span>
+            <span className="summary">
+              <data className="n-comments">{React.int(13)}</data>
+              <data className="karma">{React.int(364)}</data>
+            </span>
+          </div>
+        </>
         <button className="action"
-            onClick={ _ => 
-              if(auth.checkAuth()){setAddRep(a => !a)}else{auth.forceAuth()}
-            }>
-              {React.string(addRep?"Cancel":"New Comment")}
-          </button>
+                onClick={ _ => 
+                if(auth.checkAuth()){setAddRep(a => !a)}else{auth.forceAuth()}
+                }>
+                {React.string(addRep?"Cancel":"New Comment")}
+        </button>
       </>
     }
   };
@@ -861,20 +863,19 @@ module App{
 	let make = () => {
     let auth = AuthContext.use()
 		let url = ReasonReactRouter.useUrl();
+    let (showHelp, setShowHelp) = useState(() => false);
 		let (prsExpand, setPrsExpand) = useState(() => []);
-		let (tab, setCurrentTab) = useState(() => {
+		let (tab, setCurrentTab) = useState @@ () =>
 			Util.parseQueryParams(url.search)
 			->Js.Dict.get("view")
 			->Option.value(~default=Article->Item.View.to_string)
-			->Item.View.of_string
-		});
-		let (pr_inspect, pr_inspect_set) = React.useState(() => {
+			->Item.View.of_string;
+		let (pr_inspect, pr_inspect_set) = useState @@ () => {
 			let pr_id = Util.parseQueryParams(url.search)->Js.Dict.get("pr_id");
-			pr_id |> Option.map(int_of_string)
-		});
-		let (pullrequests, setPrs)  = React.useState(() => [||]);
-		let (postInfo, setPostInfo) = React.useState(() : option(Model.FetchedPost.t) => None);
-		let (postTag, setPostTag)   = React.useState(() : list(Model.TagButTheColorIsAString.t) => []);
+			pr_id |> Option.map(int_of_string)};
+		let (pullrequests, setPrs)  = useState(() => [||]);
+		let (postInfo, setPostInfo) = useState(() : option(Model.FetchedPost.t) => None);
+		let (postTag, setPostTag)   = useState(() : list(Model.TagButTheColorIsAString.t) => []);
 		// let tags = [| "Algorithm", "Rust" |];
 		let renderer = React.useMemo0(() => Melange__cmarkit.Cmarkit_html.renderer(~safe=false, ()));
 		let art = React.useMemo2(() => {
@@ -956,15 +957,6 @@ module App{
         setPostInfo(_ => Some(aod));
         return(())
       })
-      // X.Fetch.all(module At_repo_2(
-			// 	{ include X.GenSQL; let tgt_post_id = post_id }))(module Env);
-			// if (posts->Array.length == 0) { raise(Item_not_found) } else {
-			// 	let (_, post_title, creator_id, post_text) = posts[0];
-			// 	let* users = X.Fetch.all(module At_repo_1(
-			// 		{ include X.GenSQL; let tgt_user_id = creator_id }))(module Env);
-			// 	let (_, creator_name) = users[0];
-			// 	return @@ ignore @@ setPostInfo(_ => Some((post_id, post_title, creator_name, post_text)))
-			// }
 		}));
 		let on_prs_update_expand = React.useMemo1(((), id) => {
 			switch (List.assoc(id, prsExpand)) {
@@ -1033,12 +1025,18 @@ module App{
 			| "d" => Option.some @@ _ => setCurrentTab'(~push=ReasonReactRouter.replace) @@ _ => Item.View.Log
 			| "e" => Option.some @@ _ => setCurrentTab'(~push=ReasonReactRouter.replace) @@ _ => Item.View.Edit
 			| _ => Option.none
-		, [|setCurrentTab'|])
+		, [|setCurrentTab'|]);
+    let on_help = x => setShowHelp(_ => x);
+    React.useEffect1(() => {
+      (module ReactDOM)->Component__help_menu.update_visibility(showHelp);
+      None
+    }, [|showHelp|]);
+    Component__help_menu.use_escape(module Js__dom.Window) @@ useCallback0 @@ () => setShowHelp(_ => false);
 		show(art) @@ ((postInfo, headings, article_body)) =>
 		<>
 			<title>{React.string(postInfo.title++" | bkhack")}</title>
 			<header>
-				<Component__header memo_transition />
+				<Component__header on_help memo_transition />
 			</header>	
 			<nav className=sidebarState>
 				<ItemNav owner_id=postInfo.owner_id post_id={Option.get(Util.parseQueryParams(url.search) -> Js.Dict.get("id"))} currentTab=tab setCurrentTab=(e => setCurrentTab'(e)) prCount=Array.length(pullrequests)/>
@@ -1077,7 +1075,7 @@ module App{
 			</main>
 			
 			<Component__sidebar sidebarState setSidebarState />
-			
+      <Component__help_menu on_click_out={_ => setShowHelp(_ => false)} />
 		</>
 	}
 };

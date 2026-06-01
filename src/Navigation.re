@@ -71,10 +71,11 @@ module Completion{
 }
 
 /** The navigation state machine */
-let eval = current_url => {
+let eval = (~on_help, current_url) => {
 	let url = ref("")
 	let url_args = ref([])
 	let rec aux = fun
+    | Cons_cmd(`unfetched(["help"]), Nil) => on_help()
 		| Cons_cmd(`unfetched(["feed"]), next) => { url := "/"; aux(next) }
 		| Cons_cmd(`unfetched(["feed", ..._]), _) => raise(Invalid_syntax_of_command("feed"))
 		| Cons_cmd(`unfetched(["split", "-c", num]), next) when url^ == "/" => { url_args := Util.List.replace_assoc'("limit", num, url_args^); aux(next) }

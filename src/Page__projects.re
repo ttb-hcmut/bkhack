@@ -2,12 +2,14 @@
 // open Melange__containers.Fun
 
 module App = Keyboard.Make({
-	// open React
+	open React
 	
 	[@react.component]
 	let make = () => {
+    let (_showHelp, setShowHelp) = useState(() => false);
+    let on_help = x => setShowHelp(_ => x);
 		<>
-		<header> <Component__header /> </header>
+		<header> <Component__header on_help /> </header>
 		<main></main>
 		</>
 	}
