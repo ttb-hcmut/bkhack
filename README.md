@@ -142,6 +142,11 @@ nix-shell
 [ ! -d _opam ] && opam init
 eval $(opam env)
 
+export TEST=$PWD
+dune exec bin/bundle.exe
+export BKHACK_FIREBASE_KEY=replace_with_actual_firebase_api_key
+export BKHACK_BACKEND_ADDRESS='http://localhost:5000'
+
 pnpm install
 pnpm run init
 ```

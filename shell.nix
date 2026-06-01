@@ -16,6 +16,9 @@ let shellHook =
 		pnpm nodejs
 		nixd
 		opam rsync
+		
+		gnugrep
+		procps
 	];
 in
 	nixpkgs.mkShell {
