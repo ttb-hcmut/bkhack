@@ -30,8 +30,34 @@ defmodule App
     # reference: https://elixirforum.com/t/how-to-properly-implement-cors-in-plug-cowboy-served-rest-api/36186
     |> put_resp_header("Access-Control-Allow-Origin", "*")
     |> put_resp_header("Access-Control-Allow-Method", "POST, GET, PATCH, OPTIONS")
-    |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+    |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, jwterrible, Content-Type, Accept")
     |> put_resp_content_type("application/json")
+  end
+  def getJWTToken(conn) do
+    IO.puts("getting jwterrible")
+    case Plug.Conn.get_req_header(conn, "jwterrible")|>JSON.decode do
+    {:ok, %{
+      "user_id"   => user_id  ,
+      "user_name" => user_name,
+      "sign_at"   => sign_at  ,
+      "timeout"   => timeout  ,
+      "hash"      => hash
+    }} -> %{
+      user_id:    user_id  ,
+      user_name:  user_name,
+      sign_at:    sign_at  ,
+      timeout:    timeout  ,
+      hash:       hash
+    }
+    _ -> nil
+    end
+  end
+  def jwtReader(conn,field,default) do
+    token     = getJWTToken(conn)
+    case token do
+      nil -> default
+      _ ->   if(AuthBE.testJWT(token)) do Map.get(token,field) else default end
+    end
   end
   get "/api/tag/commit" do
     Logger.info "GET committag"
@@ -139,10 +165,8 @@ defmodule App
   get "/api/post/get" do
     Logger.info "GET post"
     post_id   = Map.get(conn.params,"post_id" ,"-1" ) |> String.to_integer
-    user_id   = Map.get(conn.params,"user_id" ,"-1" ) |> String.to_integer
     version   = Map.get(conn.params,"v"       ,"latest"  )
-
-
+    user_id = jwtReader(conn,:user_id,-1)
     data = case version do
       "latest" -> PostBE.getPostHead(Data, post_id, user_id)
       _ -> nil
@@ -164,7 +188,7 @@ defmodule App
 
   get "/api/post/count" do
     Logger.info "GET postcount"
-    user      = Map.get(conn.params,"user","-1" ) |> String.to_integer
+    user_id = jwtReader(conn,:user_id,-1)
 
     opts = %{
       search:   Map.get(conn.params,"search", "") |> URI.decode,
@@ -173,7 +197,7 @@ defmodule App
       orderby:  Map.get(conn.params,"orderby", nil)
     }
 
-    data = PostBE.getPostCount(Data, user, opts)
+    data = PostBE.getPostCount(Data, user_id, opts)
     # data = ReturnChildID.getChildComments(parent, offset, limit)
     case data do
       nil ->
@@ -190,9 +214,10 @@ defmodule App
   end
   get "/api/post/list" do
     Logger.info "GET postlist"
-    user      = Map.get(conn.params,"user","-1" ) |> String.to_integer
     offset    = Map.get(conn.params,"offset","0") |> String.to_integer
     limit     = Map.get(conn.params,"limit","10") |> String.to_integer
+    user_id = jwtReader(conn,:user_id,-1)
+
 
     opts = %{
       search:   Map.get(conn.params,"search", "") |> URI.decode,
@@ -201,7 +226,7 @@ defmodule App
       orderby:  Map.get(conn.params,"orderby", nil)
     }
 
-    data = PostBE.getPostList(Data, user, limit, offset, opts)
+    data = PostBE.getPostList(Data, user_id, limit, offset, opts)
     # data = ReturnChildID.getChildComments(parent, offset, limit)
     case data do
       nil ->
@@ -216,46 +241,52 @@ defmodule App
         |> send_resp(200 , sh)
     end
   end
-  options "/api/post/create" do
+
+  options "/*_" do
     conn
     |> put_resp_free
     |> send_resp(200, "")
   end
+
   post "/api/post/create" do
     Logger.info "POST create post"
     body = conn.body_params
     IO.inspect conn.body_params
-    creator_id  = body["id"]
     title       = body["title"]
     post_body   = body["body"]
     commit_message = body["commit_message"]
     public      = body["public"]
     post_id     = body["post-id"]
     tag         = body["tag"]
+    user_id = jwtReader(conn,:user_id,-1)
 
-    data = "User "<>Integer.to_string(creator_id)<>" with title: "<>title<>" and body: "<>post_body
+
+    data = "User "<>Integer.to_string(user_id)<>" with title: "<>title<>" and body: "<>post_body
     IO.puts(data);
-    postId = case post_id do
-      -1 ->  PostBE.createPost(Data, creator_id, title, post_body, commit_message, public, tag)
-      pid -> PostBE.updatePost(Data, pid, creator_id, title, post_body, commit_message, tag)
-    end
-    case postId do
-      nil ->
-        {:ok, sh} = JSON.encode(-1)
+    case user_id do
+      -1 ->
+        {:ok, sh} = JSON.encode([])
         conn
         |> put_resp_free
-        |> send_resp(500, sh)
-      p ->
-        {:ok, sh} = JSON.encode(p)
-        conn
-        |> put_resp_free
-        |> send_resp(201, sh)
+        |> send_resp(403 , sh)
+      _ ->
+        postId = case post_id do
+          -1 ->  PostBE.createPost(Data, user_id, title, post_body, commit_message, public, tag)
+          pid -> PostBE.updatePost(Data, pid, user_id, title, post_body, commit_message, tag)
+        end
+        case postId do
+          nil ->
+            {:ok, sh} = JSON.encode(-1)
+            conn
+            |> put_resp_free
+            |> send_resp(500, sh)
+          p ->
+            {:ok, sh} = JSON.encode(p)
+            conn
+            |> put_resp_free
+            |> send_resp(201, sh)
+        end
     end
-  end
-  options "/api/auth/register" do
-    conn
-    |> put_resp_free
-    |> send_resp(200, "")
   end
   post "/api/auth/register" do
     Logger.info "POST register"
@@ -282,9 +313,6 @@ defmodule App
         |> send_resp(500, sh)
     end
   end
-
-  options "/api/auth/login", do: conn |> put_resp_free |> send_resp(200, "")
-
   post "/api/auth/login" do
     Logger.info "POST login"
     body = conn.body_params
@@ -349,9 +377,10 @@ defmodule App
     Logger.info "GET comment"
     type   = Map.get(conn.params,"type"  ,"post")
     parent = Map.get(conn.params,"parent",nil)
-    user   = Map.get(conn.params,"user"  ,nil)
     offset = Map.get(conn.params,"offset","0")
     limit  = Map.get(conn.params,"limit","10")
+    user_id = jwtReader(conn,:user_id,nil)
+
 
     opts = %{
       search:   Map.get(conn.params,"search", "") |> URI.decode,
@@ -362,7 +391,7 @@ defmodule App
     }
 
     data = case {parent,type} do
-      {p,t} when not is_nil(p) and t in ["post","comment"]-> DiscussionBE.getComment(Data, parent,type,user,offset,limit,opts)
+      {p,t} when not is_nil(p) and t in ["post","comment"]-> DiscussionBE.getComment(Data, parent,type,user_id,offset,limit,opts)
       _ -> nil
     end
 
@@ -380,9 +409,6 @@ defmodule App
         |> send_resp(200 , sh)
     end
   end
-
-  options "/api/postcomment", do: conn |> put_resp_free |> send_resp(200, "")
-
   post "/api/postcomment" do
     Logger.info "POST comment"
     body = conn.body_params
@@ -390,43 +416,61 @@ defmodule App
     id      = body["id"]
     type    = body["type"]
     content = body["content"]
-    user_id = body["user_id"]
     version = body["post_version"]
+    user_id = jwtReader(conn,:user_id,-1)
+
 
     data = "User "<>Integer.to_string(user_id)<>" commented \""<>content<>"\" on "<>Integer.to_string(type)<>" "<>Integer.to_string(id)
     IO.puts(data);
-    comment = DiscussionBE.postComment(Data, id, type, content, user_id, version)
-    case comment do
-      nil ->
+    data = DiscussionBE.postComment(Data, id, type, content, user_id, version)
+
+    case {data,user_id} do
+      {_,-1} ->
         {:ok, sh} = JSON.encode([])
         conn
         |> put_resp_free
-        |> send_resp(500, sh)
-      _ ->
-        {:ok, sh} = JSON.encode(comment.comment_id)
+        |> send_resp(403 , sh)
+      {nil,_} ->
+        {:ok, sh} = JSON.encode([])
         conn
         |> put_resp_free
-        |> send_resp(201, sh)
+        |> send_resp(501 , sh)
+      {x,_} ->
+        {:ok, sh} = Jason.encode(data.comment_id)
+        conn
+        |> put_resp_free
+        |> send_resp(200 , sh)
     end
   end
-
-  options "/api/setvote", do: conn |> put_resp_free |> send_resp(200, "")
-
   post "/api/setvote" do
     Logger.info "POST vote"
     body = conn.body_params
     id      = body["id"]
-    user_id = body["user_id"]
     type    = body["type"]
     action  = body["action"]
+    user_id = jwtReader(conn,:user_id,-1)
+
 
     data = "User "<>Integer.to_string(user_id)<>" voted "<>Integer.to_string(action)<>" on "<>type<>" "<>Integer.to_string(id)
     IO.puts(data);
-    DiscussionBE.setVote(Data, user_id,id,action)
-    {:ok, sh} = JSON.encode(data)
-    conn
-    |> put_resp_free
-    |> send_resp(201, sh)
+    data = DiscussionBE.setVote(Data, user_id,id,action)
+    case {data,user_id} do
+      {_,-1} ->
+        {:ok, sh} = JSON.encode([])
+        conn
+        |> put_resp_free
+        |> send_resp(403 , sh)
+      {nil,_} ->
+        {:ok, sh} = JSON.encode([])
+        conn
+        |> put_resp_free
+        |> send_resp(501 , sh)
+      {x,_} ->
+        {:ok, sh} = Jason.encode(data)
+        conn
+        |> put_resp_free
+        |> send_resp(201, sh)
+    end
   end
 
   post "/api/test/free" do

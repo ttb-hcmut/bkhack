@@ -43,6 +43,7 @@ module App = {
   , ~searchBarId    :string = ""
   , ~setOpts        :option((list((string,string)) => list((string,string))) => unit)=?
   ) => {
+    let auth = Auth.AuthContext.use()
     let url = ReasonReactRouter.useUrl()
 		let searchParams = [|url|]|>React.useMemo1(() => url.search->Util.parseQueryParams');
     let (search,setSearch) = React.useState(() => List.assoc_opt("search", searchParams) |> Option.value(~default=""))
@@ -73,7 +74,17 @@ module App = {
 					| (None,_) | (_,[]) => ""
 					| (Some(_),v)=> "&" ++ (v->Util.stringQueryParams')
 				})
-			Fetch.fetch(request)
+      Fetch.fetchWithInit(
+        request,
+        Fetch.RequestInit.make(
+          ~method_=Get,
+          ~headers=Fetch.HeadersInit.make({
+            "Content-Type": "application/json",
+            "jwterrible": auth.withAuth(false) |> Js.Json.stringify
+          }),
+          ()
+        )
+      )
 			>>= Fetch.Response.json
 			>>= (json => { setResult(_=>json); return(json) })
 			>!= (err => {
@@ -91,7 +102,17 @@ module App = {
 					| (None,_) | (_,[]) => ""
 					| (Some(_),v)=> "&" ++ v->Util.stringQueryParams'
 				})
-			Fetch.fetch(request)
+      Fetch.fetchWithInit(
+        request,
+        Fetch.RequestInit.make(
+          ~method_=Get,
+          ~headers=Fetch.HeadersInit.make({
+            "Content-Type": "application/json",
+            "jwterrible": auth.withAuth(false) |> Js.Json.stringify
+          }),
+          ()
+        )
+      )
 			>>= Fetch.Response.json
 			>!= (err => {
 					Js.log(err);

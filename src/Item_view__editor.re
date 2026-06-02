@@ -284,16 +284,13 @@ module App' = {
         }
       }
       let handleSubmit = (~public) => {
-        if (!auth.checkAuth()) {
-          auth.forceAuth();
-        } else if (!validateCommit()) {
+        if (!validateCommit()) {
           ()
         } else {
           open Fetch__syntax;
           open Js.Json;
           open Json__syntax;
           let body = empty()
-          |> "id"             ^^ int    @@ Option.value(auth.getUserId(),~default = 67)
           |> "post-id"        ^^ int    @@ post.parentId
           |> "title"          ^^ string @@ post.postTitle
           |> "body"           ^^ string @@ post.postBody
@@ -309,11 +306,18 @@ module App' = {
                 body
               )),
               ~headers=Fetch.HeadersInit.make({
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "jwterrible": auth.withAuth(true) |> Js.Json.stringify
               }),
               ()
             )
           )
+          >>= ( res => {
+            res |> Fetch.Response.status |> fun
+            | 403 => auth.forceAuth()
+            | _ => ()
+            return(res)
+          })
           >>= Fetch.Response.json
           >>= (j => {
             let res = j |> Js.Json.decodeNumber |> Option.value(~default=-1.) |> int_of_float

@@ -1,5 +1,13 @@
 open Melange__containers.Fun
-
+module JWTToken{
+  type t =
+    { user_id   : int
+    , user_name : string
+    , sign_at   : int
+    , timeout   : int
+    , hash      : string
+  }
+}
 module TagButTheColorIsAString = {
 	type t =
 		{ tag_id    : int
@@ -30,25 +38,24 @@ module FetchedCommit = {
 };
 module FetchedPost = {
 	type t =
-		{ post_id     : int
-    , owner_name  : string
-    , owner_id    : int
-    , title       : string
-    , body        : string
-		}
+  { post_id     : int
+  , owner_name  : string
+  , owner_id    : int
+  , title       : string
+  , body        : string
+  }
 };
 module PostListItem = {
 	type t =
-		{
-      post_id    : int
-    , owner_id   : int
-    , owner_name : string
-    , title      : string
-    , version    : int
-    , verified   : bool
-    , created    : string
-    , updated    : string
-		}
+  { post_id    : int
+  , owner_id   : int
+  , owner_name : string
+  , title      : string
+  , version    : int
+  , verified   : bool
+  , created    : string
+  , updated    : string
+  }
 };
 module FetchedComment = {
   type t = 
@@ -71,6 +78,16 @@ module FetchedAuth = {
 };
 module Decode = {
 	open Melange_json;
+  let jwtToken = json => {
+    open JWTToken;
+    Of_json.
+    { user_id   : json |> field("user_id"   , int)
+    , user_name : json |> field("user_name" , string)
+    , sign_at   : json |> field("sign_at"   , int)
+    , timeout   : json |> field("timeout"   , int)
+    , hash      : json |> field("hash"      , string)
+    }
+  }
   let tag = json =>{
     open Tag;
     Of_json.

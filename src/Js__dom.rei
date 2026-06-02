@@ -34,4 +34,5 @@ module Document : {
 	let title_set : string => unit
 	let query_selector : string => Js.nullable(Js.t(_))
 	let query_selector_all : string => Js.array_like(Js.t(_))
+	// let cookie : string => Js.array_like(Js.t(_))
 }

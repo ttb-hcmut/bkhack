@@ -90,12 +90,11 @@ module Filter {
 		// 	{methods @@ ["hot", "new", "top-voted", "most-discussed", "recent-activity"]}
 		// 	{options @@ [10, 25, 50, 100, 0]}
 		// </form>
-    let auth = AuthContext.use();
     <Pagination.App 
       limit=3
       searchPrompt=true
-      countApi={"/api/post/count?user="  ++ string_of_int(Option.value(auth.getUserId(),~default=-1))++"&"}
-      fetchApi={"/api/post/list?user="  ++ string_of_int(Option.value(auth.getUserId(),~default=-1))++"&"}
+      countApi={"/api/post/count?"}
+      fetchApi={"/api/post/list?"}
       filter  ={[
         ("searchby",["title","author"])
       , ("sortby",  ["age","active"])

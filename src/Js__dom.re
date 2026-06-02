@@ -26,9 +26,11 @@ module Date = {
 type document_api;
 external document_api : document_api = "document";
 [@mel.set] external document_title_set : document_api => string => unit = "title"
+// [@mel.set] external document_cookie_set : document_api => string => unit = "cookie"
 
 module Document = {
 	let title_set = document_title_set(document_api);
+	// let cookie_set = document_cookie_set(document_api);
 	[@mel.scope "document"] external query_selector : string => Js.nullable(Js.t(_)) = "querySelector";
 	[@mel.scope "document"] external query_selector_all : string => Js.array_like(Js.t(_)) = "querySelectorAll";
 }

@@ -160,14 +160,11 @@ module DiscussionView = {
   module DiscussionFilter = {
     [@react.component]
     let make = (~parentId,~refresh,~setResult,~setOpts) => {
-      let auth = AuthContext.use()
-      ;
       <Pagination.App 
         limit=3
         searchPrompt=true
         countApi={"/api/comment/count?parent="++string_of_int(parentId)++"&type=post&recursive=false&"}
         fetchApi={"/api/comment/get?parent="++string_of_int(parentId)
-                ++"&user="  ++ string_of_int(Option.value(auth.getUserId(),~default=-1))
                 ++"&type=post&"}
         filter  ={[
           ("searchby",["comment","username"])
@@ -189,11 +186,9 @@ module DiscussionView = {
         let (isBusy, setIsBusy) = React.useState(()=> false)
         let (content, setContent) = React.useState(()=> "")
         let sendComment = () => {
-          if (!auth.checkAuth()) {auth.forceAuth()}
           setIsBusy(_ => true);
           let open Js.Json;
           let body = Json__syntax.( empty()
-          |> "user_id"        ^^ int    @@ Option.value(auth.getUserId(),~default=67)  
           |> "id"             ^^ int    @@ id
           |> "type"           ^^ int    @@ (parentType == "post"? 0 : 1)
           |> "content"        ^^ string @@ content
@@ -208,11 +203,18 @@ module DiscussionView = {
                 body
               )),
               ~headers=Fetch.HeadersInit.make({
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "jwterrible": auth.withAuth(true) |> Js.Json.stringify
               }),
               ()
             )
           )
+          >>= ( res => {
+            res |> Fetch.Response.status |> fun
+            | 403 => auth.forceAuth()
+            | _ => ()
+            return(res)
+          })
           >>= Fetch.Response.json
           >>= (j => {
             setIsBusy(_ => false);
@@ -329,10 +331,9 @@ module DiscussionView = {
           open Js.Json;
           open Json__syntax;
           let body = empty()
-          |> "user_id"  ^^ int    @@ Option.value(auth.getUserId(),~default = 67)
-          |> "id"       ^^ int    @@ id
-          |> "type"     ^^ string @@ "comment"
-          |> "action"   ^^ int    @@
+          |> "id"         ^^ int    @@ id
+          |> "type"       ^^ string @@ "comment"
+          |> "action"     ^^ int    @@
             ( userRating == action
             ? { setUserRating(_ => 0); 0 }
             : { setUserRating(_ => action); action })
@@ -345,11 +346,18 @@ module DiscussionView = {
                 body
               )),
               ~headers=Fetch.HeadersInit.make({
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "jwterrible": auth.withAuth(true) |> Js.Json.stringify
               }),
               ()
             )
           )
+          >>= ( res => {
+            res |> Fetch.Response.status |> fun
+            | 403 => auth.forceAuth()
+            | _ => ()
+            return(res)
+          })
           >>= Fetch.Response.json
           >!= (err => {
               Js.log(err);
@@ -376,12 +384,12 @@ module DiscussionView = {
             <div className="text"       >{React.string(text       )}</div>
             <div className="rating"     >
               <button className="up"
-              onClick={_ => if(!auth.checkAuth()) {auth.forceAuth()}else{setVote(1)}}>
+              onClick={_ => setVote(1)}>
                 {React.string(">")}
               </button>
               <span className={"v"++string_of_int(userRating)}>{{React.int(rating - user_rating + userRating)}}</span>
               <button className="down"
-              onClick={_ => if(!auth.checkAuth()) {auth.forceAuth()}else{setVote(-1)}}>
+              onClick={_ => setVote(-1)}>
                 {React.string("<")}
               </button>
             </div>
@@ -436,46 +444,57 @@ module DiscussionView = {
         // opening concept: Js.Promise.()
         let fetchComments = result => {
           let open Fetch__syntax;
+            Js.log2("before loading check: ",result)
+            Js.log2("isloading: ",loading)
           if(loading){ () }
           else{
+            Js.log2("after loading check: ",result)
             setLoading(_=>true);
             switch(pType,result){
-            | ("post",x) when x == Js.Json.null => ();
-            | (t,r) =>
-              switch(t,r){
-              | ("post",r) when r != Js.Json.null => 
-                setComments( _ => r |> Model.Decode.fetchedComments);
-                setShowMore( _ => false);
-                setLoading( _ => false);
-              | _ =>
-                let request = Env.backend ++ "/api/comment/get"
-                  ++ "?limit="  ++ string_of_int(limit)
-                  ++ "&offset=" ++ string_of_int(Array.length(comments))
-                  ++ "&user="   ++ string_of_int(Option.value(auth.getUserId(),~default=-1))
-                  ++ "&parent=" ++ string_of_int(id)
-                  ++ "&type=comment&"
-                  ++ (switch(opts |> Util.stringQueryParams'){
-                    | "" => ""
-                    | v  => "&" ++ v 
-                  })
-                Fetch.fetch(request)
-                >>= Fetch.Response.json 
-                >>= Model.Decode.Response.fetchedComments
-                >>= (aod => {
-                  setComments( x => Array.append(x,aod));
-                  setShowMore( _ => Array.length(aod) < limit ? false : true);
-                  setLoading(_=>false);
-                  Js.Promise.resolve(aod)
+            | ("post",x) when x == Js.Json.null => 
+              setLoading( _ => false);
+            | ("post",r) => 
+              Js.log2("if result not null: ",r)
+              setComments( _ => r |> Model.Decode.fetchedComments);
+              setShowMore( _ => false);
+              setLoading( _ => false);
+            | _ =>
+              let request = Env.backend ++ "/api/comment/get"
+                ++ "?limit="  ++ string_of_int(limit)
+                ++ "&offset=" ++ string_of_int(Array.length(comments))
+                ++ "&parent=" ++ string_of_int(id)
+                ++ "&type=comment&"
+                ++ (switch(opts |> Util.stringQueryParams'){
+                  | "" => ""
+                  | v  => "&" ++ v 
                 })
-                >!= (err => {
-                    Js.log(err);
-                    setShowMore( _ => false );
-                    setLoading( _ => false );
-                    return([||])
-                  })
-                |> ignore;
-              } 
-            }
+              Fetch.fetchWithInit(
+                request,
+                Fetch.RequestInit.make(
+                  ~method_=Get,
+                  ~headers=Fetch.HeadersInit.make({
+                    "Content-Type": "application/json",
+                    "jwterrible": auth.withAuth(false) |> Js.Json.stringify
+                  }),
+                  ()
+                )
+              )
+              >>= Fetch.Response.json 
+              >>= Model.Decode.Response.fetchedComments
+              >>= (aod => {
+                setComments( x => Array.append(x,aod));
+                setShowMore( _ => Array.length(aod) < limit ? false : true);
+                setLoading(_=>false);
+                Js.Promise.resolve(aod)
+              })
+              >!= (err => {
+                Js.log(err);
+                setShowMore( _ => false );
+                setLoading( _ => false );
+                return([||])
+                })
+              |> ignore;
+            } 
           }
           
         };
@@ -489,7 +508,11 @@ module DiscussionView = {
           None
         },(showRep, result))
         React.useEffect1(()=>{
-          fetchComments(result |> Option.value(~default=Js.Json.null));
+          result
+          |> Option.value(~default=Js.Json.null)
+          |> fun
+          | r when r == Js.Json.null => ()
+          | r => fetchComments(r)
           None
         },[|result|])
         // React.useEffect1(()=>{
@@ -943,10 +966,20 @@ module App{
         return(aod)
       })
       |> ignore
-      Fetch.fetch(Env.backend ++ "/api/post/get/"
+      let request = Env.backend ++ "/api/post/get/"
         ++ "?post_id=" ++ post_id
-        ++ "&user_id=" ++ string_of_int(Option.value(auth.getUserId(), ~default= -1))
-        ++ "&v=latest")
+        ++ "&v=latest"  
+      Fetch.fetchWithInit(
+        request,
+        Fetch.RequestInit.make(
+          ~method_=Get,
+          ~headers=Fetch.HeadersInit.make({
+            "Content-Type": "application/json",
+            "jwterrible": auth.withAuth(false) |> Js.Json.stringify
+          }),
+          ()
+        )
+      )
       >>= Fetch.Response.json
       >>= Model.Decode.Response.fetchedPost
       >!= (err => {
