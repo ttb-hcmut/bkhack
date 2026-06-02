@@ -16,18 +16,7 @@ The following paper provides more details:
 
 ---
 
-# Repository Structure
-
-```text
-src/         Frontend source code
-service/     Backend service
-build_aux/   Docker and auxiliary tooling
-doc/         Thesis and documentation
-```
-
----
-
-# Installation
+## Installation
 
 Add the [bkhack-repo] repository to OPAM:
 
@@ -46,7 +35,7 @@ opam install bkhack
 
 ---
 
-# Usage
+## Usage
 
 `bkhack` is distributed as both a reusable OCaml/Melange library, and a suite of frontend bundling tools.
 
@@ -70,13 +59,13 @@ suitable for deployment platforms such as Firebase Hosting or Netlify.
 
 ---
 
-# Development
+## Development
 
 See [DEVELOPMENT.md](./DEVELOPMENT.md) for more details.
 
 ---
 
-# Try it out
+## Try it out
 
 The current deployment is available at:
 

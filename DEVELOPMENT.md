@@ -1,6 +1,17 @@
 Development setup
 =================
 
+# Repository Structure
+
+```text
+src/         Frontend source code
+service/     Backend service
+build_aux/   Docker and auxiliary tooling
+doc/         Thesis and documentation
+```
+
+---
+
 `bkhack` supports two development environments:
 
 | Environment | Recommended For |
