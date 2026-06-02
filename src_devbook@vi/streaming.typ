@@ -19,9 +19,9 @@ khái niệm trừu tượng mới. Ví dụ, ta xét lệnh
 #align(center)[```sh feed | split -c 10 ```]
 trong đó ```sh split```\
   Mục tiêu là giới thiệu, giảng dạy người dùng sinh viên về khái niệm lập trình luồng (stream programming).
-= Ngữ nghĩa
+= Chính tả
 Mục tiêu là giới thiệu, giảng dạy người dùng sinh viên về khái niệm tương tác vỏ-nhân.
-= Cú pháp
+== Thuật phân giải
 Đôi khi, nhà phát triển có nhu cầu phân giải vỏ ngữ từ một nguồn văn bản. @gr
 #place(auto, float: true, scope: "parent")[
   #figure(caption: [Ngữ pháp vỏ ngữ bkhack], shell-parse.langchain) <gr>
