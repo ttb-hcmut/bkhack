@@ -1,1 +1,0 @@
-/home/kinten/s/bkhack/shells/shell.el
