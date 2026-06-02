@@ -1,0 +1,5 @@
+(executable
+ (package bkhack)
+ (libraries eio eio_main)
+ (public_name bkhack.glazer)
+ (name glazer))
