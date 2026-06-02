@@ -34,9 +34,9 @@ opam install bkhack
 
 ## Usage
 
-`bkhack` is distributed as both a reusable OCaml/Melange library, and a suite of frontend bundling tools.
+`bkhack` is distributed as both a reusable OCaml/Reason library, and a suite of frontend bundling tools.
 
-You can integrate it into your own Melange application:
+You can integrate it into your own Reason application:
 
 ```dune
 (melange.emit
