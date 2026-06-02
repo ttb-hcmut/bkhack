@@ -65,6 +65,21 @@ html {
 	display: none;
 }
 
+#root > footer {
+	position: fixed;
+	--fat: 40px;
+	height: var(--fat);
+	top: calc(100vh - var(--fat));
+	width: 100vw;
+	background-color: var(--global-bg);
+	border-top: solid 1px var(--card-border);
+	z-index: 99;
+}
+
+.modeline > .exitHint::before {
+	content: "press :wq to save and exit";
+}
+
 @media (min-width: 64rem) {
 	:root {
 		/* NOTE(kinten): make sure to manually sync these values */
