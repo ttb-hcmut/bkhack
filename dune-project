@@ -17,6 +17,7 @@
   (containers (>= 3.16))
   (iter (>= 1.9))
   (re (>= 1.14.0))
+  bkhack-compiler
   (opam-check-npm-deps (>= 4.1.0))
  ))
 
