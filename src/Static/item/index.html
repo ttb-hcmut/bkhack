@@ -190,13 +190,12 @@ dialog.help > div {
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
-    margin-right: var(--space-a);
     margin-top: var(--space-a);
     overflow-x: auto;
   }
 
   dialog.help > div > main > section {
-    width: calc((100% / 2) - 2px);
+    width: calc((100% / 2.5) - 2px);
     padding-bottom: var(--space-a);
   }
 
@@ -233,13 +232,29 @@ dialog.help > div {
 /* mobile - phone */
 @media (max-width: 48rem) {
   dialog.help > div {
-		top: 50%;
+    --offset: 3rem;
+		top: var(--offset);
 		left: 50%;
-		transform: translate(-50%, -50%);
-		background-color: red;
-		min-width: 16rem;
-		min-height: 16rem;
+		transform: translate(-50%, 0%);
+		min-width: 100vw;
+		min-height: calc(100% - var(--offset) - 2px);
+    overflow-y: scroll;
   }
+
+  dialog.help > div > main {
+    display: block;
+    flex-wrap: nowrap;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    height: fit-content;
+    margin-right: var(--space-a);
+  }
+
+  dialog.help > div > main > section {
+    width: calc(100% - 2px);
+  }
+
+  
 }
 
 @media (min-width: 64rem) {
