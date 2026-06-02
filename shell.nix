@@ -1,1 +1,1 @@
-./shells/shell.nix
+./service_shells/shell.nix
