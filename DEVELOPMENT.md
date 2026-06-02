@@ -10,6 +10,9 @@ build_aux/   Docker and auxiliary tooling
 doc/         Thesis and documentation
 ```
 
+> [!WARNING]
+> Even though `bkhack` is a full-stack framework, due to current technical limitations, there is still a separation between the front-end modules and the back-end modules. This will be changed in the future.
+
 ---
 
 `bkhack` supports two development environments:
