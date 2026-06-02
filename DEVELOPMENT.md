@@ -31,7 +31,7 @@ build_aux/       Auxiliary tooling (Docker, Webpack)
 `bkhack` supports two development environments:
 
 | Environment | Recommended For |
-|---|---|
+|-------------|-----------------|
 | Native Linux / WSL2 | Linux users and WSL2 users |
 | Windows + Docker | Windows users wanting isolated tooling |
 
