@@ -4,13 +4,19 @@ Development setup
 > [!WARNING]
 > Even though `bkhack` is a full-stack framework, due to current technical limitations, there is still a separation between the front-end and the back-end, both in repository organization and deployment. This will be changed in the future.
 
-Our repository structure is as follows:
+Our repository structure (WIP) is as follows, sorted based on importance:
 
 ```text
-src/         Frontend source code
-service/     Backend service
-build_aux/   Docker and auxiliary tooling
-doc/         Thesis and documentation
+bin/          Build system source code
+src/          Frontend source code
+src_vendors/  Frontend vendored source code
+src_buildlib/ Build system lingo source code
+service/      Backend service
+build_aux/    Auxiliary tooling (Docker, Webpack)
+src_devbook/  Developer handbook source code
+src_thesis/   Thesis source code
+doc/          Documentation and presentations
+news/         Public announcements
 ```
 
 ---
