@@ -15,7 +15,7 @@ The following paper provides more details:
 
 ## Installation
 
-Add the [bkhack-repo] repository to OPAM:
+Add the [bkhack repository][bkhack-repo] to OPAM:
 
 ```sh
 opam remote add bkhack git+https://github.com/ttb-hcmut/bkhack
