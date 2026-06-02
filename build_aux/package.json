@@ -43,6 +43,7 @@
   "dependencies": {
     "@firebase/app": "^0.14.11",
     "@firebase/firestore": "^4.14.0",
+    "@supabase/supabase-js": "^2.106.2",
     "firebase": "^11.10.0",
     "firesql": "^2.0.2",
     "live-server": "^1.2.2",
