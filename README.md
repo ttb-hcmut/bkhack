@@ -51,7 +51,7 @@ bkhack.bundle ./ -o dist --api 'http://localhost:5000'
 ```
 
 This produces a `dist/` directory containing static HTML and JavaScript bundles
-suitable for deployment platforms such as Firebase Hosting or Netlify, and a `container/` directory containing a dockerized Elixir bundle suitable for deployment platforms such as GCP Compute Engine or Fly.io.
+suitable for deployment platforms such as Firebase Hosting or Netlify, and a `dcontainer/` directory containing a dockerized Elixir bundle suitable for deployment platforms such as GCP Compute Engine or Fly.io.
 
 ---
 

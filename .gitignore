@@ -4,6 +4,7 @@ _build
 _opam
 deps
 dist/
+dcontainer/
 dist__serve/
 log/
 .pnpm-store
