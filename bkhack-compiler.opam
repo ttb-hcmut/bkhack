@@ -7,7 +7,7 @@ authors: ["ttb-hcmut"]
 license: "MIT"
 depends: [
   "dune" {>= "3.8"}
-  "ocaml" {>= "5.2.0"}
+  "ocaml" {= "5.2.0"}
   "reason" {>= "3.1.30"}
   "containers" {>= "3.16"}
   "utop" {>= "2.16.0"}
