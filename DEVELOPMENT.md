@@ -1,14 +1,13 @@
 Development setup
 =================
 
-# Repository Structure
+Our repository structure is as follows:
 
-```text
-src/         Frontend source code
-service/     Backend service
-build_aux/   Docker and auxiliary tooling
-doc/         Thesis and documentation
-```
+------------|----------------------------
+src/        |Frontend source code
+service/    |Backend service
+build_aux/  |Docker and auxiliary tooling
+doc/        |Thesis and documentation
 
 ---
 
