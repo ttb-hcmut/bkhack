@@ -9,10 +9,11 @@ The following paper provides more details:
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lê Nguyễn Gia Bảo, Lê Công Minh Khang, and Hồ Gia Tường  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Undergraduate Thesis 2026  
 
-[bkhack-paper]: https://baorepo.web.app/~ttb-hcmut/bkhack.pdf
 - Project Repository: https://github.com/ttb-hcmut/bkhack
-- Thesis Paper (PDF): https://baorepo.web.app/~ttb-hcmut/bkhack.pdf
+- [Thesis Paper (PDF)][bkhack-paper]
 - Live Deployment: https://bkhack-2eb8c.web.app
+
+[bkhack-paper]: https://baorepo.web.app/~ttb-hcmut/bkhack.pdf
 
 ---
 
@@ -65,7 +66,7 @@ See [DEVELOPMENT.md](./DEVELOPMENT.md) for more details.
 
 ---
 
-## Try it out
+## Try It Out
 
 The current deployment is available at:
 
