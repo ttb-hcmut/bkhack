@@ -7,16 +7,23 @@ Development setup
 Our repository structure (WIP) is as follows, sorted based on importance:
 
 ```text
-bin/          Build system source code
-src/          Frontend source code
-src_vendors/  Frontend vendored source code
-src_buildlib/ Build system lingo source code
-service/      Backend service
-build_aux/    Auxiliary tooling (Docker, Webpack)
-src_devbook/  Developer handbook source code
-src_thesis/   Thesis source code
-doc/          Documentation and presentations
-news/         Public announcements
+bin/             Build system source code
+src/             Frontend source code
+src_build/       Build system lingo source code
+src_devbook/     Developer handbook source code
+src_devbook/     Vietnamese translation developer handbook source code
+src_diagramming/ Diagram library source code
+src_thesis/      Thesis source code
+src_vendors/     Frontend vendored source code
+service/         Backend service
+service_agentic/ Agentic service
+service_shells/  Development tools service (Nix, Emacs, Vim)
+doc/             Documentation and presentations
+doc_benchmark/   Documentation benchmarks and artifacts
+doc_design/      Design system and artifacts
+doc_news/        Public announcements
+generative/      Off-shored generative static assets
+build_aux/       Auxiliary tooling (Docker, Webpack)
 ```
 
 ---
