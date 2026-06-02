@@ -88,7 +88,7 @@ defmodule DateTime0 do
 end
 defmodule Comment
   do use Ecto.Schema
-  @timestamps_opts [type: UTCDateTime, autogenerate: {DateTime0, :now!, ["Etc/UTC"]}]
+  @timestamps_opts [type: UTCDateTime]
   @primary_key {:comment_id,:id,autogenerate: true}
   schema "comments" do
     field :parent_post_id    ,:integer

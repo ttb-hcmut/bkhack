@@ -44,7 +44,6 @@ module Login = {
           )
         )
         >>= Fetch.Response.json
-        >>= Model.Decode.Response.fetchedAuth
         >!= (err => {
           Js.log(err);
           auth.unsetAuth();
@@ -52,8 +51,7 @@ module Login = {
           Js.Promise.reject(Js.Exn.anyToExnInternal @@ err)
         })
         >>= (j => {
-          open Model.FetchedAuth;
-          auth.setAuth(j.user_id,j.name);
+          auth.setAuthFromToken(j);
           url.search
           -> Util.parseQueryParams
           -> Js.Dict.get("redirect")
