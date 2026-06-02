@@ -15,5 +15,5 @@ storybook-static
 \#*\#
 *\~
 
-./package.json
-./pnpm-lock.yaml
+/package.json
+/pnpm-lock.yaml
