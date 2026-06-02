@@ -6,15 +6,9 @@
 #title[= Stream-based programming, as compared to sh]
 #set heading(numbering: "1.",  outlined: true, supplement: [#text(weight: 900, fill: rgb("#3851A4"))[§]#h(-0.4em)])
 #show heading: it => {
-  if it.level == 1 {
-    set text(size: 0.85em)
-    it
-  } else if it.level == 2 {
-    set text(size: 0.75em)
-    it
-  } else {
-    it
-  }
+  if it.level == 1 { set text(size: 0.85em); it }
+  else if it.level == 2 { set text(size: 0.75em); it }
+  else { it }
 }
 #set cite(style: "alphanumeric")
 // #show cite: it => text(fill: rgb("#3851A4"), it)
