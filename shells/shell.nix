@@ -10,6 +10,14 @@ let shellHook =
 		rm __firebase_json;
 		return $sts;
 	}
+  pnpm=$(which pnpm)
+  pnpm() {
+    { ln --symbolic --force build_aux/package.json package.json && ln --symbolic --force build_aux/pnpm-lock.yaml pnpm-lock.yaml ;} &&
+    $pnpm $@;
+    sts=$?;
+    # { rm package.json && rm pnpm-lock.yaml ;};
+    return $sts;
+  }
 	'';
 	pkgs = with nixpkgs; [
 		elixir erlang
