@@ -47,12 +47,11 @@ You can integrate it into your own Reason application:
 Bundle the application for deployment:
 
 ```sh
-export BKHACK_BACKEND_ADDRESS='http://localhost:5000'
-bkhack.bundle ./ -o dist
+bkhack.bundle ./ -o dist --api 'http://localhost:5000'
 ```
 
 This produces a `dist/` directory containing static HTML and JavaScript bundles
-suitable for deployment platforms such as Firebase Hosting or Netlify.
+suitable for deployment platforms such as Firebase Hosting or Netlify, and a `container/` directory containing a dockerized Elixir bundle suitable for deployment platforms such as GCP Compute Engine or Fly.io.
 
 ---
 

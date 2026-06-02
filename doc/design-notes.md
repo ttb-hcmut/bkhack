@@ -112,6 +112,10 @@ We need to inform the build system that for a Reason page file $x$ there is a ma
 
 [^attributes]: https://ocaml.org/manual/5.3/attributes.html
 
+# Inline testing
+
+Besides dedicated unit test flows, we have inline expect tests. Expect test
+
 > One of the most definitive use cases of floating attributes! The OCamldoc system also support floating attributes for manipulating system.
 
 # Diverse implementation
@@ -120,7 +124,9 @@ For every module, we have alternative modules that achieve a similar goal using 
 
 - For parsing the bkhack shell language, we use two implementations, one based on parser combinators (src/Shell__parse.re) and one based on ocaml re (src/Shell__parse_1.re). Refer to [streaming](./streaming.pdf) for a full technical report on this, and [parsing](./parsing.pdf) for a comparison between parsing techniques.
 - For parsing of the markdown language - as used throughout the project including the article view and pull request view and editor view etc - we use two implementations, one based on Daniel Bünzli's Cmarkit library, one based on Remark. See [markdown](./markdown.pdf) for the full technical report.
-- For database, we use six implementations.
+- For elixir database, we use , one is elixir ecto, one is Postgrex, one is Supabase , one is 
+- For elixir ecto database, we use six implementations, one is SQLite (`Ecto.SQLite`), one is Supabase (`Ecto.Postgres`), one is Mongo (`Ecto.Mongo`), one is Firebase.
+- For back-end hosting, we use three implementations, one is Render.com `render`, one is Fly.io `flyctl`, and one is Google Cloud Platform `gcloud`.
 - For Firebase, we use two implementations, one is the `@firebase` Node libraries (modular API) provided by Google, and one based on RESTful API at the URL `https://firestore.googleapis.com`.
 
 A telling case study of this is the markdown module. We initially used CMarkit. However, CMarkit being originally written for OCaml, when ported to Reason we hit a rare bug in the Melange compiler which is that extensible types with conflictive name with a module will result in the module members being overridden when the code is compiled to JavaScript; that, and another bug where Melange doesn't fully support OCaml's Object API (Object, as in the internal low-level value presentation API). While we can switch to using a different library, we liked Cmarkit's declarative markdown syntax tree API. We decided to use this API as a "front-end", a basis for our markdown abstraction, and under which we use another library that is Remark (with Rehype for converting to HTML) from the JavaScript ecosystem. This new abstraction we call Remarkit. All the while, we still hold onto the goal to one day "fix" all the rare bugs in Melange to finally be able to use the original Cmarkit library.
