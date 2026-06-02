@@ -11,7 +11,7 @@ bin/             Build system source code
 src/             Frontend source code
 src_build/       Build system lingo source code
 src_devbook/     Developer handbook source code
-src_devbook/     Vietnamese translation developer handbook source code
+src_devbook@vi/  Vietnamese translation developer handbook source code
 src_diagramming/ Diagram library source code
 src_thesis/      Thesis source code
 src_vendors/     Frontend vendored source code
