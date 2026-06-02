@@ -13,6 +13,7 @@
 (use-package neocaml :ensure t)
 (use-package ocaml-eglot :ensure t :after neocaml
 	:hook (neocaml-base-mode . ocaml-eglot-mode) (ocaml-eglot-mode . eglot-ensure))
+(use-package reason-mode :ensure t)
 (use-package markdown-mode :ensure t
 	:mode ("README\\.md\\'" . gfm-mode))
 ; (use-package git-modes)
