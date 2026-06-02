@@ -8,12 +8,8 @@ The following paper provides more details:
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Phát triển mạng xã hội giáo dục hướng Khoa học Máy tính tại Đại học Bách Khoa TP.HCM  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lê Nguyễn Gia Bảo, Lê Công Minh Khang, and Hồ Gia Tường  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Undergraduate Thesis 2026  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Project Repository][bkhack-repo] [Thesis Paper (pdf)][bkhack-paper] [Live Deployment][bkhack-firebase]
 
-- Project Repository: https://github.com/ttb-hcmut/bkhack
-- [Thesis Paper (PDF)][bkhack-paper]
-- Live Deployment: https://bkhack-2eb8c.web.app
-
-[bkhack-paper]: https://baorepo.web.app/~ttb-hcmut/bkhack.pdf
 
 ---
 
@@ -68,6 +64,8 @@ See [DEVELOPMENT.md](./DEVELOPMENT.md) for more details.
 
 ## Try It Out
 
-The current deployment is available at:
+The current deployment is [available here!][bkhack-firebase]
 
-https://bkhack-2eb8c.web.app
+[bkhack-repo]: https://github.com/ttb-hcmut/bkhack
+[bkhack-paper]: https://baorepo.web.app/~ttb-hcmut/bkhack.pdf
+[bkhack-firebase]: https://bkhack-2eb8c.web.app
