@@ -18,6 +18,7 @@
   color: var(--ctp-text);
   caret-color: var(--ctp-text);
   padding: var(--space-a);
+  width: 100%;
 }
 #root > main.edit > .edit *::placeholder {
   font-size: var(--text-base);

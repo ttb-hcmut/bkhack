@@ -112,8 +112,8 @@ dialog.help > div {
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: green;
-  min-width: 32rem;
-  min-height: 32rem;
+  min-width: 80%;
+  min-height: 80%;
 }
 
 /* mobile - tablet */
@@ -192,6 +192,8 @@ dialog.help > div {
     flex-direction: column;
     margin-top: var(--space-a);
     overflow-x: auto;
+    scrollbar-color: var(--card-border) transparent;
+    scrollbar-width: thin;
   }
 
   dialog.help > div > main > section {
@@ -239,6 +241,8 @@ dialog.help > div {
 		min-width: 100vw;
 		min-height: calc(100% - var(--offset) - 2px);
     overflow-y: scroll;
+    scrollbar-color: var(--card-border) transparent;
+    scrollbar-width: thin;
   }
 
   dialog.help > div > main {
