@@ -49,8 +49,8 @@ module ItemNav{
     { (auth.getUserId() |> fun | None => true | Some(u) => owner_id != u)?
       React.null
       :
-      <button onClick={_ => choose(Edit)} className=className(Edit)> <label /> </button>
-      }
+      <button onClick={_ => choose(Edit)} className=className(Edit)> <label /> <div className="mneumonics" /> </button>
+    }
 			<div className="mneumonics" />
     </>
   }
