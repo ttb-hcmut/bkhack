@@ -56,7 +56,7 @@ let chain_2 = impl => {
 }
 
 let chain_3 = impl => {
-	let* brak_l = brak_l; let* ws0 = whitespace0; let* impl = impl; let* ws1 = whitespace0; let* end_of_seq = end_of_seq; let* ws2 = whitespace0; let* brak_r = brak_r;
+	let* brak_l = brak_l and* ws0 = whitespace0 and* impl = impl and* ws1 = whitespace0 and* end_of_seq = end_of_seq and* ws2 = whitespace0 and* brak_r = brak_r;
 	return (
 	<>
 	<span className="punctuation bracket sh">{brak_l->char}</span> {ws0->string}
@@ -81,14 +81,9 @@ let chain' : code(React.element) = fix @@ impl => {
 }
 
 let chain = {
-	let* x = chain';
-	let* _ = whitespace0;
-	let* u = peek_char;
-	if (Option.is_some(u)) {
-		fail("incomplete parsing")
-	} else {
-		return(x)
-	}
+	let* x = chain' and* _ = whitespace0 and* u = peek_char;
+	if (Option.is_some(u)) fail("incomplete parsing") else
+	return(x)
 }
 
 let string = s =>
