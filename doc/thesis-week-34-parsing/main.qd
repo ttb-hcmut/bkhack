@@ -1,0 +1,135 @@
+.include {bachkhoa.qd}
+.docname {bkhack\: Week 34\: Parsing techniques}
+.doctype {slides}
+.autopagebreak maxdepth:{2}
+.docauthor {Kinten Le}
+
+.front
+	.frontTitle {Advanced programming: Parsing techniques}
+	.frontBody
+		.frontAuthor
+			.aauthor {.docauthor}
+		.frontContacts
+			.email {kinten108101\@protonmail\.com}
+		.frontOrigin
+			.align {center}
+				.container
+					HCMUT-VNUHCM
+	.align {center}
+		.container
+			Companion of `ttb-hcmut/bkhack/src_devbook/parsing.pdf`
+
+.speakernote
+	reference to PTAPG Parsing Techniques A Practical Guide
+
+.tableofcontents {Content} maxdepth:{1}
+
+# Motivation
+
+# Foundation
+
+## The parsing pipeline
+
+## Parsing without pipeline
+
+# Parsing by regular expression (`re`)
+
+## Extract patterns
+
+Given a string `?view=pullrequests&id=77&pr-id=5`, one would write a regexp as
+
+```reasonml
+let parse = s => Js.Re.match("view=(*+?)",s)
+```
+
+.code lang:{ocaml} linenumbers:{no}
+	let parse =
+		let pat = Re.compile @@ Re.(seq
+			[str "view"; char '='; group (any |> rep1 |> shortest) ]) in
+		fun s -> Re.exec pat s
+
+# Parsing by hand (`hm`)
+
+- _Hand-made parsers_ are the _most optimal_ parsers (provided with enough skills and prep-time).
+- It's not always viable to parse by hand.
+
+# Parsing by parser generator (`cc`)
+
+- A grammar definition specification code is used to generate highly-optimized parsing code.
+- Some examples are `yacc`, `menhir`, ANTLR
+- A strict compilation pipeline
+
+# Parsing by parser combinators (`parsec`)
+
+## A taste of `parsec` -- a JSON parser
+
+```ocaml
+open Angstrom
+
+let ws0 =
+	let is_ws = function ' ' | '\n' | '\t' -> true | _ -> false in
+	take_while0 is_ws
+
+let brak_left, brak_right = char '{', char '}'
+
+let str0 = take_while @@ function
+	'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' -> true | _ -> false
+
+let quoted = char '"' *> str0 <* char '"'
+
+let colon = char ':' and comma = char ','
+```
+
+## A taste of `parsec` -- a JSON parser
+
+```ocaml
+let kv lhs rhs =
+	lift2 (fun a b -> a, b)
+		(ws0 *> lhs <* ws0) (colon *> ws0 *> rhs <* ws0)
+
+let rec kvchain lhs rhs =
+  let kvs = comma *> kvchain lhs rhs in
+	lift2 (fun pair ls -> pair :: ls)
+		kv (kvs <|> (lift (fun _ -> []) end_of_input))
+
+let langchain = fix @@ fun langchain ->
+	let lhs = quoted str0
+	and rhs = lift (fun x -> `Str x) (quoted str0)
+				<|> lift (fun x -> `Dict x) langchain in
+	brak_left *> kvchain lhs rhs <* brak_right
+```
+
+## A taste of `parsec` -- a JSON parser
+
+.code lang:{ocaml} caption:{Deployment of the `langchain` language}
+	let string = Angstrom.parse_string ~consume:All langchain
+
+	let _ =
+		string {|{ "one" : "two" }|}
+		|> Result.get_ok
+	(*
+		- : ([ `Str of string | `Dict of 'weak4 list ] as 'weak4) list
+			= [ "one", `Str "two" ]
+	*)
+
+## Case study: Keyboard events
+
+## Case study: bkhack shell
+
+*Companion of `ttb-hcmut/bkhack/src_devbook/streaming.pdf`*
+
+This will involve:
+- **The normal parser.** Evaluates shell expression as an emulation of shell-kernel, but is only used to navigate around the website.\
+  $ \text{string} : \text{string} \rightarrow \text{result} (\text{program}, \text{string}) $
+- **The pasteller.** Provides real-time syntax highlighting for the command bar.\
+  $ \text{string} : \text{string} \rightarrow \text{result} (\text{element}, \text{string}) $
+
+<<<
+
+### The normal bkhack shell parser (`Shell__parse`)
+
+<<<
+
+### The bkhack shell pasteller (`Shell__pastel`)
+
+# Parsing by staged parser combinators (`gen`) (advanced)
