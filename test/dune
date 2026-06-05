@@ -1,2 +1,9 @@
-(executable
+(library
+ (libraries eio)
+ (modules diff)
  (name diff))
+
+(executable
+ (libraries diff eio eio_main)
+ (modules app)
+ (name app))
