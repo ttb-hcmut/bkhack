@@ -149,22 +149,40 @@ let make = (~on_help: bool => unit, ~memo_transition=?) => {
 		return()
 	});
   let on_help = [|on_help|]|>useCallback1 @@ () => { on_help(true); };
-	<>
-	<a className="logo" href="/" />
-	<form onSubmit={e => assert_ @@ _ => url->onSubmit(~on_help, ~memo_transition?, e)}>
-		<input autoComplete="off" autoCapitalize="off" spellCheck=false onChange={_ => bar->fakeBarSync @@ () => ()} onKeyDown={onKeyDown(setHistoryIndex, completeBarHTMLContent, onKey)} ref={ReactDOM.Ref.domRef(bar)} id="siteNavigator" className=errorClass />
-		<div className="displayonly highlight">{innerHTML}</div>
-		{errorBox}
-	</form>
-	<a className="place projects" href="/projects/"></a>
-	<a className="place wiki" href="/wiki/"></a>
-	<a className="place notifications"></a>
-	<a className="place settings" href="/settings/"></a>
+	<header>
+		<div className="header-left">
+			<a className="logo" href="/" />
+			<form onSubmit={e => assert_ @@ _ => url->onSubmit(~on_help, ~memo_transition?, e)}>
+				<input autoComplete="off" autoCapitalize="off" spellCheck=false onChange={_ => bar->fakeBarSync @@ () => ()} onKeyDown={onKeyDown(setHistoryIndex, completeBarHTMLContent, onKey)} ref={ReactDOM.Ref.domRef(bar)} id="siteNavigator" className=errorClass />
+				<div className="displayonly highlight">{innerHTML}</div>
+				{errorBox}
+			</form>
+		</div>
+		
+		<div className="header-right">
+			<a className="place notifications" title="Notifications"></a>
 
-  { showLoginButton ?
-    <button className="place auth" title="Log in" onClick={_ => auth.forceAuth()}/>
-    :
-    <button className="place" title="Log out" onClick={_ => auth.forceAuth()}>{React.string(Option.value(auth.getUserName(),~default="Guest"))}</button>
-	}
-	</>
+			<div className="separator"></div>
+
+			<a className="place projects" href="/projects/" title="Projects"></a>
+			<a className="place notes" href="/notes/" title="Notes"></a>
+
+			<div className="separator"></div>
+
+			<a className="place wiki" href="/wiki/" title="Wiki & Documentation"></a>
+
+			<div className="separator"></div>
+
+			<a className="place settings" href="/settings/" title="Settings"></a>
+
+			<div className="separator"></div>
+
+			<a className="place admin" href="/admin/" title="Admin Dashboard"></a>
+			{ showLoginButton ?
+				<button className="place auth" title="Log in" onClick={_ => auth.forceAuth()}/>
+				:
+				<button className="place auth" title="Log out" onClick={_ => auth.forceAuth()}>{React.string(Option.value(auth.getUserName(),~default="Guest"))}</button>
+			}
+		</div>
+	</header>
 }

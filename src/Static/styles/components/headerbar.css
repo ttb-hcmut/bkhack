@@ -14,15 +14,23 @@
 	padding-top: 0;
 	padding-bottom: 0;
 	height: calc(1.5rem + 2 * var(--space-a));
-	display: grid;
-	grid-template-columns: max-content max-content minmax(0, 1fr) max-content max-content max-content max-content max-content;
+	display: flex;
 	align-items: center;
-	flex-direction: row;
-	z-index:9999;
+	justify-content: space-between;
+	z-index: 9999;
 }
 
-#root > header > :not(:first-child) {
-	margin-left: var(--space-a);
+#root > header > .header-left {
+	display: flex;
+	align-items: center;
+	gap: var(--space-a);
+	flex: 0 1 auto;
+}
+
+#root > header > .header-right {
+	display: flex;
+	align-items: center;
+	gap: var(--space-c);
 }
 
 #root > header > .logo {
@@ -30,6 +38,7 @@
 	flex-direction: row;
 	align-items: center;
 	font-family: var(--font-mono);
+	flex-shrink: 0;
 }
 
 #root:not([data-tileset="gui"]) > header > .logo {
@@ -60,15 +69,41 @@
   }
 }
 
+#root > header > .header-left > form {
+	display: flex;
+	align-items: center;
+	flex: 1 1 auto;
+}
+
+#root > header > .header-right > .separator {
+	width: 1px;
+	height: 1.25rem;
+	background-color: var(--border);
+	margin-left: var(--space-c);
+	margin-right: var(--space-c);
+}
+
 #root > header > a.place,
 #root > header > button.place {
 	font-size: var(--text-sm);
 	font-family: var(--font-mono);
   color: var(--ctp-text);
+	padding: var(--space-c) var(--space-a);
+	border-radius: var(--radius);
+	border: none;
+	background-color: transparent;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--space-c);
+	transition: all 200ms ease;
+	text-decoration: none;
 }
 
-#root > header > a.place:nth-child(3) {
-	grid-column-start: 4;
+#root > header > a.place:hover,
+#root > header > button.place:hover {
+	background-color: var(--muted);
 }
 
 #root > header > a.place.projects::before {
@@ -87,6 +122,14 @@
 	content: "thư viện";
 }
 
+#root > header > a.place.notes::before {
+	content: "notes";
+}
+
+#root:lang(vi-VN) > header > a.place.notes::before {
+	content: "ghi chú";
+}
+
 #root > header > a.place.notifications::before {
 	content: "notifications";
 }
@@ -101,6 +144,14 @@
 
 #root:lang(vi-VN) > header > a.place.settings::before {
 	content: "cài đặt";
+}
+
+#root > header > a.place.admin::before {
+	content: "admin";
+}
+
+#root:lang(vi-VN) > header > a.place.admin::before {
+	content: "quản trị";
 }
 
 #root > header > a.place.auth::before,
@@ -123,6 +174,95 @@
   color: var(--ctp-text);
   caret-color: var(--ctp-text);
   padding: var(--space-f) var(--space-a);
+	max-width: 20rem;
+	flex: 1 1 auto;
+}
+
+/* GUI icons for header placeholders (uses lucide-static SVGs under /icons/) */
+#root[data-tileset="gui"] > header > a.place.projects::before,
+#root[data-tileset="gui"] > header > a.place.notes::before,
+#root[data-tileset="gui"] > header > a.place.wiki::before,
+#root[data-tileset="gui"] > header > a.place.settings::before,
+#root[data-tileset="gui"] > header > a.place.admin::before,
+#root[data-tileset="gui"] > header > a.place.notifications::before,
+#root[data-tileset="gui"] > header > a.place.auth::before {
+	content: " ";
+	display: inline-block;
+	width: 1.25em;
+	height: 1.25em;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: 1em 1em;
+	margin: 0;
+}
+
+#root[data-tileset="gui"] > header > a.place.projects::before {
+	mask-image: url("/icons/package.svg");
+	-webkit-mask-image: url("/icons/package.svg");
+	background-color: var(--ctp-text);
+}
+
+#root[data-tileset="gui"] > header > a.place.projects:hover::before {
+	background-color: var(--primary);
+}
+
+#root[data-tileset="gui"] > header > a.place.notes::before {
+	mask-image: url("/icons/sticky-note.svg");
+	-webkit-mask-image: url("/icons/sticky-note.svg");
+	background-color: var(--ctp-text);
+}
+
+#root[data-tileset="gui"] > header > a.place.notes:hover::before {
+	background-color: var(--ctp-yellow);
+}
+
+#root[data-tileset="gui"] > header > a.place.wiki::before {
+	mask-image: url("/icons/book-open.svg");
+	-webkit-mask-image: url("/icons/book-open.svg");
+	background-color: var(--ctp-text);
+}
+
+#root[data-tileset="gui"] > header > a.place.wiki:hover::before {
+	background-color: var(--ctp-sky);
+}
+
+#root[data-tileset="gui"] > header > a.place.settings::before {
+	mask-image: url("/icons/settings.svg");
+	-webkit-mask-image: url("/icons/settings.svg");
+	background-color: var(--ctp-text);
+}
+
+#root[data-tileset="gui"] > header > a.place.settings:hover::before {
+	background-color: var(--primary);
+}
+
+#root[data-tileset="gui"] > header > a.place.admin::before {
+	mask-image: url("/icons/shield.svg");
+	-webkit-mask-image: url("/icons/shield.svg");
+	background-color: var(--ctp-text);
+}
+
+#root[data-tileset="gui"] > header > a.place.admin:hover::before {
+	background-color: var(--ctp-lavender);
+}
+
+#root[data-tileset="gui"] > header > a.place.notifications::before {
+	background-image: url("/icons/bell.svg");
+	background-color: var(--ctp-text);
+}
+
+#root[data-tileset="gui"] > header > a.place.notifications:hover::before {
+	background-color: var(--primary);
+}
+
+#root[data-tileset="gui"] > header > a.place.auth::before {
+	mask-image: url("/icons/user.svg");
+	-webkit-mask-image: url("/icons/user.svg");
+	background-color: var(--ctp-text);
+}
+
+#root[data-tileset="gui"] > header > a.place.auth:hover::before {
+	background-color: var(--foreground);
 }
 
 #siteNavigator:focus {
@@ -156,8 +296,6 @@ dialog > div {
 
 #siteNavigator {
 	color: rgba(0,0,0,0);
-	grid-row: 1 / 2;
-	grid-column: 1 / 2;
 }
 
 #siteNavigator + .displayonly {
@@ -165,8 +303,9 @@ dialog > div {
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	overflow-x: hidden;
-	grid-row: 1 / 2;
-	grid-column: 1 / 2;
+	position: absolute;
+	left: 0;
+	top: 0;
 }
 
 #siteNavigator + .displayonly a {
@@ -180,6 +319,7 @@ dialog > div {
   font-family: var(--font-mono);
   padding: var(--space-f) var(--space-a);
   border: 1px solid rgba(0,0,0,0);
+  color: var(--ctp-text);
 }
 
 #siteNavigator:focus + .displayonly {
@@ -190,7 +330,8 @@ dialog > div {
 }
 
 form:has(> #siteNavigator) {
-	display: grid;
+	position: relative;
+	flex: 1 1 auto;
 }
 
 form:has(> #siteNavigator) > * {
@@ -230,3 +371,4 @@ form:has(> #siteNavigator) > * {
 	content: "Sai cú pháp lệnh 'feed' \A feed ";
 	white-space: pre-wrap;
 }
+

@@ -13,6 +13,7 @@ and generative_dir cwd = P.(cwd / "generative")
 and dist_dir cwd = P.(cwd / "dist")
 and src_dir cwd = P.(cwd / "src")
 and log_dir cwd = P.(cwd / "log")
+and lucide_dir cwd = P.(cwd / "node_modules/lucide-static")
 
 let attrib_name = Re.(
   alt [str "page"; str "Bkhack.page"])
@@ -33,8 +34,19 @@ let morphism_jspages~sw~procm~clock~cwd src_dir dist_dir log_dir =
   B.output__sync~clock jsfile';
   B.compile_jsfile~procm~clock out_dir log_dir jsfile'
 
+(** a [morphism] for lucide icons *)
+let morphism_lucide ~sw lucide_dir dist_dir =
+  Path.mkdirs ~exists_ok:true ~perm:0o700 P.(dist_dir / "icons");
+  let icons_dir = P.(lucide_dir / "icons") in
+  let icons = Path.read_dir icons_dir in
+
+  icons |> Fiber.List.iter @@ fun icon ->
+    B.Path.symlink ~sw
+      P.(dist_dir / "icons" / icon)
+      ~link_to:P.(icons_dir / icon)
+
 (** a [morphism] for linking static-content files from public dir
-    (and other sources) to dist dir *)
+(and other sources) to dist dir *)
 let morphism_static ~sw public_dir dist_dir () =
   let rec iter f ~ondir (rootdir: string list) =
     let items = Path.read_dir P.(public_dir / String.concat "/" rootdir) in
@@ -72,8 +84,8 @@ let () =
   Eio_main.run @@ fun env ->
   let procm, clock, cwd =
     Stdenv.process_mgr env, Stdenv.clock env, Stdenv.cwd env in
-  let public_dir, generative_dir, dist_dir, log_dir, src_dir =
-    public_dir cwd, generative_dir cwd, dist_dir cwd, log_dir cwd, src_dir cwd in
+  let public_dir, generative_dir, dist_dir, log_dir, src_dir, lucide_dir =
+    public_dir cwd, generative_dir cwd, dist_dir cwd, log_dir cwd, src_dir cwd, lucide_dir cwd in
   let cleantree () =
     let missing_ok = true in
     Path.rmtree ~missing_ok dist_dir in
@@ -81,4 +93,5 @@ let () =
   cleantree ();
   morphism_jspages~sw~procm~clock~cwd src_dir dist_dir log_dir;
   morphism_static~sw public_dir dist_dir ();
-  morphism_generative~sw generative_dir dist_dir
+  morphism_generative~sw generative_dir dist_dir;
+  morphism_lucide ~sw lucide_dir dist_dir
