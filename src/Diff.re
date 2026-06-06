@@ -3,18 +3,18 @@ module type Comparable {
   let ( > ) : t => t => bool
 }
 
-let with_duration = (~tag="", ~clock, k) => {
-  let start = Eio.Time.now(clock);
-  let v = k();
-  let stop = Eio.Time.now(clock);
-  Eio.traceln("duration %s: %f", tag, stop -. start);
-  v
-}
+// let with_duration = (~tag="", ~clock, k) => {
+//   let start = Eio.Time.now(clock);
+//   let v = k();
+//   let stop = Eio.Time.now(clock);
+//   Eio.traceln("duration %s: %f", tag, stop -. start);
+//   v
+// }
 
 module Int {
   include Int
   type t = int
-  let (>) = Stdlib.(>)
+  let (>) = (>)
 }
 
 module Number {
@@ -100,12 +100,9 @@ let rec diff = ( input1: list(string), input2: list(string), lcs:list(string)) =
   | ([_f1,...r1],[_f2,...r2],[flcs,...rlcs]) => [(" ",flcs),...diff(r1,r2,rlcs)]
   | (_,_,_) => []
   };
-let compare = (~clock, input1:string, input2:string, split:list(char), nukeDelim:bool) => {
-  let (array1, array2) = with_duration(~clock) @@ () => {
-    let array1:array(string) = String.length(input1)>0 ? stringDisassembler(input1,split,String.length(input1)-1,"",[],nukeDelim) |> Array.of_list : [||];
-    let array2:array(string) = String.length(input2)>0 ? stringDisassembler(input2,split,String.length(input2)-1,"",[],nukeDelim) |> Array.of_list : [||];
-    (array1, array2)
-  };
+let compare = (input1:string, input2:string, split:list(char), nukeDelim:bool) => {
+  let array1:array(string) = String.length(input1)>0 ? stringDisassembler(input1,split,String.length(input1)-1,"",[],nukeDelim) |> Array.of_list : [||];
+  let array2:array(string) = String.length(input2)>0 ? stringDisassembler(input2,split,String.length(input2)-1,"",[],nukeDelim) |> Array.of_list : [||];
   let scoreMatrix:ref(array(array(int))) = ref( 0 |> Array.make(Array.length(array2)) |> Array.make(Array.length(array1)));
   array1 |> Array.iteri((i,row)=>
     array2 |> Array.iteri((j,column) =>

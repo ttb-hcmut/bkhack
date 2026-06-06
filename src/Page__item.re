@@ -444,17 +444,17 @@ module DiscussionView = {
         // opening concept: Js.Promise.()
         let fetchComments = result => {
           let open Fetch__syntax;
-            Js.log2("before loading check: ",result)
-            Js.log2("isloading: ",loading)
+            // Js.log2("before loading check: ",result)
+            // Js.log2("isloading: ",loading)
           if(loading){ () }
           else{
-            Js.log2("after loading check: ",result)
+            // Js.log2("after loading check: ",result)
             setLoading(_=>true);
             switch(pType,result){
             | ("post",x) when x == Js.Json.null => 
               setLoading( _ => false);
             | ("post",r) => 
-              Js.log2("if result not null: ",r)
+              // Js.log2("if result not null: ",r)
               setComments( _ => r |> Model.Decode.fetchedComments);
               setShowMore( _ => false);
               setLoading( _ => false);
@@ -657,7 +657,9 @@ module PullrequestsBody = {
 	[@react.component]
 	let make = (~pullrequests, ~prsExpand, ~expand_this, ~inspect_this) => {
 		let now = Js__dom.Date.of_now();
-		<ul>
+		<>
+    <Component__diff.App input1="a b a\na a b\nb a a" input2="b a b\nb a a\na b b" />
+    <ul>
 			{pullrequests |> Array.map(x => {
 				let ((id, _post_id, _contributor_id, title, _desc, status, tags, created), contributor_name) = x;
 				let created = Js__dom.Date.of_iso_string(created);
@@ -717,6 +719,7 @@ module PullrequestsBody = {
 				</li>
 			}) |> React.array}
 		</ul>
+    </>
 	}
 }
 
