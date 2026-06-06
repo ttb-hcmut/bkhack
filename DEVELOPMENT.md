@@ -99,9 +99,9 @@ nix-shell
 eval $(opam env)
 
 export TEST=$PWD
-dune exec bin/bundle.exe
 export BKHACK_FIREBASE_KEY=replace_with_actual_firebase_api_key
 export BKHACK_BACKEND_ADDRESS='http://localhost:5000'
+dune exec bin/bundle.exe
 
 pnpm install
 pnpm run init
@@ -139,7 +139,7 @@ nix-shell
 >
 > ```sh
 > docker exec -it bkhack-shell sh
-> cd /service
+> cd service
 > nix-shell
 > ```
 
