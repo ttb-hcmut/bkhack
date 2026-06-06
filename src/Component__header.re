@@ -149,7 +149,7 @@ let make = (~on_help: bool => unit, ~memo_transition=?) => {
 		return()
 	});
   let on_help = [|on_help|]|>useCallback1 @@ () => { on_help(true); };
-	<header>
+	<>
 		<div className="header-left">
 			<a className="logo" href="/" />
 			<form onSubmit={e => assert_ @@ _ => url->onSubmit(~on_help, ~memo_transition?, e)}>
@@ -184,5 +184,5 @@ let make = (~on_help: bool => unit, ~memo_transition=?) => {
 				<button className="place auth" title="Log out" onClick={_ => auth.forceAuth()}>{React.string(Option.value(auth.getUserName(),~default="Guest"))}</button>
 			}
 		</div>
-	</header>
+	</>
 }
