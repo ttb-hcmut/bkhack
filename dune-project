@@ -34,3 +34,9 @@
   (eio (>= 1.3))
   (eio_main (>= 1.3))
   ))
+
+(package
+ (name bkhack-doc)
+ (synopsis "bkhack doc tools")
+ (description "bkhack doc tools")
+ (depends (ocaml (>= 5.2.0)) markup iter))
