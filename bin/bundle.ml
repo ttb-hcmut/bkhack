@@ -42,7 +42,6 @@ let morphism_lucide ~sw lucide_dir dist_dir =
   Path.mkdirs ~exists_ok:true ~perm:0o700 P.(dist_dir / "icons");
   let icons_dir = P.(lucide_dir / "icons") in
   let icons = Path.read_dir icons_dir in
-
   icons |> Fiber.List.iter @@ fun icon ->
     B.Path.symlink ~sw
       P.(dist_dir / "icons" / icon)
