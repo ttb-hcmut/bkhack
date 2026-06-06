@@ -19,19 +19,22 @@ let attrib_name = Re.(
 
 (** a [morphism] for JavaScript bundles *)
 let morphism_jspages~sw~procm~clock~cwd src_dir dist_dir log_dir =
+  Fiber.fork ~sw @@ fun () ->
+  let optimization = `Production in
   let jspages =
     List.filter_map (B.is_page' src_dir)
     @@ Path.read_dir src_dir in
-  Fiber.fork ~sw @@ fun () ->
-  jspages |> Fiber.List.iter @@ fun x' ->
-  let `fpath refile', `fname refile, _ = x' in
-  let jsfile = B.Output.src @@ Filename.chop_extension refile in
-  let jsfile' = P.(cwd / jsfile) in
-  let out_dir =
-    try P.(dist_dir / B.file_grep_attrib attrib_name refile')
-    with Not_found -> raise @@ Missing_mapping_entry_for refile in
-  B.output__sync~clock jsfile';
-  B.compile_jsfile~procm~clock out_dir log_dir jsfile'
+  let output_dirs =
+    jspages |> Fiber.List.map @@ fun x' ->
+    let `fpath refile', `fname refile, _ = x' in
+    let jsfile = B.Output.src @@ Filename.chop_extension refile in
+    let jsfile' = P.(cwd / jsfile) in
+    let out_dir =
+      try B.file_grep_attrib attrib_name refile'
+      with Not_found -> raise @@ Missing_mapping_entry_for refile in
+    B.output__sync~clock jsfile';
+    out_dir^"/index", jsfile' in
+  B.compile_jsfile'~procm~clock~cwd ~optimization dist_dir ~log_dir output_dirs
 
 (** a [morphism] for linking static-content files from public dir
     (and other sources) to dist dir *)
@@ -76,7 +79,8 @@ let () =
     public_dir cwd, generative_dir cwd, dist_dir cwd, log_dir cwd, src_dir cwd in
   let cleantree () =
     let missing_ok = true in
-    Path.rmtree ~missing_ok dist_dir in
+    Path.rmtree ~missing_ok dist_dir;
+    Path.mkdirs ~exists_ok:true ~perm:0o700 dist_dir in
   Switch.run @@ fun sw ->
   cleantree ();
   morphism_jspages~sw~procm~clock~cwd src_dir dist_dir log_dir;

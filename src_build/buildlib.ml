@@ -93,7 +93,65 @@ let compile_jsfile~procm~clock ?(watch = false) out_dir log_dir entry =
     ; "--output-path"; Path.native_exn out_dir
     ; "--output-filename"; "index.js"]
 
-(** TODO(kinten) grep from AST! *)
+let webpack_template v =
+  let s = v |> List.map(fun (k, v) -> "\""^k^"\":\""^v^"\"") |> String.concat(",\n") in
+  Printf.sprintf {|
+const webpack = require("webpack")
+const path = require("path")
+
+const backend_address = (() => {
+	if (process.env.BKHACK_BACKEND_ADDRESS === undefined || typeof process.env.BKHACK_BACKEND_ADDRESS !== "string") {
+		throw new Error("did not specify BKHACK_BACKEND_ADDRESS")
+	}
+	return process.env.BKHACK_BACKEND_ADDRESS;
+})()
+
+const firebase_key = (() => {
+	if (process.env.BKHACK_FIREBASE_KEY === undefined || typeof process.env.BKHACK_FIREBASE_KEY !== "string") {
+		throw new Error("did not specify BKHACK_FIREBASE_KEY")
+	}
+	return process.env.BKHACK_FIREBASE_KEY;
+})()
+
+module.exports = {
+	plugins: [
+		new webpack.DefinePlugin({
+			"bkhackenv.backend_address": `\"${backend_address}\"`,
+			"bkhackenv.firebase_key": `\"${firebase_key}\"`,
+		})
+	],
+  entry: {
+    %s
+  },
+}
+|} s
+
+let compile_jsfile'~procm~clock~cwd ?(watch = false) ~optimization out_dir ?log_dir entries =
+  let opt_to_str = function `Production -> "production" | `Development -> "development" in
+  let mkdirs x =
+    let exists_ok = true and perm = 0o700 in
+    Path.mkdirs ~exists_ok ~perm x in
+  let wrapdir ?log_dir clock k =
+    match log_dir with
+    | None -> k (Pnpm.Process.run ?stdout:None)
+    | Some log_dir ->
+      mkdirs log_dir;
+      Path.with_open_out P.(log_dir / (idgen' clock ^ ".stdout")) ~create:(`Exclusive 0o700) @@ fun stdout ->
+      k (Pnpm.Process.run ~stdout)
+    in
+  mkdirs out_dir;
+  mkdirs Path.(cwd / "_build_webpack");
+  wrapdir ?log_dir clock @@ fun run ->
+  Path.save ~create:(`Or_truncate 0o700) Path.(cwd / "_build_webpack" / "config.js") @@ webpack_template @@ List.map (fun (x, y) -> (x, Path.native_exn y)) entries;
+  run procm @@
+    [ "webpack" ] @
+    (if watch then ["watch"] else []) @
+    [ "--config"; "_build_webpack/config.js"
+    ; "--mode"; opt_to_str optimization
+    ; "--output-path"; Path.native_exn out_dir
+    ]
+
+[@alert naive("TODO(khang+kinten) bao plz grep from AST!")]
 let file_grep_attrib attrib_name refile' =
   let wrap_exn f =
     try f() with Failure "hd" [@warning "-52"] ->
