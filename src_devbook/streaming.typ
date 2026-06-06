@@ -1,4 +1,5 @@
 #import "/article": *
+#import "@preview/tdtr:0.5.5"
 #import "vocab.typ" as o
 #import "./shell-parse.typ"
 #import "./shell-sym.typ"
@@ -29,6 +30,8 @@ accepts the option ```sh -l NUM``` where `NUM` is line number size of chunk
 . There is a command for every page, but there's no way to navigate
 "relatively" such as going "back" or "forth"; in other words, there's
 no ```sh cd``` command.\
+  #lorem(50)\
+  #lorem(50)\
   #lorem(50)
 = Semantics
 The original sh language is a user interface for the system shell, which
@@ -42,7 +45,7 @@ architecture even when it's not really there.\
 = Session
 A shell is usually seen as a session that has REPL behavior, an environment with its own variables, and shells can stack on top of one another and can be "popped".\
   For #o.bkhack, #lorem(30)
-= Principles
+= Stream programming
 Stream-based programming involves #lorem(30)\
   #lorem(50)\
   #lorem(50)\
@@ -95,6 +98,24 @@ _option parser_, such as POSIX `getopts`.
 #place(auto, float: true, scope: "parent")[
   #figure(caption: [Grammar for the #o.bkhack-shell language], shell-parse.langchain) <gr>
 ]
+#align(center)[
+#tdtr.tidy-tree-graph(compact: true)[
+  #let sink(n) = tdtr.node-attr(sink: n)
+  - $< "program" >$
+    - command
+      - word
+        - ```sh feed```
+    - ```sh |``` #sink(2)
+    - command
+      - word
+        - ```sh split```
+      - word
+        - ```sh -c```
+      - word
+        - ```sh 10```
+]
+]
+where #lorem(20)
 == Parsing
 Parsing is implemented based on the grammar at @gr. #lorem(30)\
   In the initial design, we have only one phase for our parser. This is an eager, AST-less, final a.k.a. _syntax-directed_ parser--effects are eagerly executed as each term is parsed. Eventually, we did make it so that it outputs an AST, for reusability and convenience.\
