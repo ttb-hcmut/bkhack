@@ -40,13 +40,8 @@ let morphism_jspages~sw~procm~clock~cwd ?watch src_dir dist_dir log_dir =
 
 (** a [morphism] for lucide icons *)
 let morphism_lucide~sw~procm lucide_dir dist_dir =
-  Path.mkdirs ~exists_ok:true ~perm:0o700 P.(dist_dir / "icons");
   let icons_dir = P.(lucide_dir / "icons") in
-  let icons = Path.read_dir icons_dir in
-  icons |> Fiber.List.iter @@ fun icon ->
-    B.Path.physlink ~sw procm
-      P.(dist_dir / "icons" / icon)
-      ~link_to:P.(icons_dir / icon)
+  B.Path.copy_dir~sw~procm icons_dir P.(dist_dir / "icons")
 
 (** a [morphism] for linking static-content files from public dir
     (and other sources) to dist dir *)
@@ -106,7 +101,7 @@ let main__ ~watch ?(dist_dir = dist_dir) () =
   morphism_jspages~sw~procm~clock~cwd ~watch src_dir dist_dir log_dir;
   morphism_static~sw~procm public_dir dist_dir ();
   morphism_generative~sw~procm generative_dir dist_dir;
-  morphism_lucide ~sw ~procm lucide_dir dist_dir
+  morphism_lucide~sw~procm lucide_dir dist_dir
 
 open Cmdliner
 open Term.Syntax

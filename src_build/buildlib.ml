@@ -37,6 +37,11 @@ module Path = struct
     Switch.run @@ fun sw ->
     f sw newpath
 
+  let copy_dir ~sw ~procm from_ to_ =
+    Fiber.fork ~sw @@ fun () ->
+    Process.run procm
+      ["cp"; "-r"; Path.native_exn from_; Path.native_exn to_]
+
   exception Directory_doesnt_exist of string
 
   let getdir dirname filename f =
