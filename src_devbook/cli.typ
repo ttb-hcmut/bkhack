@@ -9,10 +9,23 @@
   #cetz.canvas({
     import cetz.draw: *
     let window() = rect((0,0), (5,3))
-    let bar() = rect((0.2,2.4), (4.8,2.8), radius: 0.1)
-    window(); bar()
+    let play(x: 0, y: 0, w: 0.5, h: 1) = merge-path(scale: 0.5, {
+      line((x,y), (x,y+h))
+      line((x,y+h), (x+w,y+h/2))
+      line((x+w,y+h/2),(x,y))
+    })
+    let bar() = {
+      let cursor(x: 0.2) = rect((x,3-0.3), (x+0.15,3-0.50), fill: color.rgb("#000"))
+      rect((0.2,2.4), (4.8,2.8), radius: 0.1)
+      content((0.65,2.4), (4.8,2.8), align(horizon, [abc]))
+      play(x: 0.35, y: 2.5, w: 0.2, h: 0.2)
+      cursor(x: 1.25)
+    }
+    let dialog() = rect((0.6,0.3), (3.8,2.25))
+    bar(); dialog()
   })
 ]
+which is called a _command bar_ #fn[a.k.a. _command palette_], and there is usually an accompanying _pop-down dialog_.
 
 #lorem(30)
 

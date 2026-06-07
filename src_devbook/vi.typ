@@ -1,6 +1,7 @@
 #import "/article": *
-#import "./kbd.typ"
-#import "@preview/cetz:0.5.1"
+#import "kbd.typ"
+#import "diagramming.typ": colors
+#import "@preview/cetz:0.5.2"
 #import "@preview/finite:0.5.1": automaton
 #set raw(syntaxes: ("reason.sublime-syntax")/* , theme: "quiet.tmTheme" */)
 #set heading(numbering: "1.",  outlined: true, supplement: [#text(weight: 900, fill: rgb("#3851A4"))[§]#h(-0.4em)])
@@ -15,41 +16,42 @@
 
 #lorem(50)
 
-#align(center)[
-  #let layout = (
+#align(center, {
+  let layout = (
     modecmd: (0, 2),
     modenormal: (0, 0),
-    modevisual: (2, 0),
+    modevisual: (2.2, 0),
     modeinsert: (0, -2.5)
   )
-  #let labels = (
+  let labels = (
     modecmd: [cmd],
     modenormal: [nrm],
     modevisual: [vi],
     modeinsert: [ins],
   )
-  #let cream-1 = color.rgb("#F5F7FF")
-  #let cream-2 = color.rgb("#8F95AE")
-  #let cream-3 = color.rgb("#636A8A")
-  #let style = (
-    modenormal: (stroke: cream-3, fill: cream-1),
-    modecmd: (stroke: cream-3, fill: cream-1),
-    modeinsert: (stroke: cream-3, fill: cream-1),
-    modevisual: (stroke: cream-3, fill: cream-1),
+  let style = (
+    modenormal: (stroke: colors.cream-3, fill: colors.cream-1, initial: (anchor: left, stroke: color.rgb("#000"))),
+    modecmd: (stroke: colors.cream-3, fill: colors.cream-1),
+    modeinsert: (stroke: colors.cream-3, fill: colors.cream-1),
+    modevisual: (stroke: colors.cream-3, fill: colors.cream-1),
     modenormal-modecmd: (angle: 0deg, dist: 9pt, curve: 1),
-    modenormal-modeinsert: (angle: 0deg, dist: 9pt, curve: 1),
+    modenormal-modeinsert: (angle: 0deg, dist: 9pt, curve: 0.5),
     modecmd-modenormal: (angle: 0deg, curve: 0),
     modevisual-modenormal: (angle: 0deg, curve: 0),
-    modeinsert-modenormal: (angle: 0deg, curve: 0),
+    modeinsert-modenormal: (angle: 0deg, curve: 0.5),
   )
-  #let initial = "modenormal"
-  #automaton(initial: initial, layout: layout, labels: labels, style: style, (
-    modecmd: (modenormal: $ kbd.escape $),
-    modenormal: (modecmd: $ ":", "/", "?" $, modevisual: $ "v", "V" $, modeinsert: $ "i""I""a""A""o""O""c" $),
-    modevisual: (modenormal: $ kbd.escape $),
-    modeinsert: (modenormal: $ kbd.escape $),
+  let initial = "modenormal"
+  let final = ("modenormal")
+  automaton(initial: initial, final: final, layout: layout, labels: labels, style: style, (
+    modecmd: (modenormal: kbd.escape),
+    modenormal: (
+      modecmd: pad(right: 12pt, $ ":", "/", "?" $),
+      modevisual: $ "v", "V", #kbd.ctrl-("v") $,
+      modeinsert: pad(left: 28pt, $ "i""I""a""A""o""O""c" $)),
+    modevisual: (modenormal: kbd.escape),
+    modeinsert: (modenormal: kbd.escape),
   ))
-]
+})
 
 #lorem(50)
 
@@ -66,18 +68,20 @@ type motion('t) =
 #align(center)[
   #cetz.canvas({
     import cetz.draw: *
-    let window() = rect((0,0), (6,4))
-    let cursor() = rect((0.2,3.8), (0.35,3.45), fill: color.rgb("#000"))
+    let window() = rect((0,0), (6,3))
+    let cursor(x: 0.2) = rect((x,3-0.2), (x+0.15,3-0.55), fill: color.rgb("#000"))
+    let tt() = content((0.2,3-0.2), (6,3-0.55), align(horizon, text([abc])))
     let modeline() = {
       rect((0.2,0.7), (5.8,1.2))
-      content((0.2,0.7), (5.8,1.2), box([buffer-name]), stroke: none)
+      content((0.2,0.7), (5.8,1.2), pad(left: 4pt, align(horizon)[buffer-name, line-number]), stroke: none)
     }
     let cmdline() = {
       rect((0.2,0.2), (5.8,0.7))
-      content((0.2,0.2), (5.8,0.7), box(```:command```))
+      content((0.2,0.2), (5.8,0.7), pad(left: 4pt, align(horizon, ```-- MODE --```)))
     }
     window()
-    cursor()
+    cursor(x: 0.8)
+    tt()
     modeline()
     cmdline()
   })
@@ -95,8 +99,8 @@ where #lorem(30)
     let rat = 3/2
     let ghostdiv() = {
       let pos(y) = ((1,0), (3+1,(3/rat)+y))
-      rect((1.8,(3/rat)-0.55), (1.8+0.2,(3/rat)-0.2), fill: color.rgb("#000"))
-      content((1.2,(3/rat)-0.55), (1.4,(3/rat)-0.2), fill: color.rgb("#000"), [abc])
+      rect((1.8,(3/rat)-0.55), (1.8+0.15,(3/rat)-0.2), fill: color.rgb("#000"))
+      content((1.2,(3/rat)-0.55), (1.4,(3/rat)-0.2), fill: color.rgb("#000"), text(fill: colors.light-3)[abc])
       rect(..pos(0))
       content(..pos(-1.7), [ghost div])
     }
@@ -105,7 +109,7 @@ where #lorem(30)
       rect((0.8,(3/rat)+0.5-0.55), (0.8, (3/rat)+0.5-0.2))
       content((0.2,(3/rat)+0.5-0.55), (0.2, (3/rat)+0.5-0.2), [abc])
       rect(..pos(0))
-      content(..pos(-1.7), [textarea], align: bottom)
+      content(..pos(-1.7), [textarea])
     }
     let arrow() = {
       line((2.7, 0.8), (3.8, 0.2), mark: (end: ">"))
@@ -125,5 +129,7 @@ _twinning_
 #header[The markdown editor].
 
 #header[The vim editor].
+
+#bibliography(title: none, "works.bib")
 
 // vi: set nowrap:
