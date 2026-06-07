@@ -1,2 +1,3 @@
  
-	.src__Page__app__re__HintPanel__feed__hint.command { --page-command: "feed | split -c 10" ;}
+			.src__Page__app__re__HintPanel__feed__hint.command { --page-command: "feed | split -c 10" ;}
+		

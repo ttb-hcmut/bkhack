@@ -77,7 +77,7 @@ module Filter {
 	};
 
 	[@react.component]
-	let make = (~setResult) =>
+	let make = (~setResult, ~x_limit=?) =>
 	{ 
     // let submission = React.useRef(Js.Nullable.null);
 		// let onSubmit = e => {
@@ -96,7 +96,8 @@ module Filter {
       countApi={"/api/post/count?"}
       fetchApi={"/api/post/list?"}
       filter  ={[
-        ("searchby",["title","author"])
+				("x-limit", [x_limit|>Option.value(~default=10)|>string_of_int,"15","30"])
+      , ("searchby",["title","author"])
       , ("sortby",  ["age","active"])
       , ("orderby", ["ascending","descending"])
       ]}
@@ -275,11 +276,15 @@ module Dashboard = {
   [@react.component]
   let make = () => {
 		// let (counts, setCounts) = React.useState(() => 10);
+		let url = ReasonReactRouter.useUrl();
+		let x_limit = useMemo1(() => {
+			let params = url.search->Util.parseQueryParams';
+			params |> List.assoc_opt("limit") |> Option.map(int_of_string)
+		}, [|url|]);
 		let (items, setItems) = React.useState(() => [||]);
-    let (_showHelp, setShowHelp) = React.useState(() => false);
+		let (_showHelp, setShowHelp) = React.useState(() => false);
 		let (result, setResult) = React.useState(() => Js.Json.null);
 		let (sidebarState, setSidebarState) = React.useState( _ => "state0");
-		// let ticketParam = ReasonReactRouter.useUrl().search;
     
     let fetchPostList = () => {
       setItems(_ => result |> Model.Decode.postListItems)
@@ -300,7 +305,7 @@ module Dashboard = {
 					<HintPanel />
 				</header>
         <nav>
-				<Filter setResult />
+				<Filter setResult ?x_limit />
         </nav>
 			</nav>
 			<main className=sidebarState><ol>

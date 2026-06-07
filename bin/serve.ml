@@ -29,7 +29,7 @@ let morphism_jspages~sw~procm~clock~cwd ?watch src_dir dist_dir log_dir =
   let output_dirs =
     jspages |> Fiber.List.map @@ fun x' ->
     let `fpath refile', `fname refile, _ = x' in
-    let jsfile = B.Output.src @@ Filename.chop_extension refile in
+    let jsfile  = B.Output.src @@ Filename.chop_extension refile in
     let jsfile' = P.(cwd / jsfile) in
     let out_dir =
       try B.file_grep_attrib attrib_name refile'
@@ -39,14 +39,9 @@ let morphism_jspages~sw~procm~clock~cwd ?watch src_dir dist_dir log_dir =
   B.compile_jsfile'~procm~clock~cwd ?watch ~optimization dist_dir ~log_dir output_dirs
 
 (** a [morphism] for lucide icons *)
-let morphism_lucide ~sw ~procm lucide_dir dist_dir =
-  Path.mkdirs ~exists_ok:true ~perm:0o700 P.(dist_dir / "icons");
+let morphism_lucide~sw~procm lucide_dir dist_dir =
   let icons_dir = P.(lucide_dir / "icons") in
-  let icons = Path.read_dir icons_dir in
-  icons |> Fiber.List.iter @@ fun icon ->
-    B.Path.physlink ~sw procm
-      P.(dist_dir / "icons" / icon)
-      ~link_to:P.(icons_dir / icon)
+  B.Path.copy_dir~sw~procm icons_dir P.(dist_dir / "icons")
 
 (** a [morphism] for linking static-content files from public dir
     (and other sources) to dist dir *)
@@ -106,7 +101,7 @@ let main__ ~watch ?(dist_dir = dist_dir) () =
   morphism_jspages~sw~procm~clock~cwd ~watch src_dir dist_dir log_dir;
   morphism_static~sw~procm public_dir dist_dir ();
   morphism_generative~sw~procm generative_dir dist_dir;
-  morphism_lucide ~sw ~procm lucide_dir dist_dir
+  morphism_lucide~sw~procm lucide_dir dist_dir
 
 open Cmdliner
 open Term.Syntax

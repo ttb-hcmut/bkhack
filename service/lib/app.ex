@@ -215,7 +215,12 @@ defmodule App
   get "/api/post/list" do
     Logger.info "GET postlist"
     offset    = Map.get(conn.params,"offset","0") |> String.to_integer
-    limit     = Map.get(conn.params,"limit","10") |> String.to_integer
+    x_limit = Map.get(conn.params,"x-limit")
+    limit =
+      case x_limit do
+        nil -> Map.get(conn.params,"limit","10") |> String.to_integer
+        x -> x |> String.to_integer
+      end
     user_id = jwtReader(conn,:user_id,-1)
 
 
