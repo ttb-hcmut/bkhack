@@ -53,8 +53,6 @@ html {
 	background-color: var(--card-bg);
 }
 
-
-
 #root > main.article > *.only:not(.article),
 #root > main.discussions > *.only:not(.discussions),
 #root > main.pullrequests > *.only:not(.pullrequests),
@@ -63,14 +61,6 @@ html {
 #root > main.log > *.only:not(.log),
 #root > main.edit > *.only:not(.edit) {
 	display: none;
-}
-
-#root[data-help-visibility="visible"] {
-  width: 100vw;
-  height: 100vh;
-  max-height: 100vh;
-  padding: 0;
-  overflow: hidden;
 }
 
 #root > dialog.help {
@@ -85,6 +75,10 @@ html {
   opacity: 0%;
   z-index: 10000;
   pointer-events: none;
+}
+
+#root > dialog.help {
+  background-color: rgba(100,100,100,0.2);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -233,16 +227,56 @@ dialog.help > div {
 
 /* mobile - phone */
 @media (max-width: 48rem) {
-  dialog.help > div {
+
+  #root > dialog.help {
+    opacity: 100%;
+    transition-property: all;
+    transition-duration: 300ms;
+  }
+
+  #root > dialog.help {
+    background-color: rgba(0,0,0,0);
+  }
+
+  #root[data-help-visibility="visible"] > dialog.help {
+    background-color: rgba(100,100,100,0.2);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    #root[data-help-visibility="visible"] > dialog.help {
+      background-color: rgba(0,0,0,0.2);
+    }
+  }
+
+  #root > dialog.help > div {
+    transition-property: transform;
+    transition-duration: 300ms;
     --offset: 3rem;
-		top: var(--offset);
+    top: 0px;
 		left: 50%;
-		transform: translate(-50%, 0%);
+    transform: translate(-50%, 100vh);
 		min-width: 100vw;
 		min-height: calc(100% - var(--offset) - 2px);
     overflow-y: scroll;
     scrollbar-color: var(--card-border) transparent;
     scrollbar-width: thin;
+  }
+
+  @media (prefers-reduced-motion) {
+    #root > dialog.help {
+      transition-property: none;
+      transition-duration: 0ms;
+    }
+
+		#root > dialog.help > div {
+      transition-property: none;
+		  transition-duration: 0ms;
+    }
+  }
+
+  #root[data-help-visibility="visible"] > dialog.help > div {
+    --offset: 3rem;
+		transform: translate(-50%, var(--offset));
   }
 
   dialog.help > div > main {
