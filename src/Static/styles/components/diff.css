@@ -17,12 +17,25 @@
   gap: 0;
 }
 .diff-box > header.diff-controls {
+  background-color: var(--card-bg);
+  padding: var(--space-a);
+}
+.diff-box > header.diff-controls > label {
+  color: var(--ctp-subtext0);
+  font-size: var(--text-sm);
+}
+.diff-box > header.diff-controls > button {
+  color: var(--ctp-text);
+  border-radius: var(--radius);
+  padding: var(--space-c);
+  background-color: var(--ctp-crust);
 }
 .diff-box > main {
 }
 .diff-box .code-box {
   display: grid;
   grid-template-columns: max-content minmax(0,100%);
+  border: 1px solid var(--card-border);
 }
 .diff-box  .code-box > .body {
   grid-area: 1/2/-1/3;
@@ -39,17 +52,16 @@
 }
 .diff-box .code-box > ol > li.line-numbering {
   grid-column: 1/2;
-  height: 100%;
+  display: block;
   background-color: var(--card-bg);
   border-right: 1px solid var(--card-border);
   padding-right: var(--space-a);
 }
 .diff-box .code-box > ol > li.ghost {
   grid-column: 2/3;
+  height: min-content;
 }
 .diff-box .code-box > ol > li.ghost > span {
-  height: 100%;
-  width: 100%;
 }
 .code-box .text-style{
   overflow-wrap: break-word;
@@ -59,7 +71,9 @@
   line-height: 1;
 }
 .code-box .invisible{
-  opacity: 0;
+  color: transparent;
+  pointer-events: none;
+  user-select: none;
 }
 .code-box .\+{
   background-color: color-mix(in srgb, var(--ctp-green), var(--card-bg) 70%);

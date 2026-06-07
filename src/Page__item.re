@@ -657,8 +657,18 @@ module PullrequestsBody = {
 	[@react.component]
 	let make = (~pullrequests, ~prsExpand, ~expand_this, ~inspect_this) => {
 		let now = Js__dom.Date.of_now();
+    let (input1,setInput1) = React.useState(()=>"");
+    let (input2,setInput2) = React.useState(()=>"");
 		<>
-    <Component__diff.App input1="a b a\na a b\noooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\nb a a" input2="b a b\nb a a\na b b" />
+    <div className="side-by-side">
+      <textarea
+        onChange={e => setInput1(_ => React.Event.Form.target(e)##value)}
+        value=input1/>
+      <textarea
+        onChange={e => setInput2(_ => React.Event.Form.target(e)##value)}
+        value=input2/>
+    </div>
+    <Component__diff.App input1 input2/>
     <ul>
 			{pullrequests |> Array.map(x => {
 				let ((id, _post_id, _contributor_id, title, _desc, status, tags, created), contributor_name) = x;

@@ -1,16 +1,19 @@
 module Linenumbering = {
   [@react.component]
-  let make = (~text,~mode) => {
-    let (_,_,_,lis) = text 
+  let make = (~text, ~mode) => {
+    let final = React.useMemo1(()=>{
+      let (_,jay,hol,lis) = text 
       |> List.fold_left( ((i,j,hold,listicle),(d,v)) => {
         let hideThisLine = mode != d && mode != "=" && d != "=";
-         v |> fun
+        v |> fun
         | "\n" =>
           ( hideThisLine? i : i+1
-          , j+1
+          , j+2 
           , []
-          , [ <li key={j |> string_of_int} className={"line-numbering text-style l2 " ++ (hideThisLine?"invisible":"")}> {React.int(i)}</li>
-            , <li className="ghost l3" key={i |> string_of_int}>
+          , [ <li key={string_of_int(j+1)} className="line-numbering"> 
+                <span className={"text-style " ++ (hideThisLine?"invisible":"")}>{React.int(i)}</span>
+              </li>
+            , <li key={string_of_int(j)} className="ghost" >
                 {
                   hold
                   |> List.rev
@@ -23,17 +26,30 @@ module Linenumbering = {
         | _ =>  
           ( i
           , j+1
-          , [<span key={j |> string_of_int}
-          className={ "l3 text-style invisible"}> 
+          , [<span key={string_of_int(j)}
+          className="text-style invisible"> 
             {React.string(v)}
           </span>,...hold]
           , listicle
           )
-      },(1,1,[],[<li key="0" className="line-numbering text-style l2"> {React.int(0)}</li>]))
+      }
+      , (1,1,[],[<li key="0" className="line-numbering"> <span className="text-style">{React.int(0)}</span></li>])
+      )
+      ; 
+      [ <li className="ghost" key={jay |> string_of_int}>
+          {
+            hol
+            |> List.rev
+            |> Array.of_list
+            |> React.array
+          }
+        </li>
+      , ...lis]
+    },[|text|])
     ;
-    <ol>
+    <ol> 
     {
-      lis
+      final
       |> List.rev
       |> Array.of_list
       |> React.array
