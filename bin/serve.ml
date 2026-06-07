@@ -29,7 +29,7 @@ let morphism_jspages~sw~procm~clock~cwd ?watch src_dir dist_dir log_dir =
   let output_dirs =
     jspages |> Fiber.List.map @@ fun x' ->
     let `fpath refile', `fname refile, _ = x' in
-    let jsfile = B.Output.src @@ Filename.chop_extension refile in
+    let jsfile  = B.Output.src @@ Filename.chop_extension refile in
     let jsfile' = P.(cwd / jsfile) in
     let out_dir =
       try B.file_grep_attrib attrib_name refile'
@@ -39,7 +39,7 @@ let morphism_jspages~sw~procm~clock~cwd ?watch src_dir dist_dir log_dir =
   B.compile_jsfile'~procm~clock~cwd ?watch ~optimization dist_dir ~log_dir output_dirs
 
 (** a [morphism] for lucide icons *)
-let morphism_lucide ~sw ~procm lucide_dir dist_dir =
+let morphism_lucide~sw~procm lucide_dir dist_dir =
   Path.mkdirs ~exists_ok:true ~perm:0o700 P.(dist_dir / "icons");
   let icons_dir = P.(lucide_dir / "icons") in
   let icons = Path.read_dir icons_dir in
