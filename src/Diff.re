@@ -97,7 +97,7 @@ let rec diff = ( input1: list(string), input2: list(string), lcs:list(string)) =
   | (_,[f2,...r2],[]) => [("+",f2),...diff(input1,r2,[])]
   | ([f1,...r1],_,[flcs,..._rlcs]) when f1 != flcs => [("-",f1),...diff(r1,input2,lcs)]
   | (_,[f2,...r2],[flcs,..._rlcs]) when f2 != flcs => [("+",f2),...diff(input1,r2,lcs)]
-  | ([_f1,...r1],[_f2,...r2],[flcs,...rlcs]) => [(" ",flcs),...diff(r1,r2,rlcs)]
+  | ([_f1,...r1],[_f2,...r2],[flcs,...rlcs]) => [("=",flcs),...diff(r1,r2,rlcs)]
   | (_,_,_) => []
   };
 let compare = (input1:string, input2:string, split:list(char), nukeDelim:bool) => {

@@ -658,7 +658,7 @@ module PullrequestsBody = {
 	let make = (~pullrequests, ~prsExpand, ~expand_this, ~inspect_this) => {
 		let now = Js__dom.Date.of_now();
 		<>
-    <Component__diff.App input1="a b a\na a b\nb a a" input2="b a b\nb a a\na b b" />
+    <Component__diff.App input1="a b a\na a b\noooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\nb a a" input2="b a b\nb a a\na b b" />
     <ul>
 			{pullrequests |> Array.map(x => {
 				let ((id, _post_id, _contributor_id, title, _desc, status, tags, created), contributor_name) = x;
