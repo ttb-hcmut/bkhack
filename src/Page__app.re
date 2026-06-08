@@ -276,6 +276,17 @@ module Dashboard = {
   [@react.component]
   let make = () => {
 		// let (counts, setCounts) = React.useState(() => 10);
+    let (showHelp, setShowHelp) = useState(() => false);
+    let on_help = x => setShowHelp(_ => x);
+    React.useEffect1(() => {
+      (module ReactDOM)->Component__help_menu.update_visibility(showHelp);
+      None
+    }, [|showHelp|]);
+    Component__help_menu.use_escape(module Js__dom.Window) @@ useCallback0 @@ () => setShowHelp(_ => false);
+		let memo_transition = React.useCallback0((url, url_args, k) => {
+			Js.Console.log2(url, url_args);
+			if (url == "" && url_args == []) { () } else k ()
+		});
 		let url = ReasonReactRouter.useUrl();
 		let x_limit = useMemo1(() => {
 			let params = url.search->Util.parseQueryParams';
@@ -289,7 +300,6 @@ module Dashboard = {
     let fetchPostList = () => {
       setItems(_ => result |> Model.Decode.postListItems)
     }
-    let on_help = x => setShowHelp(_ => x);
     React.useEffect1(()=>{
       if (result != Js.Json.null)
         fetchPostList();
@@ -298,7 +308,7 @@ module Dashboard = {
     ;
 		<>
 			<header>
-				<Component__header on_help />
+				<Component__header on_help memo_transition />
 			</header>
 			<nav className=sidebarState>
 				<header>
@@ -331,6 +341,7 @@ module Dashboard = {
 				<button>{string("next")}</button>
 			</footer>
 			<Component__sidebar sidebarState setSidebarState />
+      <Component__help_menu on_click_out={_ => setShowHelp(_ => false)} />
 		</>
 	}
 };
@@ -371,6 +382,8 @@ module App' =
   ->React.use(module Tileset.Make)
   ->React.use(module AuthContext.Provider)
 )
+
+// let%comptime element = ReactDOM1.Page.make(Page.url)
 
 let () = {
 	let element = ReactDOM0.querySelector("#root");
