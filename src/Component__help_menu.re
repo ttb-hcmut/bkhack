@@ -81,7 +81,6 @@ let make = (~on_click_out) => {
       <main>
         {feed_cmds()}
         {items_cmds()}
-        {feed_cmds()}
       </main>
     </div>
   </dialog>
