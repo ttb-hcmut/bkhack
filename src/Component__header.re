@@ -158,26 +158,17 @@ let make = (~on_help: bool => unit, ~memo_transition=?) => {
 				{errorBox}
 			</form>
 		</div>
-		
 		<div className="header-right">
-			<a className="place notifications" title="Notifications"></a>
-
-			<div className="separator"></div>
-
-			<a className="place projects" href="/projects/" title="Projects"></a>
-			<a className="place notes" href="/notes/" title="Notes"></a>
-
-			<div className="separator"></div>
-
-			<a className="place wiki" href="/wiki/" title="Wiki & Documentation"></a>
-
-			<div className="separator"></div>
-
-			<a className="place settings" href="/settings/" title="Settings"></a>
-
-			<div className="separator"></div>
-
-			<a className="place admin" href="/admin/" title="Admin Dashboard"></a>
+			<a className="place notifications" title="Notifications"/>
+			<div className="separator"/>
+			<a className="place projects" href="/projects/" title="Projects"/>
+			<a className="place notes" href="/notes/" title="Notes"/>
+			<div className="separator"/>
+			<a className="place wiki" href="/wiki/" title="Wiki & Documentation"/>
+			<div className="separator"/>
+			<a className="place settings" href="/settings/" title="Settings"/>
+			<div className="separator"/>
+			<a className="place admin" href="/admin/" title="Admin Dashboard"/>
 			{ showLoginButton ?
 				<button className="place auth" title="Log in" onClick={_ => auth.forceAuth()}/>
 				:
