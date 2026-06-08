@@ -38,7 +38,7 @@ let morphism_jspages~sw~procm~clock~cwd src_dir dist_dir log_dir =
   B.compile_jsfile'~procm~clock~cwd ~optimization dist_dir ~log_dir output_dirs
 
 (** a [morphism] for lucide icons *)
-let morphism_lucide ~sw lucide_dir dist_dir =
+let _morphism_lucide ~sw lucide_dir dist_dir =
   Path.mkdirs ~exists_ok:true ~perm:0o700 P.(dist_dir / "icons");
   let icons_dir = P.(lucide_dir / "icons") in
   let icons = Path.read_dir icons_dir in
@@ -86,7 +86,7 @@ let () =
   Eio_main.run @@ fun env ->
   let procm, clock, cwd =
     Stdenv.process_mgr env, Stdenv.clock env, Stdenv.cwd env in
-  let public_dir, generative_dir, dist_dir, log_dir, src_dir, lucide_dir =
+  let public_dir, generative_dir, dist_dir, log_dir, src_dir, _lucide_dir =
     public_dir cwd, generative_dir cwd, dist_dir cwd, log_dir cwd, src_dir cwd, lucide_dir cwd in
   let cleantree () =
     let missing_ok = true in
@@ -97,4 +97,4 @@ let () =
   morphism_jspages~sw~procm~clock~cwd src_dir dist_dir log_dir;
   morphism_static~sw public_dir dist_dir ();
   morphism_generative~sw generative_dir dist_dir;
-  morphism_lucide ~sw lucide_dir dist_dir
+  (* morphism_lucide ~sw lucide_dir dist_dir *)
