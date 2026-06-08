@@ -30,6 +30,12 @@
 #root > header > .header-right {
 	display: flex;
 	align-items: center;
+	gap: var(--space-d);
+}
+
+#root[data-tileset='gui'] > header > .header-right {
+	display: flex;
+	align-items: center;
 	gap: var(--space-c);
 }
 
@@ -88,7 +94,7 @@
 	font-size: var(--text-sm);
 	font-family: var(--font-mono);
   color: var(--ctp-text);
-	padding: var(--space-c) var(--space-a);
+	padding: var(--space-c) 0px;
 	border-radius: var(--radius);
 	border: none;
 	background-color: transparent;
@@ -101,8 +107,14 @@
 	text-decoration: none;
 }
 
-#root > header a.place:hover,
-#root > header button.place:hover {
+#root[data-tileset='gui'] > header {
+	a.place, button.place {
+		padding: var(--space-c) var(--space-a);
+	}
+}
+
+#root[data-tileset='gui'] > header a.place:hover,
+#root[data-tileset='gui'] > header button.place:hover {
 	background-color: var(--muted);
 }
 
