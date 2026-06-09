@@ -4,12 +4,6 @@
 #import "@preview/cetz:0.5.2"
 #import "@preview/finite:0.5.1": automaton
 #set raw(syntaxes: ("reason.sublime-syntax")/* , theme: "quiet.tmTheme" */)
-#set heading(numbering: "1.",  outlined: true, supplement: [#text(weight: 900, fill: rgb("#3851A4"))[§]#h(-0.4em)])
-#show heading: it => {
-  if it.level == 1 { set text(size: 0.85em); it }
-  else if it.level == 2 { set text(size: 0.75em); it }
-  else { it }
-}
 #set cite(style: "alphanumeric")
 #let header(it) = text(weight: 700, [#(it)#h(0.2em)])
 #title[= Vim motion]
@@ -61,7 +55,7 @@ type motion('t) =
   | Escape(motion('t)) : motion([> #normal])
 ```
 
-= User interface
+== User interface
 
 #lorem(20)
 
@@ -89,7 +83,7 @@ type motion('t) =
 
 where #lorem(30)
 
-= Graphical layering
+== Graphical layering
 
 #lorem(20)
 
@@ -122,7 +116,7 @@ We utilize what we call _ghost divs_ #fn[also known as _display divs_ in some ol
 
 _twinning_
 
-= Implementation
+== Implementation
 
 #header[The basic editor]. This is our first implementation
 
