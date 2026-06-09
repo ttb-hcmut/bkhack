@@ -106,10 +106,10 @@ module Filter {
   }
 }
 
-module Dashboard = {
+module Dashboard {
 	open React
 
-	module Card = {
+	module Card {
 		[@react.component]
 		let make = (
       ~rank
