@@ -1,6 +1,7 @@
 #import "/article": *
 #import "./shell-parse.typ"
 #let (bkhack, Bkhack) = ([bkhack], [bkhack])
+#set text(lang: "vi")
 #title[= Lập trình luồng]
 #show heading: it => {
   if it.level == 1 {
