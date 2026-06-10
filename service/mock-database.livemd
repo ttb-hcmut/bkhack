@@ -399,78 +399,114 @@ Sqlx.query!(conn, ~S"delete from comments", [])
 Sqlx.query!(conn, ~S"delete from pullrequests", []) 
 Sqlx.query!(conn, ~S"delete from posts", [])
 Sqlx.query!(conn, ~S"delete from users", [])
-Sqlx.query!(
-  conn,
-  ~S"""
-  insert into users values (0, 'yminsky_fan', 'ballsballsballs', 'khangalang@bkhack.org', 0)
-  """,
-  []
-)
-Sqlx.query!(
-  conn,
-  ~S"""
-  insert into posts values (77, 'Seven Implementations of Incremental', 0, 'Video from Jane Street Tech Talk
+RunSql.query(conn,[
+  ~S"insert into users values (0, 'rhebed rhamma', 'ballsballs', 'email0@email.email', 0)",
+  ~S"insert into users values (1, 'yminsky_fan', 'ballsballs', 'email1@email.email', 0)",
+  ~S"insert into users values (2, 'tandulm Emberspark', 'ballsballs', 'email2@email.email', 0)",
+  ~S"insert into users values (3, 'bao Doomforge', 'ballsballs', 'email3@email.email', 0)",
+  ~S"insert into users values (4, 'nogan kez', 'ballsballs', 'email4@email.email', 1)",
+])
 
-  Incremental là một thư viện FRP (functional reactive programming) dùng để viết hàm tính toán tích hợp đạo hàm ‌và giải tích tự động. Anh em nào đam mê Giải tích 1 2, và thích code React, và thích đại số trừu tượng, thì có thể tham khảo.
+Sqlx.query!(
+  conn,
+  ~S"""
+  insert into commits values (178, 0, null, 'initial', 'Applicative Programming with Effects', 'Famous paper.', '2026-04-28T15:18:26Z')
+  """
+)
+Sqlx.query!(
+  conn,
+  ~S"""
+  insert into posts values (78, 178, 0, false, true, '2026-04-28T15:18:26Z')
+  """,
+  []
+)
 
-  # FRP là gì?
-
-  TBA', false, true, '2026-04-28T15:18:26Z')
+Sqlx.query!(
+  conn,
+  ~S"""
+  insert into pullrequests values (6, 78, 0, 'Original post edits', 'Sau ngày 9/3/2016, admin bên Jane Street blog có chỉnh nội dung blog ngầm. Mấy này không ảnh hưởng đến integrity của post nhưng mình vẫn nên bump ref cho chính xác.', 'open', 'doc', '2026-04-28T15:18:26Z')
   """,
   []
 )
 Sqlx.query!(
   conn,
   ~S"""
-  insert into posts values (78, 'Applicative Programming with Effects', 0, 'Famous paper.', false, true, '2026-04-28T15:18:26Z')
+  insert into pullrequests values (7, 78, 0, 'Giới thiệu về FRP cho người học mới', 'Post có thể cải thiện thêm bằng cách thêm phần giới thiệu kiến thức. Này mình không có opinion, nhưng OP có thể tham khảo ở đây: https://blog.janestreet.com/breaking-down-frp/', 'closed', 'doc,frp', '2026-03-12T11:08:06Z')
   """,
   []
 )
 Sqlx.query!(
   conn,
   ~S"""
-  insert into posts values (79, 'Why Terraform chose OCaml', 0, '', false, true, '2026-04-28T15:18:26Z')
+  insert into pullrequests values (8, 78, 0, 'Giới thiệu về FRP cho người học mới 2', 'Post có thể cải thiện thêm bằng cách thêm phần giới thiệu kiến thức. Này mình không có opinion, nhưng OP có thể tham khảo ở đây: https://blog.janestreet.com/breaking-down-frp/', 'merged', '', '2026-03-12T11:08:06Z')
   """,
   []
 )
-Sqlx.query!(
-  conn,
+RunSql.query(conn,[
   ~S"""
-  insert into posts values (80, 'The Design of a Pretty Printing Library', 0, 'John Hughes là một nhà nghiên cứu khoa học máy tính nổi tiếng!', false, true, '2026-04-28T15:18:26Z')
+  insert into comments values (
+  0,
+  78,
+  null,
+  'Dont you worry bout your curly hair',
+  0,
+  '2026-04-28T15:18:26Z',
+  0)
   """,
-  []
-)
-Sqlx.query!(
-  conn,
   ~S"""
-  insert into posts values (81, 'Attention is Not All You Need', 0, '', false, true, '2026-04-28T15:18:26Z')
+  insert into comments values (
+  1,
+  78,
+  null,
+  'Clothes that dont quite fit you anywhere',
+  1,
+  '2026-04-28T15:18:26Z',
+  0)
   """,
-  []
-)
-Sqlx.query!(
-  conn,
   ~S"""
-  insert into pullrequests values (6, 77, 0, 'Original post edits', 'Sau ngày 9/3/2016, admin bên Jane Street blog có chỉnh nội dung blog ngầm. Mấy này không ảnh hưởng đến integrity của post nhưng mình vẫn nên bump ref cho chính xác.', 'open', 'doc', '2026-04-28T15:18:26Z')
+  insert into comments values (
+  2,
+  78,
+  null,
+  'Voices echo in the gym',
+  2,
+  '2026-04-28T15:18:26Z',
+  0)
   """,
-  []
-)
-Sqlx.query!(
-  conn,
   ~S"""
-  insert into pullrequests values (7, 77, 0, 'Giới thiệu về FRP cho người học mới', 'Post có thể cải thiện thêm bằng cách thêm phần giới thiệu kiến thức. Này mình không có opinion, nhưng OP có thể tham khảo ở đây: https://blog.janestreet.com/breaking-down-frp/', 'closed', 'doc,frp', '2026-03-12T11:08:06Z')
+  insert into comments values (
+  3,
+  null,
+  1,
+  'Another girls had her first kiss',
+  3,
+  '2026-04-28T15:18:26Z',
+  0)
   """,
-  []
-)
-Sqlx.query!(
-  conn,
   ~S"""
-  insert into pullrequests values (8, 77, 0, 'Giới thiệu về FRP cho người học mới', 'Post có thể cải thiện thêm bằng cách thêm phần giới thiệu kiến thức. Này mình không có opinion, nhưng OP có thể tham khảo ở đây: https://blog.janestreet.com/breaking-down-frp/', 'merged', '', '2026-03-12T11:08:06Z')
+  insert into comments values (
+  4,
+  null,
+  1,
+  'Please dont think too much of it, darling',
+  4,
+  '2026-04-28T15:18:26Z',
+  0)
   """,
-  []
-)
+])
+RunSql.query(conn,[
+  ~S"insert into commentratings values (0, 0, 1, -1)",
+  ~S"insert into commentratings values (1, 1, 1, -1)",
+  ~S"insert into commentratings values (2, 2, 1, -1)",
+  ~S"insert into commentratings values (3, 0, 3, 1)",
+  ~S"insert into commentratings values (4, 1, 3, 1)",
+  ~S"insert into commentratings values (5, 2, 3, 1)",
+  ~S"insert into commentratings values (6, 3, 4, 1)",
+  ~S"insert into commentratings values (7, 4, 4, 1)",
+])
 Sqlx.query!(
   conn,
-  ~S"select users.name, posts.post_title, posts.post_text from users, posts, pullrequests where users.name = 'yminsky_fan'",
+  ~S"select users.name, commits.post_title, commits.post_text, pullrequests.title from users, posts, pullrequests, commits where users.name = 'yminsky_fan' and commits.commit_id = posts.commit_head_id",
   []
 )
 ```
