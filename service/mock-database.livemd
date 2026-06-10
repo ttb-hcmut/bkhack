@@ -50,8 +50,8 @@ Target 5: Mongo Atlas MongoDB (TBA)
 Choose
 
 ```elixir
-conn = conn_sqlite
-alias Sqlx_sqlite, as: Sqlx
+conn = conn_supabase
+alias Sqlx_supabase, as: Sqlx
 ```
 
 Libraries
@@ -70,7 +70,7 @@ end
 <!-- livebook:{"attrs":"eyJjYWNoZV9xdWVyeSI6dHJ1ZSwiY29ubmVjdGlvbiI6eyJ0eXBlIjoic3FsaXRlIiwidmFyaWFibGUiOiJjb25uIn0sInF1ZXJ5IjoiU0VMRUNUICogRlJPTSB1c2VyczsiLCJyZXN1bHRfdmFyaWFibGUiOiJyZXN1bHQiLCJ0aW1lb3V0IjpudWxsfQ","chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
 
 ```elixir
-result = Exqlite.query!(conn, ~S"SELECT * FROM users;", [])
+result = Postgrex.query!(conn, ~S"SELECT * FROM users;", [])
 ```
 
 ### Relational tables
