@@ -72,6 +72,13 @@
 }
 .code-box .invisible{
   color: transparent;
+  background: repeating-linear-gradient(
+  45deg,
+  var(--card-bg),
+  var(--card-bg) var(--space-c),
+  var(--card-border) 1px,
+  var(--card-border) calc(1px + var(--space-c))
+);
   pointer-events: none;
   user-select: none;
 }

@@ -156,8 +156,8 @@ module App__display = {
     let (split, nukeDelim) = React.useMemo1(()=>{ 
       option |> fun
       | 0 => (['\n'],false)
-      | 1 => (['\n','.','!','?',';','"'],false)
-      | 2 => (['\n',' ','.','!','?',';','"'],false)
+      | 1 => (['\n'    ,'.',':',',','!','?',';','"','(',')','[',']','{','}'],false)
+      | 2 => (['\n',' ','.',':',',','!','?',';','"','(',')','[',']','{','}'],false)
       | _ => (['\n'],false)
      },[|option|])
     let diffList = React.useMemo1(() => Diff.compare(input1,input2,split,nukeDelim),[|split|])
@@ -169,7 +169,7 @@ module App__display = {
       </div>
       <Code__box text=diffList mode="=" />
     </main>
-  }
+  } 
 };
 module App = {
   [@react.component]

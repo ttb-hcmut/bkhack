@@ -133,3 +133,25 @@ defmodule CommitTag
     belongs_to  :the_commit ,Commit ,foreign_key: :commit_id  ,references: :commit_id ,define_field: false
   end
 end
+defmodule Pullrequest
+  do use Ecto.Schema
+  @primary_key {:pr_id,:id,autogenerate: true}
+  schema "pullrequests" do
+    field :user_id        ,:integer
+    field :post_id        ,:integer
+    field :post_head_id   ,:integer
+    field :commit_id      ,:integer
+    field :title          ,:string
+    field :status         ,:string
+    timestamps(inserted_at: :date_created_utc, updated_at: false)
+    belongs_to  :the_user   ,User   ,foreign_key: :user_id      ,references: :user_id   ,define_field: false
+    belongs_to  :the_post   ,Post   ,foreign_key: :post_id      ,references: :post_id   ,define_field: false
+    belongs_to  :the_head   ,Commit ,foreign_key: :post_head_id ,references: :commit_id ,define_field: false
+    belongs_to  :the_commit ,Commit ,foreign_key: :commit_id    ,references: :commit_id ,define_field: false
+  end
+  def changeset(pr, attrs) do
+    pr
+    |> cast(attrs, [:user_id, :post_id, :post_head_id, :commit_id, :title, :status])
+    |> validate_required([:user_id, :post_id, :post_head_id, :commit_id, :title, :status])
+  end
+end

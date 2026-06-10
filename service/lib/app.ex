@@ -59,6 +59,98 @@ defmodule App
       _ ->   if(AuthBE.testJWT(token)) do Map.get(token,field) else default end
     end
   end
+  options "/*_" do
+    conn
+    |> put_resp_free
+    |> send_resp(200, "")
+  end
+
+  get "/api/pullrequest/count" do
+    Logger.info "GET pullrequestcount"
+    post_id    = Map.get(conn.params,"post_id","-1") |> String.to_integer
+    data = PullrequestBE.getPullrequestCount(Data, post_id, opts)
+    # data = ReturnChildID.getChildComments(parent, offset, limit)
+    case data do
+      nil ->
+        {:ok, sh} = JSON.encode([])
+        conn
+        |> put_resp_free
+        |> send_resp(501 , sh)
+      x ->
+        {:ok, sh} = Jason.encode(x)
+        conn
+        |> put_resp_free
+        |> send_resp(200 , sh)
+    end
+  end
+  get "/api/pullrequest/list" do
+    Logger.info "GET pullrequestlist"
+    post_id    = Map.get(conn.params,"post_id","-1") |> String.to_integer
+    offset    = Map.get(conn.params,"offset","0") |> String.to_integer
+    x_limit = Map.get(conn.params,"x-limit")
+    limit =
+      case x_limit do
+        nil -> Map.get(conn.params,"limit","10") |> String.to_integer
+        x -> x |> String.to_integer
+      end
+
+    data = PullrequestBE.getPullrequestList(Data, post_id, limit, offset, opts)
+    # data = ReturnChildID.getChildComments(parent, offset, limit)
+    case data do
+      nil ->
+        {:ok, sh} = JSON.encode([])
+        conn
+        |> put_resp_free
+        |> send_resp(501 , sh)
+      x ->
+        {:ok, sh} = Jason.encode(x)
+        conn
+        |> put_resp_free
+        |> send_resp(200 , sh)
+    end
+  end
+
+  post "/api/pullrequest/create" do
+    Logger.info "PULLREQUEST create pullrequest"
+    body = conn.body_params
+    IO.inspect conn.body_params
+    title       = body["title"]
+    post_body   = body["body"]
+    commit_message = body["commit_message"]
+    public      = body["public"]
+    post_id     = body["post-id"]
+    tag         = body["tag"]
+    user_id = jwtReader(conn,:user_id,-1)
+
+
+    data = "User "<>Integer.to_string(user_id)<>" with title: "<>title<>" and body: "<>post_body
+    IO.puts(data);
+    case user_id do
+      -1 ->
+        {:ok, sh} = JSON.encode([])
+        conn
+        |> put_resp_free
+        |> send_resp(403 , sh)
+      _ ->
+        postId = case post_id do
+          -1 ->  PostBE.createPost(Data, user_id, title, post_body, commit_message, public, tag)
+          pid -> PostBE.updatePost(Data, pid, user_id, title, post_body, commit_message, tag)
+        end
+        case postId do
+          nil ->
+            {:ok, sh} = JSON.encode(-1)
+            conn
+            |> put_resp_free
+            |> send_resp(500, sh)
+          p ->
+            {:ok, sh} = JSON.encode(p)
+            conn
+            |> put_resp_free
+            |> send_resp(201, sh)
+        end
+    end
+  end
+
   get "/api/tag/commit" do
     Logger.info "GET committag"
     commitid = Map.get(conn.params,"commitid", nil) |> then(fn x -> if is_nil(x) do nil else x |> String.to_integer end end)
@@ -245,12 +337,6 @@ defmodule App
         |> put_resp_free
         |> send_resp(200 , sh)
     end
-  end
-
-  options "/*_" do
-    conn
-    |> put_resp_free
-    |> send_resp(200, "")
   end
 
   post "/api/post/create" do
