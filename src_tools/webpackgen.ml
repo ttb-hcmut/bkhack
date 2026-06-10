@@ -5,8 +5,6 @@ module B = Buildlib
 
 exception Missing_mapping_entry_for of string
 
-let log_dir cwd = P.(cwd / "log")
-
 let attrib_name = Re.(
   alt [str "page"; str "Bkhack.page"])
 
@@ -76,7 +74,7 @@ let morphism_generative~sw~procm generative_dir dist_dir =
     @raise Missing_mapping_entry_for(pagefile) when a Reason page
     file did not specify a required `[@Bkhack.page s]` attribute.
     Refer to the guide for more details. *)
-let main__ ~watch ~dist_dir ~src_dir ~public_dir ~generative_dir ~verbose () =
+let main__ ~watch ~dist_dir ~src_dir ~public_dir ~generative_dir ~log_dir ~verbose () =
   Eio_main.run @@ fun env ->
   let procm, clock, cwd, fs =
     Stdenv.process_mgr env, Stdenv.clock env, Stdenv.cwd env, Stdenv.fs env in
@@ -92,6 +90,7 @@ open Term.Syntax
 
 let main__ () =
   Cmd.v (Cmd.info "webpackgen" ~doc:"") @@
+  let log_dir cwd = P.(cwd / "log") in
   let+ dist_dir = Arg.(required & opt (some string) None &
     info ["output"; "o"] ~doc:" Output directory, containing deployable web bundle artifact. ")
     |> Term.map Path.(fun it cwd -> cwd / it)
@@ -106,7 +105,7 @@ let main__ () =
     |> Term.map Path.(fun it fs -> fs / it)
   and+ verbose = Arg.(required & opt (some bool) None &
     info ["verbose"] ~docv:"VERBOSE")
-  in main__ ~watch:false ~dist_dir ~src_dir ~public_dir ~generative_dir ~verbose ()
+  in main__ ~watch:false ~dist_dir ~src_dir ~public_dir ~generative_dir ~log_dir ~verbose ()
 
 (** autorun except in toplevel / interactive mode *)
 let () =
