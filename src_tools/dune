@@ -1,6 +1,4 @@
 (executable
  (libraries eio eio_main buildlib
             cmdliner re containers)
- (package bkhack-tools)
- (public_name bkhack-tools.webpackgen)
  (name webpackgen))
