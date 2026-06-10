@@ -3,6 +3,6 @@
  (name diff))
 
 (executable
- (libraries diff eio eio_main cmdliner containers)
+ (libraries diff eio eio_main cmdliner containers csv)
  (modules app)
  (name app))

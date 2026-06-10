@@ -39,4 +39,13 @@
  (name bkhack-doc)
  (synopsis "bkhack doc tools")
  (description "bkhack doc tools")
- (depends (ocaml (>= 5.2.0)) markup iter))
+ (depends (ocaml (= 5.2.0)) markup iter))
+
+(package
+ (name bkhack-test)
+ (synopsis "bkhack testing and benchmark suites")
+ (description "[bkhack-test] is a collection of testing and benchmark suites for bkhack, esp. for the HCMUT thesis.")
+ (depends
+  (ocaml (= 5.2.0)) (reason (>= 3.1.30))
+  eio eio_main
+  csv))
