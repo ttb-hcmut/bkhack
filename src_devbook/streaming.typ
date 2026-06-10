@@ -7,6 +7,11 @@
 #title[= Stream-based programming, as compared to sh]
 #set heading(numbering: none,  outlined: true, supplement: [#text(weight: 900, fill: rgb("#3851A4"))[§]#h(-0.4em)])
 #set cite(style: "alphanumeric")
+#show heading: it => {
+  if it.level == 3 {
+    set text(size: 0.9em); it
+  } else { it }
+}
 // #show cite: it => text(fill: rgb("#3851A4"), it)
 For #o.bkhack, the user gets to familiarize with the concept of _stream-based
 programming_. Indeed, visitors of the site will often catch glance of
