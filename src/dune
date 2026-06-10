@@ -20,7 +20,7 @@
  ; Caveat: the libraries need to be specified with `(modes melange)`.
  (libraries bkhack)
 
- (modules )
+ (modules)
 
  ; Uncomment the following to copy the generated JavaScript files inside the source tree
  ; (promote (until-clean))
