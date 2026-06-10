@@ -88,6 +88,10 @@ feed() { feed | split -c 15 | cut -f1 | sort --hot ;}
 ```
 which the user can customize. The rest of #o.bkhack-shell commands are
 exposed like so, thus the settings system.
+== Variation via flags
+#lorem(30)
+== Variation via subcommands
+#lorem(30)
 == Syntax
 Sometimes, it is needed to parse the shell language from a text.
 The grammar of the #o.bkhack-shell language, given in EBNF form in @gr, #lorem(30)
@@ -99,7 +103,7 @@ _option parser_, such as POSIX `getopts`.
   #figure(caption: [Grammar for the #o.bkhack-shell language], shell-parse.langchain) <gr>
 ]
 === Parsing the shell language
-Parsing is implemented based on the grammar at @gr. #lorem(30)\
+Parsing is implemented based on the grammar at @gr. #lorem(30) For example, one possible parse of the command at the preamble is
 #align(center)[
 #tdtr.tidy-tree-graph(compact: true)[
   #let sink(n) = tdtr.node-attr(sink: n)
@@ -132,7 +136,7 @@ programming language.
 ]
 === Embedding the shell language
 The combinators are designed based on the typing rules at @typ. #lorem(30)\
-  #lorem(50)
+  #lorem(50) An example usage of these combinators would be
 #set raw(syntaxes: ("reason.sublime-syntax")/* , theme: "quiet.tmTheme" */)
 #[
 ```reason
@@ -145,12 +149,13 @@ module Feed (Syntax : Shell.Sym)
 ]
 where the ```reason |@``` operator--accompanied by the ```reason nil``` word to mark EOL--is a semantic translation of ```sh |``` as part of an abstract algebra used to construct an embedded #o.bkhack-shell pipeline, and 
 #lorem(50)\
+  We believe that this type system can be used for composition of commands. Indeed, _type-driven composition_ allows us to implement and explore possibilities purely through types, where the type system serves as a real-time theorem checker that prompts our paths. For example, #lorem(20)
 == Completion
 When writing a pipeline, it is nice to provide a language service where user can request their partially-written command to be replaced with corrected form.
 When press #kbd.tab, user
 #lorem(30)
 == Convention
-// why are commands named the way they are? this is the same problem in sh. the truth is that there will never be a scheme that everyone can agree on. most names are historical and highly contextual. unix is loved because people like its architecture and they try to adopt the names, not that the names are actually good. indeed, there's so much you can do to appeal to a demographic of people. communication is two-way between the user and the developer.
+why are commands named the way they are? this is the same problem in sh. the truth is that there will never be a scheme that everyone can agree on. most names are historical and highly contextual. unix is loved because people like its architecture and they try to adopt the names, not that the names are actually good. indeed, there's so much you can do to appeal to a demographic of people. communication is two-way between the user and the developer.
 == Related works
 #lorem(20)\
   Stream programming languages. #lorem(50)\
