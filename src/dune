@@ -40,6 +40,8 @@
  (target node_modules__lucide-static)
  (action (bash "cp -L -r $(pnpm root)/lucide-static node_modules__lucide-static")))
 
+(data_only_dirs Static Service)
+
 ; `bkhack` is an abstract, implicitly heterogeneous full-stack application,
 ; where it is usable first as a web front-end and whose back-end is pluggable. 
 (library
