@@ -28,16 +28,28 @@ module Matrix {
   type t('a) = matrix('a)
   and row('t) = array('t) and column('t) = array('t)
 
-  let at = (x, y, matrix:ref(matrix(int))) => {
+  let at = (x, y, matrix:matrix(int)) => {
     (x,y)
     |> fun
     | (x',y') when x'<0 || y'<0 => 0
-    | (x',y') => matrix^[x'][y']
+    | (x',y') => matrix[x'][y']
   }
 
-  let set = (x:int,y:int,value:int,matrix:ref(matrix(int))) => {
-    Array.set((matrix^)[x], y, value)
-  }
+  // let set = (x:int,y:int,value:int,matrix:ref(matrix(int))) => {
+  //   // let temp = matrix^
+  //   // temp[x][y] = value
+  //   // matrix := temp 
+  //   // Array.set(matrix^, x, Array.set((matrix^)[x], y, value))
+  //   // Js.log3(x,y,value)
+  //   matrix := matrix^ |> Array.mapi((i,row)=>
+  //     row |> Array.mapi((j,col)=>
+  //       (i,j) |> fun 
+  //       | (i',j') when i' == x && j' == y => value
+  //       | _ => col
+  //     )
+  //   )
+  //   // Array.set((matrix^)[x], y, value)
+  // }
 };
 
 let rec stringDisassembler = (input:string,split:list(char),index:int,hold:string,list:list(string),nukeDelim:bool) => {
@@ -50,27 +62,28 @@ let rec stringDisassembler = (input:string,split:list(char),index:int,hold:strin
   | (_,e,l) => stringDisassembler(input,l,index-1,String.make(1, e) ++ hold,list,nukeDelim)
 };
 
-let evaluateMatrixCell = 
-  ( x: int, y: int
-  , isSpecial: bool
-  , matrix:ref(array(array(int)))
-  ) => 
-  if (isSpecial) { //you are my special
-    Matrix.set(x, y
-    , Matrix.at(x-1,y-1,matrix) + 1
-    , matrix)
-  } else {
-    Matrix.set(x, y
-    , Number.max(module Int)(Matrix.at(x-1,y,matrix),Matrix.at(x,y-1,matrix))
-    , matrix)
-  };
+// let evaluateMatrixCell = 
+//   ( x: int, y: int
+//   , isSpecial: bool
+//   , matrix:ref(array(array(int)))
+//   ) => 
+//   if (isSpecial) { //you are my special
+//     Matrix.set(x, y
+//     , Matrix.at(x-1,y-1,matrix) + 1
+//     , matrix)
+//   } else {
+//     Matrix.set(x, y
+//     , Number.max(module Int)(Matrix.at(x-1,y,matrix),Matrix.at(x,y-1,matrix))
+//     //  a > b ? a : b
+//     , matrix)
+//   };
 
 let rec retraceLCS = 
   ( x':int, y':int
   , array1:array(string)
   , array2:array(string)
   , lcs:list(string)
-  , matrix:ref(matrix(int))
+  , matrix:matrix(int)
   ) =>
   switch (x',y') {
   | (x , y) when x < 0 || y < 0 => lcs
@@ -103,15 +116,49 @@ let rec diff = ( input1: list(string), input2: list(string), lcs:list(string)) =
 let compare = (input1:string, input2:string, split:list(char), nukeDelim:bool) => {
   let array1:array(string) = String.length(input1)>0 ? stringDisassembler(input1,split,String.length(input1)-1,"",[],nukeDelim) |> Array.of_list : [||];
   let array2:array(string) = String.length(input2)>0 ? stringDisassembler(input2,split,String.length(input2)-1,"",[],nukeDelim) |> Array.of_list : [||];
-  let scoreMatrix:ref(array(array(int))) = ref( 0 |> Array.make(Array.length(array2)) |> Array.make(Array.length(array1)));
-  array1 |> Array.iteri((i,row)=>
-    array2 |> Array.iteri((j,column) =>
-      evaluateMatrixCell(i,j,row==column,scoreMatrix)
-    )
-  )
+
+  // Js.log(array1)
+  // Js.log(array2)
+
+  // let scoreMatrix:ref(array(array(int))) = ref( 0 |> Array.make(Array.length(array2)) |> Array.make(Array.length(array1)));
+  // scoreMatrix^ |> Js.log
+  // array1 |> Array.iteri((i,_row)=>
+  //   array2 |> Array.mapi((j,_column) =>
+  //     scoreMatrix^[i][j] 
+  //   ) |> Js.log2(i)
+  // )
+
+  let (_,_,evalMatrix) = array1 |> Array.fold_left(((x:int,prevRow:array(int),matOfRows:list(array(int))),row:string)=>{
+    let (_,_,evalRow)  = array2 |> Array.fold_left(((y:int,prevCol:int       ,rowOfCols:list(int)       ),col:string)=>{
+      let eval = (row == col,y) |> fun 
+      | (true,y') when y' > 0 => //you are my special
+        prevRow[y-1] + 1
+      | (true,_) => //you are my special
+        1
+      | (false,_) =>
+        prevCol > prevRow[y] ? prevCol : prevRow[y]
+      ;
+      (y+1,eval,[eval,...rowOfCols])
+    },(0,0,[]))
+    let evalRow = evalRow |> List.rev |> Array.of_list 
+    ;
+    (x+1,evalRow,[evalRow,...matOfRows])
+  },(0,Array.make(Array.length(array2),0),[]))
+
+  // array1 |> Array.iteri((i,row)=>
+  //   array2 |> Array.iteri((j,column) =>
+  //     evaluateMatrixCell(i,j,row==column,scoreMatrix)
+  //   )
+  // ) 
+  // array1 |> Array.iteri((i,_row)=>
+  //   array2 |> Array.mapi((j,_column) =>
+  //     scoreMatrix^[i][j] 
+  //   ) |> Js.log2(i)
+  // )
   let lcs = retraceLCS( Array.length(array1)-1, Array.length(array2)-1
     , array1, array2
-    , [], scoreMatrix);
+    , [], evalMatrix |> List.rev |> Array.of_list );
+  // Js.log(lcs|> Array.of_list)
   diff( array1 |> Array.to_list
       , array2 |> Array.to_list
       , lcs)

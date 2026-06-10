@@ -67,6 +67,7 @@ defmodule App
 
   get "/api/pullrequest/count" do
     Logger.info "GET pullrequestcount"
+    post_id    = Map.get(conn.params,"post_id","-1") |> String.to_integer
     data = PullrequestBE.getPullrequestCount(Data, post_id, opts)
     # data = ReturnChildID.getChildComments(parent, offset, limit)
     case data do
@@ -84,6 +85,7 @@ defmodule App
   end
   get "/api/pullrequest/list" do
     Logger.info "GET pullrequestlist"
+    post_id    = Map.get(conn.params,"post_id","-1") |> String.to_integer
     offset    = Map.get(conn.params,"offset","0") |> String.to_integer
     x_limit = Map.get(conn.params,"x-limit")
     limit =
