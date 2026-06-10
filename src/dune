@@ -1,3 +1,17 @@
+(rule
+ (target dist)
+ (deps ../src_tools/webpackgen.exe (alias react) (source_tree Static)
+       (source_tree ../generative) node_modules__lucide-static)
+ (action (run ../src_tools/webpackgen.exe
+  --verbose=false --output=dist/ --src_dir=./ --public_dir=Static/
+  --generative_dir=../generative/ --lucide_dir=node_modules__lucide-static/)))
+
+(rule
+ (target node_modules__lucide-static)
+ (action (bash "cp -L -r $(pnpm root)/lucide-static node_modules__lucide-static")))
+
+(data_only_dirs Static Service)
+
 ; `melange.emit` is a Dune stanza that will produce build rules to generate
 ; JavaScript files from sources using the Melange compiler
 ; https://dune.readthedocs.io/en/stable/melange.html#melange-emit
@@ -30,24 +44,13 @@
  ; https://melange.re/v2.0.0/build-system/#commonjs-or-es6-modules
  (module_systems es6))
 
-(rule
- (target dist)
- (deps ../src_tools/webpackgen.exe (alias react) (source_tree Static) (source_tree ../generative) node_modules__lucide-static)
- (action (run ../src_tools/webpackgen.exe
-  --verbose=false --output=dist/ --src_dir=./ --public_dir=Static/ --generative_dir=../generative/ --lucide_dir=node_modules__lucide-static/)))
-
-(rule
- (target node_modules__lucide-static)
- (action (bash "cp -L -r $(pnpm root)/lucide-static node_modules__lucide-static")))
-
-(data_only_dirs Static Service)
-
 ; `bkhack` is an abstract, implicitly heterogeneous full-stack application,
 ; where it is usable first as a web front-end and whose back-end is pluggable. 
 (library
  (modes melange)
  ; Dependencies of the stanza.
- (libraries reason-react melange-json melange__containers quel bkhack__experimental cprg melange__cmarkit melange__iter melange__re melange.belt)
+ (libraries reason-react melange-json melange__containers quel bkhack__experimental
+            cprg melange__cmarkit melange__iter melange__re melange.belt)
  (preprocess
   ; The `pps` field is a list of ppx to apply to the sources before generating JavaScript. melange.ppx allows to use Melange attributes [@mel. ...] (https://melange.re/v2.0.0/communicate-with-javascript/#attributes)
   ; reason-react-ppx allows to use JSX for ReasonReact components by using the [@JSX] attributes from Reason: https://reasonml.github.io/docs/en/jsx
