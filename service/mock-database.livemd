@@ -11,7 +11,7 @@ Mix.install([
 ## Section
 
 ```elixir
-opts = [database: "bkhack/service/db"]
+opts = [database: System.fetch_env!("LB_BKHACK_SQLITE_DB")]
 {:ok, conn_sqlite} = Kino.start_child({Exqlite, opts})
 alias Exqlite, as: Sqlx_sqlite
 ```
