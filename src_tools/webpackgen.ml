@@ -74,16 +74,17 @@ let morphism_generative~sw~procm generative_dir dist_dir =
     @raise Missing_mapping_entry_for(pagefile) when a Reason page
     file did not specify a required `[@Bkhack.page s]` attribute.
     Refer to the guide for more details. *)
-let main__ ~watch ~dist_dir ~src_dir ~public_dir ~generative_dir ~log_dir ~verbose () =
+let main__ ~watch ~dist_dir ~src_dir ~public_dir ~generative_dir ~log_dir ~lucide_dir ~verbose () =
   Eio_main.run @@ fun env ->
   let procm, clock, cwd, fs =
     Stdenv.process_mgr env, Stdenv.clock env, Stdenv.cwd env, Stdenv.fs env in
-  let public_dir, generative_dir, dist_dir, log_dir, src_dir =
-    public_dir cwd, generative_dir fs, dist_dir cwd, (if not verbose then Some (log_dir cwd) else None), src_dir cwd in
+  let public_dir, generative_dir, dist_dir, log_dir, src_dir, lucide_dir =
+    public_dir cwd, generative_dir fs, dist_dir cwd, (if not verbose then Some (log_dir cwd) else None), src_dir cwd, lucide_dir fs in
   Switch.run @@ fun sw ->
   morphism_jspages~sw~procm~clock~cwd ~watch src_dir ?log_dir dist_dir;
   morphism_static~sw~procm public_dir dist_dir ();
-  morphism_generative~sw~procm generative_dir dist_dir
+  morphism_generative~sw~procm generative_dir dist_dir;
+  morphism_lucide~sw~procm lucide_dir dist_dir
 
 open Cmdliner
 open Term.Syntax
@@ -103,9 +104,12 @@ let main__ () =
   and+ generative_dir = Arg.(required & opt (some string) None &
     info ["generative_dir"] ~doc:" Generative asset directory. ")
     |> Term.map Path.(fun it fs -> fs / it)
+  and+ lucide_dir = Arg.(required & opt (some string) None &
+    info ["lucide_dir"] ~doc:" (DEPRECATED) Lucide icon directory. ")
+    |> Term.map Path.(fun it fs -> fs / it)
   and+ verbose = Arg.(required & opt (some bool) None &
     info ["verbose"] ~docv:"VERBOSE")
-  in main__ ~watch:false ~dist_dir ~src_dir ~public_dir ~generative_dir ~log_dir ~verbose ()
+  in main__ ~watch:false ~dist_dir ~src_dir ~public_dir ~generative_dir ~log_dir ~lucide_dir ~verbose ()
 
 (** autorun except in toplevel / interactive mode *)
 let () =

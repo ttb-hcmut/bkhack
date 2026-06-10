@@ -32,10 +32,13 @@
 
 (rule
  (target dist)
- (deps ../src_tools/webpackgen.exe (alias react) (source_tree Static) (source_tree ../generative))
- (action (progn
-  (run ../src_tools/webpackgen.exe --verbose=false --output=dist/ --src_dir=./ --public_dir=Static/ --generative_dir=../generative/)
-  (run echo ok))))
+ (deps ../src_tools/webpackgen.exe (alias react) (source_tree Static) (source_tree ../generative) node_modules__lucide-static)
+ (action (run ../src_tools/webpackgen.exe
+  --verbose=false --output=dist/ --src_dir=./ --public_dir=Static/ --generative_dir=../generative/ --lucide_dir=node_modules__lucide-static/)))
+
+(rule
+ (target node_modules__lucide-static)
+ (action (bash "cp -L -r $(pnpm root)/lucide-static node_modules__lucide-static")))
 
 ; `bkhack` is an abstract, implicitly heterogeneous full-stack application,
 ; where it is usable first as a web front-end and whose back-end is pluggable. 
