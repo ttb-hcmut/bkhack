@@ -130,7 +130,7 @@ createTablesList = [
       post_title varchar(255) not null,
       post_text varchar(2048) not null,
       date_created_utc varchar(255) not null,
-      foreign key (commit_owner_id) references users(user_id)
+      foreign key (commit_owner_id) references users(user_id),
       foreign key (commit_child_id) references commits(commit_id)
     )
     """,
