@@ -6,6 +6,9 @@ module P =
 module Output = struct
   let src x =
     "./_build/default/src/output/node_modules/bkhack/" ^ x ^ ".js"
+
+  let src' x =
+    "./output/node_modules/bkhack/" ^ x ^ ".js"
 end
 
 let fix_base_path =
@@ -147,13 +150,13 @@ let compile_jsfile'~procm~clock~cwd ?(watch = false) ~optimization out_dir ?log_
   mkdirs out_dir;
   mkdirs Path.(cwd / "_build_webpack");
   wrapdir ?log_dir clock @@ fun run ->
-  Path.save ~create:(`Or_truncate 0o700) Path.(cwd / "_build_webpack" / "config.js") @@ webpack_template @@ List.map (fun (x, y) -> (x, Path.native_exn y)) entries;
+  Path.save ~create:(`Or_truncate 0o700) Path.(cwd / "_build_webpack" / "config.js") @@ webpack_template @@ List.map (fun (x, y) -> (x, Sys.getcwd() ^ "/" ^ Path.native_exn y)) entries;
   run procm @@
     [ "webpack" ] @
     (if watch then ["watch"] else []) @
-    [ "--config"; "_build_webpack/config.js"
+    [ "--config"; Sys.getcwd() ^ "/_build_webpack/config.js"
     ; "--mode"; opt_to_str optimization
-    ; "--output-path"; Path.native_exn out_dir
+    ; "--output-path"; Sys.getcwd() ^ "/" ^ Path.native_exn out_dir
     ]
 
 [@alert naive("TODO(khang+kinten) bao plz grep from AST!")]

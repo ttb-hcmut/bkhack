@@ -30,6 +30,13 @@
  ; https://melange.re/v2.0.0/build-system/#commonjs-or-es6-modules
  (module_systems es6))
 
+(rule
+ (target dist)
+ (deps ../src_tools/webpackgen.exe (alias react) (source_tree Static) (source_tree ../generative))
+ (action (progn
+  (run ../src_tools/webpackgen.exe --verbose=false --output=dist/ --src_dir=./ --public_dir=Static/ --generative_dir=../generative/)
+  (run echo ok))))
+
 ; `bkhack` is an abstract, implicitly heterogeneous full-stack application,
 ; where it is usable first as a web front-end and whose back-end is pluggable. 
 (library
