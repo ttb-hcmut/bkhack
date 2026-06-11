@@ -1,4 +1,0 @@
-(executable
- (libraries eio eio_main buildlib
-            cmdliner re containers)
- (name webpackgen))

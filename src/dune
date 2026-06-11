@@ -1,18 +1,18 @@
 (rule
  (alias bundle)
  (target dist)
- (deps ../src_tools/webpackgen.exe (alias react) (source_tree Static)
+ (deps ../src_build/webpackgen.exe (alias react) (source_tree Static)
        (source_tree ../generative) node_modules__lucide-static)
- (action (run ../src_tools/webpackgen.exe
+ (action (run ../src_build/webpackgen.exe
   --verbose=false --optimization=prod --output=%{target} --src_dir=./ --public_dir=Static/
   --generative_dir=../generative/ --lucide_dir=node_modules__lucide-static/)))
 
 (rule
  (alias bundle.dev)
  (target dist.dev)
- (deps ../src_tools/webpackgen.exe (alias react) (source_tree Static)
+ (deps ../src_build/webpackgen.exe (alias react) (source_tree Static)
        (source_tree ../generative) node_modules__lucide-static)
- (action (run ../src_tools/webpackgen.exe
+ (action (run ../src_build/webpackgen.exe
   --verbose=false --optimization=dev --output=%{target} --src_dir=./ --public_dir=Static/
   --generative_dir=../generative/ --lucide_dir=node_modules__lucide-static/)))
 
