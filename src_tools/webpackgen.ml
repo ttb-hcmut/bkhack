@@ -9,9 +9,8 @@ let attrib_name = Re.(
   alt [str "page"; str "Bkhack.page"])
 
 (** a [morphism] for JavaScript bundles *)
-let morphism_jspages~sw~procm~clock~cwd ?watch src_dir ?log_dir dist_dir =
+let morphism_jspages~sw~procm~clock~cwd ~optimization ?watch src_dir ?log_dir dist_dir =
   Fiber.fork ~sw @@ fun () ->
-  let optimization = `Development in
   let jspages =
     List.filter_map (B.is_page' src_dir)
     @@ Path.read_dir src_dir in
@@ -74,14 +73,14 @@ let morphism_generative~sw~procm generative_dir dist_dir =
     @raise Missing_mapping_entry_for(pagefile) when a Reason page
     file did not specify a required `[@Bkhack.page s]` attribute.
     Refer to the guide for more details. *)
-let main__ ~watch ~dist_dir ~src_dir ~public_dir ~generative_dir ~log_dir ~lucide_dir ~verbose () =
+let main__ ~watch ~dist_dir ~src_dir ~public_dir ~generative_dir ~log_dir ~lucide_dir ~verbose ~optimization () =
   Eio_main.run @@ fun env ->
   let procm, clock, cwd, fs =
     Stdenv.process_mgr env, Stdenv.clock env, Stdenv.cwd env, Stdenv.fs env in
   let public_dir, generative_dir, dist_dir, log_dir, src_dir, lucide_dir =
     public_dir cwd, generative_dir fs, dist_dir cwd, (if not verbose then Some (log_dir cwd) else None), src_dir cwd, lucide_dir fs in
   Switch.run @@ fun sw ->
-  morphism_jspages~sw~procm~clock~cwd ~watch src_dir ?log_dir dist_dir;
+  morphism_jspages~sw~procm~clock~cwd ~optimization ~watch src_dir ?log_dir dist_dir;
   morphism_static~sw~procm public_dir dist_dir ();
   morphism_generative~sw~procm generative_dir dist_dir;
   morphism_lucide~sw~procm lucide_dir dist_dir
@@ -109,7 +108,9 @@ let main__ () =
     |> Term.map Path.(fun it fs -> fs / it)
   and+ verbose = Arg.(required & opt (some bool) None &
     info ["verbose"] ~docv:"VERBOSE")
-  in main__ ~watch:false ~dist_dir ~src_dir ~public_dir ~generative_dir ~log_dir ~lucide_dir ~verbose ()
+  and+ optimization = Arg.(required & opt (some @@ enum ["dev", `Development; "prod", `Production]) None &
+    info ["optimization"; "O"] ~docv:"OPTIMIZATION")
+  in main__ ~watch:false ~dist_dir ~src_dir ~public_dir ~generative_dir ~log_dir ~lucide_dir ~verbose ~optimization ()
 
 (** autorun except in toplevel / interactive mode *)
 let () =
