@@ -1,32 +1,25 @@
-defmodule BKHack.Mix do
-  use Mix.Project
+defmodule BKHack.Mix
+	do use Mix.Project
 
-  def project do
-    [
-      app: :bkhack,
-      version: "0.9.0",
-      deps: deps()
-    ]
-  end
+  def project, do: [
+		app: :bkhack,
+		version: "0.9.0",
+		deps: deps()
+  ]
 
-  defp deps do
-    [
-      {:ecto_sql, "~> 3.13.0"},
-      {:ecto_sqlite3, "~> 0.17"},
-      {:mongodb_ecto, "~> 2.1.1"},
-      {:cowboy, "~> 2.6"},
-      {:plug, "~> 1.7"},
-      {:plug_cowboy, "~> 2.0"},
-      {:json, "~> 1.4"},
-      {:jason, "~> 1.4"},
-      {:utc_datetime, "~> 1.0"},
-      {:postgrex, ">= 0.0.0"},
-    ]
-  end
+  defp deps, do: [
+		{:ecto_sql, "~> 3.13.0"},
+		{:ecto_sqlite3, "~> 0.17"},
+		{:mongodb_ecto, "~> 2.1.1"},
+		{:cowboy, "~> 2.6"},
+		{:plug, "~> 1.7"},
+		{:plug_cowboy, "~> 2.0"},
+		{:json, "~> 1.4"},
+		{:jason, "~> 1.4"},
+		{:utc_datetime, "~> 1.0"},
+		{:postgrex, ">= 0.0.0"},
+  ]
 
-  def application do
-    [
-      mod: {App, []}
-    ]
+  def application, do: [ mod: {App, []} ]
+
   end
-end
