@@ -1,4 +1,5 @@
 (rule
+ (alias dist)
  (target dist)
  (deps ../src_tools/webpackgen.exe (alias react) (source_tree Static)
        (source_tree ../generative) node_modules__lucide-static)
