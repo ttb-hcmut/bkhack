@@ -16,6 +16,13 @@
   --verbose=false --optimization=dev --output=%{target} --src_dir=./ --public_dir=Static/
   --generative_dir=../generative/ --lucide_dir=node_modules__lucide-static/)))
 
+; (rule
+;  (alias bundle-service)
+;  (target dcontainer)
+;  (deps (alias elixir))
+;  (action (run mkdir %{target}))
+; )
+
 (rule
  (target node_modules__lucide-static)
  (action (bash "cp -L -r $(pnpm root)/lucide-static node_modules__lucide-static")))
