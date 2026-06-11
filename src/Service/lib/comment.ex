@@ -1,28 +1,27 @@
 defmodule DiscussionBE do
   import Ecto.Query
+
   def getCommentCount(data, parent_id,parent_type\\"post",recursive\\false,opts\\%{}) do
-    query = case recursive do
-      false -> discussionQuery(parent_id,parent_type,nil)|> discussionFilter(opts) |> select([c],c)
-      true  -> fromCommentTree(parent_id,parent_type) |> select([ct],%{id: ct.comment_id})
-    end
+    query = if !recursive,
+			do: discussionQuery(parent_id,parent_type,nil) |> discussionFilter(opts) |> select([c],c),
+      else: fromCommentTree(parent_id,parent_type) |> select([ct],%{id: ct.comment_id})
     from(n in subquery(query), select: count(n.id)) |> data.one
   end
 
-  def getComment(data, parent_id,parent_type\\"post",user_id\\nil,offset\\0,limit\\10,opts\\%{}) do
+  def getComment(data, parent_id,parent_type\\"post",user_id\\nil,offset\\0,limit\\10,opts\\%{}), do:
     discussionQuery(parent_id,parent_type,user_id)
     |> discussionFilter(opts)
     |> limit(^limit) |> offset(^offset) |> data.all
-  end
 
   defp fromCommentTree(parent_id\\-1,parent_type\\"post")do
     base_query =
       from(c in Comment)
       |> select([c], c)
       |> then(fn x -> case {parent_id,parent_type} do
-        {-1,_}         -> x
+        {-1,_}        -> x
         {_,"post"}    -> x |> where([c], c.parent_post_id    == ^parent_id)
         {_,"comment"} -> x |> where([c], c.parent_comment_id == ^parent_id)
-        {_,_}          -> x
+        {_,_}         -> x
       end end)
     recursive_query =
       from(c in Comment)
@@ -31,32 +30,32 @@ defmodule DiscussionBE do
     comment_tree =
       base_query
       |> union(^recursive_query)
-
     from(ct in "comment_tree") |> recursive_ctes(true) |> with_cte("comment_tree", as: ^comment_tree)
   end
+
   defp discussionFilter(x, opts\\%{}) do
     from(c in subquery(x))
-      |> then(fn xx -> case {opts[:search],opts[:searchby]} do
-        {s,o} when is_nil(s) or length(s) == 0 or is_nil(o) -> xx
-        {s,"comment"}   -> xx |> where([c], like(c.text, ^"%#{s}%"))
-        {s,"username"}  -> xx |> where([c], like(c.author_name, ^"%#{s}%"))
-        # {s,"version"} when Integer.parse(s) == {int,""}   -> xx |> where([c], c.post_vers == ^String.to_int(s))
-        {_,_}           -> xx
-      end end)
-      |> then(fn xx -> case opts[:filterby] do
-        s when is_nil(s) or s == "none" -> xx
-        "prof"         -> xx |> where([c], c.author_role == 1)
-        "student"      -> xx |> where([c], c.author_role == 0)
-        _ -> xx
-      end end)
-      |> then(fn xx -> case {opts[:sortby],opts[:orderby]} do
-        {s,o} when is_nil(s) or is_nil(o) -> xx
-        {"age","ascending"}         -> xx |> order_by([c], asc:  c.timestamp)
-        {"age","descending"}        -> xx |> order_by([c], desc: c.timestamp)
-        {"popularity","ascending"}  -> xx |> order_by([c], asc:  c.rating)
-        {"popularity","descending"} -> xx |> order_by([c], desc: c.rating)
-        {_,_}                       -> xx
-      end end)
+		|> then(fn xx -> case {opts[:search],opts[:searchby]} do
+		  {s,o} when is_nil(s) or length(s) == 0 or is_nil(o) -> xx
+		  {s,"comment"}   -> xx |> where([c], like(c.text, ^"%#{s}%"))
+		  {s,"username"}  -> xx |> where([c], like(c.author_name, ^"%#{s}%"))
+		  # {s,"version"} when Integer.parse(s) == {int,""}   -> xx |> where([c], c.post_vers == ^String.to_int(s))
+		  {_,_}           -> xx
+		end end)
+		|> then(fn xx -> case opts[:filterby] do
+		  s when is_nil(s) or s == "none" -> xx
+		  "prof"         -> xx |> where([c], c.author_role == 1)
+		  "student"      -> xx |> where([c], c.author_role == 0)
+		  _ -> xx
+		end end)
+		|> then(fn xx -> case {opts[:sortby],opts[:orderby]} do
+		{s,o} when is_nil(s) or is_nil(o) -> xx
+		{"age","ascending"}         -> xx |> order_by([c], asc:  c.timestamp)
+		{"age","descending"}        -> xx |> order_by([c], desc: c.timestamp)
+		{"popularity","ascending"}  -> xx |> order_by([c], asc:  c.rating)
+		{"popularity","descending"} -> xx |> order_by([c], desc: c.rating)
+		{_,_}                       -> xx
+		end end)
   end
 
   defp discussionQuery(parent_id,parent_type\\"post",user_id\\nil) do

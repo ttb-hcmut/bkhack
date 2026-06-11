@@ -33,6 +33,7 @@ defmodule App
     |> put_resp_header("Access-Control-Allow-Headers", "Origin, X-Requested-With, jwterrible, Content-Type, Accept")
     |> put_resp_content_type("application/json")
   end
+
   def getJWTToken(conn) do
     IO.puts("getting jwterrible")
     case Plug.Conn.get_req_header(conn, "jwterrible")|>JSON.decode do
@@ -52,13 +53,15 @@ defmodule App
     _ -> nil
     end
   end
+
   def jwtReader(conn,field,default) do
-    token     = getJWTToken(conn)
+    token = getJWTToken(conn)
     case token do
       nil -> default
-      _ ->   if(AuthBE.testJWT(token)) do Map.get(token,field) else default end
+      _   -> if (token |> AuthBE.testJWT) do Map.get(token,field) else default end
     end
   end
+
   options "/*_" do
     conn
     |> put_resp_free
@@ -67,22 +70,18 @@ defmodule App
 
   get "/api/pullrequest/count" do
     Logger.info "GET pullrequestcount"
-    post_id    = Map.get(conn.params,"post_id","-1") |> String.to_integer
+    post_id = Map.get(conn.params,"post_id","-1") |> String.to_integer
     data = PullrequestBE.getPullrequestCount(Data, post_id, opts)
-    # data = ReturnChildID.getChildComments(parent, offset, limit)
     case data do
-      nil ->
-        {:ok, sh} = JSON.encode([])
-        conn
-        |> put_resp_free
-        |> send_resp(501 , sh)
-      x ->
-        {:ok, sh} = Jason.encode(x)
-        conn
-        |> put_resp_free
-        |> send_resp(200 , sh)
+		nil ->
+		  {:ok, sh} = JSON.encode([])
+		  conn |> put_resp_free |> send_resp(501, sh)
+    x ->
+      {:ok, sh} = Jason.encode(x)
+      conn |> put_resp_free |> send_resp(200 , sh)
     end
   end
+
   get "/api/pullrequest/list" do
     Logger.info "GET pullrequestlist"
     post_id    = Map.get(conn.params,"post_id","-1") |> String.to_integer
