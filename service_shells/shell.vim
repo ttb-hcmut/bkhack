@@ -1,4 +1,6 @@
-:lua vim.lsp.enable('ocamllsp')
+lua vim.lsp.enable('hls')
+lua vim.lsp.enable('nixd')
+lua vim.lsp.enable('ocamllsp')
 LoadNeotree
 lua << EOF
 local opt = require("config/neotree")

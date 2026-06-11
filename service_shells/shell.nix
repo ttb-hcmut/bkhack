@@ -22,7 +22,7 @@ let shellHook =
 	pkgs = with nixpkgs; [
 		elixir erlang
 		pnpm nodejs
-		nixd
+		nixd haskell-language-server
 		opam rsync
 		
 		gnugrep
