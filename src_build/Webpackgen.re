@@ -9,22 +9,22 @@ let attrib_name = Re.(
   alt([str("page"), str("Bkhack.page")]));
 
 /** a [morphism] for JavaScript bundles */
-let morphism_jspages = (~sw,~procm,~clock,~cwd, ~optimization, ~watch=?, src_dir, ~log_dir=?, dist_dir) =>
-  Fiber.fork(~sw) @@ () => {
-		let jspages =
-			List.filter_map(B.is_page'(src_dir))
-			@@ Path.read_dir(src_dir);
-		let output_dirs = jspages |> Fiber.List.map @@ x' => {
-			let (`fpath(refile'), `fname(refile), _) = x';
-			let jsfile  = B.Output.src' @@ Filename.chop_extension(refile);
-			let jsfile' = P.(cwd / jsfile);
-			let out_dir =
-				try (B.file_grep_attrib(attrib_name, refile'))
-				{ | Not_found => raise @@ Missing_mapping_entry_for(refile) };
-			(out_dir++"/index", jsfile')
-		};
-		B.compile_jsfile'(~procm,~clock,~cwd, ~watch?, ~optimization, dist_dir, ~log_dir?, output_dirs)
-	};
+let morphism_jspages = (~sw,~procm,~clock,~cwd, ~optimization, ~watch=?, src_dir, ~log_dir=?, dist_dir) =>  {
+	let jspages = () =>
+		List.filter_map(B.is_page'(src_dir))
+		@@ Path.read_dir(src_dir);
+	let output_dirs = jspages => jspages |> Fiber.List.map(x' => {
+		let (`fpath(refile'), `fname(refile), _) = x';
+		let jsfile  = B.Output.src' @@ Filename.chop_extension(refile);
+		let jsfile' = P.(cwd / jsfile);
+		let out_dir =
+			try (B.file_grep_attrib(attrib_name, refile'))
+			{ | Not_found => raise @@ Missing_mapping_entry_for(refile) };
+		(out_dir++"/index", jsfile')
+	});
+	Fiber.fork(~sw) @@ () =>
+	output_dirs(jspages()) |> B.compile_jsfile'(~procm,~clock,~cwd, ~watch?, ~optimization, dist_dir, ~log_dir?)
+};
 
 /** a [morphism] for lucide icons */
 let morphism_lucide = (~sw,~procm, lucide_dir, dist_dir) => {
@@ -49,10 +49,10 @@ let morphism_static = (~sw,~procm, public_dir, dist_dir, ()) => {
     Path.mkdirs(~exists_ok=true, ~perm=0o700, dirpath_at_dist)
 	};
   [] |> iter(~ondir=iter_ondir) @@ fpath_at_public => {
-  let path_it = String.concat("/", fpath_at_public);
-  B.Path.physlink(~sw, procm,
-    P.(dist_dir / path_it),
-    ~link_to=P.(public_dir / path_it))
+		let path_it = String.concat("/", fpath_at_public);
+		B.Path.physlink(~sw, procm,
+			P.(dist_dir / path_it),
+			~link_to=P.(public_dir / path_it))
 	}
 }
 
@@ -64,12 +64,13 @@ let morphism_generative = (~sw,~procm, generative_dir, dist_dir) => {
 	};
   at_dir(generative_dir) @@ () => {
 		let candidates = Path.read_dir(generative_dir) |> List.filter(x => Filename.extension(x) == ".css");
-		at_dir(dist_dir) @@ () =>
-		create_index("generative.css", candidates);
-		candidates |> Fiber.List.iter @@ path_it =>
+		at_dir(dist_dir) @@ () => {
+			create_index("generative.css", candidates);
+			candidates |> Fiber.List.iter @@ path_it =>
 			B.Path.physlink(~sw, procm,
 				P.(dist_dir / path_it),
 				~link_to=P.(generative_dir / path_it))
+		}
 	}
 };
 
