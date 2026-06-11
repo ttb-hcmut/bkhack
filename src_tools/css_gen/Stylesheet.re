@@ -22,8 +22,6 @@ let format1 = (~className, str, arg1) => {
 	let str = Kernel.undo_relative_indentation(~min_padding=Kernel.min_padding(str), str);
 	let str = str |> selector_replace("."++className);
 	let content = str |> args_replace("\""++arg1++"\"");
-	
-		Containers.IO.File.write_exn(Sys.getenv("TEST")++"/generative/"++className++".css", content);
-	
+	Containers.IO.File.write_exn(Sys.getenv("TEST")++"/generative/"++className++".css", content);
 	className
 }
