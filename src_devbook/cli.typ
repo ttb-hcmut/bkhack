@@ -1,4 +1,5 @@
 #import "/article": *
+#import "vocab.typ" as o
 #import "@preview/cetz:0.5.1"
 #let header(it) = { text(weight: 700, it) }
 #title[= CLI-oriented applications]
@@ -45,5 +46,9 @@ which is called a _command bar_ #fn[a.k.a. _command palette_], and there is usua
 // Custom command language
 // sh
 // PowerShell
+
+== Command specification
+#lorem(20). In some other domain, this problem is known as _argument parsing_. There is rich literature in\
+  For the developers of #o.bkhack, this particular problem takes root in our experience with programming with Discord commands. #lorem(30)
 
 // vi: set nowrap:
