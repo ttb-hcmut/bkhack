@@ -7,7 +7,9 @@
   grid-auto-flow: row;
   grid-template-rows: max-content;
 }
-.diff-box {
+.diff-box main{
+  display: grid;
+  padding: var(--space-a);
 }
 .diff-box * {
   margin: 0;
@@ -35,6 +37,7 @@
 .diff-box .code-box {
   display: grid;
   grid-template-columns: max-content minmax(0,100%);
+  background-color: var(--ctp-base);
   border: 1px solid var(--card-border);
 }
 .diff-box  .code-box > .body {
@@ -66,19 +69,23 @@
 .code-box .text-style{
   overflow-wrap: break-word;
   white-space: pre-wrap;
+  color: var(--ctp-text);
   font-family: var(--font-mono);
   font-size: var(--text-base);
   line-height: 1;
 }
 .code-box .invisible{
+  --rise: 1.5;
+  --special: calc((var(--rise) / (sqrt(1 + ( var(--rise) * var(--rise))))) * 1ch);
   color: transparent;
-  background: repeating-linear-gradient(
-  45deg,
-  var(--card-bg),
-  var(--card-bg) var(--space-c),
-  var(--card-border) 1px,
-  var(--card-border) calc(1px + var(--space-c))
-);
+  background-image: 
+    repeating-linear-gradient(
+      atan2(var(--rise), 1),
+      var(--card-bg),
+      var(--card-bg) calc(0.70 * var(--special)),
+      var(--card-border) calc(0.20 * var(--special)),
+      var(--card-border) var(--special) /* determines size */
+    );
   pointer-events: none;
   user-select: none;
 }

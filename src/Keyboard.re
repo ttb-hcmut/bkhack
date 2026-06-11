@@ -72,7 +72,7 @@ module Mneumonics {
 
 	let onKeyDown = (state, f, e) => {
 		let key = Event.Keyboard.key(e);
-		Js.Console.log2("Mneumonics.onKeyDown", key);
+		// Js.Console.log2("Mneumonics.onKeyDown", key);
 		let justFound = ref(None);
 		switch (key) {
 		| "Alt" => 
@@ -92,7 +92,7 @@ module Mneumonics {
 
 	let onKeyUp = (state, e) => {
 		let key = Event.Keyboard.key(e);
-		Js.Console.log2("Mneumonics.onKeyUp", key);
+		// Js.Console.log2("Mneumonics.onKeyUp", key);
 		switch (key) {
 		| "Alt" =>
 			let root = ReactDOM.querySelector("#root")->Option.get->ReactDOM.domElementToObj;

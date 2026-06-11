@@ -1,11 +1,150 @@
+module DiffContext = {
+  type t = {
+    cid1              : option(int)
+  , message1          : string
+  , title1            : string
+  , input1            : string
+  , set1              : (option(int),string,string,string) => unit
+  , cid2              : option(int)
+  , message2          : string
+  , title2            : string
+  , input2            : string
+  , set2              : (option(int),string,string,string) => unit
+  };
+
+  let defaultValue: t = {
+    cid1              : None
+  , message1          : ""
+  , title1            : ""
+  , input1            : ""
+  , set1              : (_,_,_,_) => ()
+  , cid2              : None
+  , message2          : ""
+  , title2            : ""
+  , input2            : ""
+  , set2              : (_,_,_,_) => ()
+  };
+
+  let ctx = React.createContext(defaultValue);
+
+  module Provider = {
+    [@react.component]
+    let make = (~children: React.element) => {
+    let (cid1    , setCid1')     = React.useState(()=>None)    
+    and (message1, setMessage1') = React.useState(()=>"")
+    and (title1  , setTitle1')   = React.useState(()=>"")  
+    and (input1  , setInput1')   = React.useState(()=>"")  
+    and (cid2    , setCid2')     = React.useState(()=>None)    
+    and (message2, setMessage2') = React.useState(()=>"")
+    and (title2  , setTitle2')   = React.useState(()=>"")  
+    and (input2  , setInput2')   = React.useState(()=>"");
+    
+    let set1 = (i,m,t,b) => {
+      setCid1'(_    => i);
+      setMessage1'(_=> m);
+      setTitle1'(_  => t);
+      setInput1'(_  => b);
+    }
+    let set2 = (i,m,t,b) => {
+      setCid2'(_    => i);
+      setMessage2'(_=> m);
+      setTitle2'(_  => t);
+      setInput2'(_  => b);
+    }
+     
+    let ctxValue: t = {
+    cid1              : cid1    
+  , message1          : message1
+  , title1            : title1  
+  , input1            : input1  
+  , set1              : set1    
+  , cid2              : cid2    
+  , message2          : message2
+  , title2            : title2  
+  , input2            : input2  
+  , set2              : set2    
+    }; 
+    let provider = React.Context.provider(ctx);
+    React.createElement(provider, {"value": ctxValue, "children": children})
+    };
+  };
+  let use = () => React.useContext(ctx);
+};
+
+
+
 module Inspectview = {
 	[@react.component]
-	let make = (~className=?) => {
-    let cls = className |> Option.value(~default="");
-		<>
-		<header className=("only "++cls)></header>
-		<main></main>
-		</>
+	let make = () => {
+    let (option,setOption) = React.useState(()=> 0)
+    let diff = DiffContext.use()
+    let (split, nukeDelim) = React.useMemo1(()=>{ 
+      option |> fun
+      | 0 => (['\n'],false)
+      | 1 => (['\n'    ,'.',':',',','!','?',';','"','(',')','[',']','{','}'],false)
+      | 2 => (['\n',' ','.',':',',','!','?',';','"','(',')','[',']','{','}'],false)
+      | _ => (['\n'],false)
+     },[|option|])
+    let diffList = React.useMemo3(() => {
+    (diff.cid1,diff.cid2)|> fun
+      | (Some(_),Some(_)) => Diff.compare(diff.input1,diff.input2,split,nukeDelim)
+      | _ => []
+    },(split,diff.cid1,diff.cid2))
+    ;
+    <div className="diff-box">
+      <Component__diff.App__controls option setOption />
+      <main>
+        <div className="side-by-side">
+          <div className="diff1">
+          {
+            diff.cid1 |> fun
+            | None => <label>{React.string("Diff input 1: Unset")}</label>
+            | Some(c) => 
+              <>
+              <label>{React.string("Diff input 1:")}</label>
+              <span className="cid">{React.int(c)}</span>
+              <span className="spacer"/>
+              <span className="message">{React.string(diff.message1)}</span>
+              <div className="title">
+                <input
+                  type_="text" 
+                  autoComplete="off" 
+                  value=diff.title1
+                  disabled=true/>
+              </div>
+              <Component__diff.Code__box text=diffList mode="-" />
+              </>
+          }
+          </div>
+          <div className="diff2">
+          {
+            diff.cid2 |> fun
+            | None => <label>{React.string("Diff input 2: Unset")}</label>
+            | Some(c) => 
+              <>
+              <label>{React.string("Diff input 2:")}</label>
+              <span className="cid">{React.int(c)}</span>
+              <span className="spacer"/>
+              <span className="message">{React.string(diff.message2)}</span>
+              <div className="title">
+                <input
+                  type_="text" 
+                  autoComplete="off" 
+                  value=diff.title2
+                  disabled=true/>
+              </div>
+              <Component__diff.Code__box text=diffList mode="+" />
+              </>
+          }
+          </div>
+        </div>
+        {
+            (diff.cid1,diff.cid2) |> fun
+            | (Some(_),Some(_)) => <Component__diff.Code__box text=diffList mode="=" />
+            | _ => React.null  
+        }
+      </main>
+    </div>
 	}
 };
 
@@ -55,6 +194,7 @@ module Listview__Body_Card = {
   , ~post_text      
   , ~timestamp      
   ) => {
+    let diff = DiffContext.use();
     let (expand,setExpand) = React.useState(()=> false)
     let (tags,setTags) = React.useState(()=> [||])
     let fetchTags = (~id) => {
@@ -143,6 +283,28 @@ module Listview__Body_Card = {
               disabled=true/>
             // <div className="ghost body-input text-style">{React.string(post.postBody++"\n")}</div>
           </div>
+          <div className="side-by-side">
+            <button
+              onClick={_=>
+                diff.set1(
+                  Some(commit_id)      
+                , commit_message          
+                , post_title    
+                , post_text
+                )
+              }
+            >{React.string("Set as diff input 1")}</button>
+            <button
+              onClick={_=>
+                diff.set2(
+                  Some(commit_id)      
+                , commit_message          
+                , post_title    
+                , post_text
+                )
+              }
+            >{React.string("Set as diff input 2")}</button>
+          </div>
         </main>
     </li>
   }
@@ -193,6 +355,8 @@ module Listview = {
       </header>
       <main className=("only listview "++cls)>
         <Listview__Body result />
+          
+        <Inspectview />
       </main>
     </>
 	}
@@ -200,6 +364,8 @@ module Listview = {
 module App = {
   [@react.component]
   let make = (~className=?, ~parentId) => {
-    <Listview className=?className parentId />
+    <DiffContext.Provider >
+      <Listview className=?className parentId />
+    </DiffContext.Provider >
   }
 };
