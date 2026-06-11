@@ -45,7 +45,6 @@ module Listview__Filter = {
       />
 	}
 };
-[@alert warning("Bao, what the  is a subgrid")]
 module Listview__Body_Card = {
 	[@react.component]
   let make = (
