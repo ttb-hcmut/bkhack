@@ -46,7 +46,7 @@ module Promise__syntax' (U : { let sw: Switch.t }) {
 
 let suite = (fixtures, name) => Path.(fixtures / name)
 and fixtures = test => Path.(test / "fixtures")
-and test = cwd => Path.(cwd / "test")
+and test = cwd => Path.(cwd / "test_diff")
 
 let pool = (domain_mgr, k) => Switch.run @@ sw => {
 	let pool = Executor_pool.create(~sw, domain_mgr, ~domain_count=Domain.recommended_domain_count());
