@@ -1,0 +1,4 @@
+(executable
+ (name app) (public_name bkhack+adw)
+ (package bkhack+adw)
+ (libraries eio eio_main lablgtk3))

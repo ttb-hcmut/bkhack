@@ -22,6 +22,15 @@
  ))
 
 (package
+ (name bkhack+adw)
+ (synopsis "bkhack GNOME client")
+ (depends
+  (ocaml (= 5.2.0)) (reason (>= 3.13.0))
+  (eio (>= 1.3)) (eio_main (>= 1.3))
+  lablgtk3
+ ))
+
+(package
  (name bkhack-compiler)
  (synopsis "bkhack compile time tools")
  (description "bkhack compile time tools")
