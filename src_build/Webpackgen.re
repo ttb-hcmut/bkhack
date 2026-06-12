@@ -118,7 +118,7 @@ let main__ = () => Cmd.v(Cmd.info("webpackgen", ~doc="")) @@ {
     |> Term.map(Path.((it, fs) => fs / it))
   and+ verbose = Arg.(required & opt((some(bool)), None) &
     info(["verbose"], ~docv="VERBOSE"))
-  and+ optimization = Arg.(required & opt((some @@ enum @@ [("dev", `Development), ("prod", `Production)]), None) &
+  and+ optimization = Arg.(required & opt((some @@ enum @@ [("dev", `Development), ("release", `Production)]), None) &
     info(["optimization", "O"], ~docv="OPTIMIZATION"));
   main__(~watch=false, ~dist_dir, ~src_dir, ~public_dir, ~generative_dir, ~log_dir, ~lucide_dir, ~verbose, ~optimization, ())
 };

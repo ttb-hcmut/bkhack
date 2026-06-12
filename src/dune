@@ -1,33 +1,24 @@
 (rule
  (alias bundle)
- (target dist)
- (deps %{project_root}/src_build/webpackgen.exe (alias react) (source_tree Static)
-       (source_tree %{project_root}/generative) node_modules__lucide-static)
- (action (run %{project_root}/src_build/webpackgen.exe
-  --verbose=false --optimization=prod --output=%{target} --src_dir=./ --public_dir=Static/
-  --generative_dir=%{project_root}/generative/ --lucide_dir=node_modules__lucide-static/)))
-
-(rule
- (alias bundle.dev)
- (target dist.dev)
- (deps %{project_root}/src_build/webpackgen.exe (alias react) (source_tree Static)
-       (source_tree %{project_root}/generative) node_modules__lucide-static)
- (action (run %{project_root}/src_build/webpackgen.exe
-  --verbose=false --optimization=dev --output=%{target} --src_dir=./ --public_dir=Static/
-  --generative_dir=%{project_root}/generative/ --lucide_dir=node_modules__lucide-static/)))
-
-; (rule
-;  (alias bundle-service)
-;  (target dcontainer)
-;  (deps (alias elixir))
-;  (action (run mkdir %{target}))
-; )
+ (targets dist distserve)
+ (deps (:bundle %{project_root}/src_build/webpackgen.exe)
+       (:src (alias react))
+       (:static (source_tree Static))
+       (:gen (source_tree %{project_root}/generative))
+       (:serve (alias Service/default))
+       (:static-lucide node_modules__lucide-static))
+ (action (concurrent
+  (run %{bundle}
+   --verbose=false --optimization=%{profile} --output=dist --src_dir=./ --public_dir=Static/
+   --generative_dir=%{project_root}/generative/ --lucide_dir=node_modules__lucide-static/)
+  (run cp -r Service distserve)
+ )))
 
 (rule
  (target node_modules__lucide-static)
  (action (bash "cp -L -r $(pnpm root)/lucide-static node_modules__lucide-static")))
 
-(data_only_dirs Static Service)
+(data_only_dirs Static)
 
 ; `melange.emit` is a Dune stanza that will produce build rules to generate
 ; JavaScript files from sources using the Melange compiler
@@ -72,7 +63,5 @@
   ; The `pps` field is a list of ppx to apply to the sources before generating JavaScript. melange.ppx allows to use Melange attributes [@mel. ...] (https://melange.re/v2.0.0/communicate-with-javascript/#attributes)
   ; reason-react-ppx allows to use JSX for ReasonReact components by using the [@JSX] attributes from Reason: https://reasonml.github.io/docs/en/jsx
   (pps melange.ppx reason-react-ppx ppx_comptime))
- (enabled_if
-  (= %{context_name} default))
  ; Name of library, and is name of package
  (public_name bkhack) (name bkhack))

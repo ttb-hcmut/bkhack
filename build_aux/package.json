@@ -8,12 +8,12 @@
     "init": "opam switch create . 5.2.0 -y --deps-only && npm run install-opam-npm",
     "install-opam-npm": "pnpm install && pnpm run install-opam && pnpm run check-npm-deps",
     "dune": "opam exec -- dune",
-    "build": "npm run dune -- build @bundle.dev",
-    "build-verbose": "npm run build -- --verbose @bundle.dev",
+    "build": "npm run dune -- build @bundle --profile=dev",
+    "build-verbose": "npm run build -- --verbose @bundle --profile=dev",
     "clean": "npm run dune -- clean",
-    "build-watch": "npm run dune -- build @bundle.dev --watch",
-    "bundle": "npm run dune -- build @bundle",
-    "serve": "npm run dune -- exec bin/serve1.exe -- --output=_build/default/src/dist.dev",
+    "build-watch": "npm run dune -- build @bundle --profile=dev --watch",
+    "bundle": "npm run dune -- build @bundle --profile=release",
+    "serve": "npm run dune -- exec bin/serve1.exe -- --output=_build/default/src/dist",
     "dev": "npm run serve & npm run build-watch; wait"
   },
   "scriptsComments": {
