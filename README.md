@@ -18,9 +18,8 @@ The following paper provides more details:
 Add the [bkhack repository][bkhack-repo] to OPAM:
 
 ```sh
-opam remote add bkhack git+https://github.com/ttb-hcmut/bkhack
+opam remote add bkhack-repo git+https://github.com/ttb-hcmut/bkhack
 ```
-
 
 Install the package:
 
@@ -34,24 +33,46 @@ opam install bkhack
 
 ## Usage
 
-`bkhack` is distributed as both a reusable OCaml/Reason library, and a suite of frontend bundling tools.
-
-You can integrate it into your own Reason application:
+`bkhack` is distributed as both reusable OCaml/Reason library. You can integrate it into your own Reason application:
 
 ```dune
+(rule
+ (alias bundle)
+ (deps (:static (source_tree Static))
+       ; ...
+       (:src (alias core))
+       (:serve (alias Service/default)))
+ (action
+  (run bkhack-tools.webpackgen
+       -static %{static}
+       ; ...
+       -src %{src}
+       -serve %{serve})
+  ))
 (melange.emit
+ (alias core)
  ; ...
+ (preprocess (pps ppx_comptime))
  (libraries bkhack))
 ```
 
 Bundle the application for deployment:
 
 ```sh
-bkhack.bundle ./ -o dist --api 'http://localhost:5000'
+dune build @bundle
 ```
 
-This produces a `dist/` directory containing static HTML and JavaScript bundles
-suitable for deployment platforms such as Firebase Hosting or Netlify, and a `dcontainer/` directory containing a dockerized Elixir bundle suitable for deployment platforms such as GCP Compute Engine or Fly.io.
+This produces a `_build/${context}/${src}/dist/` directory containing static HTML and JavaScript bundles
+suitable for deployment platforms such as Firebase Hosting or Netlify, and a `_build/${context}/${src}/distserve/` directory containing a dockerized Elixir bundle suitable for deployment platforms such as GCP Compute Engine or Fly.io.
+
+For demonstration, let's assume you want to run the website locally
+
+```sh
+(cp -rf _build/${context}/${src}/dist dist && pnpm exec live-server --cors dist 8080) &
+({ cp -rf _build/${context}/${src}/distserve distserve && cp _build/${context}/${src}/distserve/config/shell.nix.ex distserve.nix ;} && nix-shell distserve.nix --run "cd distserve && mix deps.get && mix run --no-halt"); wait
+```
+
+![](./bkhack-1.png)
 
 ---
 
