@@ -78,18 +78,6 @@ module Filter {
 
 	[@react.component]
 	let make = (~setResult, ~x_limit=?) =>
-	{ 
-    // let submission = React.useRef(Js.Nullable.null);
-		// let onSubmit = e => {
-		// 	React.Event.Synthetic.preventDefault(e);
-		// 	let u = React.Event.Form.target(e)##showCount##value;
-		// 	onUpdateCount(u)
-		// };
-		// <form ref={ReactDOM.Ref.domRef(submission)} className="dashboard-filter" onSubmit>
-		// 	<input id="feedFilter" />
-		// 	{methods @@ ["hot", "new", "top-voted", "most-discussed", "recent-activity"]}
-		// 	{options @@ [10, 25, 50, 100, 0]}
-		// </form>
     <Pagination.App 
       limit=3
       searchPrompt=true
@@ -103,7 +91,6 @@ module Filter {
       ]}
       setResult
     />
-  }
 }
 
 module Dashboard {
