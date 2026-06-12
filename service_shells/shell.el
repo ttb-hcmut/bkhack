@@ -17,3 +17,7 @@
 (use-package markdown-mode :ensure t
 	:mode ("README\\.md\\'" . gfm-mode))
 ; (use-package git-modes)
+(use-package elixir-mode :ensure t)
+(use-package flymake-easy :ensure t)
+(use-package flymake-elixir :ensure t)
+(add-hook 'elixir-mode-hook 'flymake-elixir-load)
