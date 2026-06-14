@@ -1,6 +1,5 @@
 #import "/article": *
-#import "kbd.typ"
-#import "diagramming.typ": colors
+#import "diagramming/lib.typ": colors, kbd
 #import "@preview/cetz:0.5.2"
 #import "@preview/finite:0.5.1": automaton
 #set raw(syntaxes: ("reason.sublime-syntax")/* , theme: "quiet.tmTheme" */)
@@ -36,18 +35,19 @@
   )
   let initial = "modenormal"
   let final = ("modenormal")
+  let k(..k) = { kbd.keys(style: "basic", ..k) }
   automaton(initial: initial, final: final, layout: layout, labels: labels, style: style, (
-    modecmd: (modenormal: kbd.escape),
+    modecmd: (modenormal: k[ #kbd.escape() ]),
     modenormal: (
-      modecmd: pad(right: 12pt, $ ":", "/", "?" $),
-      modevisual: $ "v", "V", #kbd.ctrl-("v") $,
-      modeinsert: pad(left: 28pt, $ "i""I""a""A""o""O""c" $)),
-    modevisual: (modenormal: kbd.escape),
-    modeinsert: (modenormal: kbd.escape),
+      modecmd: pad(right: 12pt, $ #k[:], #k[/], #k[?] $),
+      modevisual: $ #k[v], #k[V], #k[ #kbd.ctrl-[v] ] $,
+      modeinsert: pad(left: 28pt, k(([i],[I],[a],[A],[o],[O],[c]).reduce((acc, x) => acc + [] + x)) )),
+    modevisual: (modenormal: k[ #kbd.escape() ]),
+    modeinsert: (modenormal: k[ #kbd.escape() ]),
   ))
 })
 
-#lorem(50)
+#lorem(15) #kbd.keys(kbd.meta-[x]) #lorem(10) #kbd.keys[13gcc] #lorem(30)
 
 ```reason
 type motion('t) =
