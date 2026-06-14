@@ -337,7 +337,7 @@ The service-oriented architecture architectural style is a logical choice for ar
   caption: [Concept ER Diagram, in Chen's notation, for the entities and relationships in the BKHack system]
 )[
   // #image("assets/diagrams/erd.svg")
-  #import "assets/erd.typ": diagram as erdDiagram
+  #import "assets/diagrams/erd.typ": diagram as erdDiagram
 #move(
   dx: 0%, 
   dy:-10%,

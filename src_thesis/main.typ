@@ -22,7 +22,7 @@
 #let single_page(f) = {
   f(); pagebreak()
 }
-
+ 
 #cover(
   [Develop a social news website oriented towards Computer Science for HCMUT],
   [BKHack: A Computer Science Social News Website for HCMUT],
