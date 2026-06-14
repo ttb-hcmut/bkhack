@@ -174,3 +174,24 @@ giao-trinh-trinh-bien-dich:
   title: Giáo trình Trình biên dịch
   publisher: Nhà xuất bản Đại học Quốc gia Thành phố Hồ Chí Minh
   author: Phan Thị Tươi
+
+devbook-streaming:
+  type: Web
+  title: Stream-based programming, as compared to sh
+  url: https://github.com/ttb-hcmut/bkhack/tree/main/src_devbook/streaming.pdf
+  
+devbook-diff:
+  type: Web
+  title: Diffing
+  url: https://github.com/ttb-hcmut/bkhack/tree/main/src_devbook/diff.pdf
+
+opengroups-shell:
+  type: Web
+  title: "Shell Command Language"
+  publisher: "IEEE and The Open Group"
+  url: "https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html"
+
+myers-diff:
+  type: Article
+  title: "An O(ND) Difference Algorithm and Its Variations"
+  author: Eugene W. Myers

@@ -38,9 +38,9 @@
   
     #text(size: 16pt, weight: "bold")[
       REPORT:#linebreak()
-      SPECIALIZED PROJECT:#linebreak()
+      CAPSTONE PROJECT HK252-DATN-328:#linebreak()
       #upper(title)#linebreak()
-      SEMESTER 251 ACADEMIC YEAR 2025-2026
+      SEMESTER 252 ACADEMIC YEAR 2025-2026
     ]
     
     #line(length: 80%)
@@ -58,9 +58,9 @@
         [],align(left)[*Council:*],align(left)[Department of CSE],
         
         [],align(left)[*Supervisor(s):*],align(left)[Dr. Trương Tuấn Anh],
-        [],[],align(left)[Cn. Nguyễn Minh Tâm],
+        [],[],align(left)[MS. Nguyễn Minh Tâm],
         [],[],[],
-        [],align(left)[*Reviewer:*],align(left)[#place(bottom,dy:5pt)[`....................`]],
+        [],align(left)[*Reviewer:*],align(left)[#place(bottom,dy:5pt)[MS. Mai Đức Trung]],
       )
     ]
     
@@ -93,7 +93,7 @@
     
     #align(bottom)[
       #text(size: 16pt)[
-        HO CHI MINH CITY, October 2025
+        HO CHI MINH CITY, May 2026
       ]
     ]
 
@@ -139,3 +139,36 @@
 }
 
 #let cover = cover0
+
+#let with_header(it) = {
+  
+  set heading(numbering: "1.")
+  
+  // Header and footer
+  set page(
+    footer: context [
+      #place(line(start:(0%,-10%),end:(100%,-10%)))
+      Capstone project report
+      #h(1fr)
+      Page #counter(page).display("1/1",both:true)
+  ],
+    header: context[
+      #place(
+        image("hcmut.png",height:50%),
+        bottom + left,
+      )
+      #place(
+        [Ho Chi Minh City University of Technology\ 
+        Faculty of Computer Science and Engineering],
+        bottom + left, dx: 6.5%,
+      )
+      #place(
+      line(start:(0%,0%),end:(100%,0%)),
+        bottom + left, dy:10%,
+      )
+    ]
+  )
+
+  it
+
+}

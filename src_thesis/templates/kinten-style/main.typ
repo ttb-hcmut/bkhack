@@ -24,3 +24,8 @@
     #pagebreak()
   ]
 }
+
+#let with_header(it) = {
+  set heading(numbering: "1.")
+  it
+}

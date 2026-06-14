@@ -336,7 +336,14 @@ The service-oriented architecture architectural style is a logical choice for ar
 #figure(
   caption: [Concept ER Diagram, in Chen's notation, for the entities and relationships in the BKHack system]
 )[
-  #image("assets/diagrams/erd.svg")
+  // #image("assets/diagrams/erd.svg")
+  #import "assets/erd.typ": diagram as erdDiagram
+#move(
+  dx: 0%, 
+  dy:-10%,
+  erdDiagram
+)
+  
 ] // TODO(kinten+khang) help fix
 
 == Architecture of the front-end

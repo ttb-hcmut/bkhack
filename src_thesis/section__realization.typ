@@ -290,11 +290,6 @@ Write interface files. Follow the official ocaml guide @ocaml-doc-guide.
 - Properly document deprecations
 - Have meaningful README
 
-
-
-
-// TODOne(kinten+khang) embed some example ocamldoc guidelines here
-
 == Layering of styles
 
 We consider it in development time and also in run time that styles should be implemented in a specific order. This order is so that we can achieve the ideas presented in @motion and @multigraphics.
@@ -303,7 +298,6 @@ We consider it in development time and also in run time that styles should be im
   align(image("assets/diagrams/UML-style_layering.svg"),center),
   caption:[The ordered layers of styling]
 )
-// TODOne(kinten+khang) embed layer illustration here
 
 == Bundling of front-end
 
@@ -315,3 +309,21 @@ Web applications adopt one of these paradigms:
 BKHack adopts a hybrid paradigm. At its core, it's MPA. But within a webpage there can be some "subpages", "subviews", which don't require a request to server to navigate to.
 
 All static asset - html document, css stylesheet, icon svg - should be separated into files. This is opposite to the inline philosophy e.g. inline styling, css-in-js, etc.
+
+== Source code
+
+The implementation source code can be found at
+
+#align(center)[
+  #let bkhack-repo = "https://github.com/ttb-hcmut/bkhack"
+  #link(bkhack-repo, bkhack-repo)
+]
+
+which is hosted on the GitHub platform, and where there will be a detailed documentation greeting file (a.k.a. a `README.md` file) to provide quick guide for internal developer users who may use our system as foundation to extend with more pages and services. @bkhack-repo-usage shows a section in this `README.md`.
+
+#place(auto, float: true)[
+  #figure(
+    image("assets/bkhack-repo-usage.png"),
+    caption: [A section of the front page of the source code repository of the bkhack system as seen on github.com. We provide an installation flow where BKHack (here writen as bkhack) is easily usable as an OCaml / Reason library through a few short OPAM installation commands. Source: window capture at https://github.com/ttb-hcmut/bkhack]
+  ) <bkhack-repo-usage>
+]

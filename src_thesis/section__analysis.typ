@@ -349,10 +349,13 @@ table.header(
 [ID],[Description]
 ),
 [NFR1],
+// testicle
 [The system should handle at least *30* concurrent users during normal operation without noticeable slowdown.],
 [NFR2],
+// testicle
 [Average server-side response time for common actions (viewing articles, loading discussions, submitting comments) should remain under 400 ms on campus-hosted infrastructure.],
 [NFR3],
+// testicle
 [Full page load time should not exceed *3* seconds on a standard broadband connection.],
 [NFR4],
 [Background processes (indexing, feed generation, notifications, analytics) must not increase foreground request latency by more than 20% under load.],
@@ -374,6 +377,7 @@ table.header(
 [NFR5],
 [The system should maintain at least 97% uptime during the evaluation period, excluding scheduled maintenance.],
 [NFR6],
+// testicle
 [Article versions, issues, pull requests, and comments must be durably persisted; no committed revision may be lost after acknowledgment.],
 [NFR7],
 [Automated database backups must occur at least once daily and be retained for 7 days, including revision histories and audit logs.],
@@ -395,6 +399,7 @@ table.header(
 [ID],[Description]
 ),
 [NFR9],
+// testicle
 [User credentials must be stored using industry-standard password hashing with salting; sensitive data must never be stored in plain text.],
 [NFR10],
 [The system must be demonstrably resistant to common web attacks through manual or scripted testing, including:],
