@@ -4,3 +4,4 @@
 #import "kbd.typ" as kbd
 #import "kbd-discrete.typ" as kbd-discrete
 #import "colors.typ" as colors
+#import "paper.typ" as paper
