@@ -1,0 +1,8 @@
+utopk-baorepo:
+  type: Repository
+  title: The Utopk interpreter
+  url: "https://baorepo.web.app/~kinten/utopk"
+tree-sitter-quarkdown-github:
+  type: Repository
+  title: Quarkdown grammar for tree-sitter
+  url: "https://github.com/kinten108101/tree-sitter-quarkdown"
