@@ -35,19 +35,19 @@
   )
   let initial = "modenormal"
   let final = ("modenormal")
-  let k(..k) = { kbd.keys(style: "basic", ..k) }
+  let k = kbd.keys.with(style: kbd.basic)
   automaton(initial: initial, final: final, layout: layout, labels: labels, style: style, (
-    modecmd: (modenormal: k[ #kbd.escape() ]),
+    modecmd: (modenormal: k(kbd.o.escape())),
     modenormal: (
       modecmd: pad(right: 12pt, $ #k[:], #k[/], #k[?] $),
-      modevisual: $ #k[v], #k[V], #k[ #kbd.ctrl-[v] ] $,
+      modevisual: $ #k[v], #k[V], #k(kbd.o.ctrl-[v]) $,
       modeinsert: pad(left: 28pt, k(([i],[I],[a],[A],[o],[O],[c]).reduce((acc, x) => acc + [] + x)) )),
-    modevisual: (modenormal: k[ #kbd.escape() ]),
-    modeinsert: (modenormal: k[ #kbd.escape() ]),
+    modevisual: (modenormal: k(kbd.o.escape())),
+    modeinsert: (modenormal: k(kbd.o.escape())),
   ))
 })
 
-#lorem(15) #kbd.keys(kbd.meta-[x]) #lorem(10) #kbd.keys[13gcc] #lorem(30)
+#lorem(15) #kbd.keys(kbd.o.meta-[x]) #lorem(10) #kbd.keys[13gcc] #lorem(30)
 
 ```reason
 type motion('t) =

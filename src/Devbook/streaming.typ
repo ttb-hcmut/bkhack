@@ -152,8 +152,7 @@ where the ```reason |@``` operator--accompanied by the ```reason nil``` word to 
   We believe that this type system can be used for composition of commands. Indeed, _type-driven composition_ allows us to implement and explore possibilities purely through types, where the type system serves as a real-time theorem checker that prompts our paths. For example, #lorem(20)
 == Completion
 When writing a pipeline, it is nice to provide a language service where user can request their partially-written command to be replaced with corrected form.
-When press #kbd.keys(kbd.tab()) user
-#lorem(30)
+When press #kbd.keys(kbd.o.tab()) user #lorem(30)
 // #kbd.keys(kbd.meta-[x], kbd.cmd("package-refresh-contents"), kbd.enter())
 == Convention
 why are commands named the way they are? this is the same problem in sh. the truth is that there will never be a scheme that everyone can agree on. most names are historical and highly contextual. unix is loved because people like its architecture and they try to adopt the names, not that the names are actually good. indeed, there's so much you can do to appeal to a demographic of people. communication is two-way between the user and the developer.
