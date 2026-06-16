@@ -147,10 +147,11 @@
   grid-column: 1/-1;
   display: grid;
   grid-template-columns: subgrid;
+  align-items: center;
   gap: var(--space-c);
 }
 #root > main.log > .log > ol> .card > header > .show-hide {
-  grid: 1/1/span 1/span 1;
+  grid-area: 1/1/span 1/span 1;
   height:100%;
   aspect-ratio: 1;
   border-radius: var(--radius);
@@ -167,16 +168,19 @@
   transform: rotate(90deg);
 }
 #root > main.log > .log > ol> .card > header > .spacer {
-  grid: 1/2/span 1/span 1;
-  height: 100%;
-  width: 1px;
-  background-color: var(--ctp-subtext0);
+  grid-area: 1/3/span 1/span 1;
+  height: 80%;
+  width: 2px;
+  background-color: var(--card-fg-accent-3);
 }
 #root > main.log > .log > ol> .card > header > .cid {
-  grid: 1/3/span 1/span 1;
+  grid-area: 1/2/span 1/span 1;
+  color: var(--primary);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
 }
 #root > main.log > .log > ol> .card > header > .message {
-  grid: 1/4/span 1/span 1;
+  grid-area: 1/4/span 1/span 1;
   flex-grow: 1;
   text-wrap: wrap;
 }
@@ -184,12 +188,13 @@
   content: "@";
 }
 #root > main.log > .log > ol> .card > header > .author {
-  grid: 1/5/span 1/span 1;
+  grid-area: 1/5/span 1/span 1;
   color: var(--primary);
 }
 #root > main.log > .log > ol> .card > header > .timestamp {
-  grid: 1/6/span 1/span 1;
+  grid-area: 1/6/span 1/span 1;
   color: var(--ctp-subtext0);
+  font-size: var(--text-xs);
 }
 #root > main.log > .log > ol> .card > main {
   grid-column: 1/-1;

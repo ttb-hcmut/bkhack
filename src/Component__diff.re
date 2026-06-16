@@ -160,9 +160,11 @@ module App__display = {
       | 2 => (['\n',' ','.',':',',','!','?',';','"','(',')','[',']','{','}'],false)
       | _ => (['\n'],false)
      },[|option|])
-    let diffList = React.useMemo1(() => Diff.compare(input1,input2,split,nukeDelim),[|split|])
+    let (status,setStatus) = React.useState(() => "")
+    let diffList = React.useMemo1(() => Diff.compare(input1,input2,split,nukeDelim,~setStatus = a => setStatus(_=>a),()),[|split|])
     ;
     <main>
+      <div> {React.string(status)} </div>
       <div className="side-by-side">
       <Code__box text=diffList mode="-" />
       <Code__box text=diffList mode="+" />

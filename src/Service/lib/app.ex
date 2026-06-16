@@ -636,18 +636,18 @@ defmodule App
     {:ok, pid}
   end
 
-  def start do
-    if File.exists? "lock" do
-      {:error, :already_running, msg: "server is already running"}
-    else
-      {:ok, pid} = App.Supervisor.start_link(:ok)
-      {:ok, lock} = File.open("lock", [:write])
-      :ok = IO.write(lock, :erlang.pid_to_list(pid))
-      :ok = File.close(lock)
-      {:ok, _} = Plug.Cowboy.http(__MODULE__, [ip: {0, 0, 0, 0}], port: 5000)
-      {:ok, msg: "running server"}
-    end
-  end
+  # def start do
+  #   if File.exists? "lock" do
+  #     {:error, :already_running, msg: "server is already running"}
+  #   else
+  #     {:ok, pid} = App.Supervisor.start_link(:ok)
+  #     {:ok, lock} = File.open("lock", [:write])
+  #     :ok = IO.write(lock, :erlang.pid_to_list(pid))
+  #     :ok = File.close(lock)
+  #     {:ok, _} = Plug.Cowboy.http(__MODULE__, [ip: {0, 0, 0, 0}], port: 5000)
+  #     {:ok, msg: "running server"}
+  #   end
+  # end
 
   def stop() do
     {:ok, _pid} = File.read("lock")
