@@ -133,7 +133,7 @@
   content: "Merge order";
 }
 
-dialog {
+.pagination > .dropdown > dialog{
 	margin: 0;
 	position: relative;
 	height: 0;
