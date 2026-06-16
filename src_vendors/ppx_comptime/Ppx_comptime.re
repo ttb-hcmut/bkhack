@@ -65,7 +65,7 @@ Extension.declare("comptime", Extension.Context.structure_item, Ast_pattern.(pst
 			let args =
 				List.fold_left((acc, f) => acc |> Option.value'(~default=f), None, strats);
 			let args =
-				args |> Option.map(List.map(x => ["-require", x]) %> List.flatten %> (args => ["utop", ...args]) %> String.concat(" "));
+				args |> Option.map(List.map(x => ["-require", x]) %> List.flatten %> (args => ["dune", "exec", "utop", "--", ...args]) %> String.concat(" "));
 			let pvb_expr = [%expr { let __name__ = [%e Ast.Exp.constant @@ Ast.Const.string @@ String.concat("__") @@ [sanitize(path), name]]; [%e pvb_expr] }];
 			let pvb_expr' =
 				try ({

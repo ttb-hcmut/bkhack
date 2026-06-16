@@ -14,6 +14,10 @@
   (run cp -r Service distserve)
  )))
 
+(alias
+ (name react)
+ (deps (package bkhack-compiler)))
+
 (rule
  (target node_modules__lucide-static)
  (action (bash "cp -L -r $(pnpm root)/lucide-static node_modules__lucide-static")))
