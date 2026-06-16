@@ -1,5 +1,5 @@
 [@bs.val] external backend : string = "bkhackenv.backend_address"
 
 module Firebase {
-	[@bs.val] external key : string = "bkhackenv.firebase_key"
+	let key = "AIzaSyAGZ7O5DJBt3_lcEsrJBQn_HF3e4D59X1A"
 }

@@ -114,18 +114,10 @@ const backend_address = (() => {
 	return process.env.BKHACK_BACKEND_ADDRESS;
 })()
 
-const firebase_key = (() => {
-	if (process.env.BKHACK_FIREBASE_KEY === undefined || typeof process.env.BKHACK_FIREBASE_KEY !== "string") {
-		throw new Error("did not specify BKHACK_FIREBASE_KEY")
-	}
-	return process.env.BKHACK_FIREBASE_KEY;
-})()
-
 module.exports = {
 	plugins: [
 		new webpack.DefinePlugin({
 			"bkhackenv.backend_address": `\"${backend_address}\"`,
-			"bkhackenv.firebase_key": `\"${firebase_key}\"`,
 		})
 	],
   entry: {
