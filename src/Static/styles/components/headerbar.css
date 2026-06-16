@@ -76,11 +76,6 @@
 }
 
 #root > header > .header-left > form {
-	display: flex;
-	flex-direction: column;
-	justify-content: start;
-	align-items: center;
-	flex: 1 1 auto;
 }
 
 #root > header > .header-right > .separator {
@@ -375,7 +370,6 @@
 
 form:has(> #siteNavigator) {
 	position: relative;
-	flex: 1 1 auto;
 }
 
 form:has(> #siteNavigator) > * {
