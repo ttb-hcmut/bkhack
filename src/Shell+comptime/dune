@@ -1,7 +1,8 @@
+(copy_files (files ../{Shellgen,Shell__sym}.re))
+
 (library
  (libraries containers)
  (wrapped false)
  (modes byte)
  (name shell__comptime)
- (public_name bkhack-compiler.shell)
- (modules shellgen shell__sym))
+ (public_name bkhack-compiler.shell))

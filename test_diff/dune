@@ -6,3 +6,5 @@
  (libraries diff eio eio_main cmdliner containers csv)
  (modules app)
  (name app))
+
+(copy_files (files %{workspace_root}/src/Diff.re))
