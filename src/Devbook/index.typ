@@ -11,10 +11,7 @@
   #text()[```sh cat bkhack-book```]
   #v(-12pt)
   = #o.bkhack developer handbook
-
   #v(140pt)
-
-
   #pad(left: -100pt)[
     #rotate(30deg)[
       #square(width: 600pt, height: 600pt)
