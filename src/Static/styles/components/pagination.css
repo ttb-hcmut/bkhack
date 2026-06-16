@@ -50,14 +50,14 @@
   padding: var(--space-c);
   white-space: nowrap;
 }
-.pagination > .dropdown::after{
+.pagination > .dropdown div::after{
   color: var(--ctp-subtext0);
 }
-.pagination > .dropdown.none::after{
+.pagination .dropdown div.none::after{
   content: " ";
 }
 
-.pagination > .x-limit::before{
+.pagination .dropdown .x-limit::before{
   content:"Limit";
 }
 .pagination .get-10::after{
@@ -69,67 +69,67 @@
 .pagination .get-30::after{
   content:"30";
 }
-.pagination > .sortby::before{
+.pagination .dropdown .sortby::before{
   content:"Sorted";
 }
-.pagination > .searchby::before{
+.pagination .dropdown .searchby::before{
   content:"Search";
 }
-.pagination > .orderby::before{
+.pagination .dropdown .orderby::before{
   content:"Ordered";
 }
-.pagination > .filterby::before{
+.pagination .dropdown .filterby::before{
   content:"Filtered";
 }
-.pagination .none::after{
+.pagination .dropdown .none::after{
   content: "Unset";
 }
-.pagination .age::after{
+.pagination .dropdown .age::after{
   content: "Age";
 }
-.pagination .popularity::after{
+.pagination .dropdown .popularity::after{
   content: "Popularity";
 }
-.pagination .repcount::after{
+.pagination .dropdown .repcount::after{
   content: "Repcount";
 }
-.pagination .username::after{
+.pagination .dropdown .username::after{
   content: "Username";
 }
-.pagination .comment::after{
+.pagination .dropdown .comment::after{
   content: "Comment";
 }
-.pagination .title::after{
+.pagination .dropdown .title::after{
   content: "Title";
 }
-.pagination .body::after{
+.pagination .dropdown .body::after{
   content: "Body";
 }
-.pagination .author::after{
+.pagination .dropdown .author::after{
   content: "Author";
 }
-.pagination .version::after {
+.pagination .dropdown .version::after {
   content: "Version";
 }
-.pagination .ascending::after {
+.pagination .dropdown .ascending::after {
   content: "Ascending";
 }
-.pagination .descending::after {
+.pagination .dropdown .descending::after {
   content: "Descending";
 }
-.pagination .fresh::after {
+.pagination .dropdown .fresh::after {
   content: "Only newest version";
 }
-.pagination .prof::after {
+.pagination .dropdown .prof::after {
   content: "Only prof";
 }
-.pagination .student::after {
+.pagination .dropdown .student::after {
   content: "Only student";
 }
-.pagination .message::after {
+.pagination .dropdown .message::after {
   content: "Commit message";
 }
-.pagination .merge::after {
+.pagination .dropdown .merge::after {
   content: "Merge order";
 }
 

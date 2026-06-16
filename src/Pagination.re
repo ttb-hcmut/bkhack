@@ -7,9 +7,11 @@ module Dropdown = {
       None
     })
     ;
-    <button className={"dropdown "++name++" "++Option.value(List.assoc_opt(name, value),~default="")}
+    <button className={"dropdown "}
     onClick={_=>setIsOpen((!))}>
-      {React.string("|")}
+      <div className={name++" "++Option.value(List.assoc_opt(name, value),~default="")}>
+        {React.string("|")}
+      </div>
       <dialog open_=isOpen>
         <ol>
           {
