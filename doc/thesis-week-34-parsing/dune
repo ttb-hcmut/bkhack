@@ -1,5 +1,5 @@
 (executable
  (libraries eio eio_main markup iter re)
- (package bkhack)
+ (package bkhack-doc)
  (public_name bkhack-doc.week34)
  (name compile))
