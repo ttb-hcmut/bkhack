@@ -9,13 +9,13 @@ let attrib_name = Re.(
   alt([str("page"), str("Bkhack.page")]));
 
 /** a [morphism] for JavaScript bundles */
-let morphism_jspages = (~sw,~procm,~clock,~cwd, ~optimization, ~watch=?, src_dir, ~log_dir=?, dist_dir) =>  {
+let morphism_jspages = (~sw,~procm,~clock,~cwd, ~optimization, ~watch=?, ~target_dir, src_dir, ~log_dir=?, dist_dir) =>  {
 	let jspages = () =>
 		List.filter_map(B.is_page'(src_dir))
 		@@ Path.read_dir(src_dir);
 	let output_dirs = jspages => jspages |> Fiber.List.map(x' => {
 		let (`fpath(refile'), `fname(refile), _) = x';
-		let jsfile  = B.Output.src' @@ Filename.chop_extension(refile);
+		let jsfile  = B.Output.src'(~target=target_dir) @@ Filename.chop_extension(refile);
 		let jsfile' = P.(cwd / jsfile);
 		let out_dir =
 			try (B.file_grep_attrib(attrib_name, refile'))
@@ -34,26 +34,29 @@ let morphism_lucide = (~sw,~procm, lucide_dir, dist_dir) => {
 
 /** a [morphism] for linking static-content files from public dir
     (and other sources) to dist dir */
-let morphism_static = (~sw,~procm, public_dir, dist_dir, ()) => {
-  let rec iter = (f, ~ondir, rootdir: list(string)) => {
-    let items = Path.read_dir(P.(public_dir / String.concat("/", rootdir)));
-    ondir @@ String.concat("/", rootdir);
-    items |> Fiber.List.iter @@ it => {
-			let it' = rootdir @ [it];
-			(Path.is_directory(P.(public_dir / String.concat("/", it'))))
-			? iter(f, ~ondir, it') : f(it')
-		}
+let morphism_static = (~sw,~procm,~cwd, items, dist_dir, ()) => {
+  let iter = (f, ~ondir, rootdir: list(string)) => {
+    ondir(String.concat("/", rootdir));
+    Fiber.List.iter(it => {
+			let parts = String.split_on_char('/', it);
+			let hd = List.hd(parts) and it = List.tl(parts);
+			let it' = rootdir @ it;
+			let mkdir_target = Filename.dirname(String.concat("/", it'));
+			// traceln("mkdir_target:%s", mkdir_target);
+			Path.mkdirs(~exists_ok=true, ~perm=0o700, P.(dist_dir / mkdir_target));
+			f(hd, it')
+		}, items)
 	};
   let iter_ondir = dirpath_at_public => {
     let dirpath_at_dist = P.(dist_dir / dirpath_at_public);
     Path.mkdirs(~exists_ok=true, ~perm=0o700, dirpath_at_dist)
 	};
-  [] |> iter(~ondir=iter_ondir) @@ fpath_at_public => {
+  iter(~ondir=iter_ondir, (hd, fpath_at_public) => {
 		let path_it = String.concat("/", fpath_at_public);
 		B.Path.physlink(~sw, procm,
 			P.(dist_dir / path_it),
-			~link_to=P.(public_dir / path_it))
-	}
+			~link_to=P.(cwd / hd / path_it))
+	}, [])
 }
 
 let morphism_generative = (~sw,~procm, generative_dir, dist_dir) => {
@@ -83,14 +86,14 @@ let morphism_generative = (~sw,~procm, generative_dir, dist_dir) => {
     @raise Missing_mapping_entry_for(pagefile) when a Reason page
     file did not specify a required `[@Bkhack.page s]` attribute.
     Refer to the guide for more details. */
-let main__ = (~watch, ~dist_dir, ~src_dir, ~public_dir, ~generative_dir, ~log_dir, ~lucide_dir, ~verbose, ~optimization, ()) => Eio_main.run @@ env => {
+let main__ = (~watch, ~dist_dir, ~src_dir, ~static_items, ~generative_dir, ~log_dir, ~lucide_dir, ~verbose, ~optimization, ~target_dir, ()) => Eio_main.run @@ env => {
   let (procm, clock, cwd, fs) =
     (Stdenv.process_mgr(env), Stdenv.clock(env), Stdenv.cwd(env), Stdenv.fs(env));
-  let (public_dir, generative_dir, dist_dir, log_dir, src_dir, lucide_dir) =
-    (public_dir(cwd), generative_dir(fs), dist_dir(cwd), (!verbose ? Some (log_dir(cwd)) : None), src_dir(cwd), lucide_dir(fs));
+  let (generative_dir, dist_dir, log_dir, src_dir, lucide_dir, target_dir) =
+    (generative_dir(fs), dist_dir(cwd), (!verbose ? Some (log_dir(cwd)) : None), src_dir(cwd), lucide_dir(fs), target_dir(cwd));
   Switch.run @@ sw => {
-		morphism_jspages(~sw,~procm,~clock,~cwd, ~optimization, ~watch, src_dir, ~log_dir?, dist_dir);
-		morphism_static(~sw,~procm, public_dir, dist_dir, ());
+		morphism_jspages(~sw,~procm,~clock,~cwd, ~optimization, ~watch, ~target_dir, src_dir, ~log_dir?, dist_dir);
+		morphism_static(~sw,~procm,~cwd, static_items, dist_dir, ());
 		morphism_generative(~sw,~procm, generative_dir, dist_dir);
 		morphism_lucide(~sw,~procm, lucide_dir, dist_dir)
 	}
@@ -98,6 +101,12 @@ let main__ = (~watch, ~dist_dir, ~src_dir, ~public_dir, ~generative_dir, ~log_di
 
 open Cmdliner
 open Term.Syntax
+
+type args = {
+	args_static: list(string),
+	args_gen: list(string),
+	args_other: list(string)
+}
 
 let main__ = () => Cmd.v(Cmd.info("webpackgen", ~doc="")) @@ {
   let log_dir = cwd => P.(cwd / "log");
@@ -107,8 +116,8 @@ let main__ = () => Cmd.v(Cmd.info("webpackgen", ~doc="")) @@ {
   and+ src_dir = Arg.(required & opt((some(string)), None) &
     info(["src_dir"], ~doc=" Source directory. "))
     |> Term.map(Path.((it, cwd) => cwd / it))
-  and+ public_dir = Arg.(required & opt((some(string)), None) &
-    info(["public_dir"], ~doc=" Static asset directory. "))
+  and+ target_dir = Arg.(required & opt((some(string)), None) &
+    info(["target"], ~doc=" Target directory. "))
     |> Term.map(Path.((it, cwd) => cwd / it))
   and+ generative_dir = Arg.(required & opt((some(string)), None) &
     info(["generative_dir"], ~doc=" Generative asset directory. "))
@@ -119,8 +128,19 @@ let main__ = () => Cmd.v(Cmd.info("webpackgen", ~doc="")) @@ {
   and+ verbose = Arg.(required & opt((some(bool)), None) &
     info(["verbose"], ~docv="VERBOSE"))
   and+ optimization = Arg.(required & opt((some @@ enum @@ [("dev", `Development), ("release", `Production)]), None) &
-    info(["optimization", "O"], ~docv="OPTIMIZATION"));
-  main__(~watch=false, ~dist_dir, ~src_dir, ~public_dir, ~generative_dir, ~log_dir, ~lucide_dir, ~verbose, ~optimization, ())
+    info(["optimization", "O"], ~docv="OPTIMIZATION"))
+	and+ lol = Arg.(value & pos_all(string, []) & info([], ~docv="haha")) |> Term.map(xs => {
+		xs |> List.fold_left(((mode, acc), it) => {
+			switch (it, mode) {
+			| (":static", _) => (`static, acc)
+			| (":gen", _) => (`gen, acc)
+			| (it, `static as mode) => (mode, { ...acc, args_static: [it, ...acc.args_static] })
+			| (it, `gen as mode) => (mode, { ...acc, args_gen: [it, ...acc.args_gen] })
+			| (it, `other as mode) => (mode, { ...acc, args_other: [it, ...acc.args_other] })
+			}
+		}, (`other, { args_static: [], args_gen: [], args_other: [] })) |> (((_, b)) => b)
+	});
+  main__(~watch=false, ~dist_dir, ~src_dir, ~static_items=lol.args_static, ~generative_dir, ~log_dir, ~lucide_dir, ~verbose, ~optimization, ~target_dir, ())
 };
 
 /** autorun except in toplevel / interactive mode */

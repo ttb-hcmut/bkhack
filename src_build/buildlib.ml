@@ -7,8 +7,8 @@ module Output = struct
   let src x =
     "./_build/default/src/output/node_modules/bkhack/" ^ x ^ ".js"
 
-  let src' x =
-    "./output/node_modules/bkhack/" ^ x ^ ".js"
+  let src' ~target x =
+    Eio.Path.native_exn target ^ "/node_modules/bkhack/" ^ x ^ ".js"
 end
 
 let fix_base_path =
@@ -101,8 +101,19 @@ let compile_jsfile~procm~clock ?(watch = false) out_dir log_dir entry =
     ; "--output-path"; Path.native_exn out_dir
     ; "--output-filename"; "index.js"]
 
-let webpack_template v =
+let webpack_template ~optimization v =
   let s = v |> List.map(fun (k, v) -> "\""^k^"\":\""^v^"\"") |> String.concat(",\n") in
+  let splitChunks = function
+    | `Production -> {|
+  output: {
+    filename: '[name].js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  optimization: {
+    splitChunks: { chunks: 'all' }
+  },
+|}
+    | `Development -> "" in
   Printf.sprintf {|
 const webpack = require("webpack")
 const path = require("path")
@@ -123,8 +134,9 @@ module.exports = {
   entry: {
     %s
   },
+  %s
 }
-|} s
+|} s (splitChunks optimization)
 
 let compile_jsfile'~procm~clock~cwd ?(watch = false) ~optimization out_dir ?log_dir entries =
   let opt_to_str = function `Production -> "production" | `Development -> "development" in
@@ -142,7 +154,7 @@ let compile_jsfile'~procm~clock~cwd ?(watch = false) ~optimization out_dir ?log_
   mkdirs out_dir;
   mkdirs Path.(cwd / "_build_webpack");
   wrapdir ?log_dir clock @@ fun run ->
-  Path.save ~create:(`Or_truncate 0o700) Path.(cwd / "_build_webpack" / "config.js") @@ webpack_template @@ List.map (fun (x, y) -> (x, Sys.getcwd() ^ "/" ^ Path.native_exn y)) entries;
+  Path.save ~create:(`Or_truncate 0o700) Path.(cwd / "_build_webpack" / "config.js") @@ webpack_template ~optimization @@ List.map (fun (x, y) -> (x, Sys.getcwd() ^ "/" ^ Path.native_exn y)) entries;
   run procm @@
     [ "webpack" ] @
     (if watch then ["watch"] else []) @

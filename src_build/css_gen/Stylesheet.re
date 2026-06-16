@@ -18,10 +18,18 @@ let _sorry = k => {
 	try (k()) { | _ => () }
 }
 
+let is_in_build = {
+	let pat = Re.compile @@ Re.(seq([any |> rep, str("_build"), any |> rep]));
+	Re.execp @@ pat
+}
+
 let format1 = (~className, str, arg1) => {
 	let str = Kernel.undo_relative_indentation(~min_padding=Kernel.min_padding(str), str);
 	let str = str |> selector_replace("."++className);
 	let content = str |> args_replace("\""++arg1++"\"");
-	Containers.IO.File.write_exn(Sys.getenv("TEST")++"/generative/"++className++".css", content);
+	if (!(is_in_build @@ Sys.getcwd())) () else {
+		try ( Sys.mkdir("/tmp/generative", 0o700) ) { | _ => () }
+		Containers.IO.File.write_exn("/tmp/generative/"++className++".css", content);
+	};
 	className
 }
