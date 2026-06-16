@@ -62,72 +62,7 @@ let rec stringDisassembler = (input:string,split:list(char),index:int,hold:strin
   | (_,e,l) => stringDisassembler(input,l,index-1,String.make(1, e) ++ hold,list,nukeDelim)
 };
 
-// let evaluateMatrixCell = 
-//   ( x: int, y: int
-//   , isSpecial: bool
-//   , matrix:ref(array(array(int)))
-//   ) => 
-//   if (isSpecial) { //you are my special
-//     Matrix.set(x, y
-//     , Matrix.at(x-1,y-1,matrix) + 1
-//     , matrix)
-//   } else {
-//     Matrix.set(x, y
-//     , Number.max(module Int)(Matrix.at(x-1,y,matrix),Matrix.at(x,y-1,matrix))
-//     //  a > b ? a : b
-//     , matrix)
-//   };
-
-let rec retraceLCS = 
-  ( x':int, y':int
-  , array1:array(string)
-  , array2:array(string)
-  , lcs:list(string)
-  , matrix:matrix(int)
-  ) =>
-  switch (x',y') {
-  | (x , y) when x < 0 || y < 0 => lcs
-  | (x , y) when array1[x] == array2[y] => //you are my special
-    retraceLCS( x-1, y-1
-    , array1, array2
-    , [array1[x], ...lcs]
-    , matrix)
-  | (x , y ) when Matrix.at(x-1,y,matrix) > Matrix.at(x,y-1,matrix) =>
-    retraceLCS( x-1, y
-    , array1, array2
-    , lcs
-    , matrix)
-  | (x, y) =>
-    retraceLCS( x, y-1
-    , array1, array2
-    , lcs
-    , matrix)
-  };
-let rec diff = ( input1: list(string), input2: list(string), lcs:list(string)) =>
-  switch (input1,input2,lcs) {
-  | ([],[],[]) => []
-  | ([f1,...r1],_,[]) => [("-",f1),...diff(r1,input2,[])]
-  | (_,[f2,...r2],[]) => [("+",f2),...diff(input1,r2,[])]
-  | ([f1,...r1],_,[flcs,..._rlcs]) when f1 != flcs => [("-",f1),...diff(r1,input2,lcs)]
-  | (_,[f2,...r2],[flcs,..._rlcs]) when f2 != flcs => [("+",f2),...diff(input1,r2,lcs)]
-  | ([_f1,...r1],[_f2,...r2],[flcs,...rlcs]) => [("=",flcs),...diff(r1,r2,rlcs)]
-  | (_,_,_) => []
-  };
-let compare = (input1:string, input2:string, split:list(char), nukeDelim:bool) => {
-  let array1:array(string) = String.length(input1)>0 ? stringDisassembler(input1,split,String.length(input1)-1,"",[],nukeDelim) |> Array.of_list : [||];
-  let array2:array(string) = String.length(input2)>0 ? stringDisassembler(input2,split,String.length(input2)-1,"",[],nukeDelim) |> Array.of_list : [||];
-
-  // Js.log(array1)
-  // Js.log(array2)
-
-  // let scoreMatrix:ref(array(array(int))) = ref( 0 |> Array.make(Array.length(array2)) |> Array.make(Array.length(array1)));
-  // scoreMatrix^ |> Js.log
-  // array1 |> Array.iteri((i,_row)=>
-  //   array2 |> Array.mapi((j,_column) =>
-  //     scoreMatrix^[i][j] 
-  //   ) |> Js.log2(i)
-  // )
-
+let evaluateMatrix = (array1:array(string),array2:array(string)) => {
   let (_,_,evalMatrix) = array1 |> Array.fold_left(((x:int,prevRow:array(int),matOfRows:list(array(int))),row:string)=>{
     let (_,_,evalRow)  = array2 |> Array.fold_left(((y:int,prevCol:int       ,rowOfCols:list(int)       ),col:string)=>{
       let eval = (row == col,y) |> fun 
@@ -143,23 +78,137 @@ let compare = (input1:string, input2:string, split:list(char), nukeDelim:bool) =
     let evalRow = evalRow |> List.rev |> Array.of_list 
     ;
     (x+1,evalRow,[evalRow,...matOfRows])
-  },(0,Array.make(Array.length(array2),0),[]))
+  },(0,Array.make(Array.length(array2),0),[]));
+  evalMatrix |> List.rev |> Array.of_list
+}
 
-  // array1 |> Array.iteri((i,row)=>
-  //   array2 |> Array.iteri((j,column) =>
-  //     evaluateMatrixCell(i,j,row==column,scoreMatrix)
-  //   )
-  // ) 
-  // array1 |> Array.iteri((i,_row)=>
-  //   array2 |> Array.mapi((j,_column) =>
-  //     scoreMatrix^[i][j] 
-  //   ) |> Js.log2(i)
-  // )
-  let lcs = retraceLCS( Array.length(array1)-1, Array.length(array2)-1
-    , array1, array2
-    , [], evalMatrix |> List.rev |> Array.of_list );
+// let evaluateMatrixCell = 
+//   ( x: int, y: int
+//   , isSpecial: bool
+//   , matrix:ref(array(array(int)))
+//   ) => 
+//   if (isSpecial) { //you are my special
+//     Matrix.set(x, y
+//     , Matrix.at(x-1,y-1,matrix) + 1
+    // , matrix)
+//   } else {
+//     Matrix.set(x, y
+//     , Number.max(module Int)(Matrix.at(x-1,y,matrix),Matrix.at(x,y-1,matrix))
+//     //  a > b ? a : b
+//     , matrix)
+//   };
+
+let retraceLCS = 
+  ( 
+    // x':int, y':int
+    array1:array(string)
+  , array2:array(string)
+  // , lcs:list(string)
+  , matrix:matrix(int)
+  ) =>
+  {
+    let x = ref(Array.length(array1)-1)
+    and y = ref(Array.length(array2)-1)
+    and lcs = ref([]);
+
+    while(x^ >= 0 && y^ >= 0){
+      (x^,y^) |> fun
+      | (x', y') when array1[x'] == array2[y'] =>
+      { x := x'-1 
+        y := y'-1 
+        lcs := [array1[x'],...(lcs^)]}
+      | (x', y') when Matrix.at(x'-1,y',matrix) > Matrix.at(x',y'-1,matrix) =>
+      { x := x'-1}
+      | (_ , y')=>
+      { y := y'-1}
+    }
+    ;
+    lcs^
+  // switch (x',y') {
+  // | (x , y) when x < 0 || y < 0 => lcs
+  // | (x , y) when array1[x] == array2[y] => //you are my special
+  //   retraceLCS( x-1, y-1
+  //   , array1, array2
+  //   , [array1[x], ...lcs]
+  //   , matrix)
+  // | (x , y ) when Matrix.at(x-1,y,matrix) > Matrix.at(x,y-1,matrix) =>
+  //   retraceLCS( x-1, y
+  //   , array1, array2
+  //   , lcs
+  //   , matrix)
+  // | (x, y) =>
+  //   retraceLCS( x, y-1
+  //   , array1, array2
+  //   , lcs
+  //   , matrix)
+  };
+
+let diff = ( input1: array(string), input2: array(string), lcs:list(string)) =>
+{
+  let i1 = ref(input1 |> Array.to_list)
+  let i2 = ref(input2 |> Array.to_list)
+  let l  = ref(lcs)
+  let d  = ref([])
+  while(List.length(i1^) > 0 || List.length(i2^) > 0 || List.length(l^) > 0){
+    switch (i1^,i2^,l^) {
+    | ([],[],[]) => {()}
+    | ([f1,...r1],_,[]) => {
+      i1 := r1
+      // i2 := 
+      // l  :=
+      d  := [("-",f1),...(d^)]
+    } 
+    | (_,[f2,...r2],[]) =>
+    {
+      // i1 := r1
+      i2 := r2
+      // l  :=
+      d  := [("+",f2),...(d^)]
+    }
+    | ([f1,...r1],_,[flcs,..._rlcs]) when f1 != flcs =>
+    {
+      i1 := r1
+      // i2 := r2
+      // l  :=
+      d  := [("-",f1),...(d^)]
+    }
+    | (_,[f2,...r2],[flcs,..._rlcs]) when f2 != flcs =>
+    {
+      // i1 := r1
+      i2 := r2
+      // l  :=
+      d  := [("+",f2),...(d^)]
+    }
+    | ([_f1,...r1],[_f2,...r2],[flcs,...rlcs]) =>
+    {
+      i1 := r1
+      i2 := r2
+      l  := rlcs
+      d  := [("=",flcs),...(d^)]
+    }
+    | (_,_,_) => {()}
+    }
+  }
+  ;
+  d^ |> List.rev
+};
+
+let compare = (input1:string, input2:string, split:list(char), nukeDelim:bool, ~setStatus: option(string=>unit) =?, ()) => {
+  setStatus|> fun | None => () | Some(f) => f("Initializing inputs");
+  let array1:array(string) = String.length(input1)>0 ? stringDisassembler(input1,split,String.length(input1)-1,"",[],nukeDelim) |> Array.of_list : [||];
+  let array2:array(string) = String.length(input2)>0 ? stringDisassembler(input2,split,String.length(input2)-1,"",[],nukeDelim) |> Array.of_list : [||];
+
+  setStatus|> fun | None => () | Some(f) => f("Evaluating differences");
+  let evalMatrix = evaluateMatrix(array1,array2)
+
+  setStatus|> fun | None => () | Some(f) => f("Creating LCS");
+  let lcs = retraceLCS(
+    array1, array2
+    , evalMatrix);
   // Js.log(lcs|> Array.of_list)
-  diff( array1 |> Array.to_list
-      , array2 |> Array.to_list
+
+  setStatus|> fun | None => () | Some(f) => f("Creating diff list");
+  diff( array1
+      , array2
       , lcs)
 };

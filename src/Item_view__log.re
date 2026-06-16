@@ -76,6 +76,7 @@ module DiffContext = {
 module Inspectview = {
 	[@react.component]
 	let make = () => {
+    let (status,setStatus) = React.useState(() => "")
     let (option,setOption) = React.useState(()=> 0)
     let diff = DiffContext.use()
     let (split, nukeDelim) = React.useMemo1(()=>{ 
@@ -87,13 +88,14 @@ module Inspectview = {
      },[|option|])
     let diffList = React.useMemo3(() => {
     (diff.cid1,diff.cid2)|> fun
-      | (Some(_),Some(_)) => Diff.compare(diff.input1,diff.input2,split,nukeDelim)
+      | (Some(_),Some(_)) => Diff.compare(diff.input1,diff.input2,split,nukeDelim,~setStatus = a => setStatus(_=>a),())
       | _ => []
     },(split,diff.cid1,diff.cid2))
     ;
     <div className="diff-box">
       <Component__diff.App__controls option setOption />
       <main>
+        <div> {React.string(status)} </div>
         <div className="side-by-side">
           <div className="diff1">
           {
