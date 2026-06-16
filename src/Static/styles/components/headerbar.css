@@ -77,6 +77,8 @@
 
 #root > header > .header-left > form {
 	display: flex;
+	flex-direction: column;
+	justify-content: start;
 	align-items: center;
 	flex: 1 1 auto;
 }
@@ -315,7 +317,7 @@
   border: 1px solid var(--ctp-red);
 }
 
-dialog {
+:has(> #siteNavigator) > dialog {
 	margin: 0;
 	position: relative;
 	height: 0;
@@ -326,7 +328,7 @@ dialog {
 	overflow: visible;
 }
 
-dialog > div {
+:has(> #siteNavigator) > dialog > div {
 	width: 20rem;
 	height: fit-content;
 	max-height: 10rem;
