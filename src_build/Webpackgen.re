@@ -9,7 +9,7 @@ let attrib_name = Re.(
   alt([str("page"), str("Bkhack.page")]));
 
 /** a [morphism] for JavaScript bundles */
-let morphism_jspages = (~sw,~procm,~clock,~cwd, ~optimization, ~watch=?, ~target_dir, src_dir, ~log_dir=?, dist_dir) =>  {
+let morphism_jspages = (~sw,~procm,~clock,~cwd, ~optimization, ~watch=?, ~target_dir, ~srcs, src_dir, ~log_dir=?, dist_dir) =>  {
 	let jspages = () =>
 		List.filter_map(B.is_page'(src_dir))
 		@@ Path.read_dir(src_dir);
@@ -22,8 +22,13 @@ let morphism_jspages = (~sw,~procm,~clock,~cwd, ~optimization, ~watch=?, ~target
 			{ | Not_found => raise @@ Missing_mapping_entry_for(refile) };
 		(out_dir++"/index", jsfile')
 	});
+	let output_dirs' = srcs => srcs |> List.map(s => {
+		let name = Filename.basename(s)
+		and jsfile = P.(cwd / s);
+		("/"++name, jsfile)
+	});
 	Fiber.fork(~sw) @@ () =>
-	output_dirs(jspages()) |> B.compile_jsfile'(~procm,~clock,~cwd, ~watch?, ~optimization, dist_dir, ~log_dir?)
+	(output_dirs(jspages()) @ output_dirs'(srcs)) |> B.compile_jsfile'(~procm,~clock,~cwd, ~watch?, ~optimization, dist_dir, ~log_dir?)
 };
 
 /** a [morphism] for lucide icons */
@@ -86,13 +91,13 @@ let morphism_generative = (~sw,~procm, generative_dir, dist_dir) => {
     @raise Missing_mapping_entry_for(pagefile) when a Reason page
     file did not specify a required `[@Bkhack.page s]` attribute.
     Refer to the guide for more details. */
-let main__ = (~watch, ~dist_dir, ~src_dir, ~static_items, ~generative_dir, ~log_dir, ~lucide_dir, ~verbose, ~optimization, ~target_dir, ()) => Eio_main.run @@ env => {
+let main__ = (~watch, ~dist_dir, ~src_dir, ~static_items, ~generative_dir, ~log_dir, ~lucide_dir, ~verbose, ~optimization, ~target_dir, ~srcs, ()) => Eio_main.run @@ env => {
   let (procm, clock, cwd, fs) =
     (Stdenv.process_mgr(env), Stdenv.clock(env), Stdenv.cwd(env), Stdenv.fs(env));
   let (generative_dir, dist_dir, log_dir, src_dir, lucide_dir, target_dir) =
     (generative_dir(fs), dist_dir(cwd), (!verbose ? Some (log_dir(cwd)) : None), src_dir(cwd), lucide_dir(fs), target_dir(cwd));
   Switch.run @@ sw => {
-		morphism_jspages(~sw,~procm,~clock,~cwd, ~optimization, ~watch, ~target_dir, src_dir, ~log_dir?, dist_dir);
+		morphism_jspages(~sw,~procm,~clock,~cwd, ~optimization, ~watch, ~target_dir, ~srcs, src_dir, ~log_dir?, dist_dir);
 		morphism_static(~sw,~procm,~cwd, static_items, dist_dir, ());
 		morphism_generative(~sw,~procm, generative_dir, dist_dir);
 		morphism_lucide(~sw,~procm, lucide_dir, dist_dir)
@@ -105,6 +110,7 @@ open Term.Syntax
 type args = {
 	args_static: list(string),
 	args_gen: list(string),
+	args_srcs: list(string),
 	args_other: list(string)
 }
 
@@ -134,13 +140,16 @@ let main__ = () => Cmd.v(Cmd.info("webpackgen", ~doc="")) @@ {
 			switch (it, mode) {
 			| (":static", _) => (`static, acc)
 			| (":gen", _) => (`gen, acc)
+			| (":srcs", _) => (`srcs, acc)
 			| (it, `static as mode) => (mode, { ...acc, args_static: [it, ...acc.args_static] })
 			| (it, `gen as mode) => (mode, { ...acc, args_gen: [it, ...acc.args_gen] })
+			| (it, `srcs as mode) => (mode, { ...acc, args_srcs: [it, ...acc.args_srcs] })
 			| (it, `other as mode) => (mode, { ...acc, args_other: [it, ...acc.args_other] })
 			}
-		}, (`other, { args_static: [], args_gen: [], args_other: [] })) |> (((_, b)) => b)
+		}, (`other, { args_static: [], args_gen: [], args_srcs: [], args_other: [] })) |> (((_, b)) => b)
 	});
-  main__(~watch=false, ~dist_dir, ~src_dir, ~static_items=lol.args_static, ~generative_dir, ~log_dir, ~lucide_dir, ~verbose, ~optimization, ~target_dir, ())
+	let srcs = []; // lol.args_srcs;
+  main__(~watch=false, ~dist_dir, ~src_dir, ~static_items=lol.args_static, ~generative_dir, ~log_dir, ~lucide_dir, ~verbose, ~optimization, ~target_dir, ~srcs, ())
 };
 
 /** autorun except in toplevel / interactive mode */

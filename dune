@@ -21,3 +21,8 @@
  (subdir bigstringaf+melange
   (subdir bigstringaf
    (dirs ))))
+
+(rule
+ (target services)
+ (action (bash "cat  `ls /tmp/ppxfiber.services | sed -e 's|^|/tmp/ppxfiber.services/|'` > /tmp/sss && cp /tmp/sss %{target}")))
+

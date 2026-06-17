@@ -3,14 +3,13 @@
  (targets dist distserve)
  (deps (:bundle %{project_root}/src_build/webpackgen.exe)
        (:src (alias react))
-       (:gen generative)
        (:static (source_tree Static))
        (:serve (alias Service/default))
        (:static-lucide node_modules__lucide-static))
  (action (concurrent
   (run %{bundle}
    --verbose=false --optimization=%{profile} --output=dist --src_dir=./ --target=output
-    :static %{static} --generative_dir=generative/ 
+    :static %{static} --generative_dir=%{dep:generative}
    --lucide_dir=node_modules__lucide-static/)
   (run cp -r Service distserve)
  )))
@@ -21,6 +20,8 @@
 
 (data_only_dirs Static)
 
+(dynamic_include ../services)
+
 (rule
  (target generative)
  (deps (alias react))
@@ -28,7 +29,6 @@
   (run mkdir -p generative)
   (run cp -r /tmp/generative .)
  )))
-
 
 ; `melange.emit` is a Dune stanza that will produce build rules to generate
 ; JavaScript files from sources using the Melange compiler
@@ -52,7 +52,7 @@
  ; Caveat: the libraries need to be specified with `(modes melange)`.
  (libraries bkhack)
 
- (modules)
+ (modules )
 
  ; Uncomment the following to copy the generated JavaScript files inside the source tree
  ; (promote (until-clean))
@@ -66,16 +66,25 @@
  (name react)
  (deps (package bkhack-compiler)))
 
+(library
+ (kind ppx_rewriter)
+ (name ppxfiber)
+ (modules Fiber__ppx)
+ (libraries ppxlib ppx_comptime__topcore__unparse containers)
+ (preprocess (pps ppxlib.metaquot)))
+
 ; `bkhack` is an abstract, implicitly heterogeneous full-stack application,
 ; where it is usable first as a web front-end and whose back-end is pluggable. 
 (library
- (modes melange)
+ ; Name of library, and is name of package
+ (name bkhack) (public_name bkhack)
  ; Dependencies of the stanza.
  (libraries reason-react melange-json melange__containers quel bkhack__experimental
             cprg melange__cmarkit melange__iter melange__re melange.belt)
+ (modules :standard \ Fiber__ppx)
+ (flags -w -32)
  (preprocess
   ; The `pps` field is a list of ppx to apply to the sources before generating JavaScript. melange.ppx allows to use Melange attributes [@mel. ...] (https://melange.re/v2.0.0/communicate-with-javascript/#attributes)
   ; reason-react-ppx allows to use JSX for ReasonReact components by using the [@JSX] attributes from Reason: https://reasonml.github.io/docs/en/jsx
-  (pps melange.ppx reason-react-ppx ppx_comptime))
- ; Name of library, and is name of package
- (public_name bkhack) (name bkhack))
+  (pps melange.ppx reason-react-ppx ppx_comptime ppxfiber))
+ (modes melange))

@@ -71,12 +71,24 @@ module DiffContext = {
   let use = () => React.useContext(ctx);
 };
 
-
+let%Fiber.bind k' = ((), _) => {
+	// open Fiber.Syntax;
+	Diff.compare("a b c","a d c",[' '],true,~setStatus = _ => (),())
+}
 
 module Inspectview = {
 	[@react.component]
 	let make = () => {
     let (status,setStatus) = React.useState(() => "")
+		let k = { React.useRef(k'()) |> s => s.current };
+		let () = React.useEffect0(() => {
+			ignore(Fetch__syntax.({
+				let* u = Fiber.fork_promise((), k);
+				Js.Console.log(u);
+				return(())
+			}>!= (e => { Js.Console.error(e); return(()) })));
+			None
+		});
     let (option,setOption) = React.useState(()=> 0)
     let diff = DiffContext.use()
     let (split, nukeDelim) = React.useMemo1(()=>{ 
