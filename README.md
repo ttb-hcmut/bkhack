@@ -72,8 +72,6 @@ For demonstration, let's assume you want to run the website locally
 ({ cp -rf _build/${context}/${src}/distserve distserve && cp _build/${context}/${src}/distserve/config/shell.nix.ex distserve.nix ;} && nix-shell distserve.nix --run "cd distserve && mix deps.get && mix run --no-halt"); wait
 ```
 
-![](./bkhack-1.png)
-
 ---
 
 ## Development
