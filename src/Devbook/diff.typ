@@ -3,8 +3,8 @@
 #import "@preview/fletcher:0.5.8": *
 
 #lorem(20)
-
-Based on Myer's diff algorithm @myers-ond.
+Given a pair of two strings, . This problem can be restated as: what is the _longest unchanged part_, or _LUP_ #fn[also known in literature as _longest common substring_ (LCS)], between them?\
+  Based on Myer's diff algorithm @myers-ond.
 
 #cetz.canvas({
   import cetz.draw: *
@@ -36,6 +36,10 @@ Based on Myer's diff algorithm @myers-ond.
   node((0, 2), [changes]),
 )
 
+== Specialization
+dedicated implementation as React component.
+== Parallelization
+Utilizing `fiber`, we managed to offload the  parallelize the running
 // rated <--n:n--> comments
 
 #bibliography(title: none, "works.bib")
