@@ -1,0 +1,46 @@
+#!/usr/bin/python
+import tempfile
+import argparse
+import subprocess
+import time
+
+import contextlib
+@contextlib.contextmanager
+def tmpdir_open(root, name=None):
+  import uuid
+  import os
+  dirname = f"{root}/{"" if name is None else (name + "-")}{uuid.uuid4()}"
+  os.mkdir(dirname)
+  yield dirname
+
+if __name__ == "__main__":
+  args = argparse.ArgumentParser(prog="typst-compile")
+  args.add_argument("filename")
+  args.add_argument("-r", "--root", nargs='?')
+  args.add_argument("output")
+  args = args.parse_args()
+  # with open(args.filename, "r") as fk:
+  with tmpdir_open("/home/kinten/u/.tmp") as tmpdir:
+    newfile = tmpdir + "/input.typ"
+    command = []
+    command += ["typst", "watch"]
+    command += ["--root", args.root] if args.root is not None else []
+    command += [newfile, args.output]
+    proc = subprocess.Popen(command)
+    import os
+    import time
+    oldX = None
+    while True:
+      try:
+        newX = os.path.getmtime(args.filename)
+        if newX != oldX:
+          file_content = None
+          with open(args.filename, "r") as f:
+            file_content = f.read()
+          file_content = '#import "/article": *\n#show: doc\n' + file_content
+          with open(newfile, "w+") as fu:
+            fu.write(file_content)
+        oldX = newX
+      except:
+        pass
+      time.sleep(0.1)

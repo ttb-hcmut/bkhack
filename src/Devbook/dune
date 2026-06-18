@@ -1,0 +1,15 @@
+(rule
+ (mode promote)
+ (target (dir output))
+ (deps article (:typs (glob_files page-*.typ)) (glob_files *) (source_tree diagramming) (source_tree %{project_root}/src_vendors/opt-utopk/u/typst-compile))
+ (action (progn
+  (run mkdir output)
+  (run %{dep:app.exe} %{project_root}/src_vendors/opt-utopk/u/typst-compile/run --output=output %{typs})
+ )))
+
+(copy_files
+ (files %{project_root}/src_vendors/opt-utopk/u/article))
+
+(executable
+ (name app)
+ (libraries eio eio_main cmdliner))

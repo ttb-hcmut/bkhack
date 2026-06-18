@@ -1,0 +1,37 @@
+#let doc(body) = {
+	set par(justify: true)
+	set page(
+		paper: "a4",
+		columns: 2,
+	)
+	body
+}
+
+#let title(content) = {
+  set document(title: content.body)
+}
+
+#let fn(x) = {
+	footnote(x)
+}
+
+#let vanilla_link = link
+
+#let link(l, t) = {
+	set text(blue)
+	underline(vanilla_link(l)[#t])
+}
+
+#let desmos   = "Desmos"
+#let obsidian = "Obsidian"
+#let typst    = "Typst"
+
+#let layer9link(uri, body) = {
+	link("http://localhost:4999/" + uri, body)
+}
+
+#import "@preview/simplebnf:0.1.1": *
+#let lexeme(lex) = { text(weight: "bold")[#lex] }
+#let category(name) = { text[\<#name\>] }
+
+#let ocaml = [O'Caml]

@@ -1,4 +1,5 @@
 (lang dune 3.14)
+(using directory-targets 0.1)
 (name bkhack)
 (generate_opam_files true)
 (using melange 0.1)
