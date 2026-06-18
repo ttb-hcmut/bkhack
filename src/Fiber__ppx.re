@@ -31,12 +31,14 @@ Extension.declare("Fiber.bind", Extension.Context.structure_item, Ast_pattern.(p
 		| Pexp_fun(Nolabel, None, { ppat_desc: Ppat_construct({ txt: Lident("()"), loc }, None), _ }, pvb_expr) =>
 			let name = "Fiberlet__"++sanitize(path)++"__"++name;
 			let worker_expr = [%expr {
-				Js__worker.onMessage(Js__worker.global, e => {
-					let (owner, param) = Js__worker.Message.data(e);
-					try ({
-						let res = [%e pvb_expr](param);
-						Js__worker.postMessage((owner, Result.Ok(res)));
-					}) { | e => Js__worker.postMessage((owner, Result.Error(e))) }
+				open Js__worker
+				open Melange__containers.Fun
+				open World()
+				onMessage(Message.data %> (Fiber__core.Comm__request(owner, param) as req) => {
+					let res = try
+						(Result.ok @@ [%e pvb_expr](param))
+						{ | e => Result.Error(e) };
+					postMessage(Fiber__core.Comm__reply(req, owner, res))
 				})
 			}];
 			let str = Unparse.expression(worker_expr);
@@ -55,7 +57,8 @@ Extension.declare("Fiber.bind", Extension.Context.structure_item, Ast_pattern.(p
 				Containers.IO.File.write_exn("/tmp/ppxfiber.services/"++name++".dune", str_rule);
 			}
 			let pvb_expr' = [%expr Fiber.of_worker(() => {
-				Js__worker.create(Js__worker.Url.create([%e A.Exp.constant @@ A.Const.string @@ (name++".js")], Js__worker.import_meta_url(Js__worker.import_meta)))
+				let module_ = name => Js__worker.Url.create(name, Js__worker.import_meta_url);
+				[%e A.Exp.constant @@ A.Const.string @@ (name++".js")]->module_->Js__worker.create
 			})];
 			[@warning "-23"]
 			{ pstr_loc, pstr_desc: Pstr_value(_recflag, [{ ...kkk, pvb_pat, pvb_expr: pvb_expr', pvb_attributes, pvb_loc }]) }
