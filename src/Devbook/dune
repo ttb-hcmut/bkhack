@@ -9,8 +9,7 @@
 
 (rule
  (target typc)
- (deps
-  article
+ (deps article
   (:typc-opt-utopk %{project_root}/src_vendors/opt-utopk/u/typst-compile/run))
  (action (copy %{typc-opt-utopk} typc))
 )
