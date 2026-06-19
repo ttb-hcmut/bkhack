@@ -1,7 +1,7 @@
 utopk-baorepo:
   type: Repository
   title: The Utopk interpreter
-  url: "https://baorepo.web.app/~kinten/utopk"
+  url: "https://baorepo.web.app/~kinten/u/utop"
 tree-sitter-quarkdown-github:
   type: Repository
   title: Quarkdown grammar for tree-sitter
