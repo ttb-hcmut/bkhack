@@ -1,3 +1,4 @@
+lua vim.lsp.enable('tinymist')
 lua vim.lsp.enable('hls')
 lua vim.lsp.enable('nixd')
 lua vim.lsp.enable('ocamllsp')

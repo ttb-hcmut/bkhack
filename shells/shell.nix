@@ -24,7 +24,7 @@ let shellHook =
 		pnpm nodejs
 		nixd haskell-language-server
 		opam rsync
-		
+		tinymist
 		gnugrep
 		procps
 	];
