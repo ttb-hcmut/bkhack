@@ -27,6 +27,7 @@ let shellHook =
 		tinymist
 		gnugrep
 		procps
+		ruby
 	];
 in
 	nixpkgs.mkShell {

@@ -1,1 +1,1 @@
-shells/shell.nix
+build_aux/shell.nix
