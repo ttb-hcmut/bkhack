@@ -2,5 +2,5 @@
  (libraries eio eio_main buildlib
             cmdliner re containers)
  (package bkhack)
- (public_name bkhack.serve1)
- (name serve1))
+ (public_name bkhack.serve)
+ (name serve))

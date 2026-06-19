@@ -13,7 +13,7 @@
     "clean": "npm run dune -- clean",
     "build-watch": "npm run dune -- build @bundle --profile=dev --watch",
     "bundle": "npm run dune -- build @bundle --profile=release",
-    "serve": "npm run dune -- exec bin/serve1.exe -- --output=_build/default/src/dist",
+    "serve": "npm run dune -- exec build_aux/serve.exe -- --output=_build/default/src/dist",
     "dev": "npm run serve & npm run build-watch; wait"
   },
   "scriptsComments": {
