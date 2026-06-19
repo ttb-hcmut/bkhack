@@ -1,0 +1,12 @@
+(executable
+ (name app)
+ (modules app)
+ (libraries dream bonsai)
+ (preprocess (pps lwt_ppx)))
+
+(executable
+ (name page__app)
+ (modules page__app)
+ (modes js)
+ (libraries async_js bonsai.web bonsai.web_ui_form core virtual_dom.css_gen js_of_ocaml)
+ (preprocess (pps ppx_jane js_of_ocaml-ppx bonsai.ppx_bonsai ppx_css)))
