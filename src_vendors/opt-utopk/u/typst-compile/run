@@ -1,9 +1,6 @@
 #!/usr/bin/python
 import os.path
-import tempfile
 import argparse
-import subprocess
-import time
 import contextlib
 
 @contextlib.contextmanager
@@ -16,34 +13,41 @@ def tmpdir_open(root, name=None):
 
 @contextlib.contextmanager
 def tmpfile_open(dir):
-  import uuid
-  import os
+  import uuid, os
   filename = f"{dir}/{uuid.uuid4()}"
   yield filename
-  os.unlink(filename)
+  # os.unlink(filename)
+
+def replaces(target, ls):
+  ret = target
+  for (pat, replace) in ls:
+    ret = target.replace(pat, replace)
+  return ret
 
 if __name__ == "__main__":
-  args = argparse.ArgumentParser(prog="typst-compile")
+  args = argparse.ArgumentParser(prog="typst compile")
   args.add_argument("filename")
   args.add_argument("-r", "--root", nargs='?')
+  args.add_argument("--package-path", nargs='?')
   args.add_argument("output")
   args = args.parse_args()
-  with open(args.filename, "r") as f:
-    file_content = f.read()
-  file_content = file_content.replace("\\\n  ", "\n\n")
-  file_content = file_content.replace("\n--", "--")
-  file_content = file_content.replace("\n-", "-")
-  file_content = file_content.replace("\n;", ";")
-  file_content = file_content.replace("\n:", ":")
-  file_content = file_content.replace("\n,", ",")
-  file_content = file_content.replace("\n.", ".")
-  file_content = '#import "/article": *\n#show: doc\n' + file_content
+  f = open(args.filename, "r")
+  file_content = f.read()
+  file_content = replaces(file_content, [
+    ("\\\n  ", "\n\n"),
+    ("\n-", "-"), ("\n--", "--"),
+    ("\n;", ";"), ("\n:", ":"),
+    ("\n,", ","), ("\n.", ".")
+  ])
+  file_content = '#import "/article"\n#show: article.doc\n' + file_content
   with tmpfile_open(os.path.dirname(args.filename)) as input:
-    with open(input, "w+") as f:
-      f.write(file_content)
+    f = open(input, "w+")
+    f.write(file_content)
     command = []
     command += ["typst", "compile"]
     command += ["--root", args.root] if args.root is not None else []
+    command += ["--package-path", args.package_path] if args.package_path is not None else []
     command += [input, args.output]
+    import subprocess
     proc = subprocess.run(command)
   exit(proc.returncode)

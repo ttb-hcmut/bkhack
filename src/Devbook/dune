@@ -1,14 +1,35 @@
 (rule
  (mode promote)
  (target (dir output))
- (deps article (:typs (glob_files page-*.typ)) (glob_files *) (source_tree diagramming) (source_tree %{project_root}/src_vendors/opt-utopk/u/typst-compile))
+ (deps typc (:entries (glob_files page-*.typ)) (glob_files *))
  (action (progn
-  (run mkdir output)
-  (run %{dep:app.exe} %{project_root}/src_vendors/opt-utopk/u/typst-compile/run --output=output %{typs})
+  (run mkdir %{target})
+  (run %{dep:app.exe} ./typc --output=%{target} --package-path=%{dep:_packages} %{entries})
  )))
 
-(copy_files
- (files %{project_root}/src_vendors/opt-utopk/u/article))
+(rule
+ (target typc)
+ (deps
+  article
+  (:typc-opt-utopk %{project_root}/src_vendors/opt-utopk/u/typst-compile/run))
+ (action (copy %{typc-opt-utopk} typc))
+)
+
+(rule
+ (target article)
+ (deps
+  (:typc-article %{project_root}/src_vendors/opt-utopk/u/article))
+ (action (copy %{typc-article} article))
+)
+
+(rule
+ (target (dir _packages))
+ (deps (source_tree %{project_root}/src/Diagramming))
+ (action (progn
+  (run mkdir -p _packages/local/diagramming)
+  (concurrent (run cp -r %{project_root}/src/Diagramming _packages/local/diagramming/0.1.0))
+ ))
+)
 
 (executable
  (name app)

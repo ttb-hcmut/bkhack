@@ -3,7 +3,7 @@
 #import "vocab.typ" as o
 #import "./shell-parse.typ"
 #import "./shell-sym.typ"
-#import "diagramming/lib.typ": kbd
+#import "@local/diagramming:0.1.0": kbd
 #title[= Stream-based programming, as compared to sh]
 #set heading(numbering: none,  outlined: true, supplement: [#text(weight: 900, fill: rgb("#3851A4"))[§]#h(-0.4em)])
 #set cite(style: "alphanumeric")
