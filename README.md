@@ -76,7 +76,7 @@ For demonstration, let's assume you want to run the website locally
 
 ## Development
 
-See [DEVELOPMENT.md](./DEVELOPMENT.md) for more details.
+See [./doc/development.md](./doc/development.md) for more details.
 
 ---
 
