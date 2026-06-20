@@ -1,5 +1,5 @@
 #import "/article": *
-#import "diagramming/lib.typ": colors, kbd
+#import "@local/diagramming:0.1.0": colors, kbd
 #import "@preview/cetz:0.5.2"
 #import "@preview/finite:0.5.1": automaton
 #set raw(syntaxes: ("reason.sublime-syntax")/* , theme: "quiet.tmTheme" */)
@@ -7,7 +7,7 @@
 #let header(it) = text(weight: 700, [#(it)#h(0.2em)])
 #title[= Vim motion]
 
-#lorem(50)
+#lorem(50) motions. _text objects_.
 
 #align(center, {
   let layout = (
