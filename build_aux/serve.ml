@@ -1,7 +1,7 @@
 open Eio
-module Pnpm = Buildlib.Pnpm
+module Pnpm = Buildlib.Build.Pnpm
 module P = Path
-module B = Buildlib
+module B = Buildlib.Build
 
 (** preview the [morphism]s at [dist_dir] *)
 let pv_morphism~sw~procm dist_dir =

@@ -1,6 +1,0 @@
-(library
- (modes byte)
- (libraries containers re)
- (public_name bkhack-compiler.css_gen)
- (flags -open Containers.Fun)
- (name css_gen))

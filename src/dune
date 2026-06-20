@@ -1,7 +1,7 @@
 (rule
  (alias bundle)
  (targets dist distserve)
- (deps (:bundle %{project_root}/src_build/webpackgen.exe)
+ (deps (:bundle webpackgen.exe)
        (:src (alias react))
        (:static (source_tree Static))
        (:serve (alias Service/default))
@@ -81,7 +81,7 @@
  ; Dependencies of the stanza.
  (libraries reason-react melange-json melange__containers quel bkhack__experimental
             cprg melange__cmarkit melange__iter melange__re melange.belt)
- (modules :standard \ Fiber__ppx)
+ (modules :standard \ Fiber__ppx Webpackgen Css_gen build kernel)
  (flags -w -32)
  (preprocess
   ; The `pps` field is a list of ppx to apply to the sources before generating JavaScript. melange.ppx allows to use Melange attributes [@mel. ...] (https://melange.re/v2.0.0/communicate-with-javascript/#attributes)
@@ -96,3 +96,23 @@
   (libraries containers)
   (modes byte)
   (wrapped false)))
+
+(executable
+ (libraries eio eio_main buildlib
+            cmdliner re containers)
+ (modules webpackgen)
+ (name webpackgen))
+
+(library
+ (libraries eio containers re)
+ (flags -open Containers.Fun)
+ (modules build)
+ (name buildlib))
+
+(library
+ (modes byte)
+ (libraries containers re)
+ (modules Css_gen kernel)
+ (public_name bkhack-compiler.css_gen)
+ (flags -open Containers.Fun)
+ (name css_gen))

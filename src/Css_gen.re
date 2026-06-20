@@ -44,15 +44,16 @@ module Gen (K : Work) {
 	if (!(is_in_build @@ Sys.getcwd())) () else
 	{ let _ = (module K(IO) : Empty); () }
 }
-
-let format1 = (~className, str, arg1) => {
-	let content = str
-		|> Kernel.undo_relative_indentation(~min_padding=Kernel.min_padding(str))
-		|> selector_replace("."++className)
-	  |> args_replace("\""++arg1++"\"");
-	let open Gen((IO : IO) => {
-		try ( IO.mkdir'("", 0o700) ) { | Sys_error(_) => () }
-		IO.write_exn(className++".css", content);
-	});
-	className
+module Stylesheet {
+	let format1 = (~className, str, arg1) => {
+		let content = str
+			|> Kernel.undo_relative_indentation(~min_padding=Kernel.min_padding(str))
+			|> selector_replace("."++className)
+		  |> args_replace("\""++arg1++"\"");
+		let open Gen((IO : IO) => {
+			try ( IO.mkdir'("", 0o700) ) { | Sys_error(_) => () }
+			IO.write_exn(className++".css", content);
+		});
+		className
+	}
 }
