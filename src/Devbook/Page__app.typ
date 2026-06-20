@@ -1,6 +1,6 @@
 #import "/article": *
 #import "@local/diagramming:0.1.0"
-#import "vocab.typ" as o
+#import "Vocab.typ" as o
 #let prefix_1 = "http://idea:4999/u/bkhack-book"
 #let prefix_2 = "https://github.com/ttb-hcmut/bkhack/tree/main/doc"
 #let prefix   = prefix_1

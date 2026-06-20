@@ -1,5 +1,5 @@
 #import "/article": *
-#import "vocab.typ" as o
+#import "Vocab.typ" as o
 #import "@preview/cetz:0.5.1"
 #let header(it) = { text(weight: 700, it) }
 #title[= CLI-oriented applications]

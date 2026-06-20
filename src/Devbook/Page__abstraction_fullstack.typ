@@ -1,5 +1,5 @@
 #import "/article": *
-#import "vocab.typ" as o
+#import "Vocab.typ" as o
 #import "@preview/fletcher:0.5.8" as fletcher
 #title[= Abstraction full-stack]
 A conventional view of application development would be that the client

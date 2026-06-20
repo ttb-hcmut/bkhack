@@ -1,7 +1,7 @@
 (rule
  (mode promote)
  (target (dir _output))
- (deps typc (:entries (glob_files page-*.typ)) (glob_files *))
+ (deps typc (:entries (glob_files Page__*.typ)) (glob_files *))
  (action (progn
   (run mkdir %{target})
   (run %{dep:app.exe} ./typc --output=%{target} --package-path=%{dep:_packages} %{entries})

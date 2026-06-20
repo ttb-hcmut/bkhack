@@ -1,8 +1,8 @@
 #import "/article": *
 #import "@preview/tdtr:0.5.5"
-#import "vocab.typ" as o
-#import "./shell-parse.typ"
-#import "./shell-sym.typ"
+#import "Vocab.typ" as o
+#import "Shell__parse.typ" as shell-parse
+#import "Shell__sym.typ" as shell-sym
 #import "@local/diagramming:0.1.0": kbd
 #title[= Stream-based programming, as compared to sh]
 #set heading(numbering: none,  outlined: true, supplement: [#text(weight: 900, fill: rgb("#3851A4"))[§]#h(-0.4em)])

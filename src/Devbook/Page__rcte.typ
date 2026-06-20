@@ -1,5 +1,5 @@
 #import "/article": *
-#import "vocab.typ" as o
+#import "Vocab.typ" as o
 #title[= Design of the #o.bkhack comment-tree]
 ```sh
 discuss $id | limit 3

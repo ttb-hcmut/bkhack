@@ -1,8 +1,13 @@
 open Eio
 
+let snake_to_burger = {
+	let f = _ => "-";
+	Re.replace(~f, ~all=true) @@ Re.compile @@ Re.(char('_'))
+}
+
 let strip_prefix = {
-	let f = g => Re.Group.get(g, 1);
-	Re.replace(~f) @@ Re.compile @@ Re.(seq([ bos, str("page"), char('-'), group(any |> rep1), eos ]))
+	let f = g => Re.Group.get(g, 1) |> snake_to_burger;
+	Re.replace(~f) @@ Re.compile @@ Re.(seq([ bos, str("Page"), str("__"), group(any |> rep1), eos ]))
 }
 
 let main = (~outdir, ~package_path, `typst_compile(bin, args)) => Eio_main.run @@ env => {
