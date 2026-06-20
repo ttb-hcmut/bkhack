@@ -116,3 +116,11 @@
  (public_name bkhack-compiler.css_gen)
  (flags -open Containers.Fun)
  (name css_gen))
+
+(subdir Diagramming
+ (copy_files (files ../diagramming-*))
+ (rule (target typst.toml)
+  (action (run mv %{dep:diagramming-typst.toml} typst.toml)))
+ (rule (target lib.typ)
+  (action (run mv %{dep:diagramming-lib.typ} lib.typ)))
+)

@@ -22,7 +22,7 @@
 
 (rule
  (target (dir _packages))
- (deps (source_tree %{project_root}/src/Diagramming))
+ (deps (glob_files %{project_root}/src/Diagramming/*))
  (action (progn
   (run mkdir -p _packages/local/diagramming)
   (concurrent (run cp -r %{project_root}/src/Diagramming _packages/local/diagramming/0.1.0))

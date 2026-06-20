@@ -1,5 +1,5 @@
-#import "colors.typ"
-#import "kbd-common.typ" as o
+#import "diagramming-colors.typ" as colors
+#import "diagramming-kbd-common.typ" as o
 
 /// This function returns a keyboard key element
 ///
