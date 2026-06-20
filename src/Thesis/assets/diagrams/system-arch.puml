@@ -1,0 +1,26 @@
+@startuml
+rectangle "Presentation Layer\n(Front-end)" as pl{
+    rectangle "Web Aplication"
+}
+rectangle "Business Layer\n(Back-end)" as bl{
+    rectangle {
+        rectangle "Authentication"
+    }
+    rectangle {
+        rectangle "Content"
+        rectangle "Article"
+        rectangle "Moderation"
+        rectangle "Notes"
+        rectangle "Pull Request"
+        rectangle "Issues"
+    }
+
+}
+rectangle "Data store Layer\n(Database)" as dl {
+    database database[
+    Centralized data store]
+}
+
+
+@enduml
+
