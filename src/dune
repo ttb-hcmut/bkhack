@@ -118,7 +118,7 @@
  (name css_gen))
 
 (subdir Diagramming
- (copy_files (files ../Diagramming*))
+ (copy_files (files ../{*.typ,Diagramming*}))
  (rule (target typst.toml)
   (action (run mv %{dep:Diagramming__typst.toml} typst.toml)))
  (rule (target lib.typ)

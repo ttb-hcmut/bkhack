@@ -1,4 +1,4 @@
-#import "Diagramming__colors.typ"
+#import "Colors.typ"
 
 #let key(c) = {
   box(
