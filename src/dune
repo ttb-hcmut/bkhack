@@ -88,3 +88,11 @@
   ; reason-react-ppx allows to use JSX for ReasonReact components by using the [@JSX] attributes from Reason: https://reasonml.github.io/docs/en/jsx
   (pps melange.ppx reason-react-ppx ppx_comptime ppxfiber))
  (modes melange))
+
+(subdir Shell+comptime
+ (copy_files (files ../{Shellgen,Shell__sym}.re))
+ (library
+  (name shell__comptime) (public_name bkhack-compiler.shell)
+  (libraries containers)
+  (modes byte)
+  (wrapped false)))
