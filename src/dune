@@ -79,7 +79,7 @@
  ; Name of library, and is name of package
  (name bkhack) (public_name bkhack)
  ; Dependencies of the stanza.
- (libraries reason-react melange-json melange__containers quel bkhack__experimental
+ (libraries reason-react melange-json melange__containers quel melange-fetch
             cprg melange__cmarkit melange__iter melange__re melange.belt)
  (modules :standard \ Fiber__ppx Webpackgen Css_gen Build Kernel)
  (flags -w -32)

@@ -1,4 +1,4 @@
-module type S = Sym.S;
+module type S = Exprm__sym.S;
 module GenSQL = GenSQL;
 module GenStructuredQuery = GenStructuredQuery;
 module Firebase__with_strqry = Firebase__with_strqry;
