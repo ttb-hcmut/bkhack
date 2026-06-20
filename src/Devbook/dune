@@ -1,6 +1,6 @@
 (rule
  (mode promote)
- (target (dir output))
+ (target (dir _output))
  (deps typc (:entries (glob_files page-*.typ)) (glob_files *))
  (action (progn
   (run mkdir %{target})
@@ -16,8 +16,7 @@
 
 (rule
  (target article)
- (deps
-  (:typc-article %{project_root}/src_vendors/opt-utopk/u/article))
+ (deps (:typc-article %{project_root}/src_vendors/opt-utopk/u/article))
  (action (copy %{typc-article} article))
 )
 
@@ -32,4 +31,4 @@
 
 (executable
  (name app)
- (libraries eio eio_main cmdliner))
+ (libraries eio eio_main cmdliner re))
