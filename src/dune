@@ -81,7 +81,7 @@
  ; Dependencies of the stanza.
  (libraries reason-react melange-json melange__containers quel bkhack__experimental
             cprg melange__cmarkit melange__iter melange__re melange.belt)
- (modules :standard \ Fiber__ppx Webpackgen Css_gen build kernel)
+ (modules :standard \ Fiber__ppx Webpackgen Css_gen Build Kernel)
  (flags -w -32)
  (preprocess
   ; The `pps` field is a list of ppx to apply to the sources before generating JavaScript. melange.ppx allows to use Melange attributes [@mel. ...] (https://melange.re/v2.0.0/communicate-with-javascript/#attributes)
@@ -106,13 +106,13 @@
 (library
  (libraries eio containers re)
  (flags -open Containers.Fun)
- (modules build)
+ (modules Build)
  (name buildlib))
 
 (library
  (modes byte)
  (libraries containers re)
- (modules Css_gen kernel)
+ (modules Css_gen Kernel)
  (public_name bkhack-compiler.css_gen)
  (flags -open Containers.Fun)
  (name css_gen))
