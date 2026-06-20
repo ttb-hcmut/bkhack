@@ -1,11 +1,16 @@
 open Eio
 
+let strip_prefix = {
+	let f = g => Re.Group.get(g, 1);
+	Re.replace(~f) @@ Re.compile @@ Re.(seq([ bos, str("page"), char('-'), group(any |> rep1), eos ]))
+}
+
 let main = (~outdir, ~package_path, `typst_compile(bin, args)) => Eio_main.run @@ env => {
 	let cwd = Stdenv.cwd(env) and process_mgr = Stdenv.process_mgr(env);
 	Fiber.List.iter(entry => {
 		let name = Filename.basename(entry) |> Filename.remove_extension;
 		let entry' = Path.(cwd / entry);
-		let output' = Path.(outdir(cwd) / (name++".pdf"));
+		let output' = Path.(outdir(cwd) / (strip_prefix(name)++".pdf"));
 		Process.run(process_mgr, [bin, "--package-path", Path.native_exn(package_path(cwd)), Path.native_exn(entry'), Path.native_exn(output')]);
 	}, args);
 }
