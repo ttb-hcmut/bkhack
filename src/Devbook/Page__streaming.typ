@@ -17,10 +17,12 @@ For #o.bkhack, the user gets to familiarize with the concept of _stream-based
 programming_. Indeed, visitors of the site will often catch glance of
 command hints and tips as they are littered about the user interface.
 #lorem(20)\
-  Stream programming in #o.bkhack is sh pipelining @shlang, with certain flavorful
-differences #fn["flavorful" here means that the differences are poignant ones that the language writer feels when she transitions between the languages. See more at XXX]. The most important difference is that, instead of dealing
-with textual data and lines and files, here we deal with abstract post
-data and post counts. Consider
+  Stream programming in #o.bkhack is sh pipelining @shlang, with certain
+flavorful differences #fn["flavorful" here means that the differences
+are poignant ones that the language writer feels when she transitions
+between the languages. See more at XXX]. The most important difference
+is that, instead of dealing with textual data and lines and files, here
+we deal with abstract post data and post counts. Consider
 #align(center)[```sh feed | split -c 10 ```]
 where ```sh split``` has the option ```sh -c NUM``` where `NUM` is the
 count size of each chunk. Conventionally, the POSIX ```sh split``` command
