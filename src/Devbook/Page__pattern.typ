@@ -45,59 +45,86 @@ whose structure can be broken down as a sequence of (three) consecutive rectangl
   import cetz.decorations
   let piece(i, k: none) = {
     let o(i, it) = "o"+repr(i)+"-"+it;
-    let left() = line((piece-width*i,piece-height), (piece-width*i,0), name: o(i, "left"))
-    let right() = line((piece-width*(i+1),piece-height), (piece-width*(i+1),0), name: o(i, "right"))
-    let top() = line((piece-width*i,piece-height), (piece-width*(i+1),piece-height), name: o(i, "top"))
+    let left(..style) = line((piece-width*i,piece-height), (piece-width*i,0), name: o(i, "left"), ..style)
+    let right(..style) = line((piece-width*(i+1),piece-height), (piece-width*(i+1),0), name: o(i, "right"), ..style)
+    let top(..style) = line((piece-width*i,piece-height), (piece-width*(i+1),piece-height), name: o(i, "top"), ..style)
     let bottom() = line((piece-width*i,0), (piece-width*(i+1),0), name: o(i, "bottom"))
     let drawdiag(k: none, ..style) = {
       let a = (piece-width*i,piece-height);
       let b = (piece-width*(i+1),0)
-      let draw(..style) = line(a, b, stroke: 1pt, name: o(i, "diag"), ..style)
+      let draw(a, b, ..style) = line(a, b, stroke: 1pt, name: o(i, "diag"), ..style)
       let o = (a: a, b: b, draw: draw)
       if k != none { k(o) } else {
-        draw(..style)
+        draw(a, b, ..style)
       }
     }
-    let drawh(..style) = line((piece-width*i,0), {
-      let angle = calc-alpha(piece-width, piece-height);
-      let h- = calc-h(piece-width, piece-height)
-      (piece-width*i + h- * calc.cos(angle), h- * calc.sin(angle))
-    }, name: o(i, "h"), ..style)
+    let drawh(k: none, ..style) = {
+      let a = (piece-width*i,0)
+      let b = {
+        let angle = calc-alpha(piece-width, piece-height);
+        let h- = calc-h(piece-width, piece-height)
+        (piece-width*i + h- * calc.cos(angle), h- * calc.sin(angle))
+      }
+      let draw(a, b, ..style) = {
+        line(a, b, name: o(i, "h"), ..style)
+      }
+      let o = (draw: draw, a: a, b: b)
+      if k != none { k(o) } else {
+        draw(a, b, ..style)
+      }
+    }
     let o = (drawh: drawh, drawdiag: drawdiag, top: top, bottom: bottom, left: left, right: right)
     if k != none { k(o) } else {
       top(); bottom(); left(); right(); drawdiag()
     }
   }
+  let h-marker(..args) = {
+    content(..args, text(size: 0.5em, stroke: 1pt, "/"))
+  }
+  let piece_1(o0) = {
+    piece(1, k: o => {
+      (o.top)(stroke: color.transparentize(color.rgb("#000"), 80%))
+      (o.bottom)()
+      (o.right)()
+      (o.drawdiag)(stroke: color.transparentize(color.rgb("#000"), 80%))
+      (o.drawh)(k: o => {
+        let offset(coord) = {
+          let (x, y) = coord
+          let (x-, y-) = o0.b
+          (x - (piece-width - x-), (y + (y- - 0)))
+        }
+        (o.draw)(offset(o.a), offset(o.b), stroke: (dash: "dashed", paint: color.transparentize(color.rgb("#000"), 60%)))
+      })
+      h-marker(("o1-h.start", 50%, "o1-h.end"), angle: "o1-h.end", anchor: "center")
+    })
+  }
   piece(0, k: o => {
-    (o.top)()
-    (o.bottom)()
-    (o.left)()
-    (o.right)()
+    (o.drawh)(k: o => {
+      piece_1(o)
+      (o.draw)(o.a, o.b, stroke: (dash: "dashed"))
+    })
     (o.drawdiag)(k: o => {
       let offset(pair, i) = {
         let (a, b) = pair
-        (a+i, b+i+0.2)
+        (a+i, b+i - 0.1)
       }
-      let u = 1.2
-      decorations.flat-brace(offset(o.a, -u), offset(o.b, -u), flip: true, outer-curves: 0, name: "d-hint")
+      let u = -0.15
+      decorations.brace(offset(o.a, -u), offset(o.b, -u), outer-curves: 0, name: "d-hint")
       content("d-hint.content", $d$)
-      (o.draw)()
+      (o.draw)(o.a, o.b)
     })
-    (o.drawh)(stroke: (dash: "dashed"))
-  })
-  // decorations.flat-brace((-0.1,piece-height), (-0.1,0), outer-curves: 0, flip: true, name: "R-hint", aspect: 75%)
-  // content("R-hint.content", $R$)
-  content(("o0-left.start", 50%, "o0-left.end"), anchor: "east", padding: 4pt, $R$)
-  decorations.flat-brace((0,-0.1), (piece-width,-0.1), outer-curves: 0, flip: true, name: "w-hint")
-  content("w-hint.content", [$w = 1$])
-  angle.angle("o0-left.start", "o0-left.end", "o0-diag.end", label: $alpha$, radius: 0.5)
-  angle.right-angle("o0-h.end", "o0-h.start", "o0-diag.start", label: "", radius: 0.2)
-  content(("o0-h.start", 50%, "o0-h.end"), angle: "o0-h.end", anchor: "south", padding: 4pt, $h$)
-  piece(1, k: o => {
-    (o.top)()
+    (o.top)(stroke: color.transparentize(color.rgb("#000"), 80%))
     (o.bottom)()
-    (o.right)()
-    (o.drawdiag)()
+    (o.left)()
+    (o.right)(stroke: color.transparentize(color.rgb("#000"), 80%))
+    content(("o0-left.start", 50%, "o0-left.end"), anchor: "east", padding: 4pt, $R$)
+    decorations.brace((0,-0.1), (piece-width,-0.1), outer-curves: 0, flip: true, name: "w-hint")
+    content("w-hint.content", [$1$])
+    angle.angle("o0-left.start", "o0-left.end", "o0-diag.end", label: $alpha$, label-radius: 0.7, radius: 0.5)
+    angle.angle("o0-bottom.start", "o0-bottom.end", "o0-h.end", label: $alpha$, label-radius: 0.4, radius: 0.2)
+    angle.right-angle("o0-h.end", "o0-h.start", "o0-diag.start", label: "", radius: 0.2)
+    content(("o0-h.start", 50%, "o0-h.end"), angle: "o0-h.end", anchor: "south", padding: 4pt, $h$)
+    h-marker(("o0-h.start", 50%, "o0-h.end"), angle: "o0-h.end", anchor: "center")
   })
   piece(2)
   piece(3)
