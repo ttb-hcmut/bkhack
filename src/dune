@@ -9,7 +9,7 @@
  (action (concurrent
   (run %{bundle}
    --css_only=%{env:CSS_ONLY=false}
-   --verbose=false --optimization=%{profile} --output=dist --src_dir=./ --public_dir=Static/
+   --verbose=false --optimization=%{profile} --output=dist --src_dir=./ --public_dir=Static/ --target_dir=output/
    --generative_dir=%{project_root}/generative/ --lucide_dir=node_modules__lucide-static/)
   (run cp -r Service distserve)
  )))

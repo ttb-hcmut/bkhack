@@ -9,7 +9,7 @@ let attrib_name = Re.(
   alt([str("page"), str("Bkhack.page")]));
 
 /** a [morphism] for JavaScript bundles */
-let morphism_jspages = (~sw,~procm,~clock,~cwd, ~optimization, ~watch=?, ~target_dir, ~srcs, src_dir, ~log_dir=?, dist_dir) =>  {
+let morphism_jspages = (~sw,~procm,~clock,~cwd, ~optimization, ~watch=?, ~target_dir, src_dir, ~log_dir=?, dist_dir) =>  {
 	let jspages = () =>
 		List.filter_map(B.is_page'(src_dir))
 		@@ Path.read_dir(src_dir);
@@ -22,13 +22,8 @@ let morphism_jspages = (~sw,~procm,~clock,~cwd, ~optimization, ~watch=?, ~target
 			{ | Not_found => raise @@ Missing_mapping_entry_for(refile) };
 		(out_dir++"/index", jsfile')
 	});
-	let output_dirs' = srcs => srcs |> List.map(s => {
-		let name = Filename.basename(s)
-		and jsfile = P.(cwd / s);
-		("/"++name, jsfile)
-	});
 	Fiber.fork(~sw) @@ () =>
-	(output_dirs(jspages()) @ output_dirs'(srcs)) |> B.compile_jsfile'(~procm,~clock,~cwd, ~watch?, ~optimization, dist_dir, ~log_dir?)
+	output_dirs(jspages()) |> B.compile_jsfile'(~procm,~clock,~cwd, ~watch?, ~optimization, dist_dir, ~log_dir?)
 };
 
 /** a [morphism] for lucide icons */
@@ -54,11 +49,11 @@ let morphism_static = (~sw,~procm, ~force=?, public_dir, dist_dir, ()) => {
     let dirpath_at_dist = P.(dist_dir / dirpath_at_public);
     Path.mkdirs(~exists_ok=true, ~perm=0o700, dirpath_at_dist)
 	};
-  iter(~ondir=iter_ondir, (hd, fpath_at_public) => {
+  iter(~ondir=iter_ondir, (fpath_at_public) => {
 		let path_it = String.concat("/", fpath_at_public);
 		B.Path.physlink(~force?, ~sw, procm,
 			P.(dist_dir / path_it),
-			~link_to=P.(cwd / hd / path_it))
+			~link_to=P.(public_dir / path_it))
 	}, [])
 }
 
@@ -89,17 +84,16 @@ let morphism_generative = (~sw,~procm, generative_dir, dist_dir) => {
     @raise Missing_mapping_entry_for(pagefile) when a Reason page
     file did not specify a required `[@Bkhack.page s]` attribute.
     Refer to the guide for more details. */
-let main__ = (~css_only,~watch, ~dist_dir, ~src_dir, ~public_dir, ~generative_dir, ~log_dir, ~lucide_dir, ~verbose, ~optimization, ()) => Eio_main.run @@ env => {
+let main__ = (~css_only, ~watch, ~dist_dir, ~src_dir, ~public_dir, ~generative_dir, ~log_dir, ~lucide_dir, ~verbose, ~optimization, ~target_dir, ()) => Eio_main.run @@ env => {
   let (procm, clock, cwd, fs) =
     (Stdenv.process_mgr(env), Stdenv.clock(env), Stdenv.cwd(env), Stdenv.fs(env));
   let cache_dir = P.(Stdenv.fs(env) / "/tmp" / "bkcache");
-  let (public_dir, generative_dir, dist_dir, log_dir, src_dir, lucide_dir) =
-    (public_dir(cwd), generative_dir(fs), dist_dir(cwd), (!verbose ? Some (log_dir(cwd)) : None), src_dir(cwd), lucide_dir(fs));
-  
+  let (public_dir, generative_dir, dist_dir, log_dir, src_dir, lucide_dir, target_dir) =
+    (public_dir(cwd), generative_dir(fs), dist_dir(cwd), (!verbose ? Some (log_dir(cwd)) : None), src_dir(cwd), lucide_dir(fs), target_dir(fs));
     (css_only,cache_dir |> Path.is_directory) |> fun
     | (false,_) | (_,false) =>  {
       Switch.run @@ sw => {
-        morphism_jspages(~sw,~procm,~clock,~cwd, ~optimization, ~watch, src_dir, ~log_dir?, dist_dir);
+        morphism_jspages(~sw,~procm,~clock,~cwd, ~optimization, ~watch, ~target_dir, src_dir, ~log_dir?, dist_dir);
         morphism_static(~sw,~procm, public_dir, dist_dir, ());
         morphism_generative(~sw,~procm, generative_dir, dist_dir);
         morphism_lucide(~sw,~procm, lucide_dir, dist_dir);
@@ -125,13 +119,6 @@ let main__ = (~css_only,~watch, ~dist_dir, ~src_dir, ~public_dir, ~generative_di
 open Cmdliner
 open Term.Syntax
 
-type args = {
-	args_static: list(string),
-	args_gen: list(string),
-	args_srcs: list(string),
-	args_other: list(string)
-}
-
 let main__ = () => Cmd.v(Cmd.info("webpackgen", ~doc="")) @@ {
   let log_dir = cwd => P.(cwd / "log");
   let+ dist_dir = Arg.(required & opt((some(string)), None) &
@@ -139,12 +126,14 @@ let main__ = () => Cmd.v(Cmd.info("webpackgen", ~doc="")) @@ {
     |> Term.map(Path.((it, cwd) => cwd / it))
   and+ css_only = Arg.(required & opt((some(bool)), None) &
     info(["css_only"], ~doc="takes in the env CSSONLY bool to only bundle public folder with the cache folder, BUILD NORMALLY FIRST TO MAKE THE CACHE FOLDER"))
-    
   and+ src_dir = Arg.(required & opt((some(string)), None) &
     info(["src_dir"], ~doc=" Source directory. "))
     |> Term.map(Path.((it, cwd) => cwd / it))
+  and+ public_dir = Arg.(required & opt((some(string)), None) &
+    info(["public_dir"], ~doc=" Public directory. "))
+    |> Term.map(Path.((it, cwd) => cwd / it))
   and+ target_dir = Arg.(required & opt((some(string)), None) &
-    info(["target"], ~doc=" Target directory. "))
+    info(["target_dir"], ~doc=" Target directory. "))
     |> Term.map(Path.((it, cwd) => cwd / it))
   and+ generative_dir = Arg.(required & opt((some(string)), None) &
     info(["generative_dir"], ~doc=" Generative asset directory. "))
@@ -156,7 +145,7 @@ let main__ = () => Cmd.v(Cmd.info("webpackgen", ~doc="")) @@ {
     info(["verbose"], ~docv="VERBOSE"))
   and+ optimization = Arg.(required & opt((some @@ enum @@ [("dev", `Development), ("release", `Production)]), None) &
     info(["optimization", "O"], ~docv="OPTIMIZATION"));
-  main__(~css_only,~watch=false, ~dist_dir, ~src_dir, ~public_dir, ~generative_dir, ~log_dir, ~lucide_dir, ~verbose, ~optimization, ())
+  main__(~css_only,~watch=false, ~dist_dir, ~src_dir, ~public_dir, ~generative_dir, ~log_dir, ~lucide_dir, ~verbose, ~optimization, ~target_dir, ())
 };
 
 /** autorun except in toplevel / interactive mode */
