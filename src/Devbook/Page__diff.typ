@@ -48,7 +48,7 @@ Given a pair of two strings, . This problem can be restated as: what is the _lon
 ]
 
 #quote[
-  TTB-HCMUT is an indie developer group. #text-removed[We make experimental softwares.] #text-added[We research embedded softwares and AI applications.]
+  TTB-HCMUT is an indie developer group. #text-removed[We make experimental softwares]#text-added[We research embedded softwares and AI applications].
 ]
 
 #diagram(
