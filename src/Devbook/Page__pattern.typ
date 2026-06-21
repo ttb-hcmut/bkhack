@@ -1,6 +1,7 @@
 #import "/article": *
 #import "@preview/cetz:0.5.2"
 == Strip pattern
+#title[= Design patterns]
 #let calc-h(width, R) = (R*width)/calc.sqrt(width*width+calc.pow(R, 2))
 #let calc-alpha(width, R) = calc.atan(width/R)
 #let piece-width = 0.9;
