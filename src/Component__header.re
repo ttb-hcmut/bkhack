@@ -83,11 +83,11 @@ let make = (~on_help: bool => unit, ~memo_transition=?) => {
   let
 		auth = AuthContext.use() and
 		url = ReasonReactRouter.useUrl();
-  let
-		(showLoginButton, setShowLoginButton) = useState(()=>true) and
-		(content, setContent) = useState(() => "") and
-		(historyIndex, setHistoryIndex) = useState(Rlwrap.index_init) and
-		(navigatorError, setNavigatorError) = useState(() => None);
+  let (showLoginButton, setShowLoginButton) = useState(()=>true)
+  and (content, setContent) = useState(() => "") 
+  and (historyIndex, setHistoryIndex) = useState(Rlwrap.index_init) 
+  and (navigatorError, setNavigatorError) = useState(() => None) 
+  and (headerRightExpand,setHeaderRightExpand) = useState(() => false);
 	let bar = useRef(Js.Nullable.null);
 	let setHistoryIndex = useCallback1(k => {
 		setHistoryIndex(prev => {
@@ -149,7 +149,7 @@ let make = (~on_help: bool => unit, ~memo_transition=?) => {
 		return()
 	});
   let on_help = [|on_help|]|>useCallback1 @@ () => { on_help(true); };
-	<>
+	<div>
 		<div className="header-left">
 			<a className="logo" href="/" />
 			<form onSubmit={e => assert_ @@ _ => url->onSubmit(~on_help, ~memo_transition?, e)}>
@@ -158,16 +158,21 @@ let make = (~on_help: bool => unit, ~memo_transition=?) => {
 				{errorBox}
 			</form>
 		</div>
-		<div className="header-right">
+    <button className={"header-right-hamburger " ++ (headerRightExpand?"expand":"")}
+      onClick={_ => setHeaderRightExpand((!))}
+    />
+		<div className={"header-right " ++ (headerRightExpand?"expand":"")}>
+			<span className="separator"/>
 			<a className="place notifications" title="Notifications"/>
-			<div className="separator"/>
+			<span className="separator"/>
 			<a className="place projects" href="/projects/" title="Projects"/>
+			<span className="separator"/>
 			<a className="place notes" href="/notes/" title="Notes"/>
-			<div className="separator"/>
+			<span className="separator"/>
 			<a className="place wiki" href="/wiki/" title="Wiki & Documentation"/>
-			<div className="separator"/>
+			<span className="separator"/>
 			<a className="place settings" href="/settings/" title="Settings"/>
-			<div className="separator"/>
+			<span className="separator"/>
 			<a className="place admin" href="/admin/" title="Admin Dashboard"/>
 			{ showLoginButton ?
 				<button className="place auth" title="Log in" onClick={_ => auth.forceAuth()}/>
@@ -175,5 +180,5 @@ let make = (~on_help: bool => unit, ~memo_transition=?) => {
 				<button className="place auth" title="Log out" onClick={_ => auth.forceAuth()}>{React.string(Option.value(auth.getUserName(),~default="Guest"))}</button>
 			}
 		</div>
-	</>
+	</div>
 }

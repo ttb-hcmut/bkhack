@@ -66,14 +66,9 @@ html {
 }
 
 
-@media (min-width: 64rem) {
-	:root {
-		/* NOTE(kinten): make sure to manually sync these values */
-		--grid-1: minmax(0,1fr) minmax(0,calc(64rem - 300px)) minmax(0,400px)  minmax(0,1fr);
-		--offset: calc((100vw - (64rem - 300px + 400px - 2 * var(--space-a))) / 2);
-	}
-
+@media (min-width: 48rem) {
 	#root {
+    position: relative;
 		display: grid;
 		grid-auto-rows: max-content;
 		grid-template-columns: var(--grid-1);
@@ -83,12 +78,6 @@ html {
 	/* #root > * {
 		grid-column: 2 / 3;
 	} */
-
-	#root > header {
-		grid-column: 1 / -1;
-		padding-left: var(--offset);
-		padding-right: var(--offset);
-	}
 	#root > nav {
 		grid-column: 2 / 3;
 		grid-row: 2 / 3;
@@ -106,7 +95,7 @@ html {
 	
 /* if mobile state1 => show, state0 => hide */
 
-@media (max-width: 64rem) {
+@media (max-width: 48rem) {
 	body:has(.state1){
 		overflow: hidden;
 	}
@@ -120,7 +109,7 @@ html {
 	}
 }
 /* if desktop state0 => show, state1 => hide */
-@media (min-width: 64rem) {
+@media (min-width: 48rem) {
 
 	/* #root > * {
 		grid-column: 2 / 3;

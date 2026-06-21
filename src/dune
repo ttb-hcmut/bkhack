@@ -8,9 +8,9 @@
        (:static-lucide node_modules__lucide-static))
  (action (concurrent
   (run %{bundle}
-   --verbose=false --optimization=%{profile} --output=dist --src_dir=./ --target=output
-    :static %{static} --generative_dir=%{dep:generative}
-   --lucide_dir=node_modules__lucide-static/)
+   --css_only=%{env:CSS_ONLY=false}
+   --verbose=false --optimization=%{profile} --output=dist --src_dir=./ --public_dir=Static/
+   --generative_dir=%{project_root}/generative/ --lucide_dir=node_modules__lucide-static/)
   (run cp -r Service distserve)
  )))
 

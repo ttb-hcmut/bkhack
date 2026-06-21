@@ -1,6 +1,9 @@
 @import "/styles/variables.css";
 
-@media (max-width: 64rem) {
+@media (max-width: 48rem) {
+	#root > .show-hide-sidebar {
+	  top: calc(4rem + 2 * var(--space-a));
+  }
 	#root > .show-hide-sidebar.state1:hover::after{
 		content: "Hide Sidebar";
 	}
@@ -22,7 +25,11 @@
 		top: 6rem;
 	}
 }
-@media (min-width: 64rem) {
+@media (min-width: 48rem) {
+	#root > .show-hide-sidebar {
+    grid-area: 2/4/span 1/span 1;
+	  top: unset;
+  }
 	#root > .show-hide-sidebar.state0:hover::after{
 		content: "Hide Sidebar";
 	}
@@ -52,11 +59,27 @@
   line-height: 1;
   font-weight: var(--font-weight-normal);
 }
+
 #root > .show-hide-sidebar{
-  display:grid;
-  grid-template-columns: 1rem;
-  grid-template-rows: 1rem;
+  box-sizing: border-box;
+  font-size: var(--text-sm);
+	position: fixed;
+	right:0;
+	padding: var(--space-a);
+	display: flex;
+	flex-direction: row;
+	align-items: center;
   gap: var(--space-a);
+	justify-content: start;
+	background-color: var(--card-bg);
+	border: solid 1px var(--card-border);
+	border-right: 0;
+	border-radius: var(--radius) 0 0 var(--radius);
+	padding: var(--space-a);
+	color: var(--light-b);
+	transition-property: border-radius, background-color;
+	transition-duration: 0.2s;
+  z-index:99;
 }
 #root > .show-hide-sidebar > .hamburger{
   display:grid;
@@ -87,28 +110,6 @@
 	clip: rect(0 0 0 0);
 	white-space: nowrap;
 	border: 0;
-}
-
-#root > .show-hide-sidebar{
-  box-sizing: border-box;
-  font-size: var(--text-sm);
-	position: fixed;
-	top: calc(1.5rem + 3 * var(--space-a));
-	right:0;
-	padding: var(--space-a);
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	justify-content: start;
-	background-color: var(--card-bg);
-	border: solid 1px var(--card-border);
-	border-right: 0;
-	border-radius: var(--radius) 0 0 var(--radius);
-	padding: var(--space-a);
-	color: var(--light-b);
-	transition-property: border-radius, background-color;
-	transition-duration: 0.2s;
-  z-index:99;
 }
 
 #root > aside *{

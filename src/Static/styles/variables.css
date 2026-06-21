@@ -45,6 +45,11 @@
 	--sig-blue: #1488DB;
 	--sig-blue-deep: #030391;
 
+  /* Page Layout Grid stuff */
+  --min-width: 48rem;
+  --grid-1: minmax(0,1fr) 8fr 4fr minmax(0,1fr);
+  --offset: 0;
+   /* calc((100vw - (var(--min-width) - 300px + 400px - 2 * var(--space-a))) / 2); */
 
 	/*===== Colors =====*/
 	/* Catppuccin Latte (Light Theme) - Surface Colors */

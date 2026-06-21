@@ -24,13 +24,13 @@ let fix_base_path = {
 module Path {
   open Eio;
 
-  let physlink = (~sw, process_mgr, ~link_to, file) =>
+  let physlink = (~force=false, ~sw, process_mgr, ~link_to, file) =>
     Fiber.fork(~sw) @@
     (
       () =>
         Process.run(
           process_mgr,
-          ["ln", Path.native_exn(link_to), Path.native_exn(file)],
+          ["ln"] @ (force ? ["-f"] : []) @ [Path.native_exn(link_to), Path.native_exn(file)]
         )
     );
 

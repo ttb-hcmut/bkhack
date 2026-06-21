@@ -3,37 +3,60 @@
 @import "/styles/treesitter/sh.css";
 
 #root > header {
-	background-color: var(--card-bg);
+  grid-area: 1/1/span 1 /-1;
+  background-color: var(--card-bg);
 	border-color: var(--card-border-20);
 	border-bottom-width: 1px;
 	border-bottom-style: solid;
 	position: sticky;
 	top: 0px;
-	padding-left: var(--space-a);
-	padding-right: var(--space-a);
 	padding-top: 0;
 	padding-bottom: 0;
-	height: calc(1.5rem + 2 * var(--space-a));
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
+	/* height: calc(1.5rem + 2 * var(--space-a)); */
+	display: grid;
+  grid-template-columns: subgrid;
+	/* align-items: center;
+	justify-content: space-between; */
 	z-index: 9999;
 }
-
-#root > header > .header-left {
+#root > header > div {
+  grid-area: 1/1/span 1 / span 1;
+	/* padding-left: var(--space-a);
+	padding-right: var(--space-a); */
+  /* display: grid;
+  grid-auto-flow: row dense;
+  grid-template-columns: repeat(auto-fit,minmax(0, 1fr)); */
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+#root > header > div > .header-left {
+  /* grid-column: auto/span 1; */
 	display: flex;
 	align-items: center;
+  width: max-content;
+	gap: var(--space-a);
+	flex: 1 1 auto;
+}
+/* 
+#root > header > div > .header-right-hamburger {
+	display: flex;
+	align-items: center;
+  width: max-content;
 	gap: var(--space-a);
 	flex: 0 1 auto;
-}
-
-#root > header > .header-right {
+} */
+#root > header > div > .header-right {
+  /* grid-column: auto/span 1; */
 	display: flex;
 	align-items: center;
 	gap: var(--space-d);
+	flex: 1 1 auto;
+  justify-content: space-between;
 }
 
-#root[data-tileset='gui'] > header > .header-right {
+#root[data-tileset='gui'] > header > div > .header-right {
 	display: flex;
 	align-items: center;
 	gap: var(--space-c);
@@ -69,16 +92,21 @@
 	padding: calc((1.5rem + 2 * var(--space-a) - 1.7rem) / 2) 0;
 }
 
+@media (min-width: 48rem){
+  #root > header > div {  
+    grid-area: 1/2/span 1 / span 2;
+  }
+}
 @media (prefers-color-scheme: dark) {
   #root[data-tileset="gui"] > header .logo {
 	  background-color: var(--sig-blue-deep);
   }
 }
 
-#root > header > .header-left > form {
+#root > header > div > .header-left > form {
 }
 
-#root > header > .header-right > .separator {
+#root > header > div > .header-right > .separator {
 	width: 1px;
 	height: 1.25rem;
 	background-color: var(--border);
@@ -164,7 +192,7 @@
 }
 
 #root > header a.place.auth::before,
-#root > header button.place.auth::before {
+#root > header button.place.auth[title="Log in"]::before {
 	content: "login";
 }
 
@@ -183,12 +211,13 @@
   color: var(--ctp-text);
   caret-color: var(--ctp-text);
   padding: var(--space-f) var(--space-a);
-	max-width: 20rem;
+	/* max-width: 20rem; */
+  width:100%;
 	flex: 1 1 auto;
 }
 
 /* GUI icons for header placeholders (uses lucide-static SVGs under /icons/) */
-#root[data-tileset="gui"] > header a.place.projects::before,
+/* #root[data-tileset="gui"] > header a.place.projects::before,
 #root[data-tileset="gui"] > header a.place.notes::before,
 #root[data-tileset="gui"] > header a.place.wiki::before,
 #root[data-tileset="gui"] > header a.place.settings::before,
@@ -203,14 +232,27 @@
 	background-position: center;
 	background-size: 1em 1em;
 	margin: 0;
-}
-
-#root[data-tileset="gui"] > header a.place.projects::before {
+} */
+#root[data-tileset="gui"] > header a.place::before {
+	content: " ";
+	display: inline-block;
+	width: 1.25em;
+	height: 1.25em;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: 1em 1em;
+	margin: 0;
+  mask-size: contain;
 	mask-repeat: no-repeat;
 	mask-position: center;
+	background-color: var(--ctp-text);
+}
+#root[data-tileset="gui"] > header a.place.projects::before {
+	/* mask-repeat: no-repeat;
+	mask-position: center; */
 	mask-image: url("/icons/package.svg");
 	-webkit-mask-image: url("/icons/package.svg");
-	background-color: var(--ctp-text);
+	/* background-color: var(--ctp-text); */
 }
 
 #root[data-tileset="gui"] > header a.place.projects:hover::before {
@@ -218,11 +260,11 @@
 }
 
 #root[data-tileset="gui"] > header a.place.notes::before {
-	mask-repeat: no-repeat;
-	mask-position: center;
+	/* mask-repeat: no-repeat;
+	mask-position: center; */
 	mask-image: url("/icons/sticky-note.svg");
 	-webkit-mask-image: url("/icons/sticky-note.svg");
-	background-color: var(--ctp-text);
+	/* background-color: var(--ctp-text); */
 }
 
 #root[data-tileset="gui"] > header a.place.notes:hover::before {
@@ -230,11 +272,11 @@
 }
 
 #root[data-tileset="gui"] > header a.place.wiki::before {
-	mask-repeat: no-repeat;
-	mask-position: center;
+	/* mask-repeat: no-repeat;
+	mask-position: center; */
 	mask-image: url("/icons/book-open.svg");
 	-webkit-mask-image: url("/icons/book-open.svg");
-	background-color: var(--ctp-text);
+	/* background-color: var(--ctp-text); */
 }
 
 #root[data-tileset="gui"] > header a.place.wiki:hover::before {
@@ -242,11 +284,11 @@
 }
 
 #root[data-tileset="gui"] > header a.place.settings::before {
-	mask-repeat: no-repeat;
-	mask-position: center;
+	/* mask-repeat: no-repeat;
+	mask-position: center; */
 	mask-image: url("/icons/settings.svg");
 	-webkit-mask-image: url("/icons/settings.svg");
-	background-color: var(--ctp-text);
+	/* background-color: var(--ctp-text); */
 }
 
 #root[data-tileset="gui"] > header a.place.settings:hover::before {
@@ -254,11 +296,11 @@
 }
 
 #root[data-tileset="gui"] > header a.place.admin::before {
-	mask-repeat: no-repeat;
-	mask-position: center;
+	/* mask-repeat: no-repeat;
+	mask-position: center; */
 	mask-image: url("/icons/shield.svg");
 	-webkit-mask-image: url("/icons/shield.svg");
-	background-color: var(--ctp-text);
+	/* background-color: var(--ctp-text); */
 }
 
 #root[data-tileset="gui"] > header a.place.admin:hover::before {
@@ -266,11 +308,11 @@
 }
 
 #root[data-tileset="gui"] > header a.place.notifications::before {
-	mask-repeat: no-repeat;
-	mask-position: center;
+	/* mask-repeat: no-repeat;
+	mask-position: center; */
 	mask-image: url("/icons/bell.svg");
 	-webkit-mask-image: url("/icons/bell.svg");
-	background-color: var(--ctp-text);
+	/* background-color: var(--ctp-text); */
 }
 
 #root[data-tileset="gui"] > header a.place.notifications:hover::before {
@@ -278,11 +320,11 @@
 }
 
 #root[data-tileset="gui"] > header a.place.auth::before {
-	mask-repeat: no-repeat;
-	mask-position: center;
+	/* mask-repeat: no-repeat;
+	mask-position: center; */
 	mask-image: url("/icons/user.svg");
 	-webkit-mask-image: url("/icons/user.svg");
-	background-color: var(--ctp-text);
+	/* background-color: var(--ctp-text); */
 }
 
 #root[data-tileset="gui"] > header a.place.auth:hover::before {
@@ -292,7 +334,7 @@
 	& .separator {
 		display: none;
 	}
-
+/* 
 	& > header a.place.projects::before,
 	& > header a.place.notes::before,
 	& > header a.place.wiki::before,
@@ -300,6 +342,10 @@
 	& > header a.place.admin::before,
 	& > header a.place.notifications::before,
 	& > header a.place.auth::before {
+		white-space: nowrap;
+	} */
+   
+	& > header a.place::before {
 		white-space: nowrap;
 	}
 }
@@ -324,7 +370,7 @@
 }
 
 :has(> #siteNavigator) > dialog > div {
-	width: 20rem;
+	/* width: 20rem; */
 	height: fit-content;
 	max-height: 10rem;
 	overflow-y: auto;
@@ -373,7 +419,9 @@ form:has(> #siteNavigator) {
 }
 
 form:has(> #siteNavigator) > * {
-	max-width: 20rem;
+	/* max-width: 20rem; */
+  width:100%;
+	flex: 1 1 auto;
 }
 
 #siteNavigator.error.unknown-command ~ dialog > div::before {

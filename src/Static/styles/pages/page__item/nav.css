@@ -106,6 +106,7 @@
 	content: " ";
 	display: inline-block;
 	mask-image: url("/assets/icon.pullrequest.svg");
+  mask-size: contain; 
 	background-color: var(--card-fg-accent-2);
 	background-size: 1em 1em;
 	width: 1em;

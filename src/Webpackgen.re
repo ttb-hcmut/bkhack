@@ -39,18 +39,16 @@ let morphism_lucide = (~sw,~procm, lucide_dir, dist_dir) => {
 
 /** a [morphism] for linking static-content files from public dir
     (and other sources) to dist dir */
-let morphism_static = (~sw,~procm,~cwd, items, dist_dir, ()) => {
-  let iter = (f, ~ondir, rootdir: list(string)) => {
-    ondir(String.concat("/", rootdir));
-    Fiber.List.iter(it => {
-			let parts = String.split_on_char('/', it);
-			let hd = List.hd(parts) and it = List.tl(parts);
-			let it' = rootdir @ it;
-			let mkdir_target = Filename.dirname(String.concat("/", it'));
-			// traceln("mkdir_target:%s", mkdir_target);
-			Path.mkdirs(~exists_ok=true, ~perm=0o700, P.(dist_dir / mkdir_target));
-			f(hd, it')
-		}, items)
+
+let morphism_static = (~sw,~procm, ~force=?, public_dir, dist_dir, ()) => {
+  let rec iter = (f, ~ondir, rootdir: list(string)) => {
+    let items = Path.read_dir(P.(public_dir / String.concat("/", rootdir)));
+    ondir @@ String.concat("/", rootdir);
+    items |> Fiber.List.iter @@ it => {
+			let it' = rootdir @ [it];
+			(Path.is_directory(P.(public_dir / String.concat("/", it'))))
+			? iter(f, ~ondir, it') : f(it')
+		}
 	};
   let iter_ondir = dirpath_at_public => {
     let dirpath_at_dist = P.(dist_dir / dirpath_at_public);
@@ -58,7 +56,7 @@ let morphism_static = (~sw,~procm,~cwd, items, dist_dir, ()) => {
 	};
   iter(~ondir=iter_ondir, (hd, fpath_at_public) => {
 		let path_it = String.concat("/", fpath_at_public);
-		B.Path.physlink(~sw, procm,
+		B.Path.physlink(~force?, ~sw, procm,
 			P.(dist_dir / path_it),
 			~link_to=P.(cwd / hd / path_it))
 	}, [])
@@ -91,17 +89,37 @@ let morphism_generative = (~sw,~procm, generative_dir, dist_dir) => {
     @raise Missing_mapping_entry_for(pagefile) when a Reason page
     file did not specify a required `[@Bkhack.page s]` attribute.
     Refer to the guide for more details. */
-let main__ = (~watch, ~dist_dir, ~src_dir, ~static_items, ~generative_dir, ~log_dir, ~lucide_dir, ~verbose, ~optimization, ~target_dir, ~srcs, ()) => Eio_main.run @@ env => {
+let main__ = (~css_only,~watch, ~dist_dir, ~src_dir, ~public_dir, ~generative_dir, ~log_dir, ~lucide_dir, ~verbose, ~optimization, ()) => Eio_main.run @@ env => {
   let (procm, clock, cwd, fs) =
     (Stdenv.process_mgr(env), Stdenv.clock(env), Stdenv.cwd(env), Stdenv.fs(env));
-  let (generative_dir, dist_dir, log_dir, src_dir, lucide_dir, target_dir) =
-    (generative_dir(fs), dist_dir(cwd), (!verbose ? Some (log_dir(cwd)) : None), src_dir(cwd), lucide_dir(fs), target_dir(cwd));
-  Switch.run @@ sw => {
-		morphism_jspages(~sw,~procm,~clock,~cwd, ~optimization, ~watch, ~target_dir, ~srcs, src_dir, ~log_dir?, dist_dir);
-		morphism_static(~sw,~procm,~cwd, static_items, dist_dir, ());
-		morphism_generative(~sw,~procm, generative_dir, dist_dir);
-		morphism_lucide(~sw,~procm, lucide_dir, dist_dir)
-	}
+  let cache_dir = P.(Stdenv.fs(env) / "/tmp" / "bkcache");
+  let (public_dir, generative_dir, dist_dir, log_dir, src_dir, lucide_dir) =
+    (public_dir(cwd), generative_dir(fs), dist_dir(cwd), (!verbose ? Some (log_dir(cwd)) : None), src_dir(cwd), lucide_dir(fs));
+  
+    (css_only,cache_dir |> Path.is_directory) |> fun
+    | (false,_) | (_,false) =>  {
+      Switch.run @@ sw => {
+        morphism_jspages(~sw,~procm,~clock,~cwd, ~optimization, ~watch, src_dir, ~log_dir?, dist_dir);
+        morphism_static(~sw,~procm, public_dir, dist_dir, ());
+        morphism_generative(~sw,~procm, generative_dir, dist_dir);
+        morphism_lucide(~sw,~procm, lucide_dir, dist_dir);
+      };
+      Switch.run @@ sw => {
+        Process.run(procm, ["rm","-rf",P.native_exn(cache_dir)]);
+        Path.mkdirs(~perm=0o700, ~exists_ok=true, cache_dir);
+        B.Path.copy_dir(~procm,~sw, dist_dir, cache_dir);
+      };
+    }
+    | (true,true) => {
+    
+      Switch.run @@ sw => {
+        B.Path.copy_dir(~procm,~sw, P.(cache_dir / "dist"), dist_dir);
+      };
+      Switch.run @@ sw => {
+        morphism_static(~sw,~procm, ~force=true, public_dir, dist_dir, ());
+      };
+      ()
+    }
 }
 
 open Cmdliner
@@ -119,6 +137,9 @@ let main__ = () => Cmd.v(Cmd.info("webpackgen", ~doc="")) @@ {
   let+ dist_dir = Arg.(required & opt((some(string)), None) &
     info(["output", "o"], ~doc=" Output directory, containing deployable web bundle artifact. "))
     |> Term.map(Path.((it, cwd) => cwd / it))
+  and+ css_only = Arg.(required & opt((some(bool)), None) &
+    info(["css_only"], ~doc="takes in the env CSSONLY bool to only bundle public folder with the cache folder, BUILD NORMALLY FIRST TO MAKE THE CACHE FOLDER"))
+    
   and+ src_dir = Arg.(required & opt((some(string)), None) &
     info(["src_dir"], ~doc=" Source directory. "))
     |> Term.map(Path.((it, cwd) => cwd / it))
@@ -134,22 +155,8 @@ let main__ = () => Cmd.v(Cmd.info("webpackgen", ~doc="")) @@ {
   and+ verbose = Arg.(required & opt((some(bool)), None) &
     info(["verbose"], ~docv="VERBOSE"))
   and+ optimization = Arg.(required & opt((some @@ enum @@ [("dev", `Development), ("release", `Production)]), None) &
-    info(["optimization", "O"], ~docv="OPTIMIZATION"))
-	and+ lol = Arg.(value & pos_all(string, []) & info([], ~docv="haha")) |> Term.map(xs => {
-		xs |> List.fold_left(((mode, acc), it) => {
-			switch (it, mode) {
-			| (":static", _) => (`static, acc)
-			| (":gen", _) => (`gen, acc)
-			| (":srcs", _) => (`srcs, acc)
-			| (it, `static as mode) => (mode, { ...acc, args_static: [it, ...acc.args_static] })
-			| (it, `gen as mode) => (mode, { ...acc, args_gen: [it, ...acc.args_gen] })
-			| (it, `srcs as mode) => (mode, { ...acc, args_srcs: [it, ...acc.args_srcs] })
-			| (it, `other as mode) => (mode, { ...acc, args_other: [it, ...acc.args_other] })
-			}
-		}, (`other, { args_static: [], args_gen: [], args_srcs: [], args_other: [] })) |> (((_, b)) => b)
-	});
-	let srcs = []; // lol.args_srcs;
-  main__(~watch=false, ~dist_dir, ~src_dir, ~static_items=lol.args_static, ~generative_dir, ~log_dir, ~lucide_dir, ~verbose, ~optimization, ~target_dir, ~srcs, ())
+    info(["optimization", "O"], ~docv="OPTIMIZATION"));
+  main__(~css_only,~watch=false, ~dist_dir, ~src_dir, ~public_dir, ~generative_dir, ~log_dir, ~lucide_dir, ~verbose, ~optimization, ())
 };
 
 /** autorun except in toplevel / interactive mode */
