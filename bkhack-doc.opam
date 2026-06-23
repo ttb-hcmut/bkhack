@@ -6,7 +6,7 @@ maintainer: ["Kinten Le <kinten108101@protonmail.com>"]
 authors: ["ttb-hcmut"]
 license: "MIT"
 depends: [
-  "dune" {>= "3.8"}
+  "dune" {>= "3.14"}
   "ocaml" {= "5.2.0"}
   "markup"
   "iter"
