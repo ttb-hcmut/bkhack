@@ -199,7 +199,7 @@
 }
 
 #root:lang(vi-VN) > header a.place.auth::before,
-#root:lang(vi-VN) > header button.place.auth::before {
+#root:lang(vi-VN) > header button.place.auth[title="Log in"]::before {
 	content: "đăng nhập";
 }
 
