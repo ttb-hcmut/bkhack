@@ -1,5 +1,5 @@
 #import "/article": *
-#import "./Grammar.typ": *
+#import "Grammar.typ": *
 
 #let punctuation_delimiter = (
   fill: color.hsl(0deg, 40%, 60%))
