@@ -1,4 +1,5 @@
 #import "/article": *
+#import "Vocab.typ" as o
 #import "@local/diagramming:0.1.0": colors, kbd
 #import "@preview/cetz:0.5.2"
 #import "@preview/finite:0.5.1": automaton
@@ -7,14 +8,13 @@
 #let header(it) = text(weight: 700, [#(it)#h(0.2em)])
 #title[= Vim motion]
 
-#lorem(50) motions. _text objects_.
-
+#lorem(50) motions. _text objects_. For example, the primary user flow of Vim, which is
 #align(center, {
   let layout = (
-    modecmd: (0, 2),
+    modecmd: (0, 1.8),
     modenormal: (0, 0),
     modevisual: (2.2, 0),
-    modeinsert: (0, -2.5)
+    modeinsert: (0, -2)
   )
   let labels = (
     modecmd: [cmd],
@@ -23,10 +23,10 @@
     modeinsert: [ins],
   )
   let style = (
-    modenormal: (stroke: colors.cream-3, fill: colors.cream-1, initial: (anchor: left, stroke: color.rgb("#000"))),
-    modecmd: (stroke: colors.cream-3, fill: colors.cream-1),
-    modeinsert: (stroke: colors.cream-3, fill: colors.cream-1),
-    modevisual: (stroke: colors.cream-3, fill: colors.cream-1),
+    modenormal: (stroke: colors.cream-3, fill: colors.cream-1, radius: 0.5, initial: (anchor: left, stroke: color.rgb("#000"))),
+    modecmd: (stroke: colors.cream-3, fill: colors.cream-1, radius: 0.5),
+    modeinsert: (stroke: colors.cream-3, fill: colors.cream-1, radius: 0.5),
+    modevisual: (stroke: colors.cream-3, fill: colors.cream-1, radius: 0.5),
     modenormal-modecmd: (angle: 0deg, dist: 9pt, curve: 1),
     modenormal-modeinsert: (angle: 0deg, dist: 9pt, curve: 0.5),
     modecmd-modenormal: (angle: 0deg, curve: 0),
@@ -46,6 +46,7 @@
     modeinsert: (modenormal: k(kbd.o.escape())),
   ))
 })
+is exemplary of modal editing, where there is a central liminal mode.
 
 #lorem(15) #kbd.keys(kbd.o.meta-[x]) #lorem(10) #kbd.keys[13gcc] #lorem(30)
 
@@ -82,6 +83,38 @@ type motion('t) =
 ]
 
 where #lorem(30)
+
+== Syntax
+
+#[
+  #import "Grammar.typ": *
+
+  #let motion = category[motion]
+
+  #let verb = category[verb]
+
+  #let noun = category[noun]
+
+  #let mult = category[multiplier]
+
+  #let motion_ = Prod(motion, {
+    Or[ #verb #optional[ #mult ] #noun ][_Vim motion_]
+  })
+
+  #let langchain = bnf(
+    motion_
+  )
+
+  #place(auto, scope: "parent", float:true)[
+    #figure(caption: [Grammar for the Vim motion language], langchain)
+  ]
+]
+
+== Help
+Like #o.bkhack-shell @bkhack:shell-help, Vim motion is considered new knowledge. The user
+is encouraged to self-study and explore the knowledge, and it is the
+developer's responsibility to provide hints and directions and manuals
+.
 
 == Graphical layering
 

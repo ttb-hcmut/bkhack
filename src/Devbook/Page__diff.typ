@@ -51,6 +51,8 @@ Given a pair of two strings, . This problem can be restated as: what is the _lon
   TTB-HCMUT is an indie developer group. #text-removed[We make experimental softwares]#text-added[We research embedded softwares and AI applications].
 ]
 
+The choice of diffing specificity is given to the user.
+
 #diagram(
   spacing: (10mm, 5mm),
   node((0, 0), [text]),

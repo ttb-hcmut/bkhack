@@ -79,7 +79,7 @@ whose structure can be broken down as a sequence of (three) consecutive rectangl
     }
   }
   let h-marker(..args) = {
-    content(..args, text(size: 0.5em, stroke: 1pt, "/"))
+    content(..args, text(size: 0.5em, stroke: 1.5pt, "/"))
   }
   let piece_1(o0) = {
     piece(1, k: o => {
@@ -121,7 +121,7 @@ whose structure can be broken down as a sequence of (three) consecutive rectangl
     decorations.brace((0,-0.1), (piece-width,-0.1), outer-curves: 0, flip: true, name: "w-hint")
     content("w-hint.content", [$1$])
     angle.angle("o0-left.start", "o0-left.end", "o0-diag.end", label: $alpha$, label-radius: 0.7, radius: 0.5)
-    angle.angle("o0-bottom.start", "o0-bottom.end", "o0-h.end", label: $alpha$, label-radius: 0.4, radius: 0.2)
+    angle.angle("o0-bottom.start", "o0-bottom.end", "o0-h.end", radius: 0.5)
     angle.right-angle("o0-h.end", "o0-h.start", "o0-diag.start", label: "", radius: 0.2)
     content(("o0-h.start", 50%, "o0-h.end"), angle: "o0-h.end", anchor: "south", padding: 4pt, $h$)
     h-marker(("o0-h.start", 50%, "o0-h.end"), angle: "o0-h.end", anchor: "center")

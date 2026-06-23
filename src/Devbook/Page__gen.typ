@@ -7,7 +7,8 @@ Continuation of BIPHASIC PROGRAMMING
 _Off-shoring_, as introduced by Oleg Kiselyov @generating-c, 
 
 = A naive branched sub-compiler
-
+  For example, it's possible to describe CSS stylesheet in Reason in the
+same code that defines React components
 ```reason
 let%comptime feed__hint = {
   open At__sh(Shellgen)
@@ -17,14 +18,14 @@ let%comptime feed__hint = {
     |}, command)
 }
 ```
-where the ```reason %comptime``` macro denotes. This can then later be used as
+where the ```reason %comptime``` macro denotes #lorem(10). This can then later be used as
 ```reason
 module Hint {
   [@react.component]
   let make = () =>
     ...
     <span className={
-      "command "++feed__hint}></span>
+    "command "++feed__hint} />
 }
 ```
 
