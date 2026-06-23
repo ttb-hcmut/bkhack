@@ -58,22 +58,33 @@ and secured fetch code.\
   This has been one example, being data repository portal #fn[currently, a POC implementation of this exists, called _free sql_]
 . Other kinds include stylesheet portal, pagegen portal, fiber @bkhack:fiber, and server-side react components
 .
-== Implementation
+== Implementation conceptual layers
+#lorem(30)
 #cetz.canvas({
   import cetz.draw: *
-  let b-width = 3.5
-  let b-height = 1
+  let gap = 0.2
+  let b-width = 3.0
+  let colwidth = 7.65
+  let b-height = 0.7
   let bl(i, title, side: none) = {
     let name = "bl"+repr(i)
     rect((0,b-height*i), (b-width,b-height*(i+1)), name: name)
     content(name, title)
     if side != none {
-      content((b-width,b-height*i), (b-width*2,b-height*(i+1)), side)
+      content((b-width+gap,b-height*i), (colwidth,b-height*(i+1)), pad(bottom: 4pt, align(horizon, side)))
     }
   }
-  bl(1, [Algebra layer], side: [fiber])
-  bl(0, [Application layer])
+  let bl-et-cetera(i) = {
+    line((0,b-height*i), (b-width,b-height*i))
+    line((0,b-height*(i+0.5)), (b-width,b-height*(i+0.5)))
+    line((0,b-height*(i+1)), (b-width,b-height*(i+1)))
+  }
+  bl(1, [Algebra layer], side: [promise, fiber, portal])
+  bl(0, [Application layer], side: [worker, fetch, websocket])
+  bl(-1, [Transport layer], side: [tcp, udp])
+  bl-et-cetera(-2)
 })
+#lorem(30)
 == First-class full-stack build process
 @dune-version-1
 #place(auto, scope: "parent", float: true)[
