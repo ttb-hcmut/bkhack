@@ -2,8 +2,7 @@
 #import "@preview/fletcher:0.5.8"
 #lorem(50)
 
-#figure[
-#fletcher.diagram(spacing: (-0.5em,2em), {
+#figure(fletcher.diagram(spacing: (-0.5em,2em), {
   import fletcher: *
   let activity(..args) = {
     node(..args, stroke: 1pt, shape: shapes.rect)
@@ -35,8 +34,7 @@
   edge(<fetch-with-token.north>, "-|>", dash: "dashed", <k.south>)
   decision((0,-3), [token is invalid], name: <token-invalid>)
   edge(<token-invalid.south>, "-|>", <invalidation.north>)
-})
-]
+}))
 
 #lorem(100)
 #lorem(100)
