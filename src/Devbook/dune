@@ -16,7 +16,7 @@
 
 (rule
  (target article)
- (deps (:typc-article %{project_root}/src_vendors/opt-utopk/u/article))
+ (deps %{project_root}/article (:typc-article %{project_root}/src_vendors/opt-utopk/u/article))
  (action (copy %{typc-article} article))
 )
 
