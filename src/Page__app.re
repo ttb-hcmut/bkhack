@@ -365,7 +365,7 @@ module App' =
 	val (module Dashboard)
 	->React.use(module Language.Make)
 	->React.use(module Keyboard.Make2(SecondaryNavigator))
-	->React.use(module Command.Make)
+	->React.use(module Command__highlight.Make)
   ->React.use(module Tileset.Make)
   ->React.use(module AuthContext.Provider)
 )

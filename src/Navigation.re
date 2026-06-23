@@ -120,9 +120,9 @@ let eval = (~on_help, current_url) => {
 			root->Tileset.sync_from_exn(Dom.Storage.localStorage);
 			aux(next) }
 		| Cons_cmd(`unfetched(["set", "--highlight", mode]), next) => {
-			mode->Command.Highlight.save_into(Dom.Storage.localStorage);
+			mode->Command__highlight.save_into(Dom.Storage.localStorage);
 			let root = ReactDOM.querySelector("#root")->Option.get;
-			root->Command.Highlight.sync_from_exn(Dom.Storage.localStorage);
+			root->Command__highlight.sync_from_exn(Dom.Storage.localStorage);
 			aux(next) }
 		| Cons_cmd(`unfetched(["set", "--language", lang_id]), next) => {
 			Dom.Storage.setItem("bkhack.language", lang_id, Dom.Storage.localStorage);
