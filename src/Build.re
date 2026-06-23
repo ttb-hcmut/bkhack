@@ -262,7 +262,7 @@ let compile_jsfile' =
           [];
         }
       )
-      @ [@alert naive("TODO(khang+kinten) bao plz grep from AST!")]
+      @ 
         [
           "--config",
           Sys.getcwd() ++ "/_build_webpack/config.js",
@@ -274,31 +274,35 @@ let compile_jsfile' =
     }
   );
 };
-let file_grep_attrib = (attrib_name, refile') => {
-  let wrap_exn = f =>
-    try(f()) {
-    | [@warning "-52"] Failure("hd") => raise(Not_found)
-    };
-  let quoted = x => Re.(seq([char('"'), x, char('"')]));
-  let matches =
-    Re.all(
-      Re.(
-        compile @@
-        seq([
-          char('['),
-          char('@'),
-          attrib_name,
-          blank |> rep,
-          quoted(group(any |> rep1 |> shortest)),
-          blank |> rep,
-          char(']'),
-        ])
-      ),
-    ) @@
-    Path.load(refile');
-  let fst_match = wrap_exn @@ (() => List.hd(matches));
-  "." ++ Re.Group.get(fst_match, 1);
-};
+
+[@alert naive("TODO(khang+kinten) bao plz grep from AST!")]
+module File_grep {
+	let attrib = (attrib_name, refile') => {
+		let wrap_exn = f =>
+			try(f()) {
+			| [@warning "-52"] Failure("hd") => raise(Not_found)
+			};
+		let quoted = x => Re.(seq([char('"'), x, char('"')]));
+		let matches =
+			Re.all(
+				Re.(
+					compile @@
+					seq([
+						char('['),
+						char('@'),
+						attrib_name,
+						blank |> rep,
+						quoted(group(any |> rep1 |> shortest)),
+						blank |> rep,
+						char(']'),
+					])
+				),
+			) @@
+			Path.load(refile');
+		let fst_match = wrap_exn @@ (() => List.hd(matches));
+		"." ++ Re.Group.get(fst_match, 1);
+	};
+}
 
 let output__sync = (~clock, jsfile') =>
   /* NOTE(kinten) the generation of [jsfile] is responsible by another process. it is expected to be "ready to use" when it finally exists as a file */

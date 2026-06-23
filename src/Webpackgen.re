@@ -18,7 +18,7 @@ let morphism_jspages = (~sw,~procm,~clock,~cwd, ~optimization, ~watch=?, ~target
 		let jsfile  = B.Output.src'(~target=target_dir) @@ Filename.chop_extension(refile);
 		let jsfile' = P.(cwd / jsfile);
 		let out_dir =
-			try (B.file_grep_attrib(attrib_name, refile'))
+			try (B.File_grep.attrib(attrib_name, refile'))
 			{ | Not_found => raise @@ Missing_mapping_entry_for(refile) };
 		(out_dir++"/index", jsfile')
 	});
