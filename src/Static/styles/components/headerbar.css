@@ -18,6 +18,7 @@
 	/* align-items: center;
 	justify-content: space-between; */
 	z-index: 9999;
+	--padding-vertical: calc((1.5rem + 2 * var(--space-a) - 1.7rem) / 2);
 }
 #root > header > div {
   grid-area: 1/1/span 1 / span 1;
@@ -89,7 +90,7 @@
 	background-size: 4rem 1.7rem;
 	width: 4rem;
 	height: 1.7rem;
-	padding: calc((1.5rem + 2 * var(--space-a) - 1.7rem) / 2) 0;
+	padding: var(--padding-vertical) 0;
 }
 
 @media (min-width: 48rem){
@@ -104,6 +105,7 @@
 }
 
 #root > header > div > .header-left > form {
+	margin: var(--padding-vertical) 0;
 }
 
 #root > header > div > .header-right > .separator {
