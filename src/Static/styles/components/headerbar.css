@@ -134,6 +134,15 @@
 	text-decoration: none;
 }
 
+
+@media (prefers-reduced-motion) {
+	#root > header a.place,
+	#root > header button.place {
+		transition: none;
+		transition-duration: 0ms;
+	}
+}
+
 #root[data-tileset='gui'] > header {
 	a.place, button.place {
 		padding: var(--space-c) var(--space-a);
