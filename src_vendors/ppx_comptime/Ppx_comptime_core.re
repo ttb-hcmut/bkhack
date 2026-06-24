@@ -67,8 +67,8 @@ Extension.declare("comptime", Extension.Context.structure_item, Ast_pattern.(pst
 			});
 			let cwd = Sys.getcwd();
 			let strats = [
-				() => !is_in_build(cwd) ? None : Containers.IO.File.read("src/dune-compiler") |> Containers.Result.to_opt |> Option.bind'(Sexplib.Sexp.of_string %> get_libraries_opt),
 				() => !is_in_build_sandbox(cwd) ? None : Containers.IO.File.read("../../../default/src/dune-compiler") |> Containers.Result.to_opt |> Option.bind'(Sexplib.Sexp.of_string %> get_libraries_opt),
+				() => !is_in_build(cwd) ? None : Containers.IO.File.read("src/dune-compiler") |> Containers.Result.to_opt |> Option.bind'(Sexplib.Sexp.of_string %> get_libraries_opt),
 				() => Containers.IO.File.read("dune-compiler") |> Containers.Result.to_opt |> Option.bind'(Sexplib.Sexp.of_string %> get_libraries_opt),
 				() => List.assoc_opt("comptime.libraries", meta) |> Option.bind'(of_str_list),
 				() => List.assoc_opt("libraries", meta) |> Option.bind'(of_str_list),

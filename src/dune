@@ -64,7 +64,7 @@
 
 (alias
  (name react)
- (deps (package bkhack-compiler)))
+ (deps (package bkhack-compiler) (glob_files dune-compiler)))
 
 (library
  (kind ppx_rewriter)

@@ -134,7 +134,10 @@ module App = {
 			|> ignore;
     }), countApi)
     React.useEffect1(()=>{
-      setOffset( _ => getCurrentOffset );
+      if (getCurrentOffset == offset)
+        fetch(offset)
+      else
+        setOffset( _ => getCurrentOffset );
       None
     },[|refresh|])
    
