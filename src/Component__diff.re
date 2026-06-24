@@ -57,47 +57,7 @@ module Linenumbering = {
     </ol>
   }
 }
-// module Ghost = {
-//   [@react.component]
-//   let make = (~text) => {
-//     let (_,_,lis) = text 
-//       |> List.fold_left( ((i,hold,listicle),(_,v)) => {
-//         v |> fun
-//         | "\n" =>
-//           ( i
-//           , []
-//           , [hold,...listicle]
-//           )
-//         | _ =>
-//           ( i+1
-//           , [<span key={i |> string_of_int}
-//           className={ "l3 text-style invisible"}> 
-//             {React.string(v)}
-//           </span>,...hold]
-//           , listicle
-//           )
-//       },(0,[],[]))
-//     ;
-//     <>
-//     { 
-//       lis
-//       |> List.mapi( (i,l)=>
-//         <li className="ghost l3" key={i |> string_of_int}>
-//           {
-//             l
-//             |> List.rev
-//             |> Array.of_list
-//             |> React.array
-//           }
-//         </li>
-//       )
-//       |> List.rev
-//       |> Array.of_list
-//       |> React.array
-//     }
-//     </>
-//   }
-// }
+
 module TextContent = {
   [@react.component]
   let make = (~text,~mode) => {
