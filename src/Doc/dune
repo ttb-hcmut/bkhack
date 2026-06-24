@@ -16,6 +16,5 @@
 (rule
  (target .storybook)
  (deps (source_tree %{project_root}/build_aux/storybook))
- (action (run cp -r %{project_root}/build_aux/storybook .storybook))
- )
+ (action (run cp -r %{project_root}/build_aux/storybook .storybook)))
 
