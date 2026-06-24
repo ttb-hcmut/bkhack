@@ -84,6 +84,7 @@ module Inspectview = {
 		let () = React.useEffect0(() => {
 			ignore(Fetch__syntax.({
 				let* u = Fiber.fork_promise((), k);
+				if (false) { ignore(u+1) };
 				Js.Console.log(u);
 				return(())
 			}>!= (e => { Js.Console.error(e); return(()) })));
