@@ -55,6 +55,7 @@ dialog.help > div {
 
   dialog.help > div {
 		min-width: 36rem;
+		width: fit-content;
 		min-height: 20rem;
 		max-height: 22rem;
     height: fit-content;
