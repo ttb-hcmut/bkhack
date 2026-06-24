@@ -1,7 +1,7 @@
 (rule
- (target dist-storybook)
+ (target dist)
  (deps (source_tree .) .storybook (alias react-storybook))
- (action (bash "pnpm storybook build --config-dir ${PWD}/.storybook --output-dir ${PWD}/dist-storybook >&2")))
+ (action (bash "pnpm storybook build --config-dir ${PWD}/.storybook --output-dir ${PWD}/dist >&2")))
 
 (melange.emit
  (target output)
