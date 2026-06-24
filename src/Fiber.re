@@ -33,6 +33,6 @@ and onerror = worker => { worker->Js__worker.Worker.onerror(e => {
 	Js.Console.error2("fiber: uncaught internal tbl error", e)
 }); worker };
 
-let fork_promise = (type in_, type ret, arg:'in_, k: fiber('in_, 'ret)) => {
+let fork_promise = (type in_, type ret, arg:in_, k: fiber(in_, ret)) => {
 	k(arg)
 }
