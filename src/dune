@@ -82,7 +82,6 @@
  (libraries reason-react melange-json melange__containers quel melange-fetch
             cprg melange__cmarkit melange__iter melange__re melange.belt)
  (modules :standard \ Fiber__ppx Webpackgen Css_gen Build Kernel)
- (flags -w -32)
  (preprocess
   ; The `pps` field is a list of ppx to apply to the sources before generating JavaScript. melange.ppx allows to use Melange attributes [@mel. ...] (https://melange.re/v2.0.0/communicate-with-javascript/#attributes)
   ; reason-react-ppx allows to use JSX for ReasonReact components by using the [@JSX] attributes from Reason: https://reasonml.github.io/docs/en/jsx
