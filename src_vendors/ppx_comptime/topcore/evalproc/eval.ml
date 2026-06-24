@@ -27,6 +27,13 @@ let extract =
     any |> rep;
   ]
 
+let extract_boc_opt =
+  let pat = Re.compile @@ Re.(
+    seq [str "%BOC%"; group (any |> rep |> shortest); str "%EOC%"]
+  ) in
+  let get_1 g = Re.Group.get g 1 in
+  Re.exec_opt pat %> Option.map(get_1)
+
 let extract2 : string -> ir =
   ( Re.exec @@ Re.compile @@
     let open Re in
@@ -97,6 +104,10 @@ pdir_arg : ir =
     Printf.sprintf "sh -c '%s < %s'"
       args tempfile) in
   if is_error res then raise (Program_exception (res |> test_strip)) else
-  let part1 = extract res in
-  let part2 = extract2 part1 in
-  part2
+  ( match extract_boc_opt res with
+  | Some boc -> ("string", boc)
+  | None ->
+      let part1 = extract res in
+      let part2 = extract2 part1 in
+      part2
+  )
