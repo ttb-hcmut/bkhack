@@ -88,8 +88,8 @@ pdir_arg : ir =
     in
   File.write_exn tempfile content;
   let res = run (
-    Printf.sprintf "TEST=%s sh -c '%s < %s'"
-      (Sys.getenv "TEST") args tempfile) in
+    Printf.sprintf "sh -c '%s < %s'"
+      args tempfile) in
   if is_error res then raise (Program_exception (res |> test_strip)) else
   let part1 = extract res in
   let part2 = extract2 part1 in

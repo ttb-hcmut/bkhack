@@ -35,6 +35,16 @@ module Location {
 	}
 }
 
+let is_in_build = {
+	let pat = Re.compile @@ Re.(seq([any |> rep, str("_build"), any |> rep]));
+	Re.execp @@ pat
+}
+
+let is_in_build_sandbox = {
+	let pat = Re.compile @@ Re.(seq([any |> rep, str("_build"), char('/'), str(".sandbox"), any |> rep]));
+	Re.execp @@ pat
+}
+
 let comptime =
 Context_free.Rule.extension @@
 Extension.declare("comptime", Extension.Context.structure_item, Ast_pattern.(pstr(__))) @@
@@ -55,10 +65,11 @@ Extension.declare("comptime", Extension.Context.structure_item, Ast_pattern.(pst
 				| List([Atom("libraries"), ...xs]) => Some(xs |> List.map(each) |> List.filter_map(Fun.id))
 				| _ => Location.raise_error(~loc, "bad spec")
 			});
-			let test =
-				try ({ Sys.getenv("TEST") }) { | _ => Location.raise_error(~loc, "missing env var TEST") };
+			let cwd = Sys.getcwd();
 			let strats = [
-				() => Containers.IO.File.read(test++"/src/dune-compiler") |> Containers.Result.to_opt |> Option.bind'(Sexplib.Sexp.of_string %> get_libraries_opt),
+				() => !is_in_build(cwd) ? None : Containers.IO.File.read("src/dune-compiler") |> Containers.Result.to_opt |> Option.bind'(Sexplib.Sexp.of_string %> get_libraries_opt),
+				() => !is_in_build_sandbox(cwd) ? None : Containers.IO.File.read("../../../default/src/dune-compiler") |> Containers.Result.to_opt |> Option.bind'(Sexplib.Sexp.of_string %> get_libraries_opt),
+				() => Containers.IO.File.read("dune-compiler") |> Containers.Result.to_opt |> Option.bind'(Sexplib.Sexp.of_string %> get_libraries_opt),
 				() => List.assoc_opt("comptime.libraries", meta) |> Option.bind'(of_str_list),
 				() => List.assoc_opt("libraries", meta) |> Option.bind'(of_str_list),
 			];
@@ -67,14 +78,16 @@ Extension.declare("comptime", Extension.Context.structure_item, Ast_pattern.(pst
 			let args =
 				args |> Option.map(List.map(x => ["-require", x]) %> List.flatten %> (args => ["dune", "exec", "utop", "--", ...args]) %> String.concat(" "));
 			let pvb_expr = [%expr { let __name__ = [%e Ast.Exp.constant @@ Ast.Const.string @@ String.concat("__") @@ [sanitize(path), name]]; [%e pvb_expr] }];
+			Printexc.record_backtrace(true);
 			let pvb_expr' = try ({
 				Eval.expression(~process_mgr=(module Sys), ~fs=(module Containers.IO.File), ~args?, pvb_expr) |> Eval.parse(~loc);
 			}) {
 				| Failure(s) => Location.raise_error(~loc, "failed to eval expression: '"++s++"'")
 				| Eval.Program_exception(s) => Location.raise_errorf(~loc, "%s", s)
 				| Eval.Unknown_value_serialization_of_type(e) => Location.raise_error(~loc, "don't known how to parse return value of type '"++e++"'")
-				| _ => Location.raise_error(~loc, "failed to eval expression")
+				// | _ => let a = Printexc.get_backtrace(); Location.raise_errorf(~loc, "failed to eval expression\n%s", a)
 			};
+			Printexc.record_backtrace(false);
 			[@warning "-23"]
 			{ pstr_loc, pstr_desc: Pstr_value(_recflag, [{ ...kkk, pvb_pat, pvb_expr: pvb_expr', pvb_attributes, pvb_loc }]) }
 		}
