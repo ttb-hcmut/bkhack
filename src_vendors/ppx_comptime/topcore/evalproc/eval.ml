@@ -43,6 +43,12 @@ let strip_quotes =
   let u = Re.exec @@ Re.compile @@ Re.(seq [bos; char '"'; group @@ greedy @@ rep @@ any; char '"'; eos]) in
   u %> (fun x -> Re.Group.get x 1)
 
+exception Bad_strip_quotes of string
+
+let prettify_strip_quotes_error f =
+  fun s ->
+  try f(s) with Not_found -> raise(Bad_strip_quotes(s))
+
 exception Unknown_value_serialization_of_type of string
 
 let parse ~loc (t : ir) =
@@ -50,7 +56,7 @@ let parse ~loc (t : ir) =
   let open Ppxlib in
   let (module A) = Ast_builder.make loc in
   match dtype with
-  | "string" -> A.estring @@ strip_quotes @@ v
+  | "string" -> A.estring @@ prettify_strip_quotes_error strip_quotes @@ v
   | "float"  -> A.efloat  @@ v
   | "unit"   -> A.pexp_construct { loc; txt = Lident "()" } None
   | "bool"   -> A.ebool   @@ bool_of_string v
