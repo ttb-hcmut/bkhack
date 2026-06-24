@@ -183,19 +183,7 @@ let webpack_template = (~optimization, v) => {
 const webpack = require("webpack")
 const path = require("path")
 
-const backend_address = (() => {
-	if (process.env.BKHACK_BACKEND_ADDRESS === undefined || typeof process.env.BKHACK_BACKEND_ADDRESS !== "string") {
-		throw new Error("did not specify BKHACK_BACKEND_ADDRESS")
-	}
-	return process.env.BKHACK_BACKEND_ADDRESS;
-})()
-
 module.exports = {
-	plugins: [
-		new webpack.DefinePlugin({
-			"bkhackenv.backend_address": `\"${backend_address}\"`,
-		})
-	],
   entry: {
     %s
   },
