@@ -1,0 +1,7 @@
+(package
+ (name diagramming) (entrypoint_module App)
+ (description "A collection of DSLs that model all things.")
+ (version 0.1.0)
+ (authors ttb-hcmut)
+ (license "MIT"))
+; vi: set ft=dune;

@@ -1,20 +1,41 @@
 (rule
  (target dist)
- (deps (source_tree .) .storybook (alias react-storybook))
- (action (bash "pnpm storybook build --config-dir ${PWD}/.storybook --output-dir ${PWD}/dist >&2")))
+ (deps (source_tree .) (glob_files output/node_modules/bkhack.uu/*) (alias react-storybook))
+ (action (bash "pnpm storybook build --config-dir ${PWD}/output/node_modules/bkhack.uu --output-dir ${PWD}/dist >&2")))
 
 (melange.emit
  (target output)
  (alias react-storybook)
+ (libraries uu)
+ (modules)
+ (module_systems es6))
+
+(library
+ (modes melange)
+ (name uu)
+ (public_name bkhack.uu)
  (libraries reason-react bkhack)
  (preprocess
   ; The `pps` field is a list of ppx to apply to the sources before generating JavaScript. melange.ppx allows to use Melange attributes [@mel. ...] (https://melange.re/v2.0.0/communicate-with-javascript/#attributes)
   ; reason-react-ppx allows to use JSX for ReasonReact components by using the [@JSX] attributes from Reason: https://reasonml.github.io/docs/en/jsx
-  (pps melange.ppx reason-react-ppx ppx_comptime))
- (module_systems es6))
+  (pps melange.ppx reason-react-ppx ppx_comptime)))
 
-(rule
- (target .storybook)
- (deps (source_tree %{project_root}/build_aux/storybook))
- (action (run cp -r %{project_root}/build_aux/storybook .storybook)))
+; (rule
+;  (target main.re)
+;  (action (run cp %{dep:App.re} main.re)))
+; (rule
+;  (target preview.re)
+;  (action (run cp %{dep:App__preview.re} preview.re)))
+
+(subdir output
+ (subdir node_modules
+  (subdir bkhack.uu
+   (rule
+    (target main.js)
+    (action (run cp %{dep:App.js} %{target})))
+
+   (rule
+    (target preview.js)
+    (action (run cp %{dep:App__preview.js} %{target})))
+  )))
 

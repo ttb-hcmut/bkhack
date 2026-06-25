@@ -1,6 +1,6 @@
 open Bkhack
 
-let default = Js__storybook.meta(~component=Test.make, ~title="Components/FDS", ());
+let default = Js__storybook.meta(~component=Test.make, ~title="FDS", ());
 
 let primary = {
 	let play = env => Fetch__syntax.({

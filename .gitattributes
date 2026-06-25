@@ -1,2 +1,3 @@
 src_vendors/** linguist-vendored
 * text=auto eol=lf
+dune* linguist-language=Dune

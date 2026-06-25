@@ -179,17 +179,17 @@ let webpack_template = (~optimization, v) => {
 |}
     | `Development => "";
   Printf.sprintf(
-    {|
-const webpack = require("webpack")
-const path = require("path")
+		{|
+			const webpack = require("webpack")
+			const path = require("path")
 
-module.exports = {
-  entry: {
-    %s
-  },
-  %s
-}
-|},
+			module.exports = {
+				entry: {
+					%s
+				},
+				%s
+			}
+		|},
     s,
     splitChunks(optimization),
   );

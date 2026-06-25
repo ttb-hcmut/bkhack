@@ -5,14 +5,20 @@
        (:src (alias react))
        (:static (source_tree Static))
        (:serve (alias Service/default))
+       %{project_root}/src/Doc/dist
        (:static-lucide node_modules__lucide-static))
- (action (concurrent
-  (run %{bundle}
-   --css_only=%{env:CSS_ONLY=false}
-   --verbose=false --optimization=%{profile} --output=dist --src_dir=./ --public_dir=Static/ --target_dir=output/
-   --generative_dir=%{project_root}/generative/ --lucide_dir=node_modules__lucide-static/)
-  (run cp -r Service distserve)
- )))
+ (action (progn
+  (concurrent
+   (run %{bundle}
+    --css_only=%{env:CSS_ONLY=false}
+    --verbose=false --optimization=%{profile} --output=dist --src_dir=./ --public_dir=Static/ --target_dir=output/
+    --generative_dir=%{dep:generative} --lucide_dir=node_modules__lucide-static/)
+   (run cp -r Service distserve))
+  (progn
+   (run mkdir -p dist/doc)
+   (run cp -r %{project_root}/src/Doc/dist/. dist/doc))
+ ))
+)
 
 (rule
  (target node_modules__lucide-static)
@@ -23,7 +29,7 @@
 (dynamic_include ../services)
 
 (rule
- (target generative)
+ (target (dir generative))
  (deps (alias react))
  (action (progn
   (run mkdir -p generative)
@@ -81,7 +87,7 @@
  ; Dependencies of the stanza.
  (libraries reason-react melange-json melange__containers quel melange-fetch
             cprg melange__cmarkit melange__iter melange__re melange.belt)
- (modules :standard \ Fiber__ppx Webpackgen Css_gen Build Kernel)
+ (modules :standard \ Fiber__ppx Webpackgen Css_gen Build Kernel Dune_typst)
  (preprocess
   ; The `pps` field is a list of ppx to apply to the sources before generating JavaScript. melange.ppx allows to use Melange attributes [@mel. ...] (https://melange.re/v2.0.0/communicate-with-javascript/#attributes)
   ; reason-react-ppx allows to use JSX for ReasonReact components by using the [@JSX] attributes from Reason: https://reasonml.github.io/docs/en/jsx
@@ -116,10 +122,8 @@
  (flags -open Containers.Fun)
  (name css_gen))
 
-(subdir Diagramming
- (copy_files (files ../{*.typ,Diagramming*}))
- (rule (target typst.toml)
-  (action (run mv %{dep:Diagramming__typst.toml} typst.toml)))
- (rule (target lib.typ)
-  (action (run mv %{dep:Diagramming.typ} lib.typ)))
-)
+(executable
+ (name dune_typst)
+ (modules Dune_typst)
+ (libraries eio eio_main cmdliner sexplib containers toml)
+ (flags -open Containers.Fun))

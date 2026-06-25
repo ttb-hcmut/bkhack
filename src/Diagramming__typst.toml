@@ -1,7 +1,0 @@
-[package]
-name = "diagramming"
-version = "0.1.0"
-entrypoint = "lib.typ"
-authors = ["TTB-HCMUT"]
-license = "MIT"
-description = "A collection of DSLs that model all things."
