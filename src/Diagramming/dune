@@ -1,12 +1,10 @@
 (rule
  (mode promote)
- (target (dir dist))
- (deps (glob_files *.typ) (:dune (glob_files dune-typst-universe))
+ (targets (dir dist))
+ (deps (glob_files *.typ) (:dune (file dune-typst-universe))
        (:typst-export %{project_root}/src/dune_typst.exe))
  (action
-  (progn
-   (run mkdir dist)
-   (concurrent
-    (run %{typst-export} --print=toml %{dune} %{target}/typst.toml)
-    (bash "find . -name '*.typ' | xargs cp -t %{target}")))
+  (progn (run mkdir dist) (concurrent
+   (run %{typst-export} --print=toml %{dune} %{targets}/typst.toml)
+   (bash "find . -name '*.typ' | xargs cp -t %{targets}")))
  ))
