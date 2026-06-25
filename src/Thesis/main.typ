@@ -36,13 +36,13 @@
 
 We present *BKHack*, a social news website oriented towards computer science, designed for internal use at Bach Khoa University of Ho Chi Minh City. The platform provides a centralized space for students to share knowledge, discuss research topics, and stay up-to-date with developments in the field.
 
-Throughout this report, we mainly discuss the analysis, the design and several implementation details of BKHack. The analysis involves user-level specifications of features and also non-functional requirements that will help us achieve feature goals. The design includes high-level architectural diagrams and other developer-oriented specifications. The "implementation" section involves intiial implementations of ideas presented in the design section. We also provide a timeline which should realistic map our development projection for the next phase of this project.
+Throughout this report, we mainly discuss the analysis, the design and several implementation details of BKHack. The analysis involves user-level specifications of features and also non-functional requirements that will help us achieve feature goals. The design includes high-level architectural diagrams and other developer-oriented specifications. The "implementation" section involves initial implementations of ideas presented in the design section. We also provide a timeline which should realistic map our development projection for the next phase of this project.
 
 In conclusion, we've gone through the initial development phase of this project with a working prototype based on this report.
 
 #pagebreak()
 
-= Guanrantee of originality
+= Guarantee of originality
 
 This capstone project is an original work of our group under the supervision of Mr. Trương Tuấn Anh. All content in this capstone are entirely of our own and free from plagiarism.
 

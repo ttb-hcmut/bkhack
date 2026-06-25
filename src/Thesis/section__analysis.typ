@@ -39,7 +39,7 @@ Hacker News's voting-based system naturally promotes popular or timely informati
 
 // pros: great for highlight trending topics
 // cons: posts lose visibility fast
-// fix: PR system encourage maintainance of old posts
+// fix: PR system encourage maintenance of old posts
 === Lobsters
 
 #figure(  
@@ -69,8 +69,8 @@ Lobsters provides a more tightly moderated environment for technical discussion,
 
 
 // pros: environment for technical discussion, emphasizing depth and accuracy
-// cons: Very tight moderation leading to very small, closed community, lacks perspective and stuff
-// little moderation and using issues and stuff to fix misinformations
+// cons: Very tight moderation leading to very small, closed community, lacks perspective
+// little moderation and using issues and other features to fix misinformation
 
 // TODO(kinten) === Lambda The Ultimate
 
@@ -121,9 +121,9 @@ BKHack builds upon the lessons of these systems by combining academic focus with
 
 Reddit is one of the largest online community platforms, hosting numerous sub-communities (subreddits) across diverse domains. Its familiar interface and interaction mechanisms make it widely accessible and easy to use.
 
-For its trengths, Reddit is a highly scalable system; flexible community-building features; familiar UX patterns that ease adoption. It has sub-communities to separate by discussion topic, a tagging system for further specificity.
+For its strengths, Reddit is a highly scalable system; flexible community-building features; familiar UX patterns that ease adoption. It has sub-communities to separate by discussion topic, a tagging system for further specificity.
 
-However, Reddit as a system is too broad and unfocused, with communities across all possible topics; moderation and governance vary widely by community; no alignment with HCMUT’s academic and cultural context. Lack of advanced functionality for a technical audience like regex, (short navigation philosphy: not having to go through too many menus, functions hidden under context menus, having to go through in-betweens), etc. Not making effient use of UI/screen space, too much fluff
+However, Reddit as a system is too broad and unfocused, with communities across all possible topics; moderation and governance vary widely by community; no alignment with HCMUT’s academic and cultural context. Lack of advanced functionality for a technical audience like regex, (short navigation philosophy: not having to go through too many menus, functions hidden under context menus, having to go through in-betweens), etc. Not making efficient use of UI/screen space, too much fluff
 
 */
 
@@ -131,7 +131,7 @@ However, Reddit as a system is too broad and unfocused, with communities across 
 // Description
 Reddit has a tagging system within its communities to separate content posted
 // Analysis
-We might want BK news to have such tagging system to curate a personalized stream of knowledge and news relavent to the user
+We might want BK news to have such tagging system to curate a personalized stream of knowledge and news relevant to the user
 // NOTE(kinten) The cons are outside of HCMUT
 Reddit has a focus on building communities around different topics, where as our platform will only be focusing on Tech and Computer Science
 
@@ -173,7 +173,7 @@ Among HCMUT students, Facebook groups remain one of the most commonly used tools
 /*
 // Description
 Twitter is a social media where users can post their thoughts, media, or news about anything in the world.
-On twitter there is a community driven form of fact checking called Community Notes, where contributers can leave notes of context, correction or sources of information, and if it gains enough approval from a wide range of contributers it will be attatched under the original post
+On twitter there is a community driven form of fact checking called Community Notes, where contributors can leave notes of context, correction or sources of information, and if it gains enough approval from a wide range of contributors it will be attached under the original post
 
 // Analysis
 
@@ -202,11 +202,11 @@ Wiki.gg is a community ran wikipedia for information about specific games. As it
 #figure(  
   image("assets/wikigg.png"),
   caption: "A community wiki made in wiki.gg. Source: window capture at https://deadcells.wiki.gg/"
-) // TODO(kinten) descripion
+) // TODO(kinten) description
 
 // TODO(kinten) maybe a separate screenshot showing history revisions page
 
-Wiki.gg is a community-run wikipedia primarily used for maintaining detailed documentation of media from various commuinties @wikigg.
+Wiki.gg is a community-run wikipedia primarily used for maintaining detailed documentation of media from various communities @wikigg.
 
 Its structure supports continual content improvement and consistent referencing, helping to preserve the accuracy of technical material. However, its design emphasizes static documentation rather than active discussion. As a result, updates depend on contributor initiative rather than real-time dialogue, and information can lag behind current understanding. Although it succeeds in maintaining structured knowledge, it does not address the social dynamics of discussion or the need to contextualize information as it ages.
 
@@ -216,7 +216,7 @@ Its structure supports continual content improvement and consistent referencing,
 // - Lobsters: a similar link aggregation site that focus on the more technical side of IT and a rich tagging system and caters to a small dedicated community.
 // - Reddit: A well known and beginner friendly site consisting of forums for a wide range of communities.
 // - Facebook pages and groups: Widely used by everyone and is often the go-to event planning while still being a social media site.
-// - Twitter's community notes: Community driven factchecking and source linking.
+// - Twitter's community notes: Community driven fact-checking and source linking.
 // - Wiki.gg's editorial features: Allows posts to be corrected and change in the presence of new information.
 
 // We think that these features would be something that would help us achieve our goal of creating the perfect tech and CS information and discussion site.

@@ -1,4 +1,6 @@
-{ nixpkgs ? import <nixpkgs> {} }:
+{ nixpkgs ? import <nixpkgs> {}
+, withTinymist ? true
+}:
 
 let shellHook =
 	''
@@ -24,14 +26,15 @@ let shellHook =
 		pnpm nodejs
 		nixd haskell-language-server
 		opam rsync
-		tinymist
 		gnugrep
 		procps
 		ruby
-	];
+	]
+	++ nixpkgs.lib.optionals withTinymist [
+      tinymist
+    ];
 in
 	nixpkgs.mkShell {
 		packages = pkgs;
 		shellHook = shellHook;
 	}
-

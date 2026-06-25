@@ -14,7 +14,7 @@ We have kept these constant considerations in mind:
 
 For (1). Some examples. Page for discussion takes place after page for viewing article, ensuring that the readers must have read the article first before making decisions.
 
-For (2), we achive by ensuring maximum reasonability and expressiveness in development (e.g. in source code). For example, most diagrams in documentation are coded in domain-specific languages. We discuss more in @technologies-final.
+For (2), we archive by ensuring maximum reasonability and expressiveness in development (e.g. in source code). For example, most diagrams in documentation are coded in domain-specific languages. We discuss more in @technologies-final.
 
 // TODO(kinten) cite sources for the definition of "reasonability" and "expressiveness"
 
@@ -37,7 +37,7 @@ Admin: Users with moderation or administrative privileges
 // - Identity provider: HCMUT SSO // uhhhh this does not exist in the diagram right now...
 
 // function to generate usecase description
-// Im sobbing right now the previously drawn diagram is so detatched from the UC table ToT who in the slop did this (its me)
+// Im sobbing right now the previously drawn diagram is so detached from the UC table ToT who in the slop did this (its me)
 
 === Usecase diagram
 
@@ -374,7 +374,7 @@ This section details the state management and user flow logic for the BKHack fro
 
 This state diagram describes the user flow and state transitions involved in a pull request session on the BKHack front-end. The interaction begins at the Pull Requests List, which serves as the primary entry point for browsing existing pull requests. Within this list, users can paginate through results and optionally apply or remove filters and sorting criteria, with pagination supported in both the filtered and unfiltered states.
 
-From the list view, users may initiate the creation of a new pull request, transitioning into the Pull Request Edit state. This editing state internally manages two substates: an editor for composing or modifying content, and a preview for viewing the rendered result. Users can freely switch between editing and previewing before confirming creation or edits. Confirmation exits the flow, while cancellation returns the user to the pull request list.
+From the list view, users may initiate the creation of a new pull request, transitioning into the Pull Request Edit state. This editing state internally manages two sub-states: an editor for composing or modifying content, and a preview for viewing the rendered result. Users can freely switch between editing and previewing before confirming creation or edits. Confirmation exits the flow, while cancellation returns the user to the pull request list.
 
 Users may also open an existing pull request from the list, entering the Pull Request View state. This view allows navigation between the main pull request post and its associated changes, such as commits and diffs, while preserving the ability to return to the list. From this state, the author may approve the pull request, terminating the session, or transition back into the edit flow to modify the pull request before confirming the changes.
 
@@ -451,7 +451,7 @@ The initial stage of BKHack’s development involved a wireframe prototype built
 - Sterile Aesthetic: The first version was criticized too bland in its use of colors and having neither lack of depth nor sense of hierarchy.
 - Lack of Originality: Early designs looked too similar to existing platforms like its direct inspiration HackerNews and Lobste.rs. While these are clean, they did not outwardly reflect the "university CS department intranet" theme the team desired.
 - UI Annoyances: Experimental features, such as extreme symbolic notation (e.g., `24c 3i 2pr` for comments and issues), were found to be "annoying to use" and potentially confusing even for initiated users. Overall, it did not deliver on our intended design.
-Influence on Later Decisions: These early "failures" were instrumental in shaping the current Design System. The realization that the prototype was too derivative led the team to adopt a Terminal-UI (TUI) aesthetic—specifically inspired by modern tools like the Ghostty terminal—an existing aesthetic that not only fit are criterias, but also ties in quite well thematically.
+Influence on Later Decisions: These early "failures" were instrumental in shaping the current Design System. The realization that the prototype was too derivative led the team to adopt a Terminal-UI (TUI) aesthetic—specifically inspired by modern tools like the Ghostty terminal—an existing aesthetic that not only fit our criteria, but also ties in quite well thematically.
 
 === React prototype
 Following the initial design phase in Figma, the we developed a second prototype using React, TypeScript, and Tailwind CSS. While the Figma iteration allowed for rapid visual experimentation, the tools provided were rather restrictive in its usage. This second prototype was created to apply the lessons learned previously and decide on a more concrete design.

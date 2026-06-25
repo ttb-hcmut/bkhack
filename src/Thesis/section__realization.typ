@@ -17,7 +17,7 @@ For languages and frameworks, there are metric - certain attractive features tha
 - How strict is the type system and its programming experience. Static type-checking is preferable.
 - How well supported documentation facilities. This is mentioned as a design goal in @design-goals, we want great maintainability.
 - Does it come with an opinionated programming paradigm? Today there are many programming paradigms, such as object-oriented programming, functional programming, procedural programming, etc. 
-- Continuation of the above point: does it come with an opinionated UI programming paradigm? Today there are manyy UI programming paradigms, such as reactive programming @reactive-programming, the Elm Architecture @elm-architecture, immediate-mode graphics rendering @immediate-mode. These programming models specialize in the domain of UI programming and will help us build safer systems by naturally leaning developers towards intuitive mental models during programming.
+- Continuation of the above point: does it come with an opinionated UI programming paradigm? Today there are many UI programming paradigms, such as reactive programming @reactive-programming, the Elm Architecture @elm-architecture, immediate-mode graphics rendering @immediate-mode. These programming models specialize in the domain of UI programming and will help us build safer systems by naturally leaning developers towards intuitive mental models during programming.
 
 #figure(caption: [In clockwise order from top-left: logo for the OCaml programming language; logo for the Reason programming language; logo for the Reason React binding; logo for the React library])[
   #box[#image("assets/ocaml__colour-logo.svg", width: 4cm,)]
@@ -170,7 +170,7 @@ OCaml and Reason and their ecosystem of languages and frameworks are known to fa
 
 == Design system 
 
-// TODO(kinten+hgt) why do we need a design system? its a framework of reusable components so that we dont need design skills to use, or need to design from scratch
+// TODO(kinten+hgt) why do we need a design system? its a framework of reusable components so that we don't need design skills to use, or need to design from scratch
 
 // TODO(kinten+hgt) an interactive version of this design system is available through this project's storybook, talk more in appendix?
 
