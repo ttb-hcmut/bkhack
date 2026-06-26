@@ -11,12 +11,7 @@ module Ctrl {
 	let create : unit => ctrl('ret)
 }
 
-module With_ctrl0 {
-	let makef : (~ctrl:ctrl('ret), continuation('in_, 'ret)) => fiber('in_, 'ret)
-	let runf  : 'in_ 'ret. (~ctrl:ctrl('ret), 'in_, fiber('in_, 'ret)) => Js.promise('ret)
-}
-
-module With_ctrl1 {
+module With_ctrl {
 	let make : (~ctrl:ctrl('ret), continuation('in_, 'ret)) => fiber('in_, 'ret)
 	let run_promise : 'in_ 'ret. (~ctrl:ctrl('ret), 'in_, fiber('in_, 'ret)) => Js.promise('ret)
 }
