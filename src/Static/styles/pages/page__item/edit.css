@@ -156,7 +156,7 @@ dialog {
 	transition: none;
 	overflow: visible;
 }
-#root > main.edit > .edit > header> .settings > .tags > dialog{
+#root > main.edit > .edit > header> .settings > .tags > dialog {
   overflow: visible;
   width: 100%;
 }

@@ -57,10 +57,13 @@
   content: " ";
 }
 
-.pagination .dropdown .x-limit::before{
+.pagination .dropdown .limit::before{
   content:"Limit";
 }
-.pagination .get-10::after{
+.pagination .dropdown .custom::before{
+  content:"Custom: ";
+}
+/* .pagination .get-10::after{
   content:"10";
 }
 .pagination .get-15::after{
@@ -68,7 +71,7 @@
 }
 .pagination .get-30::after{
   content:"30";
-}
+} */
 .pagination .dropdown .sortby::before{
   content:"Sorted";
 }
@@ -133,7 +136,7 @@
   content: "Merge order";
 }
 
-.pagination > .dropdown > dialog{
+.pagination > .dropdown > dialog {
 	margin: 0;
 	position: relative;
 	height: 0;
@@ -144,10 +147,12 @@
 	overflow: visible;
 }
 
-.pagination > .dropdown > dialog{
+.pagination > .dropdown > dialog {
   overflow: visible;
   width: 100%;
 }
+/* .pagination > .dropdown > dialog:not([open]) */
+
 .pagination > .dropdown > dialog > ol {
   display: flex;
   flex-direction: column;
@@ -161,7 +166,8 @@
   margin-left: calc(-1*(var(--space-c)));
   z-index: 9999;
 }
-.pagination > .dropdown > dialog > ol *::after{
+.pagination > .dropdown > dialog > ol *::after,
+.pagination > .dropdown > dialog > ol *{
   color: var(--ctp-subtext0);
 }
 .pagination > .dropdown > dialog > ol > li {
@@ -171,6 +177,17 @@
 }
 .pagination > .dropdown > dialog > ol > li:hover {
   background-color: var(--ctp-mantle);
+}
+.pagination > .dropdown > dialog > ol > li > input {
+  font-size: var(--text-base);
+  outline: none;
+	background-color: var(--ctp-mantle);
+  border-radius: var(--radius);
+  border: 0;
+  color: var(--ctp-text);
+  caret-color: var(--ctp-text);
+  padding: var(--space-c);
+  width: 5ch;
 }
 .pagination > .paging {
   display: grid;

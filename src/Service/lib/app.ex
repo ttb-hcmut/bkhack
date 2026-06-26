@@ -84,14 +84,10 @@ defmodule App
 
   get "/api/pullrequest/list" do
     Logger.info "GET pullrequestlist"
-    post_id    = Map.get(conn.params,"post_id","-1") |> String.to_integer
+    post_id   = Map.get(conn.params,"post_id","-1") |> String.to_integer
     offset    = Map.get(conn.params,"offset","0") |> String.to_integer
-    x_limit = Map.get(conn.params,"x-limit")
-    limit =
-      case x_limit do
-        nil -> Map.get(conn.params,"limit","10") |> String.to_integer
-        x -> x |> String.to_integer
-      end
+    # x_limit = Map.get(conn.params,"x-limit")
+    limit     = Map.get(conn.params,"limit","10") |> String.to_integer
 
     data = PullrequestBE.getPullrequestList(Data, post_id, limit, offset, opts)
     # data = ReturnChildID.getChildComments(parent, offset, limit)

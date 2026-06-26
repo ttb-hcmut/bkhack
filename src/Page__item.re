@@ -161,16 +161,22 @@ module DiscussionView = {
     [@react.component]
     let make = (~parentId,~refresh,~setResult,~setOpts) => {
       <Pagination.App 
-        limit=3
-        searchPrompt=true
+        defaultLimit=3
         countApi={"/api/comment/count?parent="++string_of_int(parentId)++"&type=post&recursive=false&"}
-        fetchApi={"/api/comment/get?parent="++string_of_int(parentId)
-                ++"&type=post&"}
-        filter  ={[
-          ("searchby",["comment","username"])
-        , ("sortby",  ["age","popularity"])
-        , ("orderby", ["ascending","descending"])
-        , ("filterby",["none","prof","student"])
+        fetchApi={"/api/comment/get?parent="++string_of_int(parentId)++"&type=post&"}
+        options={[
+          Pagination.textinput( ~action = "search"
+                              , ~placeholder = "Search..."
+                              , ~is_secondary = true
+                              , ())
+        , Pagination.dropdown(  ~action = "searchby"
+                              , ~options = ["comment","username"])
+        , Pagination.dropdown(  ~action = "sortby"
+                              , ~options = ["age","popularity"])
+        , Pagination.dropdown(  ~action = "orderby"
+                              , ~options = ["ascending","descending"])
+        , Pagination.dropdown(  ~action = "filterby"
+                              , ~options = ["none","prof","student"])
         ]}
         refresh
         setResult
