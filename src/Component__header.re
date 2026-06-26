@@ -107,7 +107,11 @@ let make = (~on_help: bool => unit, ~memo_transition=?) => {
 	}, [|setNavigatorError|]);
 	let placeholder = useMemo0(() =>
 		Dom.Storage.sessionStorage |> Greetings.load_from_opt_exn
-		|> fun | None => Some("Start typing to dismiss or don't show this again.") | Some() => None
+		|> fun | None => Some({
+			<span className="placeholder">
+				<span className="show-all-commands"></span><kbd className="type_ help" />
+			</span>
+		}) | Some() => None
 	);
 	let fakeBarSync = (bar, k) => {
 		let v = k();
@@ -129,7 +133,7 @@ let make = (~on_help: bool => unit, ~memo_transition=?) => {
 	};
 	let innerHTML = (content, placeholder) |> useMemo2(() =>
 		content === ""
-		? Option.value(~default="", placeholder)->string
+		? (placeholder |> Option.value(~default=null))
 		: content->Shell__pastel.string->Result.value(~default=content->string)
 	);
   useEffect0 @@ () =>

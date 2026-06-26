@@ -227,6 +227,23 @@
 	flex: 1 1 auto;
 }
 
+#root > header .displayonly .placeholder {
+	font-style: italic;
+}
+
+#root > header .displayonly .placeholder .show-all-commands::before {
+	content: "Show all commands";
+}
+
+#root > header .displayonly .placeholder kbd {
+	border: solid 1px var(--ctp-text);
+	border-radius: 0.4rem;
+}
+
+#root > header .displayonly .placeholder kbd.type_.help::before {
+	content: "help";
+}
+
 /* GUI icons for header placeholders (uses lucide-static SVGs under /icons/) */
 /* #root[data-tileset="gui"] > header a.place.projects::before,
 #root[data-tileset="gui"] > header a.place.notes::before,
