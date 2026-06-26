@@ -62,7 +62,7 @@ let runtest = (~sw, dir, nukeDelim) => Promise.await_exn @@ {
 	and- input2 = () => Path.load(Path.(dir / "input2.txt"))
 	and- input3 = () => Path.load(Path.(dir / "split.txt"));
 	let split = String.length(input3)>0? Diff.stringDisassembler(input3,[],String.length(input3)-1,"",[],false) |> List.map(a=>a.[0]):[]
-	let res = Diff.compare(input1,input2,split,nukeDelim)|>List.map(((d,v))=>d++"|\t"++v)|>String.concat("\n");
+	let res = Diff.compare(input1,input2,split,nukeDelim,())|>List.map(((d,v))=>d++"|\t"++v)|>String.concat("\n");
 	Promise.await_exn @@ {
 		let- () = () => Path.save(~create=`Or_truncate(0o700), Path.(dir / "res.txt"), res)
 		and- res_expect = () => Path.load(Path.(dir / "res-expect.txt")) |> fix;
