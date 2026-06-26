@@ -14,7 +14,7 @@
 
 #let doc(content) = {
   set list(indent: 10pt)
-  text(font: "New Computer Modern", size: 12pt, content)
+  text(font: "Times New Roman", size: 13pt, content)
 }
 
 #let cover0(title, subtitle) = {

@@ -1,5 +1,8 @@
 { nixpkgs ? import <nixpkgs> {} }:
-let pkgs = with nixpkgs; [ typst tinymist ];
-in nixpkgs.mkShell {
-	packages = pkgs;
+
+let
+  docs = import ../../build_aux/docs.nix { inherit nixpkgs; };
+in
+nixpkgs.mkShell {
+  inherit (docs) packages shellHook;
 }

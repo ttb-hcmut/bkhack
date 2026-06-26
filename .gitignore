@@ -21,3 +21,4 @@ storybook-static
 /pnpm-lock.yaml
 
 /article
+.vscode/settings.json

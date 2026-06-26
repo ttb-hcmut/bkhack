@@ -1,9 +1,11 @@
 { nixpkgs ? import <nixpkgs> {}
-, withTinymist ? true
+, withDocs ? true
 }:
 
-let shellHook =
-	''
+let
+  docs = import ./docs.nix { inherit nixpkgs; };
+
+  shellHook = ''
 	firebase=$(which firebase)
 	firebase() {
 		cp build_aux/firebase.json __firebase_json &&
@@ -20,7 +22,7 @@ let shellHook =
     # { rm package.json && rm pnpm-lock.yaml ;};
     return $sts;
   }
-	'';
+  '';
 	pkgs = with nixpkgs; [
 		elixir erlang
 		pnpm nodejs
@@ -30,11 +32,11 @@ let shellHook =
 		procps
 		ruby
 	]
-	++ nixpkgs.lib.optionals withTinymist [
-      tinymist
-    ];
+	++ nixpkgs.lib.optionals withDocs docs.packages;
 in
 	nixpkgs.mkShell {
 		packages = pkgs;
-		shellHook = shellHook;
+		shellHook = 
+		  shellHook
+		  + nixpkgs.lib.optionalString withDocs docs.shellHook;
 	}
