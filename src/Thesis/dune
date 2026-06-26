@@ -1,0 +1,5 @@
+(rule
+ (mode promote)
+ (target res_diff.csv)
+ (deps (:res (file ../../test_diff/res.csv)))
+ (action (run cp %{res} res_diff.csv)))

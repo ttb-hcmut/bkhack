@@ -70,6 +70,16 @@ Because we implemented a shell parser instead of reusing external libraries, the
 
 Because we implemented a diffing algorithm besides reusing ones in the form of external libraries, there is a need to test this algorithm. We've prepared a suite of tests which can be run at anything using the command `dune exec test/diff.exe`.
 
+#place(auto, scope: "parent", float: true)[
+  #figure(
+    caption: [Result of diff testing],
+    table(columns: 2,
+      [*Name*], [*Result*],
+      ..csv("res_diff.csv").flatten()
+    )
+  )
+]
+
 // == Functional testing - browser user interface testing
 
 // TODO(kinten) storybook
