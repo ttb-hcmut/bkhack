@@ -23,9 +23,7 @@
   f(); pagebreak()
 }
 
-#single_page(() => [
-  Warning: the content is WIP and is not representative of final work
-])
+// #single_page(() => [ Warning: the content is WIP and is not representative of final work ])
  
 #cover(
   [Develop a social news website oriented towards Computer Science for HCMUT],
