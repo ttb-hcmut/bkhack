@@ -283,7 +283,7 @@ module Dashboard {
 			Js.Console.log2(url, url_args);
 			if (url == "" && url_args == []) { () } else k ()
 		});
-		let url = ReasonReactRouter.useUrl();
+		// let url = ReasonReactRouter.useUrl();
 		// let x_limit = useMemo1(() => {
 		// 	let params = url.search->Util.parseQueryParams';
 		// 	params |> List.assoc_opt("limit") |> Option.map(int_of_string)
