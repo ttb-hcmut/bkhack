@@ -79,11 +79,12 @@ let%Fiber.bind k' = ((), _) => {
 module Inspectview = {
 	[@react.component]
 	let make = () => {
-    let (status,setStatus) = React.useState(() => "")
-		let k = { React.useRef(k'()) |> s => s.current };
+    let (status, setStatus) = React.useState(() => "")
+		let ctrl = React.useMemo0(Fiber.Ctrl.create);
+		let k = React.useMemo0(() => Fiber.With_ctrl.make(~ctrl, k'));
 		let () = React.useEffect0(() => {
 			ignore(Fetch__syntax.({
-				let* u = Fiber.fork_promise((), k);
+				let* u = Fiber.With_ctrl.run_promise(~ctrl, (), k);
 				if (false) { ignore(u+1) };
 				Js.Console.log(u);
 				return(())
