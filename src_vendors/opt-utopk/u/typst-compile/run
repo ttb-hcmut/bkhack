@@ -18,7 +18,7 @@ def tmpfile_open(dir):
 def replaces(target, ls):
   ret = target
   for (pat, replace) in ls:
-    ret = target.replace(pat, replace)
+    ret = ret.replace(pat, replace)
   return ret
 
 if __name__ == "__main__":
