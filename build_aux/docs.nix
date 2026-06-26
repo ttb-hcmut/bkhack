@@ -8,6 +8,6 @@
   ];
 
   shellHook = ''
-    export FONTCONFIG_FILE=${../src/thesis/fonts.conf}
+    export FONTCONFIG_FILE=${../src/Thesis/fonts.conf}
   '';
 }
