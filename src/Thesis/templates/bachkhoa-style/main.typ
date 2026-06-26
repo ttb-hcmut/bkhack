@@ -1,4 +1,7 @@
-
+#let offset-top-1 = 2.0cm
+#let offset-top-2 = 0cm
+#let offset-bottom-1 = 1.6cm
+#let offset-bottom-2 = 0cm
 
 #let signing(content) = {
   align(right, text(style: "italic", content))
@@ -14,6 +17,14 @@
 
 #let doc(content) = {
   set list(indent: 10pt)
+  set page(
+    margin: (
+      inside: 3cm,
+      outside: 2cm,
+      top: 2cm + offset-top-1,
+      bottom: 2cm + offset-bottom-1,
+    )
+  )
   text(font: "Times New Roman", size: 13pt, content)
 }
 
@@ -146,27 +157,29 @@
   
   // Header and footer
   set page(
-    footer: context [
-      #place(line(start:(0%,-10%),end:(100%,-10%)))
-      Capstone project report
-      #h(1fr)
-      Page #counter(page).display("1/1",both:true)
-  ],
     header: context[
       #place(
-        image("hcmut.png",height:50%),
-        bottom + left,
+        image("hcmut.png",height:1cm),
+        bottom + left, dy: offset-top-2,
       )
       #place(
         [Ho Chi Minh City University of Technology\ 
         Faculty of Computer Science and Engineering],
-        bottom + left, dx: 6.5%,
+        bottom + left, dx: 6.5%, dy: offset-top-2,
       )
       #place(
-      line(start:(0%,0%),end:(100%,0%)),
-        bottom + left, dy:10%,
+        line(start:(0%,0%),end:(100%,0%)),
+        bottom + left, dy:8pt + offset-top-2,
       )
-    ]
+    ],
+    footer: context [
+      #place(line(start:(0%,-8pt + offset-bottom-2),end:(100%,-8pt + offset-bottom-2)))
+      #place(dy: offset-bottom-2, [
+        Capstone project report
+        #h(1fr)
+        Page #counter(page).display("1/1",both:true)
+      ])
+    ],
   )
 
   it
