@@ -187,17 +187,23 @@ module Listview__Filter = {
 	[@react.component]
 	let make = (~setResult,~parentId) => {
     <Pagination.App 
-        limit = 3
-        searchPrompt=true
-        countApi={"/api/history/count?postid="++string_of_int(parentId)++"&"}
-        fetchApi={"/api/history/list?postid="++string_of_int(parentId)++"&"}
-        filter  ={[
-          ("searchby",["message","username","title","body"])
-        , ("sortby",  ["merge","age"])
-        , ("orderby", ["ascending","descending"])
-        ]}
-        setResult
-      />
+      defaultLimit = 3
+      countApi={"/api/history/count?postid="++string_of_int(parentId)++"&"}
+      fetchApi={"/api/history/list?postid="++string_of_int(parentId)++"&"}
+      options={[
+        Pagination.textinput( ~action = "search"
+                            , ~placeholder = "Search..."
+                            , ~is_secondary = true
+                            , ())
+      , Pagination.dropdown(  ~action = "searchby"
+                            , ~options = ["message","username","title","body"])
+      , Pagination.dropdown(  ~action = "sortby"
+                            , ~options = ["merge","age"])
+      , Pagination.dropdown(  ~action = "orderby"
+                            , ~options = ["ascending","descending"])
+      ]}
+      setResult
+    />
 	}
 };
 module Listview__Body_Card = {

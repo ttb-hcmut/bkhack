@@ -90,6 +90,10 @@ Update channels and enter the project shell:
 nix-channel --update
 nix-shell
 ```
+If you do not need Tinymist (for example, when not working on the documentation), you can use a lighter shell configuration:
+```sh
+nix-shell --arg withTinymist false
+```
 ---
 
 ## Initial setup

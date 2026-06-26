@@ -77,17 +77,26 @@ module Filter {
 	};
 
 	[@react.component]
-	let make = (~setResult, ~x_limit=?) =>
+	let make = (~setResult) =>
     <Pagination.App 
-      limit=3
-      searchPrompt=true
+      defaultLimit = 3
       countApi={"/api/post/count?"}
       fetchApi={"/api/post/list?"}
-      filter  ={[
-				("x-limit", [x_limit|>Option.value(~default=10)|>string_of_int,"15","30"])
-      , ("searchby",["title","author"])
-      , ("sortby",  ["age","active"])
-      , ("orderby", ["ascending","descending"])
+      options={[
+        Pagination.textinput( ~action = "search"
+                            , ~placeholder = "Search..."
+                            , ~is_secondary = true
+                            , ())
+			, Pagination.limit( ~action = "limit"
+                        , ~placeholder = "012"
+                        , ~options = [15,30,45]
+                        , ())
+      , Pagination.dropdown(  ~action = "searchby"
+                            , ~options = ["title","author"])
+      , Pagination.dropdown(  ~action = "sortby"
+                            , ~options = ["merge","age"])
+      , Pagination.dropdown(  ~action = "orderby"
+                            , ~options = ["ascending","descending"])
       ]}
       setResult
     />
@@ -274,11 +283,11 @@ module Dashboard {
 			Js.Console.log2(url, url_args);
 			if (url == "" && url_args == []) { () } else k ()
 		});
-		let url = ReasonReactRouter.useUrl();
-		let x_limit = useMemo1(() => {
-			let params = url.search->Util.parseQueryParams';
-			params |> List.assoc_opt("limit") |> Option.map(int_of_string)
-		}, [|url|]);
+		// let url = ReasonReactRouter.useUrl();
+		// let x_limit = useMemo1(() => {
+		// 	let params = url.search->Util.parseQueryParams';
+		// 	params |> List.assoc_opt("limit") |> Option.map(int_of_string)
+		// }, [|url|]);
 		let (items, setItems) = React.useState(() => [||]);
 		let (_showHelp, setShowHelp) = React.useState(() => false);
 		let (result, setResult) = React.useState(() => Js.Json.null);
@@ -302,7 +311,7 @@ module Dashboard {
 					<HintPanel />
 				</header>
         <nav>
-				<Filter setResult ?x_limit />
+				<Filter setResult />
         </nav>
 			</nav>
 			<main className=sidebarState><ol>

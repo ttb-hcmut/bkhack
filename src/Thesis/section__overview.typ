@@ -8,7 +8,7 @@ Beyond dispersion, another emerging challenge is information reliability over ti
 
 == Survey
 
-We have done an informal questionaire-based survey in HCMUT, where we ask students and lecturers at the site of HCMUT a few questions about their social news experience in general:
+We have done an informal questionnaire-based survey in HCMUT, where we ask students and lecturers at the site of HCMUT a few questions about their social news experience in general:
 
 1. "What content are you interested in the most?"
 2. "How do you usually discover topics you'd explored in-depth (rabbit holes/deep dives)?"
@@ -62,12 +62,12 @@ We found that there's a small albeit relevant interest in an educational, resear
 
 #figure(
   image("assets/survey/Q1.svg", width: 10cm),
-  caption: [Responses to question 1 of the questoinaire, "what content are you interested in the most?"]
+  caption: [Responses to question 1 of the questionnaire, "what content are you interested in the most?"]
 ) <qq1>
 
 #figure(
   image("assets/survey/Q2.svg", width: 10cm),
-  caption: [Responses to question 2 of the questoinaire, "how do you usually discover topics you'd explored in-depth (rabbit holes/deep dives)?"]
+  caption: [Responses to question 2 of the questionnaire, "how do you usually discover topics you'd explored in-depth (rabbit holes/deep dives)?"]
 ) <qq2>
 
 #figure(
@@ -77,7 +77,7 @@ We found that there's a small albeit relevant interest in an educational, resear
 
 #figure(
   image("assets/survey/Q4.svg", width: 10cm),
-  caption: [Responses to question 4 of the questoinaire, "what is the most important aspect of a community platform?"]
+  caption: [Responses to question 4 of the questionnaire, "what is the most important aspect of a community platform?"]
 ) <qq4>
 
 == Solution
@@ -116,7 +116,7 @@ The goal of this capstone project is to develop BKHack, a social news website fo
 
 The development of BKHack concerns skills in web application development and the hosting of an always-online internet service.
 
-The stakeholders of BKHack should be all students and lecturers of HCMUT who are interested in computer science discussion. The maintenance of BKHack may also concern system adminstrators of staff of HCMUT.
+The stakeholders of BKHack should be all students and lecturers of HCMUT who are interested in computer science discussion. The maintenance of BKHack may also concern system administrators or staff of HCMUT.
 
 /*
 // dont laugh there is a method to the madness
