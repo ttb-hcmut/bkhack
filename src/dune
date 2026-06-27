@@ -1,4 +1,11 @@
 (rule
+ (alias al)
+ (deps dist firebase.json)
+ (action (bash "\"$(pnpm root)\"/.bin/firebase deploy")))
+
+(copy_files (files %{project_root}/build_aux/firebase.json))
+
+(rule
  (alias bundle)
  (targets (dir dist) (dir distserve))
  (deps (:serve (alias Service/default))
