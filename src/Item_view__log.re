@@ -81,10 +81,10 @@ module Inspectview = {
 	let make = () => {
     let (status, setStatus) = React.useState(() => "")
 		let ctrl = React.useMemo0(Fiber.Ctrl.create);
-		let k = React.useMemo0(() => Fiber.With_ctrl.make(~ctrl, k'));
+		let k = React.useMemo0(() => Fiber.With_ctrl1.make(~ctrl, k'));
 		let () = React.useEffect0(() => {
 			ignore(Fetch__syntax.({
-				let* u = Fiber.With_ctrl.run_promise(~ctrl, (), k);
+				let* u = Fiber.With_ctrl1.run_promise(~ctrl, (), k);
 				if (false) { ignore(u+1) };
 				Js.Console.log(u);
 				return(())

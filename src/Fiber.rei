@@ -21,10 +21,10 @@ module With_ctrl1 {
 	let run_promise : 'in_ 'ret. (~ctrl:ctrl('ret), 'in_, fiber('in_, 'ret)) => Js.promise('ret)
 }
 
-module Cancel {
-	let propagate : (~ctrl:ctrl('ret), fiber('in_, 'ret)) => Js.promise(unit)
-}
-
-module Syntax {
-
-}
+// module Cancel {
+// 	let propagate : (~ctrl:ctrl('ret), fiber('in_, 'ret)) => Js.promise(unit)
+// }
+//
+// module Syntax {
+// 	
+// }

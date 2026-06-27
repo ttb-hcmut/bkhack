@@ -56,7 +56,7 @@ module Ctrl {
 	}
 }
 
-module With_ctrl {
+module With_ctrl1 {
 	let make = (~ctrl:ctrl('ret), k: continuation('in_, 'ret)) : fiber('in_, 'ret) => {
 		let (ctrl_id, ctrl) = ctrl;
 		let (tbl, idgen) = ctrl();
@@ -70,4 +70,9 @@ module With_ctrl {
 		k(arg)
 	}
 
+}
+
+module With_ctrl0 {
+	let makef = With_ctrl1.make
+	let runf  = With_ctrl1.run_promise
 }
