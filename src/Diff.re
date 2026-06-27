@@ -212,3 +212,22 @@ let compare = (input1:string, input2:string, split:list(char), nukeDelim:bool, ~
       , array2
       , lcs)
 };
+
+let compare' = (input1:string, input2:string, split:list(char), nukeDelim:bool, ~setStatus: option(string=>unit) =?, ()) => {
+  setStatus|> fun | None => () | Some(f) => f("Initializing inputs");
+  let array1:array(string) = String.length(input1)>0 ? stringDisassembler(input1,split,String.length(input1)-1,"",[],nukeDelim) |> Array.of_list : [||];
+  let array2:array(string) = String.length(input2)>0 ? stringDisassembler(input2,split,String.length(input2)-1,"",[],nukeDelim) |> Array.of_list : [||];
+
+  setStatus|> fun | None => () | Some(f) => f("Evaluating differences");
+  let evalMatrix = evaluateMatrix(array1,array2)
+
+  setStatus|> fun | None => () | Some(f) => f("Creating LCS");
+  let lcs = retraceLCS(
+    array1, array2
+    , evalMatrix);
+  // Js.log(lcs|> Array.of_list)
+
+  setStatus|> fun | None => () | Some(f) => f("Creating diff list");
+  let res = diff( array1 , array2 , lcs);
+	(res, `tokens(array1))
+};

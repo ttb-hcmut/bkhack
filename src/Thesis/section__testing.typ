@@ -64,20 +64,36 @@ For our system, there are certain functions and modules that are more complex th
 
 === Shell parser <test-sh>
 
-Because we implemented a shell parser instead of reusing external libraries, there is a need to test this parser. Unit tests for the shell parser is implemented in the form of inline tests.
+Because we implemented a shell parser instead of reusing external libraries, there is a need to test this parser. Unit tests for the shell parser is implemented in the form of inline tests. The result of this is in @test-sh-result.
 
-=== Diffing <test-diff>
-
-Because we implemented a diffing algorithm besides reusing ones in the form of external libraries, there is a need to test this algorithm. We've prepared a suite of tests which can be run at anything using the command `dune exec test/diff.exe`.
+// TODO(kinten): test melange vs ocamlopt
 
 #place(auto, scope: "parent", float: true)[
   #figure(
     caption: [Result of diff testing],
-    table(columns: 2,
-      [*Name*], [*Result*],
+    table(columns: 3,
+      [*Name*], [*Input string*], [*Input Reason expression*],
+      [basic],  [```sh feed ```], [```reason { feed @| nil ;}```],
+      [long],   [```sh feed | { feed | split -c 1 ;} | split -c 10 ```], [```reason 
+{ let sub = sub { feed @| Split_by.count(1) @| nil };
+  feed @| sub @| Split_by.count(10) @| nil ;}
+```]
+    )
+  ) <test-sh-result>
+]
+
+=== Diffing <test-diff>
+
+Because we implemented a diffing algorithm besides reusing ones in the form of external libraries, there is a need to test this algorithm. We've prepared a suite of tests which can be run at anything using the command ```sh dune exec test_diff/app.exe -- --nuke-delim=true --fmt=csv```. The result of this is in @test-diff-result. The diff is performed by comparing a file of text (`input1`) to a version of itself with one arbitrary character removed (`input2`).  
+
+#place(auto, scope: "parent", float: true)[
+  #figure(
+    caption: [Result of diff testing. Note: the test `bee-movie'` is a version of `bee-movie` where the split token is changed from space to newline.],
+    table(columns: 4,
+      [*Name*], [*Split*], [*Diffing time*], [*Token count*],
       ..csv("res_diff.csv").flatten()
     )
-  )
+  ) <test-diff-result>
 ]
 
 // == Functional testing - browser user interface testing
