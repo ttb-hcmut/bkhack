@@ -35,7 +35,7 @@ let morphism_lucide = (~sw,~procm, lucide_dir, dist_dir) => {
 /** a [morphism] for linking static-content files from public dir
     (and other sources) to dist dir */
 
-let morphism_static = (~sw,~procm, ~force=?, public_dir, dist_dir, ()) => {
+let _morphism_static = (~sw,~procm, ~force=?, public_dir, dist_dir, ()) => {
   let rec iter = (f, ~ondir, rootdir: list(string)) => {
     let items = Path.read_dir(P.(public_dir / String.concat("/", rootdir)));
     ondir @@ String.concat("/", rootdir);
@@ -84,17 +84,17 @@ let morphism_generative = (~sw,~procm, generative_dir, dist_dir) => {
     @raise Missing_mapping_entry_for(pagefile) when a Reason page
     file did not specify a required `[@Bkhack.page s]` attribute.
     Refer to the guide for more details. */
-let main__ = (~css_only, ~watch, ~dist_dir, ~src_dir, ~public_dir, ~generative_dir, ~log_dir, ~lucide_dir, ~verbose, ~optimization, ~target_dir, ()) => Eio_main.run @@ env => {
+let main__ = (~css_only, ~watch, ~dist_dir, ~src_dir, ~generative_dir, ~log_dir, ~lucide_dir, ~verbose, ~optimization, ~target_dir, ()) => Eio_main.run @@ env => {
   let (procm, clock, cwd, fs) =
     (Stdenv.process_mgr(env), Stdenv.clock(env), Stdenv.cwd(env), Stdenv.fs(env));
   let cache_dir = P.(Stdenv.fs(env) / "/tmp" / "bkcache");
-  let (public_dir, generative_dir, dist_dir, log_dir, src_dir, lucide_dir, target_dir) =
-    (public_dir(cwd), generative_dir(fs), dist_dir(cwd), (!verbose ? Some (log_dir(cwd)) : None), src_dir(cwd), lucide_dir(fs), target_dir(fs));
+  let (generative_dir, dist_dir, log_dir, src_dir, lucide_dir, target_dir) =
+    (generative_dir(fs), dist_dir(cwd), (!verbose ? Some (log_dir(cwd)) : None), src_dir(cwd), lucide_dir(fs), target_dir(fs));
     (css_only,cache_dir |> Path.is_directory) |> fun
     | (false,_) | (_,false) =>  {
       Switch.run @@ sw => {
         morphism_jspages(~sw,~procm,~clock,~cwd, ~optimization, ~watch, ~target_dir, src_dir, ~log_dir?, dist_dir);
-        morphism_static(~sw,~procm, public_dir, dist_dir, ());
+        // morphism_static(~sw,~procm, public_dir, dist_dir, ());
         morphism_generative(~sw,~procm, generative_dir, dist_dir);
         morphism_lucide(~sw,~procm, lucide_dir, dist_dir);
       };
@@ -110,7 +110,8 @@ let main__ = (~css_only, ~watch, ~dist_dir, ~src_dir, ~public_dir, ~generative_d
         B.Path.copy_dir(~procm,~sw, P.(cache_dir / "dist"), dist_dir);
       };
       Switch.run @@ sw => {
-        morphism_static(~sw,~procm, ~force=true, public_dir, dist_dir, ());
+        // morphism_static(~sw,~procm, ~force=true, public_dir, dist_dir, ());
+				ignore(sw)
       };
       ()
     }
@@ -129,9 +130,6 @@ let main__ = () => Cmd.v(Cmd.info("webpackgen", ~doc="")) @@ {
   and+ src_dir = Arg.(required & opt((some(string)), None) &
     info(["src_dir"], ~doc=" Source directory. "))
     |> Term.map(Path.((it, cwd) => cwd / it))
-  and+ public_dir = Arg.(required & opt((some(string)), None) &
-    info(["public_dir"], ~doc=" Public directory. "))
-    |> Term.map(Path.((it, cwd) => cwd / it))
   and+ target_dir = Arg.(required & opt((some(string)), None) &
     info(["target_dir"], ~doc=" Target directory. "))
     |> Term.map(Path.((it, cwd) => cwd / it))
@@ -145,7 +143,7 @@ let main__ = () => Cmd.v(Cmd.info("webpackgen", ~doc="")) @@ {
     info(["verbose"], ~docv="VERBOSE"))
   and+ optimization = Arg.(required & opt((some @@ enum @@ [("dev", `Development), ("release", `Production)]), None) &
     info(["optimization", "O"], ~docv="OPTIMIZATION"));
-  main__(~css_only,~watch=false, ~dist_dir, ~src_dir, ~public_dir, ~generative_dir, ~log_dir, ~lucide_dir, ~verbose, ~optimization, ~target_dir, ())
+  main__(~css_only,~watch=false, ~dist_dir, ~src_dir, ~generative_dir, ~log_dir, ~lucide_dir, ~verbose, ~optimization, ~target_dir, ())
 };
 
 /** autorun except in toplevel / interactive mode */
