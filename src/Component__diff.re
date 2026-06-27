@@ -113,18 +113,22 @@ module App__controls = {
 module App__display = {
   [@react.component]
   let make = (~input1, ~input2, ~option) => {
-    let (split, nukeDelim) = React.useMemo1(()=>{ 
+    let split = React.useMemo1(()=>{ 
       option |> fun
-      | 0 => (['\n'],false)
-      | 1 => (['\n'    ,'.',':',',','!','?',';','"','(',')','[',']','{','}'],false)
-      | 2 => (['\n',' ','.',':',',','!','?',';','"','(',')','[',']','{','}'],false)
-      | _ => (['\n'],false)
+      // | 0 => (['\n'],false)
+      // | 1 => (['\n'    ,'.',':',',','!','?',';','"','(',')','[',']','{','}'],false)
+      // | 2 => (['\n',' ','.',':',',','!','?',';','"','(',')','[',']','{','}'],false)
+      // | _ => (['\n'],false)
+      | 0 => [%re {|/(?:(?:[^\n]+)|(?:[\n]))/gm|}]
+      | 1 => [%re {|/(?:(?:[\w\t ]+)|(?:[^\w\t ]))/gm|}]
+      | 2 => [%re {|/(?:(?:\w+)|(?:\W))/gm|}]
+      | _ => [%re {|/(?:(?:[^\n]+)|(?:[\n]))/gm|}]
      },[|option|])
-    let (status,setStatus) = React.useState(() => "")
-    let diffList = React.useMemo1(() => Diff.compare(input1,input2,split,nukeDelim,~setStatus = a => setStatus(_=>a),()),[|split|])
+    // let (status,setStatus) = React.useState(() => "")
+    let diffList = React.useMemo1(() => Diff.compareSplitByRe(~input1,~input2,~split),[|split|])
     ;
     <main>
-      <div> {React.string(status)} </div>
+      // <div> {React.string(status)} </div>
       <div className="side-by-side">
       <Code__box text=diffList mode="-" />
       <Code__box text=diffList mode="+" />

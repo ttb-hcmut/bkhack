@@ -61,6 +61,21 @@ let rec stringDisassembler = (input:string,split:list(char),index:int,hold:strin
   | (0,e,_l) => [String.make(1, e) ++ hold,...list]
   | (_,e,l) => stringDisassembler(input,l,index-1,String.make(1, e) ++ hold,list,nukeDelim)
 };
+// let stringDisassembler2 = (~input:string, ~split:Js.Re.t ,~nukeDelim:bool): array(string) => {
+//   let l = ref(0)
+//   and r = ref(1)
+//   and length = String.length(input)
+//   let res = [];
+//   while (r^ < length && r^>l^) {
+//     r := split |> Array.fold_left(
+//       (acc, ele) => {
+//         Js.String.indexOf(~search=ele,~start=l^) != -1 ? item : result
+//       },-1);
+//       input |> Js.String.indexOf(~search="a",~start=l^)
+//   };
+// }
+
+
 
 let evaluateMatrix = (array1:array(string),array2:array(string)) => {
   let (_,_,evalMatrix) = array1 |> Array.fold_left(((x:int,prevRow:array(int),matOfRows:list(array(int))),row:string)=>{
@@ -80,6 +95,63 @@ let evaluateMatrix = (array1:array(string),array2:array(string)) => {
     (x+1,evalRow,[evalRow,...matOfRows])
   },(0,Array.make(Array.length(array2),0),[]));
   evalMatrix |> List.rev |> Array.of_list
+}
+
+let evaluateMatrix2 = (array1:array(string),array2:array(string)) => {
+  let l1 = Array.length(array1)
+  and l2 = Array.length(array2);
+  let mat = Array.init(l1*l2, _ => [| 0 , -1 |] )
+  // mat[0] = score of the cell
+  // mat[1] = where lcs should jump to next
+  and i  = ref(0);
+
+  let at = (dx:int , dy: int, j: int, arr: array(array(int))) => {
+    ((j / l2) + dx, (j mod l2) + dy) |> fun 
+    | (a',b') when a' >= 0 && b' >= 0 => arr[a'*l2+b'] 
+    | _ => [| 0 , -1 |]
+  }
+  
+  let max = (a: array(int), b: array(int)) => {
+    a[0] > b[0] ? a : b
+  }
+  
+  while( i^ < l1*l2)
+  {
+    array1[i^ / l2] == array2[i^ mod l2] |> fun
+    | true  => {
+      mat[i^][0] = (mat |> at(-1,-1,i^))[0] + 1
+      mat[i^][1] = i^
+    }
+    | false => {
+      max(mat|>at(-1,0,i^), mat|>at(0,-1,i^)) |> fun
+      | [|score,jump|] => {
+        mat[i^][0] = score
+        mat[i^][1] = jump
+      }
+      | _ => ()
+    }
+    i := i^ + 1;
+  }
+  mat
+  // let (_,_,evalMatrix) = array1 |> Array.fold_left(((x:int,prevRow:array(int),matOfRows:list(array(int))),row:string)=>{
+  //   let (_,_,evalRow)  = array2 |> Array.fold_left(((y:int,prevCol:int       ,rowOfCols:array(int)       ),col:string)=>{
+  //     let eval = (row == col,y) |> fun 
+  //     | (true,y') when y' > 0 => //you are my special
+  //       prevRow[y-1] + 1
+  //     | (true,_) => //you are my special
+  //       1
+  //     | (false,_) =>
+  //       prevCol > prevRow[y] ? prevCol : prevRow[y]
+  //     ;
+  //     rowOfCols[y] = eval
+  //     ;
+  //     (y+1,eval,rowOfCols)
+  //   },(0,0,Array.make(l2,0)))
+  //   let evalRow = evalRow
+  //   ;
+  //   (x+1,evalRow,[evalRow,...matOfRows])
+  // },(0,Array.make(l2,0),Array.make(l2,0)));
+  // evalMatrix |> Array.of_list
 }
 
 // let evaluateMatrixCell = 
@@ -142,6 +214,25 @@ let retraceLCS =
   //   , lcs
   //   , matrix)
   };
+let retraceLCS2 = (input1:array(string), length2:int, matrix:array(array(int)) ) =>
+  {
+    let mlen = Array.length(matrix)
+    let i = ref(mlen>0? matrix[mlen-1][1] : -1)
+    and lcs = ref([])
+    while(i^ >= 0){
+      if( i^ != matrix[i^][1] )
+      {
+        i := matrix[i^][1]
+      }
+      else 
+      {
+        lcs := [input1[i^ / length2],...lcs^]
+        i := i^ - length2 - 1
+      }
+    }
+    ;
+    lcs^
+  };
 
 let diff = ( input1: array(string), input2: array(string), lcs:list(string)) =>
 {
@@ -193,25 +284,7 @@ let diff = ( input1: array(string), input2: array(string), lcs:list(string)) =>
   d^ |> List.rev
 };
 
-let compare = (input1:string, input2:string, split:list(char), nukeDelim:bool, ~setStatus: option(string=>unit) =?, ()) => {
-  setStatus|> fun | None => () | Some(f) => f("Initializing inputs");
-  let array1:array(string) = String.length(input1)>0 ? stringDisassembler(input1,split,String.length(input1)-1,"",[],nukeDelim) |> Array.of_list : [||];
-  let array2:array(string) = String.length(input2)>0 ? stringDisassembler(input2,split,String.length(input2)-1,"",[],nukeDelim) |> Array.of_list : [||];
 
-  setStatus|> fun | None => () | Some(f) => f("Evaluating differences");
-  let evalMatrix = evaluateMatrix(array1,array2)
-
-  setStatus|> fun | None => () | Some(f) => f("Creating LCS");
-  let lcs = retraceLCS(
-    array1, array2
-    , evalMatrix);
-  // Js.log(lcs|> Array.of_list)
-
-  setStatus|> fun | None => () | Some(f) => f("Creating diff list");
-  diff( array1
-      , array2
-      , lcs)
-};
 
 let compare' = (input1:string, input2:string, split:list(char), nukeDelim:bool, ~setStatus: option(string=>unit) =?, ()) => {
   setStatus|> fun | None => () | Some(f) => f("Initializing inputs");
@@ -230,4 +303,25 @@ let compare' = (input1:string, input2:string, split:list(char), nukeDelim:bool, 
   setStatus|> fun | None => () | Some(f) => f("Creating diff list");
   let res = diff( array1 , array2 , lcs);
 	(res, `tokens(array1))
+};
+
+let compare = (input1, input2, split, nukeDelim, ~setStatus=?, ()) => {
+  let (res, _) = compare'(input1, input2, split, nukeDelim, ~setStatus?, ());
+  res
+};
+
+let compareSplitByRe = (~input1:string, ~input2:string, ~split:Js.Re.t) => {
+  let array1:array(string) = Js.String.match(~regexp=split,input1) |> Option.value(~default= [||]) |> Array.map(x => x |> Option.value(~default="balls"));
+  let array2:array(string) = Js.String.match(~regexp=split,input2) |> Option.value(~default= [||]) |> Array.map(x => x |> Option.value(~default="balls"));
+
+  let evalMatrix = evaluateMatrix2(array1,array2)
+
+  let lcs = retraceLCS2(
+    array1, array2 |> Array.length
+    , evalMatrix);
+  // Js.log(lcs|> Array.of_list)
+
+  diff( array1
+      , array2
+      , lcs)
 };

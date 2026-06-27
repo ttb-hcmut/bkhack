@@ -71,26 +71,26 @@ module DiffContext = {
   let use = () => React.useContext(ctx);
 };
 
-let%Fiber.bind k' = ((), _) => {
-	// open Fiber.Syntax;
-	Diff.compare("a b c","a d c",[' '],true,~setStatus = _ => (),())
-}
+// let%Fiber.bind k' = ((), _) => {
+// 	// open Fiber.Syntax;
+// 	Diff.compare("a b c","a d c",[' '],true,~setStatus = _ => (),())
+// }
 
 module Inspectview = {
 	[@react.component]
 	let make = () => {
     let (status, setStatus) = React.useState(() => "")
-		let ctrl = React.useMemo0(Fiber.Ctrl.create);
-		let k = React.useMemo0(() => Fiber.With_ctrl1.make(~ctrl, k'));
-		let () = React.useEffect0(() => {
-			ignore(Fetch__syntax.({
-				let* u = Fiber.With_ctrl1.run_promise(~ctrl, (), k);
-				if (false) { ignore(u+1) };
-				Js.Console.log(u);
-				return(())
-			}>!= (e => { Js.Console.error(e); return(()) })));
-			None
-		});
+		// let ctrl = React.useMemo0(Fiber.Ctrl.create);
+		// let k = React.useMemo0(() => Fiber.With_ctrl.make(~ctrl, k'));
+		// let () = React.useEffect0(() => {
+		// 	ignore(Fetch__syntax.({
+		// 		let* u = Fiber.With_ctrl.run_promise(~ctrl, (), k);
+		// 		if (false) { ignore(u+1) };
+		// 		Js.Console.log(u);
+		// 		return(())
+		// 	}>!= (e => { Js.Console.error(e); return(()) })));
+		// 	None
+		// });
     let (option,setOption) = React.useState(()=> 0)
     let diff = DiffContext.use()
     let (split, nukeDelim) = React.useMemo1(()=>{ 

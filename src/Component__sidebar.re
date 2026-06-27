@@ -356,6 +356,7 @@ module Activities = {
       <header> {string("Recent Activities")} </header>
       <button className="see-more" onClick={_ => seeMoreActivities()}>{string("All activities")}</button>
       <ul>
+        <li> <Test_timer.Timer /> </li>
         {
           activities
           |> List.map(((activity_id,activity_type, author, content, timestamp)) =>
