@@ -13,3 +13,9 @@
 
 /// State Machine Blue
 #let blue-2 = color.rgb("#017bcd")
+
+/// Promise Yellow
+#let yellow-2 = color.rgb("#D9985E")
+
+/// Compiler Yellow
+#let yellow-alt-2 = color.rgb("#ff8e27")

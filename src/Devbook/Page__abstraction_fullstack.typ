@@ -85,6 +85,9 @@ and secured fetch code.\
   bl-et-cetera(-2)
 })
 #lorem(30)
+== Mechanics
+_generatives_
+_staging_
 == First-class full-stack build process
 @dune-version-1
 #place(auto, scope: "parent", float: true)[
