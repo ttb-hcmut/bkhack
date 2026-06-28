@@ -79,7 +79,7 @@ module DiffContext = {
 module Inspectview = {
 	[@react.component]
 	let make = () => {
-    let (status, setStatus) = React.useState(() => "")
+    // let (status, setStatus) = React.useState(() => "")
 		// let ctrl = React.useMemo0(Fiber.Ctrl.create);
 		// let k = React.useMemo0(() => Fiber.With_ctrl.make(~ctrl, k'));
 		// let () = React.useEffect0(() => {
@@ -102,14 +102,14 @@ module Inspectview = {
      },[|option|])
     let diffList = React.useMemo3(() => {
     (diff.cid1,diff.cid2)|> fun
-      | (Some(_),Some(_)) => Diff.compare(diff.input1,diff.input2,split,nukeDelim,~setStatus = a => setStatus(_=>a),())
+      | (Some(_),Some(_)) => Diff.compare(diff.input1,diff.input2,split,nukeDelim)
       | _ => []
     },(split,diff.cid1,diff.cid2))
     ;
     <div className="diff-box">
       <Component__diff.App__controls option setOption />
       <main>
-        <div> {React.string(status)} </div>
+        // <div> {React.string(status)} </div>
         <div className="side-by-side">
           <div className="diff1">
           {
