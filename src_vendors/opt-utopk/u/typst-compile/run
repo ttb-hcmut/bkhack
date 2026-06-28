@@ -11,9 +11,9 @@ def tmpdir_open(root, name=None):
 @contextlib.contextmanager
 def tmpfile_open(dir):
   import uuid, os
-  filename = f"{dir}/{uuid.uuid4()}"
+  filename = f"{dir}/__u__typst__compile__{uuid.uuid4()}"
   yield filename
-  # os.unlink(filename)
+  os.unlink(filename)
 
 def replaces(target, ls):
   ret = target
