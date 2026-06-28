@@ -91,7 +91,7 @@ Because we implemented a diffing algorithm besides reusing ones in the form of e
     caption: [Result of diff testing. Note: the test `bee-movie'` is a version of `bee-movie` where the split token is changed from space to newline.],
     table(columns: 4,
       [*Name*], [*Split*], [*Diffing time*], [*Token count*],
-      ..csv("res_diff.csv").flatten()
+      // ..csv("res_diff.csv").flatten()
     )
   ) <test-diff-result>
 ]

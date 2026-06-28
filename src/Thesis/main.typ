@@ -10,7 +10,7 @@
   // - "kinten-style"
   "bachkhoa-style"
 }
-
+#import "lib/loram/main.typ":lorem
 #import ("templates/"+style+"/main.typ"): *
 // #import "templates/kinten-style/main.typ": *
 #set text(lang: "VN")
