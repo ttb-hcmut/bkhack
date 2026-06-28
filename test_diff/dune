@@ -1,10 +1,11 @@
 (library
- (modules diff)
+ (modules diff js)
  (name diff))
 
 (executable
+ (package bkhack-test)
  (libraries diff eio eio_main cmdliner containers csv)
  (modules app)
- (name app))
+ (name app) (public_name bkhack-test.diff))
 
 (copy_files (files %{workspace_root}/src/Diff.re))

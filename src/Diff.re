@@ -282,7 +282,7 @@ let diff = ( input1: array(string), input2: array(string), lcs:list(string)) =>
   d^ |> List.rev
 };
 
-let compare = (input1:string, input2:string, split:list(char), nukeDelim:bool) => {
+let compare' = (input1:string, input2:string, split:list(char), nukeDelim:bool) => {
   let start = Js.Date.now();
   let array1:array(string) = String.length(input1)>0 ? stringDisassembler(input1,split,String.length(input1)-1,"",[],nukeDelim) |> Array.of_list : [||];
   let array2:array(string) = String.length(input2)>0 ? stringDisassembler(input2,split,String.length(input2)-1,"",[],nukeDelim) |> Array.of_list : [||];
@@ -312,9 +312,15 @@ let compare = (input1:string, input2:string, split:list(char), nukeDelim:bool) =
   , "\nDiff listing: " ++ string_of_float(afterDiffList -. afterLCS)
   , "\n------------------------"
   , "\nTotal: " ++ string_of_float(afterDiffList -. start)
-  |])
-  diffList
+  |]);
+  (diffList, `tokens(array1))
 };
+
+let compare = (input1, input2, split, nukeDelim) => {
+	let (res, _) = compare'(input1, input2, split, nukeDelim);
+	res
+}
+
 let compareSplitByRe = (~input1:string, ~input2:string, ~split:Js.Re.t) => {
   let start = Js.Date.now();
   let array1:array(string) = Js.String.match(~regexp=split,input1) |> Option.value(~default= [||]) |> Array.map(x => x |> Option.value(~default="balls"));
