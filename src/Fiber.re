@@ -43,6 +43,7 @@ and onmessage = (worker, ~tbl) => { worker->Js__worker.Worker.onmessage(e => {
 	open { [@mel.send] external call1 : Js.Fn.arity1('a => 'b) => 'this => 'a => 'b = "call"; };
 	let Fiber__core.Comm__reply(_, owner, res) = Js__worker.Message.data(e);
 	let (resolve, reject_) = tbl->Hashtbl.find(owner);
+	tbl->Hashtbl.remove(owner);
 	switch (res) {
 	| Result.Ok(data) => resolve->call1(Js.null, data)
 	| Result.Error(e) => reject_->call1(Js.null, e)
