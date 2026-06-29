@@ -1,4 +1,5 @@
-type fiber('in_, 'ret) = (int, fiber'('in_, 'ret))
+type fiber('in_, 'ret) =
+	{ fiber_id: int, fiber_run: fiber'('in_, 'ret) }
 
 and fiber'('in_, 'ret) = 'in_ => Js.promise('ret)
 
@@ -7,10 +8,12 @@ and continuation('in_, 'ret) = (
 	~idgen:ref(int)
 ) => fiber'('in_, 'ret)
 
-and ctrl('ret) = (int, unit => (
-	Hashtbl.t(int, (Js.Fn.arity1('ret => unit), Js.Fn.arity1(exn => unit))),
-	ref(int)
-));
+and ctrl('ret) = 
+	{ ctrl_id: int, ctrl_gen: unit =>
+		(
+			Hashtbl.t(int, (Js.Fn.arity1('ret => unit), Js.Fn.arity1(exn => unit))),
+			ref(int)
+		)};
 
 let rec of_worker =
 	(mkworker: unit => Js__worker.worker(
@@ -52,21 +55,22 @@ module Ctrl {
 	let create = () : ctrl(_) => {
 		let id = idgen^
 		and f = () => { let tbl = Hashtbl.create(4) and idgen = ref(0); (tbl, idgen) };
-		idgen := id + 1; (id, f)
+		idgen := id + 1;
+		{ ctrl_id: id, ctrl_gen: f }
 	}
 }
 
 module With_ctrl1 {
 	let make = (~ctrl:ctrl('ret), k: continuation('in_, 'ret)) : fiber('in_, 'ret) => {
-		let (ctrl_id, ctrl) = ctrl;
+		let { ctrl_id, ctrl_gen: ctrl } = ctrl;
 		let (tbl, idgen) = ctrl();
-		(ctrl_id, k(~tbl, ~idgen))
+		{ fiber_id: ctrl_id, fiber_run: k(~tbl, ~idgen) }
 	}
 
 	let run_promise = (type in_, type ret, ~ctrl:ctrl(ret), arg:in_, k: fiber(in_, ret)) => {
-		let (group_id, k) = k;
-		let (ctrl_id, _) = ctrl;
-		assert(group_id == ctrl_id);
+		let { fiber_id: fiber_group_id, fiber_run: k } = k;
+		let { ctrl_id: ctrl_group_id, _ } = ctrl;
+		assert(fiber_group_id == ctrl_group_id);
 		k(arg)
 	}
 
