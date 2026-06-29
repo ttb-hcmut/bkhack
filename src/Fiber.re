@@ -4,14 +4,14 @@ type fiber('in_, 'ret) =
 and fiber'('in_, 'ret) = 'in_ => Js.promise('ret)
 
 and continuation('in_, 'ret) = (
-	~tbl:Hashtbl.t(int, (Js.Fn.arity1('ret => unit), Js.Fn.arity1(exn => unit))),
+	~tbl:Hashtbl.t(int, ('ret => unit, exn => unit)),
 	~idgen:ref(int)
 ) => fiber'('in_, 'ret)
 
 and ctrl('ret) = 
 	{ ctrl_id: int, ctrl_gen: unit =>
 		(
-			Hashtbl.t(int, (Js.Fn.arity1('ret => unit), Js.Fn.arity1(exn => unit))),
+			Hashtbl.t(int, ('ret => unit, exn => unit)),
 			ref(int)
 		)};
 
@@ -32,21 +32,23 @@ let rec of_worker = (mkworker: unit => Js__worker.worker(Js__worker.Fiber.reques
 
 and submit = (worker, ~idgen, ~tbl) =>
 	in_ => {
+		open { [@mel.send] external call1 : Js.Fn.arity1('a => 'b) => 'this => 'a => 'b = "call"; };
 		let id = idgen^; idgen := id + 1;
 		Js.Promise.make @@ (~resolve, ~reject) => {
+			let resolve = data => resolve->call1(Js.null, data)
+			and reject  = e => reject->call1(Js.null, e);
 			tbl->Hashtbl.add(id, (resolve, reject));
 			Js__worker.Worker.postMessage(worker, Fiber__core.Comm__request(id, in_))
 		}
 	}
 
 and onmessage = (worker, ~tbl) => { worker->Js__worker.Worker.onmessage(e => {
-	open { [@mel.send] external call1 : Js.Fn.arity1('a => 'b) => 'this => 'a => 'b = "call"; };
 	let Fiber__core.Comm__reply(_, owner, res) = Js__worker.Message.data(e);
 	let (resolve, reject_) = tbl->Hashtbl.find(owner);
 	tbl->Hashtbl.remove(owner);
 	switch (res) {
-	| Result.Ok(data) => resolve->call1(Js.null, data)
-	| Result.Error(e) => reject_->call1(Js.null, e)
+	| Result.Ok(data) => resolve(data)
+	| Result.Error(e) => reject_(e)
 	}
 }); worker }
 
