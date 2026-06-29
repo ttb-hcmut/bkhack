@@ -1,5 +1,5 @@
 (rule
- (alias al)
+ (alias all)
  (deps dist firebase.json)
  (action (bash "\"$(pnpm root)\"/.bin/firebase deploy")))
 
