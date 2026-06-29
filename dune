@@ -23,10 +23,6 @@
    (dirs ))))
 
 (rule
- (target services)
- (action (bash "cat `ls /tmp/ppxfiber.services | sed -e 's|^|/tmp/ppxfiber.services/|'` > /tmp/sss && cp /tmp/sss %{target}")))
-
-(rule
  (mode promote)
  (target article)
  (deps (:typc-article %{project_root}/src_vendors/opt-utopk/u/article))

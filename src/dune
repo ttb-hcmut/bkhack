@@ -44,14 +44,24 @@
 
 (data_only_dirs Static)
 
-(dynamic_include ../services)
+(rule
+ (target Fiberlet__src__Test_timer__re__p'.ml)
+ (deps Test_timer.re.pp.ml)
+ (action (run cp -s /tmp/%{target} %{target})))
 
 (rule
- (target (dir generative))
- (deps (alias react))
+ (target Fiberlet__src__Test_timer__re__q'.ml)
+ (deps Test_timer.re.pp.ml)
+ (action (run cp -s /tmp/%{target} %{target})))
+
+(rule
+ (targets (dir generative))
+ (deps Page__app.re.pp.ml)
  (action (progn
   (run mkdir -p generative)
-  (run cp -r /tmp/generative .)
+  (concurrent
+   (run cp -s /tmp/generative/src__Page__app__re__HintPanel__feed__hint.css generative/src__Page__app__re__HintPanel__feed__hint.css)
+  )
  )))
 
 ; `melange.emit` is a Dune stanza that will produce build rules to generate
