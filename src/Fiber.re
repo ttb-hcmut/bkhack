@@ -15,11 +15,15 @@ and ctrl('ret) =
 			ref(int)
 		)};
 
-let rec of_worker =
-	(mkworker: unit => Js__worker.worker(
-		Fiber__core.comm('in_, 'ret, [ `requested ]),
-		Fiber__core.comm('in_, 'ret, [ `replied ]),
-	)) : continuation('in_, 'ret) => {
+module Js__worker {
+	include Js__worker
+	module Fiber {
+		type request('in_, 'ret) = Fiber__core.comm('in_, 'ret, [ `requested ])
+		and  reply('in_, 'ret)   = Fiber__core.comm('in_, 'ret, [ `replied ])
+	}
+}
+
+let rec of_worker = (mkworker: unit => Js__worker.worker(Js__worker.Fiber.request('in_, 'ret), Js__worker.Fiber.reply('in_, 'ret))) : continuation('in_, 'ret) => {
 	(~tbl, ~idgen) => {
 		let worker = mkworker() |> onmessage(~tbl) |> onerror;
 		worker->submit(~idgen, ~tbl)
@@ -29,8 +33,8 @@ let rec of_worker =
 and submit = (worker, ~idgen, ~tbl) =>
 	in_ => {
 		let id = idgen^; idgen := id + 1;
-		Js.Promise.make @@ (~resolve, ~reject) =>
-		{ tbl->Hashtbl.add(id, (resolve, reject));
+		Js.Promise.make @@ (~resolve, ~reject) => {
+			tbl->Hashtbl.add(id, (resolve, reject));
 			Js__worker.Worker.postMessage(worker, Fiber__core.Comm__request(id, in_))
 		}
 	}
@@ -78,5 +82,5 @@ module With_ctrl1 {
 
 module With_ctrl0 {
 	let makef = With_ctrl1.make
-	let runf  = With_ctrl1.run_promise
+	and runf  = With_ctrl1.run_promise
 }
