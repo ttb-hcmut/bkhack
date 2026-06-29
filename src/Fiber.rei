@@ -1,4 +1,4 @@
-type fiber('in_, 'ret) and continuation('in_, 'ret) and ctrl('ret);
+type fiber('in_, 'ret) and continuation('in_, 'ret) and ctrl('ret) and argmaker;
 
 let of_worker : 'in_ 'ret. (
 	unit => Js__worker.worker(
@@ -13,12 +13,12 @@ module Ctrl {
 
 module With_ctrl0 {
 	let makef : (~ctrl:ctrl('ret), continuation('in_, 'ret)) => fiber('in_, 'ret)
-	let runf  : 'in_ 'ret. (~ctrl:ctrl('ret), 'in_, fiber('in_, 'ret)) => Js.promise('ret)
+	let runf  : 'in_ 'ret. (~ctrl:ctrl('ret), [ `apply0('in_) | `apply1(argmaker => 'in_) ], fiber('in_, 'ret)) => Js.promise('ret)
 }
 
 module With_ctrl1 {
 	let make : (~ctrl:ctrl('ret), continuation('in_, 'ret)) => fiber('in_, 'ret)
-	let run_promise : 'in_ 'ret. (~ctrl:ctrl('ret), 'in_, fiber('in_, 'ret)) => Js.promise('ret)
+	let run_promise : 'in_ 'ret. (~ctrl:ctrl('ret), [ `apply0('in_) | `apply1(argmaker => 'in_) ], fiber('in_, 'ret)) => Js.promise('ret)
 }
 
 // module Cancel {

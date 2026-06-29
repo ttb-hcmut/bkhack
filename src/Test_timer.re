@@ -21,7 +21,7 @@ module Timer = {
     // let balls = ;
     let run' = k => {
       ignore(Fetch__syntax.({
-				let* u = Fiber.With_ctrl1.run_promise(~ctrl, (interval), k);
+				let* u = Fiber.With_ctrl1.run_promise(~ctrl, `apply0(interval), k);
         // u ;
 				if (false) { ignore(u+1) };
 				Js.Console.log(u);

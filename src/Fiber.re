@@ -74,11 +74,14 @@ module With_ctrl1 {
 		{ fiber_id: ctrl_id, fiber_run: k(~tbl, ~idgen) }
 	}
 
-	let run_promise = (type in_, type ret, ~ctrl:ctrl(ret), arg:in_, k: fiber(in_, ret)) => {
+	let run_promise = (type in_, type ret, ~ctrl:ctrl(ret), arg:[ `apply0(in_) | `apply1(argmaker => in_) ], k:fiber(in_, ret)) => {
 		let { fiber_id: fiber_group_id, fiber_run: k } = k;
 		let { ctrl_id: ctrl_group_id, _ } = ctrl;
 		assert(fiber_group_id == ctrl_group_id);
-		k(arg)
+		switch (arg) {
+		| `apply0(arg) => k(arg)
+		| `apply1(_mkarg) => failwith("unimplemented")
+		}
 	}
 
 }
