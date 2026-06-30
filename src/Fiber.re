@@ -4,7 +4,7 @@ type fiber('in_, 'ret, 'yield, 'yieldback) =
 and fiber'('in_, 'ret, 'yield, 'yieldback) = 'in_ => Js.promise('ret)
 
 and continuation('in_, 'ret, 'yield, 'yieldback) = (
-	~tbl:Hashtbl.t(int, ('ret => unit, int => 'yield => unit, exn => unit)),
+	~tbl:Hashtbl.t(int, ('ret => unit, int => int => 'yield => unit, exn => unit)),
 	~idgen:ref(int),
 	~handletbl:Hashtbl.t(int, 'yield => Js.promise('yieldback))
 ) => fiber'('in_, 'ret, 'yield, 'yieldback)
@@ -12,7 +12,7 @@ and continuation('in_, 'ret, 'yield, 'yieldback) = (
 and ctrl('ret, 'yield, 'yieldback) = 
 	{ ctrl_id: int, ctrl_gen: unit =>
 		(
-			Hashtbl.t(int, ('ret => unit, int => 'yield => unit, exn => unit)),
+			Hashtbl.t(int, ('ret => unit, int => int => 'yield => unit, exn => unit)),
 			ref(int)
 		),
 		ctrl_lambda_data: 
@@ -45,11 +45,11 @@ and submit = (worker, ~idgen, ~tbl, ~handletbl) => {
 		idgen := idgen^ + 1;
 		Js.Promise.make @@ (~resolve, ~reject) => {
 			let resolve = data => resolve->call1(Js.null, data)
-			and reflect = (id: int, x: 'yield) => {
+			and reflect = (async_id: int, await_id: int, x: 'yield) => {
 				ignore(Fetch__syntax.({
-					let handle = Hashtbl.find(handletbl, id);
+					let handle = Hashtbl.find(handletbl, async_id);
 					let* u = handle(x)
-					Js__worker.Worker.postMessage(worker, Either.Right(Fiber__core.Comm__set(id, u)));
+					Js__worker.Worker.postMessage(worker, Either.Right(Fiber__core.Comm__set(await_id, u)));
 					return()
 				}>!= (e => { Js.Console.error(e); return() })) );
 			}
@@ -67,8 +67,8 @@ and onmessage = (worker, ~tbl) => { worker->Js__worker.Worker.onmessage(e => {
 	| Result.Ok(Fiber__core.Rep_ly(data)) =>
 		tbl->Hashtbl.remove(owner);
 		resolve(data)
-	| Result.Ok(Fiber__core.Rep_(id, x)) =>
-		reflect(id, x)
+	| Result.Ok(Fiber__core.Rep_({ async_id, await_id, app: x })) =>
+		reflect(async_id, await_id, x)
 	| Result.Error(e) =>
 		tbl->Hashtbl.remove(owner);
 		reject_(e)
@@ -121,10 +121,10 @@ module With_ctrl0 {
 
 let lam' = (type ret, type a, type b, ctrl:ctrl(ret, a, b), f: a => Js.promise(b)): Fiber__core.lambda(a, b) => {
 	let { ctrl_lambda_data: (handletbl, yieldgen), _ } = ctrl;
-	let await_id = yieldgen^;
+	let async_id = yieldgen^;
 	yieldgen := yieldgen^ + 1;
-	Hashtbl.add(handletbl, await_id, f);
-	Fiber__core.Lambda({ await_id: await_id })
+	Hashtbl.add(handletbl, async_id, f);
+	Fiber__core.Lambda({ async_id: async_id })
 }
 
 let lam = (type ret, type a, type b, ctrl:ctrl(ret, a, b), f: a => b): Fiber__core.lambda(a, b) => {

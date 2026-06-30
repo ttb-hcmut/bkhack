@@ -4,7 +4,7 @@ type comm('in_, 'ret, 'yield, 'yieldback, 'ctx) =
 	| Comm__reply(comm('in_, 'ret, 'yield, 'yieldback, [`requested]), int, result(reply('ret, 'yield), exn)): comm('in_, 'ret, 'yield, 'yieldback, [`replied])
 
 and reply('ret, 'yield) =
-	| Rep_(int, 'yield)
+	| Rep_({ async_id: int, await_id: int, app: 'yield })
 	| Rep_ly('ret)
 
-and lambda('a, 'b) = Lambda({ await_id: int })
+and lambda('a, 'b) = Lambda({ async_id: int })

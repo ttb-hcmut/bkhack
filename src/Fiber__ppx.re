@@ -43,7 +43,7 @@ Extension.declare("Fiber.bind", Extension.Context.structure_item, Ast_pattern.(p
 				open Melange__containers.Fun
 				[@warning "-73"]
 				open World()
-				let promiser = Hashtbl.create(0);
+				let promiser = Hashtbl.create(0) and awaitgen = ref(0);
 				onMessage(Message.data %> req => {
 					switch (req) {
 						| Either.Right(Fiber__core.Comm__set(promiser_id, promiser_val)) =>
@@ -52,18 +52,28 @@ Extension.declare("Fiber.bind", Extension.Context.structure_item, Ast_pattern.(p
 						| Either.Left(Fiber__core.Comm__request(owner, param) as req) =>
 							module Lam {
 								[@warning "-32"]
-								let app = (v: 'a, f: Fiber__core.lambda('a, 'b)) : Js.promise('b) => {
-									let Lambda({ await_id }) = f;
-									Js.Promise.make @@ (~resolve, ~reject) => {
+								let app = (app: 'a, f: Fiber__core.lambda('a, 'b)) : Js.promise('b) => {
+									let Lambda({ async_id }) = f;
+									let await_id = awaitgen^;
+									awaitgen := awaitgen^ + 1;
+									Js.Promise.make((~resolve, ~reject) => {
 										open {
 											[@mel.send] external call1 : Js.Fn.arity1('a => 'b) => 'this => 'a => 'b = "call";
 											let resolve = data => resolve->call1(Js.null, data)
 											and reject  = e    => reject->call1(Js.null, e);
 										};
 										promiser->Hashtbl.add(await_id, (resolve, reject));
-										let res = Result.ok @@ Fiber__core.Rep_(await_id, v);
+										let res = Result.ok @@ Fiber__core.Rep_({ async_id, await_id, app });
 										postMessage(Fiber__core.Comm__reply(req, owner, res))
-									}
+									})
+									|> Js.Promise.then_(x => {
+										promiser->Hashtbl.remove(await_id);
+										Js.Promise.resolve(x)
+									})
+									|> Js.Promise.catch(e => {
+										promiser->Hashtbl.remove(await_id);
+										Js.Promise.reject(Js.Exn.anyToExnInternal(e))
+									})
 								}
 							};
 							let k = [%e pvb_expr];
