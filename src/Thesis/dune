@@ -3,3 +3,8 @@
  (target res_diff.csv)
  (deps (:res (file ../../test_diff/res.csv)))
  (action (run cp %{res} res_diff.csv)))
+
+(rule
+ (target main.pdf)
+ (deps (source_tree .))
+ (action (run typst compile --font-path=. main.typ)))
