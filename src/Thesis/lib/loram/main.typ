@@ -1,22 +1,23 @@
 #import "../../config.typ": config as c
-#let wippingit() = {[#square(size: 100000pt,fill: tiling(scale(1000%,reflow:true)[#rotate(45deg,reflow:true)[#text(fill: color.linear-rgb(0%,0%,0%,20%))[WIP]]]))]}
-#let longJohnson = state("longJohnson",0)
-// #weirdDict.update(v => (,))
+#let longJohnson = state("longJohnson",())
+#set page(foreground: context{ 
+  if("profile" in c.keys() and c.at("profile") == "dev"){none} else {
+    if(longJohnson.final().contains(counter(page).get().first())){
+      box(
+        height: 100%,
+        width: 100%,
+        fill: tiling(scale(1000%,reflow:true)[#rotate(45deg,reflow:true)[#text(fill: color.linear-rgb(0%,0%,0%,20%))[WIP]]])
+      )
+    }else{
+      none
+  }}}
+)
 #let lorem(length) = {
-[
-    #context {
-      let current_page = counter(page).get().first()
-      if("profile" in c.keys() and c.at("profile") == "dev"){
-        []
-      } else {
-      if(longJohnson.get() != current_page) {
-          longJohnson.update(v=>current_page)
-          place(center, dx:-50%, dy:-50% ,
-          wippingit())
-          []
-      }
-    }
+  context{
+    let pagenum = counter(page).get().first()
+    longJohnson.update(
+        v => (pagenum,..v)
+    )
+    std.lorem(length)
   }
-  #std.lorem(length)
-  ]
 }
