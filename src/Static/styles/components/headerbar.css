@@ -35,6 +35,11 @@
   flex-wrap: wrap;
   justify-content: space-between;
 }
+
+#root > header > div > .header-left > form {
+	margin: var(--padding-vertical) 0;
+}
+
 #root > header > div > .header-left {
   /* grid-column: auto/span 1; */
 	display: flex;
@@ -43,29 +48,6 @@
 	gap: var(--space-a);
 	flex: 1 1 auto;
 }
-/* 
-#root > header > div > .header-right-hamburger {
-	display: flex;
-	align-items: center;
-  width: max-content;
-	gap: var(--space-a);
-	flex: 0 1 auto;
-} */
-#root > header > div > .header-right {
-  /* grid-column: auto/span 1; */
-	display: flex;
-	align-items: center;
-	gap: var(--space-d);
-	flex: 1 1 auto;
-  justify-content: space-between;
-}
-
-#root[data-tileset='gui'] > header > div > .header-right {
-	display: flex;
-	align-items: center;
-	gap: var(--space-c);
-}
-
 #root > header .logo {
 	display: flex;
 	flex-direction: row;
@@ -84,7 +66,7 @@
 
 #root[data-tileset="gui"] > header .logo {
 	content: " ";
-	margin-left: var(--space-a);
+	/* margin-left: var(--space-a); */
 	background-image: url("/assets/logo.svg");
 	background-repeat: no-repeat;
 	background-position-x: center;
@@ -106,37 +88,102 @@
 	  background-color: var(--sig-blue-deep);
   }
 }
-
-#root > header > div > .header-left > form {
-	margin: var(--padding-vertical) 0;
+#root > header > div > .header-right {
+  /* grid-column: auto/span 1; */
+	display: flex;
+	align-items: center;
+	gap: var(--space-d);
+	/* flex: 1 1 auto; */
 }
-
-#root > header > div > .header-right > .separator {
+#root[data-tileset='gui'] > header > div > .header-right {
+	display: flex;
+	align-items: center;
+}
+#root > header > div > .header-right > .nav-list {
+	display: flex;
+	align-items: stretch;
+	gap: var(--space-c);
+}
+#root > header > div > .header-right > .nav-list > .separator {
 	width: 1px;
-	height: 1.25rem;
 	background-color: var(--border);
-	margin-left: var(--space-c);
-	margin-right: var(--space-c);
 }
 
-#root > header a.place,
-#root > header button.place {
+#root > header > div > .header-right :is(a.place ,button.place,.header-right-hamburger){
+  height: 100%;
 	font-size: var(--text-sm);
 	font-family: var(--font-mono);
   color: var(--ctp-text);
-	padding: var(--space-c) 0px;
+	padding: var(--space-c);
 	border-radius: var(--radius);
 	border: none;
 	background-color: transparent;
 	cursor: pointer;
-	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	gap: var(--space-c);
 	transition: all 200ms ease;
 	text-decoration: none;
 }
-
+#root > header > div  > .header-right > .header-right-hamburger {
+	display: none;
+}
+#root > header > div > .header-right :is(a,button).place {
+	display: inline-flex;
+}
+@media (max-width: 48rem) {
+  .header-right {
+    position: relative;
+    
+  }
+  .header-right-hamburger {
+    display: inline-flex !important;
+  }
+  .header-right-hamburger.expand:after {
+    --secret: calc(sqrt(2)*var(--space-a));
+    content: '';
+    position: absolute;
+    background-color: var(--ctp-crust);
+    border: 1px solid var(--card-border);
+    border-right: 0;
+    border-bottom: 0;
+    bottom: calc(-2* var(--space-a) + 2px);
+    right: calc(1/2* (var(--secret) - var(--space-a)) + 1px);
+    height: var(--secret);
+    width: var(--secret);
+    transform: rotate(45deg);
+    z-index: 99999;
+}
+  .nav-list {
+    display: none !important;
+	  justify-content: center;
+    position: absolute;
+    max-height: 60vh;
+    scrollbar-gutter: stable;
+    overflow-y: scroll; 
+    scrollbar-color: var(--card-border) transparent;
+    scrollbar-width: thin;
+    flex-direction: column;
+    top:calc(100% + var(--space-a));
+    background-color: var(--ctp-crust);
+    padding: var(--space-a);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius) 0 var(--radius) var(--radius);
+    right:0;
+  }
+  .nav-list.expand {
+    display: flex !important;
+  }
+  
+  #root > header > div > .header-right > .nav-list > .separator {
+    width: unset !important;
+    height: 1px;
+  }
+  .nav-list a.place {
+    justify-content: start !important;
+	  padding: var(--space-c) !important;
+  }
+}
 
 @media (prefers-reduced-motion) {
 	#root > header a.place,
@@ -145,73 +192,75 @@
 		transition-duration: 0ms;
 	}
 }
-
-#root[data-tileset='gui'] > header {
-	a.place, button.place {
-		padding: var(--space-c) var(--space-a);
-	}
-}
-
-#root[data-tileset='gui'] > header a.place:hover,
-#root[data-tileset='gui'] > header button.place:hover {
+#root[data-tileset='gui'] > header :is(a.place,button.place,.header-right-hamburger):hover{
 	background-color: var(--muted);
 }
 
-#root > header a.place.projects::before {
+@media( min-width: 48rem) {
+  #root[data-tileset='gui'] > header .header-right a.place::after {
+    content: unset !important;
+  }
+}
+
+#root > header .header-right-hamburger::before {
+	content: "menu";
+}
+
+#root > header a.place.projects::after {
 	content: "projects";
 }
 
-#root:lang(vi-VN) > header a.place.projects::before {
+#root:lang(vi-VN) > header a.place.projects::after {
 	content: "dự án nguồn mở";
 }
 
-#root > header a.place.wiki::before {
+#root > header a.place.wiki::after {
 	content: "wiki";
 }
 
-#root:lang(vi-VN) > header a.place.wiki::before {
+#root:lang(vi-VN) > header a.place.wiki::after {
 	content: "thư viện";
 }
 
-#root > header a.place.notes::before {
+#root > header a.place.notes::after {
 	content: "notes";
 }
 
-#root:lang(vi-VN) > header a.place.notes::before {
+#root:lang(vi-VN) > header a.place.notes::after {
 	content: "ghi chú";
 }
 
-#root > header a.place.notifications::before {
+#root > header a.place.notifications::after {
 	content: "notifications";
 }
 
-#root:lang(vi-VN) > header a.place.notifications::before {
+#root:lang(vi-VN) > header a.place.notifications::after {
 	content: "thông báo";
 }
 
-#root > header a.place.settings::before {
+#root > header a.place.settings::after {
 	content: "settings";
 }
 
-#root:lang(vi-VN) > header a.place.settings::before {
+#root:lang(vi-VN) > header a.place.settings::after {
 	content: "cài đặt";
 }
 
-#root > header a.place.admin::before {
+#root > header a.place.admin::after {
 	content: "admin";
 }
 
-#root:lang(vi-VN) > header a.place.admin::before {
+#root:lang(vi-VN) > header a.place.admin::after {
 	content: "quản trị";
 }
 
-#root > header a.place.auth::before,
-#root > header button.place.auth[title="Log in"]::before {
+#root > header a.place.auth::after,
+#root > header button.place.auth[title="Log in"]::after {
 	content: "login";
 }
 
-#root:lang(vi-VN) > header a.place.auth::before,
-#root:lang(vi-VN) > header button.place.auth[title="Log in"]::before {
+#root:lang(vi-VN) > header a.place.auth::after,
+#root:lang(vi-VN) > header button.place.auth[title="Log in"]::after {
 	content: "đăng nhập";
 }
 
@@ -272,7 +321,7 @@
 	background-size: 1em 1em;
 	margin: 0;
 } */
-#root[data-tileset="gui"] > header a.place::before {
+#root[data-tileset="gui"] > header :is(a.place, .header-right-hamburger)::before {
 	content: " ";
 	display: inline-block;
 	width: 1.25em;
@@ -285,6 +334,13 @@
 	mask-repeat: no-repeat;
 	mask-position: center;
 	background-color: var(--ctp-text);
+}
+#root[data-tileset="gui"] > header .header-right-hamburger::before {
+	mask-image: url("/icons/menu.svg");
+	-webkit-mask-image: url("/icons/menu.svg");
+}
+#root[data-tileset="gui"] > header .header-right-hamburger:hover::before {
+	background-color: var(--primary);
 }
 #root[data-tileset="gui"] > header a.place.projects::before {
 	/* mask-repeat: no-repeat;
