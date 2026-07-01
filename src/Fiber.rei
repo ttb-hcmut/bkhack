@@ -24,11 +24,12 @@ module With_ctrl1 {
 	let run_promise : 'in_ 'ret 'yield 'yieldback. (~ctrl:ctrl('ret, 'yield, 'yieldback), 'in_, fiber('in_, 'ret, 'yield, 'yieldback)) => Js.promise('ret)
 	let run_promise2 : 'in_1 'in_2 'ret 'yield 'yieldback. (~ctrl:ctrl('ret, 'yield, 'yieldback), 'in_1, 'in_2, fiber(('in_1, 'in_2), 'ret, 'yield, 'yieldback)) => Js.promise('ret)
 	let run_promise3 : 'in_1 'in_2 'in_3 'ret 'yield 'yieldback. (~ctrl:ctrl('ret, 'yield, 'yieldback), 'in_1, 'in_2, 'in_3, fiber(('in_1, 'in_2, 'in_3), 'ret, 'yield, 'yieldback)) => Js.promise('ret)
+
+	module Cancel {
+		let force : (~ctrl:ctrl('ret, 'yield, 'yieldback), fiber('in_, 'ret, 'yield, 'yieldback)) => unit
+	}
 }
 
-// module Cancel {
-// 	let propagate : (~ctrl:ctrl('ret), fiber('in_, 'ret)) => Js.promise(unit)
-// }
 //
 // module Syntax {
 // 	

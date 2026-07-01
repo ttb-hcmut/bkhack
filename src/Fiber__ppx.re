@@ -36,7 +36,7 @@ Extension.declare("Fiber.bind", Extension.Context.structure_item, Ast_pattern.(p
 	switch (u) {
 	| Ppat_var({ txt: name, _ }) => {
 		switch (pvb_expr.pexp_desc) {
-		| Pexp_fun(Nolabel, None, { ppat_desc: Ppat_construct({ txt: Lident("()"), loc }, None), _ }, pvb_expr) =>
+		| Pexp_fun(Labelled("ctrl"), None, labelpat, pvb_expr) =>
 			let name = "Fiberlet__"++sanitize(path)++"__"++name;
 			let worker_expr = [%expr {
 				open Js__worker
@@ -46,41 +46,15 @@ Extension.declare("Fiber.bind", Extension.Context.structure_item, Ast_pattern.(p
 				let promiser = Hashtbl.create(0) and awaitgen = ref(0);
 				onMessage(Message.data %> req => {
 					switch (req) {
-						| Either.Right(Fiber__core.Comm__set(promiser_id, promiser_val)) =>
-							let (resolve, _reject) = promiser->Hashtbl.find(promiser_id);
+						| Either.Right(Fiber__core.Comm__set(await_id, promiser_val)) =>
+							let (resolve, _reject) = promiser->Hashtbl.find(await_id);
 							resolve(promiser_val)
 						| Either.Left(Fiber__core.Comm__request(owner, param) as req) =>
-							module Lam {
-								[@warning "-32"]
-								let app = (app: 'a, f: Fiber__core.lambda('a, 'b)) : Js.promise('b) => {
-									let Lambda({ async_id }) = f;
-									let await_id = awaitgen^;
-									awaitgen := awaitgen^ + 1;
-									Js.Promise.make((~resolve, ~reject) => {
-										open {
-											[@mel.send] external call1 : Js.Fn.arity1('a => 'b) => 'this => 'a => 'b = "call";
-											let resolve = data => resolve->call1(Js.null, data)
-											and reject  = e    => reject->call1(Js.null, e);
-										};
-										promiser->Hashtbl.add(await_id, (resolve, reject));
-										let res = Result.ok @@ Fiber__core.Rep_({ async_id, await_id, app });
-										postMessage(Fiber__core.Comm__reply(req, owner, res))
-									})
-									|> Js.Promise.then_(x => {
-										promiser->Hashtbl.remove(await_id);
-										Js.Promise.resolve(x)
-									})
-									|> Js.Promise.catch(e => {
-										promiser->Hashtbl.remove(await_id);
-										Js.Promise.reject(Js.Exn.anyToExnInternal(e))
-									})
-								}
-							};
-							let k = [%e pvb_expr];
+							let k = ([%p labelpat]) => [%e pvb_expr];
+							let ctrl = (owner, req, awaitgen, promiser, postMessage);
 							ignore(
-								k(param)
-								|> Js.Promise.catch(e => {
-									let e = Js.Exn.anyToExnInternal(e);
+								k(ctrl, param)
+								|> Js.Promise.catch(Js.Exn.anyToExnInternal %> e => {
 									let res = Result.error @@ e;
 									postMessage(Fiber__core.Comm__reply(req, owner, res));
 									Js.Promise.reject(e)

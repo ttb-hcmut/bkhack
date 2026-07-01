@@ -1,11 +1,12 @@
+open Melange__containers.Fun
 
 [@in_: (_, int)] [@ret: int]
-let%Fiber.bind p' = ((), (setResult, count)) => Fetch__syntax.({
+let%Fiber.bind p' = (~ctrl, (setResult, count)) => Fiber__world.({
   let input = String.make(count, ' ');
 	let i = ref(0);
 	while (true) {
 		if (i^ mod 1000000 == 0) {
-			ignore @@ Lam.app(i^ / 1000000, setResult);
+			ignore @@ ctrl->Lam.app(i^ / 1000000, setResult);
 		}
 		i := i^ + 1;
 	}
@@ -14,39 +15,53 @@ let%Fiber.bind p' = ((), (setResult, count)) => Fetch__syntax.({
 });
 
 [@in_: (_, int)] [@ret: int]
-let%Fiber.bind q' = ((), (_setResult, count)) => Fetch__syntax.({
+let%Fiber.bind q' = (~ctrl as _, (_setResult, count)) => Fiber__world.({
   let input = String.make(count, ' ');
   let _ = Diff.compareSplitByRe(~input1=input, ~input2=input, ~split=[%re {|/(?:.)/gm|}]);
   return(0)
 });
 
+[@warning "-27"]
+class cancel('a) {
+	val tbl = Hashtbl.create(1);
+	val idgen = ref(0);
+	pub lation_register = k => {
+		let id = idgen^;
+		idgen := idgen^ + 1;
+		tbl->Hashtbl.add(id, k);
+	};
+	pub all_and_clear = (~ctrl: 'a) => {
+		let clone = Hashtbl.to_seq %> List.of_seq;
+		tbl |> clone |> List.iter(((k, f)) => {
+			f(~ctrl); tbl->Hashtbl.remove(k)
+		})
+	}
+}
+
 module Timer = {
   [@react.component]
   let make = () => {
     let (interval, setInterval) = React.useState(() => 0)
-		let (result, setResult) = React.useState(() => 0)
-    // let (count,setCount) = React.useState(()=>0);
+		let (count, setCount) = React.useState(()=>0);
 		let ctrl = React.useMemo0(Fiber.Ctrl.create)
-		let n = React.useMemo0(() => Fiber.With_ctrl1.make(~ctrl, p'));
-		let m = React.useMemo0(() => Fiber.With_ctrl1.make(~ctrl, q'));
-    // let balls = ;
-    let run' = k => {
-      ignore(Fetch__syntax.({
-				let f = i => setResult(_ => i);
-				let* u = Fiber.With_ctrl1.run_promise2(~ctrl,
-					ctrl->Fiber.lam(f), interval, k);
-				Js.Console.log(u);
-				return(())
-			}>!= (e => { Js.Console.error(e); return(()) })));
-    }
-    ;
+		let cancel = React.useMemo0(() => new cancel);
+    let run' = k => Fetch__syntax.({
+			let k = Fiber.With_ctrl1.make(~ctrl, k);
+			cancel#lation_register((~ctrl) => Fiber.With_ctrl1.Cancel.force(~ctrl, k));
+			let* u = Fiber.(With_ctrl1.run_promise2(~ctrl,
+				ctrl->lam(i => setCount(_ => i)), interval, k));
+			Js.Console.log2("result", u);
+			return(())
+		} >!= (e => { Js.Console.error(e); return(()) }));
     let run = () => {
-      run'(n); run'(m);
+      ignore@@run'(p');
+			ignore@@run'(q');
     }; 
     <div> 
-			<div>result->React.int</div>
+			<div>count->React.int</div>
       <input onChange={e => setInterval(_ => React.Event.Form.target(e)##value |> fun | v when String.length(v) == 0 => 0 | v => {v |> int_of_string})}/>
       <button onClick={_=>run()}>{React.string("Start Timer")}</button>
+      <button onClick={_=>cancel#all_and_clear(~ctrl)}>{React.string("Cancel")}</button>
       // <button onClick={_=>Js.log(count^)}>{React.string("query")}</button>
       // <label> {React.int(count^)} </label>  
     </div>

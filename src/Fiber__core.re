@@ -7,4 +7,4 @@ and reply('ret, 'yield) =
 	| Rep_({ async_id: int, await_id: int, app: 'yield })
 	| Rep_ly('ret)
 
-and lambda('a, 'b) = Lambda({ async_id: int })
+and lambda('a, 'b) = Lambda({ async_id: int });

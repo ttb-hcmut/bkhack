@@ -1,13 +1,15 @@
 type fiber('in_, 'ret, 'yield, 'yieldback) =
-	{ fiber_id: int, fiber_run: fiber'('in_, 'ret, 'yield, 'yieldback) }
+	{ fiber_id: int, fiber_run: fiber'('in_, 'ret, 'yield, 'yieldback), fiber_cancel: unit => unit }
 
 and fiber'('in_, 'ret, 'yield, 'yieldback) = 'in_ => Js.promise('ret)
+
+and fibercancel = unit => unit
 
 and continuation('in_, 'ret, 'yield, 'yieldback) = (
 	~tbl:Hashtbl.t(int, ('ret => unit, int => int => 'yield => unit, exn => unit)),
 	~idgen:ref(int),
 	~handletbl:Hashtbl.t(int, 'yield => Js.promise('yieldback))
-) => fiber'('in_, 'ret, 'yield, 'yieldback)
+) => (fibercancel, fiber'('in_, 'ret, 'yield, 'yieldback))
 
 and ctrl('ret, 'yield, 'yieldback) = 
 	{ ctrl_id: int, ctrl_gen: unit =>
@@ -19,6 +21,8 @@ and ctrl('ret, 'yield, 'yieldback) =
 			( Hashtbl.t(int, 'yield => Js.promise('yieldback)),
 				ref(int))
 	};
+
+exception Cancelled
 
 module Js__worker {
 	include Js__worker
@@ -32,9 +36,13 @@ module Js__worker {
 }
 
 let rec of_worker = (mkworker: unit => Js__worker.worker(Js__worker.Fiber.request('in_, 'ret, 'yield, 'yieldback), Js__worker.Fiber.reply('in_, 'ret, 'yield, 'yieldback))) : continuation('in_, 'ret, 'yield, 'yieldback) => {
-	(~tbl, ~idgen, ~handletbl) => {
+	(~tbl) => {
 		let worker = mkworker() |> onmessage(~tbl) |> onerror;
-		worker->submit(~idgen, ~tbl, ~handletbl)
+		let cancel = worker->cancel(~tbl);
+		(~idgen, ~handletbl) => {
+			let f = worker->submit(~idgen, ~tbl, ~handletbl);
+			(cancel, f)
+		}
 	}
 }
 
@@ -58,6 +66,15 @@ and submit = (worker, ~idgen, ~tbl, ~handletbl) => {
 			Js__worker.Worker.postMessage(worker, Either.Left(Fiber__core.Comm__request(workid, in_)))
 		}
 	}
+}
+
+and cancel = (worker, ~tbl, ()) => {
+	Js__worker.Worker.terminate(worker);
+	tbl->Hashtbl.to_seq |> List.of_seq |> List.iter(((owner, v)) => {
+		let (_resolve, _reflect, reject_) = v;
+		reject_(Cancelled);
+		tbl->Hashtbl.remove(owner)
+	});
 }
 
 and onmessage = (worker, ~tbl) => { worker->Js__worker.Worker.onmessage(e => {
@@ -98,11 +115,12 @@ module With_ctrl1 {
 	let make = (~ctrl:ctrl('ret, 'yield, 'yieldback), k: continuation('in_, 'ret, 'yield, 'yieldback)) : fiber('in_, 'ret, 'yield, 'yieldback) => {
 		let { ctrl_id, ctrl_gen: ctrl, ctrl_lambda_data: (handletbl, _) } = ctrl;
 		let (tbl, idgen) = ctrl();
-		{ fiber_id: ctrl_id, fiber_run: k(~tbl, ~idgen, ~handletbl) }
+		let (cancel, f) = k(~tbl, ~idgen, ~handletbl);
+		{ fiber_id: ctrl_id, fiber_run: f, fiber_cancel: cancel }
 	}
 
 	let run_promise = (type in_, type ret, type yield, type yieldback, ~ctrl:ctrl(ret, yield, yieldback), arg, k:fiber(in_, ret, yield, yieldback)) => {
-		let { fiber_id: fiber_group_id, fiber_run: k } = k;
+		let { fiber_id: fiber_group_id, fiber_run: k, _ } = k;
 		let { ctrl_id: ctrl_group_id, _ } = ctrl;
 		assert(fiber_group_id == ctrl_group_id);
 		k(arg)
@@ -112,6 +130,14 @@ module With_ctrl1 {
 
 	let run_promise3 = (~ctrl, arg1, arg2, arg3, k) => run_promise(~ctrl, (arg1, arg2, arg3), k)
 
+	module Cancel {
+		let force = (type in_, type ret, type yield, type yieldback, ~ctrl:ctrl(ret, yield, yieldback), k:fiber(in_, ret, yield, yieldback)) => {
+			let { fiber_id: fiber_group_id, fiber_cancel: cancel, _ } = k;
+			let { ctrl_id: ctrl_group_id, _ } = ctrl;
+			assert(fiber_group_id == ctrl_group_id);
+			cancel()
+		}
+	}
 }
 
 module With_ctrl0 {
