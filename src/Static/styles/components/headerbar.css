@@ -12,13 +12,16 @@
 	top: 0px;
 	padding-top: 0;
 	padding-bottom: 0;
-	/* height: calc(1.5rem + 2 * var(--space-a)); */
+	/* height: calc(var(--text-base) + 2 * var(--space-a)); */
 	display: grid;
   grid-template-columns: subgrid;
 	/* align-items: center;
 	justify-content: space-between; */
 	z-index: 9999;
-	--padding-vertical: calc((1.5rem + 2 * var(--space-a) - 1.7rem) / 2);
+	--logo-height: calc(var(--font-size) * 1.7);
+	--logo-width: calc(var(--font-size) * 4);
+	--content-height: var(--text-base);
+	--padding-vertical: calc((var(--text-base) + 2 * var(--space-a) - var(--logo-height)) / 2);
 }
 #root > header > div {
   grid-area: 1/1/span 1 / span 1;
@@ -87,9 +90,9 @@
 	background-position-x: center;
 	background-position-y: center;
 	background-color: var(--sig-blue);
-	background-size: 4rem 1.7rem;
-	width: 4rem;
-	height: 1.7rem;
+	background-size: var(--logo-width) var(--logo-height);
+	width: var(--logo-width);
+	height: var(--logo-height);
 	padding: var(--padding-vertical) 0;
 }
 
@@ -396,9 +399,9 @@
 
 :has(> #siteNavigator) > dialog {
 	margin: 0;
-	position: relative;
 	height: 0;
-	width: 0;
+	margin-top: calc(8pt + var(--content-height));
+	width: 100%;
 	padding: 0;
 	border: 0;
 	transition: none;
