@@ -1,6 +1,7 @@
 open Stdlib
 open React
 open Auth
+open Melange__containers.Fun
 
 module Greetings {
 	let flag = storage => {
@@ -78,6 +79,22 @@ let a = fun
 }
 ;
 
+module Input {
+	[@react.component]
+	let make = forwardRef((
+		~autoComplete=?, ~autoCapitalize=?,
+		~onInput=?, ~onKeyDown=?, ~spellCheck=?,
+		~forceUpdateState=?, ~id=?, ~className=?, ref) =>
+	{ let ref = Js.Nullable.toOption(ref) |> Option.map(x => ReactDOM.Ref.domRef(x));
+		useEffect1(() =>
+			Option.bind(forceUpdateState, f => {
+			let x = Js.Global.setInterval(~f, 100);
+			Some(() => Js.Global.clearInterval(x)) })
+		, [|forceUpdateState|]);
+		<input ?autoComplete ?autoCapitalize ?onInput ?onKeyDown ?spellCheck ?id ?className ?ref />
+	})
+};
+
 [@react.component]
 let make = (~on_help: bool => unit, ~memo_transition=?) => {
   let
@@ -90,12 +107,12 @@ let make = (~on_help: bool => unit, ~memo_transition=?) => {
   and (headerRightExpand,setHeaderRightExpand) = useState(() => false);
 	let bar = useRef(Js.Nullable.null);
 	let setHistoryIndex = useCallback1(k => {
-		setHistoryIndex(prev => {
-			let newval = k(prev);
-			let newval = newval->Int.min(Dom.Storage.getItem("bkhack.cmd-history", Dom.Storage.localStorage) |> Option.map(String.split_on_char(',')) |> Option.value(~default=[]) |> List.length);
-			let newval = newval->Int.max(0)
-			newval
-		})
+		let historyLen = Dom.Storage.localStorage
+			|> Dom.Storage.getItem("bkhack.cmd-history")
+			|> Option.map(String.split_on_char(','))
+			|> Option.value(~default=[])
+			|> List.length;
+		setHistoryIndex(k %> Int.min(historyLen) %> Int.max(0))
 	}, [|setHistoryIndex|])
 	let setBarHTMLContent = (bar, str: string => string) => {
 		let bar = bar.current->Js.Nullable.toOption->Option.get->ReactDOM.domElementToObj;
@@ -106,12 +123,13 @@ let make = (~on_help: bool => unit, ~memo_transition=?) => {
 		try ({ let () = k(prev); None }) { | e => Some(e) }
 	}, [|setNavigatorError|]);
 	let placeholder = useMemo0(() =>
-		Dom.Storage.sessionStorage |> Greetings.load_from_opt_exn
-		|> fun | None => Some({
+		switch (Dom.Storage.sessionStorage |> Greetings.load_from_opt_exn) {
+		| Some() => None
+		| None   => Option.some @@
 			<span className="placeholder">
-				<span className="show-all-commands"></span><kbd className="type_ help" />
+				<kbd className="type_ help" /> <span className="show-all-commands"/> <a className="ignore-this"/>
 			</span>
-		}) | Some() => None
+		}
 	);
 	let fakeBarSync = (bar, k) => {
 		let v = k();
@@ -119,6 +137,7 @@ let make = (~on_help: bool => unit, ~memo_transition=?) => {
 		setContent(_ => bar##value);
 		v
 	};
+	let inputForceUpdateState = useCallback0(() => bar->fakeBarSync(() => ()));
 	let completeBarHTMLContent = useCallback1(() => {
 		assert_ @@ _ =>
 		bar->fakeBarSync @@ () =>
@@ -157,7 +176,11 @@ let make = (~on_help: bool => unit, ~memo_transition=?) => {
 		<div className="header-left">
 			<a className="logo" href="/" />
 			<form onSubmit={e => assert_ @@ _ => url->onSubmit(~on_help, ~memo_transition?, e)}>
-				<input autoComplete="off" autoCapitalize="off" spellCheck=false onChange={_ => bar->fakeBarSync @@ () => ()} onKeyDown={onKeyDown(setHistoryIndex, completeBarHTMLContent, onKey)} ref={ReactDOM.Ref.domRef(bar)} id="siteNavigator" className=errorClass />
+				<Input
+					autoComplete="off" autoCapitalize="off" spellCheck=false
+					onInput={_ => bar->fakeBarSync @@ () => ()} onKeyDown={onKeyDown(setHistoryIndex, completeBarHTMLContent, onKey)}
+					forceUpdateState=inputForceUpdateState ref={ReactDOM.Ref.domRef(bar)}
+					id="siteNavigator" className=errorClass />
 				<div className="displayonly highlight">{innerHTML}</div>
 				{errorBox}
 			</form>
