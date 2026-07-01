@@ -410,8 +410,8 @@
 	height: fit-content;
 	max-height: 10rem;
 	overflow-y: auto;
-	background-color: white;
-	border: solid 1px #ddd;
+	background-color: rgba(0,0,0,0);
+	border: solid 1px rgba(0,0,0,0);
 	border-radius: var(--radius);
 }
 
@@ -452,6 +452,7 @@
 
 form:has(> #siteNavigator) {
 	position: relative;
+	display: flex;
 }
 
 form:has(> #siteNavigator) > * {
