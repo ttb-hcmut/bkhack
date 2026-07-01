@@ -12,7 +12,10 @@
 #let light-3 = color.rgb("#767676")
 
 /// State Machine Blue
-#let blue-2 = color.rgb("#017bcd")
+#let blue-alt-2 = color.rgb("#017bcd")
+
+/// Bach Khoa Wire Blue
+#let blue-3 = color.rgb("#3851A4")
 
 /// Promise Yellow
 #let yellow-2 = color.rgb("#D9985E")

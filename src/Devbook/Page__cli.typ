@@ -32,11 +32,11 @@ which is called a _command bar_ #fn[a.k.a. _command palette_], and there is usua
 
 == Literature
 
-// #header[Replit] is #lorem(50)
+Replit is #lorem(10)
 
-// #header[GitHub] has a search #lorem(50)
+GitHub has a search #lorem(10)
 
-// #header[Fly.io] is #lorem(50)
+Fly.io is #lorem(10)
 
 // wireframe
 // https://github.com/stefanjudis/awesome-command-palette

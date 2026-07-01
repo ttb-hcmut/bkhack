@@ -6,6 +6,7 @@
 #import "@local/diagramming:0.1.0"
 #show: paper.doc
 #set raw(syntaxes: ("reason.sublime-syntax")/* , theme: "quiet.tmTheme" */)
+#let nl = $ \ &#v(-1em)\ $
 #title[= Abstraction full-stack]
 Previously, we discussed the motivation of abstraction and the science
 of them. #lorem(20) In this article, we present a more concrete motivation
@@ -37,8 +38,8 @@ functor--into an abstract data repository then defines a _flow_:
   })
 })
 #let ghost(it) = text(fill: diagramming.colors.cream-2, it)
-/// Back Khoa Wire
-#let wire(it)  = text(fill: color.rgb("#3851A4"), it)
+/// FrontPage Light Blue
+#let wire(it)  = text(fill: diagramming.colors.blue-3, it)
 $
 &"module" "At-repo"_0\ &#v(-1em)\ 
 &(U : { #h(2pt) "let" italic("tgtpost") : "id" #h(2pt) }, #text(fill: diagramming.colors.cream-2, $S$) : "Entities".S)\ &#v(-1em)\ 
@@ -107,17 +108,15 @@ $
 //   }));
 // }
 // ```
-This orchestration syntax is very expressive, it resembles a direct
+This orchestration syntax is highly expressive, it resembles a direct
 relational data query, the module $S$ in the fuctor $"At-repo"_0$ provides
 all entities and relationships symbol vocabulary in the #o.bkhack system that a programmer
 can use. This is an abstraction. In the implementation layer, each
 $"At-repo"_0$, upon plug-in to a $"Buf-read"."of-flow"$, compiles to specialized
 and secured fetch code.\
   This has been one example, being data repository portal #fn[currently, a POC implementation of this exists, called _free sql_]
-. Other kinds include stylesheet portal, pagegen portal, fiber @bkhack:fiber, and server-side react components
-.
-== Implementation conceptual layers
-#lorem(30). These include
+. Other kinds include stylesheet portal, pagegen portal, fiber @bkhack:fiber, and server-side react components.\
+  *Conceptual layers*. The goal of an abstraction isn't to hide all details underneath, but to provide an intuitive building block on top of other building blocks which the programmer can choose to rely on. For abstraction, these building blocks / layers include
 #cetz.canvas({
   import cetz.draw: *
   let gap = 0.2
@@ -143,15 +142,51 @@ and secured fetch code.\
   bl-et-cetera(-2)
 })
 #lorem(30)
-== Mechanics
-_generatives_
-_staging_ _mode_
-_orchestrates_ _choreographs_ _flows_
+#pagebreak()
+== Code mechanization
+_staging_ _mode_ Boundaries. Structure items. shared or non-shared lexical scopes. _Functors_. _Comptime_. _Biphasic programming_ @exploring-biphasic-programming.
+
+#box(stroke: 0.2pt, [compiler mode])
+
+#box(stroke: 0.2pt, [server mode])
+
+#box(stroke: 0.2pt, [client mode])
+
+Implementation is PPX layer.
+The artifacts are called _generatives_ because they aren't what Dune expect them to be Reason code. The $"Gen"$ module.
+The Reason-to-JavaScript code is further optimized by _webpacking_. _code splitting_ _code sharing_
+
+Implementation is Reason symbol algebras. _orchestrates_ _choreographs_ _flows_
+
+Implementation is the build system declarations.
+
 _compiler_ _graph_
-== First-class full-stack build process
-@dune-version-1
+
+*Generatives are heterogeneous*.
+_Heterogeneity_, specifically _implicit heterogeneity_, as an aspect of a full-stack system, is the idea that even when the full-stack system is programmable in one homogeneous unit, its output doesn't have to be homogeneous but instead can be hetergeneous. The #o.bkhack system, albeit full-stack, is being split into a front-end part and an optional back-end part. Within this front-end part, the Reason code is one homogeneous source-tree, but is actually being implicitly split into multiple page outputs (multi-page application) as well as being generative of stylesheet (`cssgen`) and page layout (`pagegen`) static asset. This implicit heterogeneity ensures zero-cost abstraction.
+  // This heterogeneity is made possible because our system is built before deployment--it is staged and has layers.
+#pagebreak()
+== First-class build process
+We thought about implementing an intelligent compiler that will work
+with the above programs, the user can hand-off (@dune-version-1). However, some of these
+ideas would violate the purity philosophy of the build system Dune, like the previously-mentioned generatives.
+Ultimately, we embrace Dune as a _build system langugage_ that the user
+--not the framework implementer--controls. Any extensions to implement
+the full-stack system should be in the form of new idioms of Dune that
+the user can use (@dune-version-2).\
+  For example, if
+$
+&("rule"#nl
+& #h(8pt) ("deps" ("inc" ))
+$
+The previous build system is based on processes. Dune model is based on build components
+
+Optimization is done per build component tools.
+
+We extended Dune to support Typst packages.
+
 #place(auto, scope: "parent", float: true)[
-  #figure(caption: [Version 1])[
+  #figure(caption: [Version 1 of the build system for #o.bkhack. Notice that there are multiple _build subsystems_ in orchestration.])[
     #fletcher.diagram({
       import fletcher: *
       let public_dir = (pos: (1,0.5), label: [public dir])
@@ -170,9 +205,9 @@ _compiler_ _graph_
     })
   ] <dune-version-1>
 ]
-@dune-version-2
+
 #place(auto, scope: "parent", float: true)[
-  #figure(caption: [Version 2])[
+  #figure(caption: [Version 2 of the build system for #o.bkhack. Notice that there are no more many build subsystems, but only one unifying build system that is Dune. Some steps, which previously required other subsystem, are now remade as Dune rules.])[
     #fletcher.diagram({
       import fletcher: *
       node((0,0), [library `bkhack`], stroke: 1pt)
@@ -189,18 +224,17 @@ _compiler_ _graph_
     })
   ] <dune-version-2>
 ]
-== Design with escape-hatches in mind, self-recovery
-Even with the goal of a full-stack framework in mind, we must admit the reality that it is hard and is an contextual evolving process to design an abstraction, we embrace it that our system is a living evolving one. And the view of a full-stack abstraction is not always good, sometimes it's good to have clear separation of responsibilities. And the goal isn't uniformly shared by all developers.\
-  Hence, while the core app is a Reason front-end bundle, there are other aspects of the app. The styling of the app is shifted towards the static front-end bundle. The serving of data is shifted towards the service bundle of the app. The final-state, ideal of the app is one where only the core remains. The current reality is that there are multiple aspects / bundles of the app, and we try to shrink these aspects / bundles as much as we could, while upholding functional and non-functional requirements.\
-  APIs will be eventually converted from references and fetches to embeddings and abstract algebras. In the case when conversion is difficult, or when there is disagreement, we will be fine with the way things are. In other words, when the full-stack abstraction fails, it can self-recover by defaulting to a reliable raw, concrete implementation.
-== Heterogeneous
-_Heterogeneity_, specifically _implicit heterogeneity_, as an aspect of a full-stack system, is the idea that even when the full-stack system is programmable in one homogeneous unit, its output doesn't have to be homogeneous but instead can be hetergeneous.\
-  The #o.bkhack system, albeit full-stack, is being split into a front-end part and an optional back-end part. Within this front-end part, the Reason code is one homogeneous source-tree, but is actually being implicitly split into multiple page outputs (multi-page application) as well as being generative of stylesheet (`cssgen`) and page layout (`pagegen`) static asset.\
-  This implicit heterogeneity ensures _zero-cost abstraction_.\
-  This heterogeneity is made possible because our system is built before deployment--it is staged and has layers.
+#pagebreak()
 == Related works
+Since #o.bkhack is written for a quarter and a half in Reason, its first natural source of inspiration was the Eliom framework @eliom from OCaml. Eliom is a multi-tier framework for OCaml. A single source code file can contain both server and client code, the two tiers don't necessarily interact but programmers can write mixed modules that can be used at both tiers with mixed implementations. Eliom is grounded in semantic proofs. Like Eliom, #o.bkhack restricts tier boundaries to structures instead of expressions. Unlike Eliom, #o.bkhack focuses on high-level flow algebra.
+
+$
+&"let"_#ghost("server") "a"
+$
+
+The reactive programming engine of #o.bkhack is React, and for React it boasts a specification for server components. React server component @rsc:server-components Functions @rsc:server-functions
+
 Electric Clojure @electric-clojure in eclj, any expression can be split into client or back-end or more, but for bkhack we restrict to top-level expressions and modules as both to ease code splitting implementation and to make scoping less black-magic. Also, eclj fuses react programming cross-tier, bkhack we don't enforce that reactive prorgamming paradigm and currently it's only in front-end in the form of ReactJS, combined with data-flow programming from the data portal... but it would be nice.
-#let nl = $ \ &#v(-1em)\ $
 
 #[
 #let box = std.box.with(stroke: 0.2pt, inset: (x: 4pt, y: 4pt))
@@ -224,8 +258,34 @@ $
 & #h(8pt) #h(8pt) #h(8pt) #h(8pt) #h(38pt) #h(4pt) #(`:db/id`) ("prs" italic("db") italic("search")) #wire($)$) #ghost($)$) #h(4pt) ]#nl
 & #h(8pt) #h(8pt) #h(8pt) #h(8pt) #h(8pt) ("dom"\/"tr" ("dom"\/"text" ("pr-str" italic("record"))))))
 $
-React server component
-Eliom
 // Ruby on Rails, Expo, Phoenix, Eliom
+#pagebreak()
+== Addendum: Design with escape-hatches in mind, self-recovery
+Even with the goal of a full-stack framework in mind, we must admit the reality that it is hard and is an contextual evolving process to design an abstraction, we embrace it that our system is a living evolving one. And the view of a full-stack abstraction is not always good, sometimes it's good to have clear separation of responsibilities. And the goal isn't uniformly shared by all developers.\
+  Hence, while the core app is a Reason front-end bundle, there are other aspects of the app. The styling of the app is shifted towards the static front-end bundle. The serving of data is shifted towards the service bundle of the app. The final-state, ideal of the app is one where only the core remains. The current reality is that there are multiple aspects / bundles of the app, and we try to shrink these aspects / bundles as much as we could, while upholding functional and non-functional requirements.\
+  APIs will be eventually converted from references and fetches to embeddings and abstract algebras. In the case when conversion is difficult, or when there is disagreement, we will be fine with the way things are. In other words, when the full-stack abstraction fails, it can self-recover by defaulting to a reliable raw, concrete implementation.
+#cetz.canvas({
+  import cetz.draw: *
+  let gap = 0.2
+  let b-width = 3.0
+  let colwidth = 7.65
+  let b-height = 0.7
+  let bl(i, title, side: none) = {
+    let name = "bl"+repr(i)
+    rect((0,b-height*i), (b-width,b-height*(i+1)), name: name)
+    content(name, title)
+    if side != none {
+      content((b-width+gap,b-height*i), (colwidth,b-height*(i+1)), pad(bottom: 4pt, align(horizon, side)))
+    }
+  }
+  let bl-et-cetera(i) = {
+    line((0,b-height*i), (b-width,b-height*i))
+    line((0,b-height*(i+0.5)), (b-width,b-height*(i+0.5)))
+    line((0,b-height*(i+1)), (b-width,b-height*(i+1)))
+  }
+  bl(1, [Data portal])
+  bl(0, [Fetch])
+  bl-et-cetera(-1)
+})
 #bibliography(title: none, "works.bib")
 // vi: set nowrap:
