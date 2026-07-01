@@ -1,7 +1,10 @@
 #import "/article": *
+#import "Paper.typ" as paper
 #import "Vocab.typ" as o
 #import "@preview/fletcher:0.5.8" as fletcher
 #import "@preview/cetz:0.5.2"
+#import "@local/diagramming:0.1.0"
+#show: paper.doc
 #set raw(syntaxes: ("reason.sublime-syntax")/* , theme: "quiet.tmTheme" */)
 #title[= Abstraction full-stack]
 Previously, we discussed the motivation of abstraction and the science
@@ -24,31 +27,86 @@ a computer program, but the grammar to describe and declare between humans.\
   For example, a Reason code may orchestrate that data (pull request
 items filtered by $"target-post-id"$) shall flow from a source to the current
 application. It does so by opening a _portal_--written as a Reason
-functor--into an abstract data repository then defines a flow, like so
-```reason
-module At_repo0(S : {
-  include Entities.S
-  let tgt_post_id : string })
-{ open S
-  let rec q = () =>
-    foreach(prs') @@ o =>
-    where(Pull_request.post_id(o) =@ str(tgt_post_id)) @@ () =>
-    yield(o)
-  and prs' = () => table @@ ("pullrequest", prs())
-}
-```
+functor--into an abstract data repository then defines a _flow_:
+#let mkbox(inset: 0em, p) = context box(inset: inset, {
+  cetz.canvas({
+    import cetz.draw: *
+    let p-length = measure(p)
+    cetz.decorations.brace((-0.17, 0pt), (-0.17, p-length.height + 1pt), outer-curvyness: 100%)
+    content((0, 0), (p-length.width, p-length.height), name: "ds", p)
+  })
+})
+#let ghost(it) = text(fill: diagramming.colors.cream-2, it)
+/// Back Khoa Wire
+#let wire(it)  = text(fill: color.rgb("#3851A4"), it)
+$
+&"module" "At-repo"_0\ &#v(-1em)\ 
+&(U : { #h(2pt) "let" italic("tgtpost") : "id" #h(2pt) }, #text(fill: diagramming.colors.cream-2, $S$) : "Entities".S)\ &#v(-1em)\ 
+&#mkbox($
+  &"open" #ghost($S$)  #h(4cm + 1pt) #box(inset: (bottom: -2pt - 2pt, top: -2pt), box(stroke: 0.2pt, inset: (bottom: 2pt, top: 2pt, left: 2pt, right: 2pt), text(font: "Libertinus Serif")[server mode]))\ &#v(-1em)\ 
+  &"let" "rec" q = (dot) =>\ &#v(-1em)\ 
+  &#h(8pt)"foreach"(italic("prs'"), #h(4pt) o =>\ &#v(-1em)\ 
+  &#h(8pt)"where"(o#h(-1pt)->#h(-1pt)"Pr"."postid" #box(height: 0.7em, $=_@$) "str"(U.italic("tgtpost")), (dot) =>\ &#v(-1em)\ 
+  &#h(8pt)"yield"(o)))\ &#v(-1em)\ 
+  &"and" italic("prs'") #h(1pt) = (dot) => "table"(#[`shared-pr`], "prs"())
+$)
+$
+// ```reason
+// module At_repo0(S : {
+//   include Entities.S
+//   let tgt_post_id : string })
+// { open S
+//   let rec q = () =>
+//     foreach(prs') @@ o =>
+//     where(Pull_request.post_id(o) =@ str(tgt_post_id)) @@ () =>
+//     yield(o)
+//   and prs' = () => table @@ ("pullrequest", prs())
+// }
+// ```
 and this orchestration is then used, #lorem(15)
-```reason
-[@react.component]
-let make () => {
-  ...
-  let open Remote(module Env);
-  watch0(() => Promise.Syntax.({
-    let* prs = Buf_read.of_flow(module At_repo0);
-    ...
-  }));
+#let promise-star = text(fill: diagramming.colors.yellow-2, math.star)
+#let let_(ext: none) = {
+  if ext == none { $"let" #h(2pt)$ } else {
+    show math.star: it => text(size: 16pt, it)
+    $"let"_#ext$
+  }
+  h(2pt)
 }
-```
+$
+&#box(width: 100%, inset: (bottom: -2pt - 2pt, top: -2pt),
+  align(right,
+    box(stroke: 0.2pt, inset: (bottom: 2pt, top: 2pt, left: 2pt, right: 2pt), text(font: "Libertinus Serif")[client mode])
+  )
+)\ &#v(-1.8em)\
+&"let"^("@""react"."component") "make" = (dot) =>\ &#v(-1em)\ 
+&#mkbox(
+  $
+  &#v(0em)\ 
+  &dots\ &#v(-1em + 0.3em)\ 
+  &"let" "open" "Remote" ("module" "Env")\ &#v(-1em)\ 
+  &"React"."watch"_1 (t) #h(1pt) #scale(x: 80%, y: 70%, rotate(-90deg, text(stroke: 0.1pt, math.triangle))) #h(1pt) (dot) =>\ &#v(-1em)\ 
+  &#mkbox(
+    $
+    &#let_(ext: promise-star) "prs" = "Buf-read"."of-flow"("module"\ &#v(-1em)\ 
+    &#h(12pt) "At-repo"_0({ #h(1pt) "let" italic("tgtpost") = t #h(1pt) }))\ &#v(-1em)\ 
+    &#v(0em)\ 
+    &dots\ &#v(0em)\ 
+    $
+  )
+  $
+)
+$
+// ```reason
+// [@react.component]
+// let make = () => {
+//   ...
+//   let open Remote(module Env);
+//   watch0(() => Promise.Syntax.({
+//     let* prs = Buf_read.of_flow(module At_repo0);
+//     ...
+//   }));
+// }
+// ```
 This orchestration syntax is very expressive, it resembles a direct
 relational data query, the module $S$ in the fuctor $"At-repo"_0$ provides
 all entities and relationships symbol vocabulary in the #o.bkhack system that a programmer
@@ -59,7 +117,7 @@ and secured fetch code.\
 . Other kinds include stylesheet portal, pagegen portal, fiber @bkhack:fiber, and server-side react components
 .
 == Implementation conceptual layers
-#lorem(30)
+#lorem(30). These include
 #cetz.canvas({
   import cetz.draw: *
   let gap = 0.2
@@ -79,7 +137,7 @@ and secured fetch code.\
     line((0,b-height*(i+0.5)), (b-width,b-height*(i+0.5)))
     line((0,b-height*(i+1)), (b-width,b-height*(i+1)))
   }
-  bl(1, [Algebra layer], side: [promise, fiber, portal])
+  bl(1, [Algebra layer], side: [promise, fiber @bkhack:fiber, portal])
   bl(0, [Application layer], side: [worker, fetch, websocket])
   bl(-1, [Transport layer], side: [tcp, udp])
   bl-et-cetera(-2)
@@ -87,7 +145,9 @@ and secured fetch code.\
 #lorem(30)
 == Mechanics
 _generatives_
-_staging_
+_staging_ _mode_
+_orchestrates_ _choreographs_ _flows_
+_compiler_ _graph_
 == First-class full-stack build process
 @dune-version-1
 #place(auto, scope: "parent", float: true)[
@@ -139,6 +199,33 @@ _Heterogeneity_, specifically _implicit heterogeneity_, as an aspect of a full-s
   This implicit heterogeneity ensures _zero-cost abstraction_.\
   This heterogeneity is made possible because our system is built before deployment--it is staged and has layers.
 == Related works
-Ruby on Rails, Expo, Phoenix, Eliom
+Electric Clojure @electric-clojure in eclj, any expression can be split into client or back-end or more, but for bkhack we restrict to top-level expressions and modules as both to ease code splitting implementation and to make scoping less black-magic. Also, eclj fuses react programming cross-tier, bkhack we don't enforce that reactive prorgamming paradigm and currently it's only in front-end in the form of ReactJS, combined with data-flow programming from the data portal... but it would be nice.
+#let nl = $ \ &#v(-1em)\ $
+
+#[
+#let box = std.box.with(stroke: 0.2pt, inset: (x: 4pt, y: 4pt))
+#box[
+$
+#text(font: "Libertinus Serif")[client mode] & (e\/"client")#nl
+#text(font: "Libertinus Serif")[server mode] & #ghost($($)e\/#ghost("server")#ghost($)$)#nl
+#text(font: "Libertinus Serif")[diff mode]   & #wire($($)e\/#wire("diff-by")#wire($)$)
+$
+]
+]
+$
+&(e\/"defn" "Pull-request-view" [#h(1pt)]#nl 
+& #h(8pt) (e\/"client"#nl
+& #h(8pt) #h(8pt) ("dom"\/"h"_1 ("dom"\/"text" “#text(font: "Libertinus Serif", "pull requests")”))#nl
+& #h(8pt) #h(8pt) ("let" [ #h(4pt) italic("db") #ghost($($)e\/#ghost("server") (e\/"watch" italic("conn") ) #ghost($)$)   #nl
+& #h(8pt) #h(8pt) #h(28pt) italic("search") ("dom"\/"input" ("dom"\/"On" #[`input`]#nl
+& #h(8pt) #h(8pt) #h(28pt) #h(4pt) \#(-> %."target"."value") #h(2pt) “” #h(2pt) )) #h(4pt) ]#nl
+& #h(8pt) #h(8pt) #h(8pt) ("dom"\/"table"#nl
+& #h(8pt) #h(8pt) #h(8pt) #h(8pt) (e\/"for" [ #h(4pt) italic("record") #ghost($($)e\/#ghost("server") #wire($($)e\/#wire("diff-by")#nl
+& #h(8pt) #h(8pt) #h(8pt) #h(8pt) #h(38pt) #h(4pt) #(`:db/id`) ("prs" italic("db") italic("search")) #wire($)$) #ghost($)$) #h(4pt) ]#nl
+& #h(8pt) #h(8pt) #h(8pt) #h(8pt) #h(8pt) ("dom"\/"tr" ("dom"\/"text" ("pr-str" italic("record"))))))
+$
+React server component
+Eliom
+// Ruby on Rails, Expo, Phoenix, Eliom
 #bibliography(title: none, "works.bib")
 // vi: set nowrap:

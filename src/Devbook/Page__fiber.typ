@@ -3,6 +3,7 @@
 #import "Vocab.typ" as o
 #import "@local/diagramming:0.1.0"
 #import "@preview/cetz:0.5.2"
+// #import diagramming: lorem
 #show: paper.doc
 #title[= Sewing in-browser parallelism and more with fibers]
 Since #o.bkhack is deployed to the browser, an algebra was a much
@@ -37,6 +38,16 @@ $k$ defined by
   })
 })
 #let promise-star = text(fill: diagramming.colors.yellow-2, math.star)
+#cetz.canvas({
+  import cetz.draw: *
+  let x = 2.1
+  let offsetv = 5pt
+  let offseth = 2.4
+  line((0,0), (0,0))
+  content((x - 0.2 + offseth - 4,6pt+offsetv), (x + 5 + offseth - 4,0pt+offsetv), [$#text(fill: diagramming.colors.cream-3,"bind")$ : offshore to Worker #fn[for more details on what is _offshoring_, refers to X]])
+  line((x,0), (x,-16pt))
+})
+#v(-16pt)
 $
 &#let_(ext: $"Fiber".#text(fill: diagramming.colors.cream-3,"bind")$) k = (f, n) =>\ &#v(-1em)\ 
 &#mkbox(
@@ -64,7 +75,7 @@ $
 $)                                               \ &#v(-1em)\ 
 &#let_(ext: promise-star) italic("result") =     \ &#v(-1em)\
 &#h(8pt)"Promise"."all" "Iter"."range"(1000, n =>\ &#v(-1em)\
-&#h(8pt)"Fiber"."With-ctrl"."run"_2(#h(-1pt)~#h(-0.5pt)italic("ctrl")\ &#v(-1em)\
+&#h(8pt)"Fiber"."With-ctrl"."run-promise"_2(#h(-1pt)~#h(-0.5pt)italic("ctrl"),\ &#v(-1em)\
 &#h(8pt)italic("ctrl")#h(-1pt)->#h(-1pt)"Fiber"."lam"(f), n, k))
 $
 
@@ -99,10 +110,6 @@ callback $f$, and a zoo of other terms.
 // })
 // ```
 // ]
-// == Related works
-// Unlike most solutions in the ecosystem, `fiber` offers a more opaque
-// interface.
-// Dune's `fiber`. The Cancel module. #lorem(10) Eio's Fiber.  #lorem(10)
 == Design
   The _module layer_.\
   The _ppx layer_.\
@@ -124,6 +131,12 @@ callback $f$, and a zoo of other terms.
     room(o, name: "hall")
   })
 })
-#lorem(150)
+== Implementation
+Workers have specific characteristics that makes its programming low-level @coordination2017. First, Workers can't send messages directly to each other. Secondly, Workers can't reply to messages, can't correlate messages sent to, and later received from, the main workers. Third, Workers can't block, can't pause processing of the current message in anticipation of another message.
+== Related works
+Unlike most solutions in the ecosystem, `fiber` offers a more opaque
+interface.
+Dune's `fiber`. The Cancel module. #lorem(10) Eio's Fiber.  #lorem(10)\
+  Promise-based asynchronous task-running @understandinges6:promise Reo\@JS is a JavaScript runtime that enables high-level Reo-based worker coordination @coordination2017, an attempt to abstract in-browser parallelism similar to us. Reo\@JS emphasizes the importance of coordination protocols as explicit programming artifacts, it uses the Reo circuit-based coordination language then compiles it to JavaScript. Its API is a mix of Promise-based and generators. Our implemetation is Promise-based in a functional programming language.
 #bibliography(title: none, "works.bib")
 // vi: set nowrap:

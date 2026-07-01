@@ -6,6 +6,7 @@
 #import "Shell__sym.typ" as shell-sym
 #import "@local/diagramming:0.1.0": kbd
 #show: paper.doc
+#let censored(it) = highlight(fill: black, it)
 #title[= Stream-based programming with sh]
 // #show cite: it => text(fill: rgb("#3851A4"), it)
 For #o.bkhack, the user gets to familiarize with the concept of _stream-based
@@ -28,13 +29,13 @@ accepts the option #box(```sh -l NUM```) where `NUM` is line number size of chun
 . There is a command for every page, but there's no way to navigate
 "relatively" such as going "back" or "forth"; in other words, there's
 no ```sh cd``` command.\
-  The original sh language is a user interface for the system shell, which
+  #censored[The original sh language is a user interface for the system shell, which
 itself is an interface for the kernel, as part of the shell-kernel
 architecture @shell-kernel-arch. In comparison, the #o.bkhack-shell
 language is highly abstract:
 at most, the #o.bkhack website's CLI system attempts to simulate the
 shell-kernel architecture, so that the user feels the shell-kernel
-architecture even when it's not necessarily there.\
+architecture even when it's not necessarily there.]\
   // A shell is usually seen as a session that has REPL behavior, an environment with its own variables, and shells can stack on top of one another and can be "popped". For #o.bkhack, every command performs its effect and finishes, and it's not possible to make more shells on top of an existing one.
 // == Stream programming
 // Stream-based programming involves #lorem(30)\
@@ -47,9 +48,9 @@ with each other parsibly simply via textual data. In this composition
 , there are relationships between commands to form the pipeline by parts
 . This composition is part of the design patterns in designing Unix
 programs as a whole @taoup-design-patterns.\
-#let ls-sources = [```sh ls```, ```sh cat```, etc]
-#let ls-filters = [```sh grep```, ```sh sort```, ```sh split```, ```sh cut```, etc]
-#let ls-cantrips = [`mv`, `rm`, etc]
+#let ls-sources = [```sh feed```, ```sh cat```, etc]
+#let ls-filters = [```sh grep```, ```sh rg```, ```sh gron```, ```sh sort```, ```sh split```, ```sh cut```, etc]
+#let ls-cantrips = [```sh set```, ```sh man```, etc]
 
   The _source_ e.g. #ls-sources is the start of the pipeline, it exclusively produces
 output. The _sink_ is the end of the pipeline, it exclusively consumes
@@ -62,15 +63,15 @@ each group of commands as in \@fn, then use special filters to branch on
 conditions using redirections with named pipes #fn[in practice, this is
 rarely done]. The rest are _cantrips_ e.g. #(ls-cantrips)--commands that don't produce output
 but instead apply an effect onto the current environment.\
-  When all parts of the pipeline are put together, a pipeline is formed. The evaluation
+  #censored[When all parts of the pipeline are put together, a pipeline is formed. The evaluation
 order of the part commands is that all commands start simultaneously when
 a pipeline runs. For a pipeline that runs persistently, all pipes must
 run concurrently and persistently as well. #fn[This is contrary to the semantics
-of pipeline seen elsewhere e.g. functional programming.]\
-  Pipelines in the #o.bkhack-shell language are trivially constructed as commands the user can use, one after another; pipelining is first-class citizen.
+of pipeline seen elsewhere e.g. functional programming.]]\
+  #censored[Pipelines in the #o.bkhack-shell language are trivially constructed as commands the user can use, one after another; pipelining is first-class citizen.
 The grammar expects all commands to unequivocally form a pipeline, as
 evident by @gr, and multiple groups of commands will connect to form
-complex pipelines that branch.\
+complex pipelines that branch.]\
   *Function*. For a special case, a reusable pipeline or grouping of commands would be called a _function_
 . In the #o.bkhack-shell language, functions aren't allowed to be defined conventionally.
 Still, function is a useful abstraction; for example, since feed can be treated as a function simply built-in, it's possible to customize the behavior of ```sh feed``` by overloading it. Indeed, the default ```sh feed``` command in #o.bkhack, which automatically has limiting of 15 items pagination, is simply a function
@@ -127,10 +128,13 @@ Not only that, an implicit structure allows room for undefined behaviors
 ; each parser can do things in flexible ways that should hopefully achieve
 desirable results.\
   Indeed, the lexing phase was added when we branched the parser to support _pastelling_; so, two parsers, a parser and a pastel. A shared lexing phase helps communicating that the two parsers share a structure, even if that structure is only infra-, and ter'es no explicit GADT or signature to explicitly enforce it.\
-  // The usefulness of this starts to show when we added a new feature: support for quoted words. Thanks to the two-phase separation, we managed to implement this feature simply by modifying the lexer. We added new parsing rule, and changed the return type of $<"word">$. This cascades into all descendant parsers, requiring them to handle the new feature. Here, they are being rewritten by adding a new $<"word">$ overloading guard before usage.
+  The usefulness of this starts to show when we added a new feature: support for quoted words. #censored[Thanks to the two-phase separation, we managed to implement this feature simply by modifying the lexer. We added new parsing rule, and changed the return type of $<"word">$. This cascades into all descendant parsers, requiring them to handle the new feature. Here, they are being rewritten by adding a new $<"word">$ overloading guard before usage.]
+  === Real-time parsing
+  The #o.bkhack-shell pasteller achieves real-time syntax highlighting
+by being constructed purely out of React combinators that follows the grammar above (@gr) and the implicit structure above.
 == Typing
 Sometimes, it is useful to verify the shell language before evalutation.
-The typing of the #o.bkhack-shell language, given in @typ, #lorem(30)
+The typing of the #o.bkhack-shell language, given in @typ.
 This is useful when shell commands have to be embedded in a statically-typed
 programming language.
 #place(auto, float: true, scope: "parent")[
@@ -148,9 +152,13 @@ module Feed (Syntax : Shell.Sym)
   and v' = () => observe @@ v() }
 ```
 ]
-where the ```reason |@``` operator--accompanied by the ```reason nil``` word to mark EOL--is a semantic translation of ```sh |``` as part of an abstract algebra used to construct an embedded #o.bkhack-shell pipeline, and 
-#lorem(10)\
-  We believe that this type system can be used for composition of commands. Indeed, _type-driven composition_ allows us to implement and explore possibilities purely through types, where the type system serves as a real-time theorem checker that prompts our paths. For example, #lorem(20)
+where the ```reason |@``` operator--accompanied by the ```reason nil```
+word to mark EOL--is a semantic translation of ```sh |``` as part of an
+abstract algebra used to construct an embedded #o.bkhack-shell pipeline
+. We believe that this type system can be used for composition of commands
+. Indeed, _type-driven composition_ allows us to implement and explore
+possibilities purely through types, where the type system serves as a
+real-time theorem checker that prompts our paths.
 == Completion
 When writing a pipeline, it is nice to provide a language service where user can request their partially-written command to be replaced with corrected form.
 When press #kbd.keys(kbd.o.tab()) user #lorem(30)
