@@ -232,7 +232,15 @@
 }
 
 #root > header .displayonly .placeholder .show-all-commands::before {
-	content: "Show all commands";
+	content: " to show all commands. ";
+}
+
+#root > header .displayonly .placeholder a.ignore-this {
+	text-decoration: underline;
+}
+
+#root > header .displayonly .placeholder .ignore-this::before {
+	content: "Ignore this";
 }
 
 #root > header .displayonly .placeholder kbd {
