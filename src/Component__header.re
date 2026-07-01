@@ -162,27 +162,29 @@ let make = (~on_help: bool => unit, ~memo_transition=?) => {
 				{errorBox}
 			</form>
 		</div>
-    <button className={"header-right-hamburger " ++ (headerRightExpand?"expand":"")}
-      onClick={_ => setHeaderRightExpand((!))}
-    />
 		<div className={"header-right " ++ (headerRightExpand?"expand":"")}>
-			<span className="separator"/>
-			<a className="place notifications" title="Notifications"/>
-			<span className="separator"/>
-			<a className="place projects" href="/projects/" title="Projects"/>
-			<span className="separator"/>
-			<a className="place notes" href="/notes/" title="Notes"/>
-			<span className="separator"/>
-			<a className="place wiki" href="/wiki/" title="Wiki & Documentation"/>
-			<span className="separator"/>
-			<a className="place settings" href="/settings/" title="Settings"/>
-			<span className="separator"/>
-			<a className="place admin" href="/admin/" title="Admin Dashboard"/>
-			{ showLoginButton ?
-				<button className="place auth" title="Log in" onClick={_ => auth.forceAuth()}/>
-				:
-				<button className="place auth" title="Log out" onClick={_ => auth.forceAuth()}>{React.string(Option.value(auth.getUserName(),~default="Guest"))}</button>
-			}
+      <button className={"header-right-hamburger " ++ (headerRightExpand?"expand":"")}
+        onClick={_ => setHeaderRightExpand((!))}
+      />
+      <div className={"nav-list " ++ (headerRightExpand?"expand":"")}>
+        <a className="place notifications" title="Notifications"/>
+        <span className="separator"/>
+        <a className="place projects" href="/projects/" title="Projects"/>
+        <span className="separator"/>
+        <a className="place notes" href="/notes/" title="Notes"/>
+        <span className="separator"/>
+        <a className="place wiki" href="/wiki/" title="Wiki & Documentation"/>
+        <span className="separator"/>
+        <a className="place settings" href="/settings/" title="Settings"/>
+        <span className="separator"/>
+        <a className="place admin" href="/admin/" title="Admin Dashboard"/>
+        <span className="separator"/>
+        { showLoginButton ?
+          <button className="place auth" title="Log in" onClick={_ => auth.forceAuth()}/>
+          :
+          <button className="place auth" title="Log out" onClick={_ => auth.forceAuth()}>{React.string(Option.value(auth.getUserName(),~default="Guest"))}</button>
+        }
+      </div>
 		</div>
 	</div>
 }
