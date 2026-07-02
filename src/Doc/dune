@@ -14,11 +14,13 @@
  (modes melange)
  (name uu)
  (public_name bkhack.uu)
- (libraries reason-react bkhack)
+ (libraries reason-react melange__re)
  (preprocess
   ; The `pps` field is a list of ppx to apply to the sources before generating JavaScript. melange.ppx allows to use Melange attributes [@mel. ...] (https://melange.re/v2.0.0/communicate-with-javascript/#attributes)
   ; reason-react-ppx allows to use JSX for ReasonReact components by using the [@JSX] attributes from Reason: https://reasonml.github.io/docs/en/jsx
   (pps melange.ppx reason-react-ppx ppx_comptime)))
+
+(copy_files (files %{project_root}/src/{Js__storybook.re,Fetch__syntax.re}))
 
 ; (rule
 ;  (target main.re)

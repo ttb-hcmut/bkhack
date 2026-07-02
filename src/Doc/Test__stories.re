@@ -1,5 +1,3 @@
-open Bkhack
-
 let default = Js__storybook.meta(~component=Test.make, ~title="FDS", ());
 
 let primary = {
