@@ -54,7 +54,6 @@ engineering.\
 = Projects & experiences <projects>
 #let kind(it) = text(weight: "bold", it)
   #[== 1 Unity Peripherals <unity-peripherals>] #kind[personal project] This is a Unity package for writing and deploying Arduino code from Unity. It is written in #fsharp, utilizing a mix of .NET modules and self-written implementations.\
-  #figure(image(width: 100%, height: 80pt, "Screenshot From 2026-04-14 00-01-27 kworld editor app seq dev clock base threading tasks.png"))\
   #[== 2 Arduino Joy <arduinojoy>] #kind[personal project] This is a driver program written in OCaml. It is a personal project.\
   #[== 3 `bkhack` <bkhack>] #kind[3-person group thesis project] This was my thesis and is an ongoing project: a computer-science-oriented social news website with a home-built full-stack framework. #lorem(60)
 #bibliography(title: none, "works.yml")
