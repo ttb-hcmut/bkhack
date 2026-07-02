@@ -7,6 +7,34 @@ exception Invalid_syntax_of_command(string)
 exception Empty
 
 module Completion{
+	let%comptime samples_man_3' = {
+		open Containers.Fun;
+		let get_in_build_sandbox_opt = {
+			let pat = Re.compile @@ Re.(seq([any |> rep, str("_build"), str(Filename.dir_sep), str(".sandbox"), str(Filename.dir_sep), alnum |> rep1, str(Filename.dir_sep), group(any |> rep)]));
+			let match_ = Re.exec_opt @@ pat;
+			let map_compensate = g => "../../../"++Re.Group.get(g, 1)++"/";
+			match_ %> Option.map(map_compensate)
+		};
+		let get_in_build_opt = {
+			let pat = Re.compile @@ Re.(seq([any |> rep, str("_build"), str(Filename.dir_sep), group(any |> rep)]));
+			let match_ = Re.exec_opt @@ pat;
+			let map_compensate = g => Re.Group.get(g, 1);
+			match_ %> Option.map(map_compensate)
+		};
+		let output = {
+			let cwd = Sys.getcwd();
+			get_in_build_sandbox_opt(cwd)
+			|> Option.fold(~none=get_in_build_opt(cwd), ~some=Option.some)
+			|> Option.map(compensate => compensate++"src/Devbook/_output")
+		};
+		let entries = output
+			|> Option.map(output => output |> Sys.readdir |> Array.map(Filename.remove_extension))
+			|> Option.value(~default=[||]);
+		Printf.printf("%%BOC%%\"%s\"%%EOC%%", entries |> Array.to_list |> String.concat("/"));
+	}
+
+	let samples_man_3 = samples_man_3' |> String.split_on_char('/')
+
 	let samples_set_tilesets = [ "gui", "''" ]
 
 	and samples_set_languages = [ "vi-VN", "en-US" ]
@@ -17,7 +45,7 @@ module Completion{
 
 	and samples_split = [ "-c" ]
 
-	and samples = [ "feed", "discuss", "set", "split" ]
+	and samples = [ "feed", "discuss", "set", "split", "man" ]
 
 	exception Ambiguous_completion(list(string))
 
@@ -37,8 +65,12 @@ module Completion{
 			}
 		};
 		(last, ~cmd) => {
-			Js.Console.log2("try to complete", cmd);
+			// Js.Console.log2("try to complete", cmd);
 			switch (cmd) {
+			| ["man", "3", _] =>
+				samples_man_3 |> List.filter_map(last->doit) |> funnel_opt
+			| ["man", "3"] =>
+				samples_man_3 |> List.filter_map(""->doit) |> funnel_opt
 			| ["set", "--tileset", _] =>
 				samples_set_tilesets |> List.filter_map(last->doit) |> funnel_opt
 			| ["set", "--tileset"] =>
@@ -76,6 +108,7 @@ let eval = (~on_help, current_url) => {
 	let url_args = ref([])
 	let rec aux = fun
     | Cons_cmd(`unfetched(["help"]), Nil) => on_help()
+		| Cons_cmd(`unfetched(["man", "3", cmd]), next) => { url := "/devbook/"++cmd++".pdf"; aux(next) }
 		| Cons_cmd(`unfetched(["feed"]), next) => { url := "/"; aux(next) }
 		| Cons_cmd(`unfetched(["feed", ..._]), _) => raise(Invalid_syntax_of_command("feed"))
 		| Cons_cmd(`unfetched(["split", "-c", num]), next) when url^ == "/" => { url_args := Util.List.replace_assoc'("limit", num, url_args^); aux(next) }
