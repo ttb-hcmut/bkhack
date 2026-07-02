@@ -3,7 +3,7 @@ type tree('t, 'ctx) = ..
 module type S {
 	type command('a) and conv('a, 'b)
 
-	let info : list(string) => conv('a, 'b) => command('b)
+	let info : (list(string), ~doc:string=?, conv('a, 'b)) => command('b)
 
 	let unit : (unit => 'a) => conv(unit, 'a)
 

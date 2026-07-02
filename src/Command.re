@@ -25,8 +25,9 @@ exception Not_matched
 module A {
 	type nonrec command('t) = command('t) and conv('a, 'b) = conv('a, 'b)
 
-	let info = (type a, type b, spec, conv: conv(a, b)): command(b) =>
+	let info = (type a, type b, spec, ~doc=?, conv: conv(a, b)): command(b) =>
 		argss => {
+			ignore(doc);
 			let args = try (List.hd(argss)) { | Failure(_) => raise(Not_matched) };
 			let assert_ = () => {
 				assert(spec |> List.mapi((i, x) => (i, x)) |> List.fold_left((acc, (i, x)) => {
