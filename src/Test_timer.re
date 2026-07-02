@@ -21,7 +21,7 @@ let%Fiber.bind q' = (~ctrl as _, (_setResult, count)) => Fiber__world.({
   return(0)
 });
 
-class cancel('a) {
+class cancel('ret, 'yield, 'yieldback) {
 	val tbl = Hashtbl.create(1);
 	val idgen = ref(0);
 	pri clone = Hashtbl.to_seq %> List.of_seq;
@@ -30,7 +30,7 @@ class cancel('a) {
 		idgen := idgen^ + 1;
 		tbl->Hashtbl.add(id, k);
 	};
-	pub all_and_clear = (~ctrl: 'a) => {
+	pub all_and_clear = (~ctrl: Fiber.ctrl('ret, 'yield, 'yieldback)) => {
 		tbl |> this#clone |> List.iter(((k, f)) => {
 			f(~ctrl); tbl->Hashtbl.remove(k)
 		})
