@@ -1,0 +1,4 @@
+(library
+ (name typst_compile)
+ (modules lib lib_io)
+ (libraries re eio uuidm))

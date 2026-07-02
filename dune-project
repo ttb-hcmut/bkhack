@@ -18,6 +18,8 @@
   (containers (>= 3.16))
   (iter (>= 1.9))
   (re (>= 1.14.0))
+  (uuidm (>= 0.9.10))
+  (eio (>= 1.3)) (eio_main (>= 1.3))
   bkhack-compiler
   (opam-check-npm-deps (>= 4.1.0))
  ))

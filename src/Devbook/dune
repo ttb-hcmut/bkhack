@@ -1,18 +1,11 @@
 (rule
  (mode promote)
  (target (dir _output))
- (deps typc (:entries (glob_files Page__*.typ)) (glob_files *))
+ (deps (:entries (glob_files Page__*.typ)) (glob_files *) article)
  (action (progn
   (run mkdir %{target})
-  (run %{dep:app.exe} ./typc --output=%{target} --package-path=%{dep:_packages} %{entries})
+  (run %{dep:app.exe} typst compile --article-at-root=true --output=%{target} --package-path=%{dep:_packages} %{entries})
  )))
-
-(rule
- (target typc)
- (deps article
-  (:typc-opt-utopk %{project_root}/src_vendors/opt-utopk/u/typst-compile/run))
- (action (copy %{typc-opt-utopk} typc))
-)
 
 (rule
  (target article)
@@ -31,4 +24,4 @@
 
 (executable
  (name app)
- (libraries eio eio_main cmdliner re))
+ (libraries eio eio_main cmdliner re typst_compile))
