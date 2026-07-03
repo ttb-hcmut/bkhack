@@ -3,6 +3,44 @@ open React
 open Auth
 open Melange__containers.Fun
 
+
+module HeaderRight = {
+  [@react.component]
+  let make = () => {
+    let auth = AuthContext.use();
+    let (showLoginButton, setShowLoginButton) = useState(() => true)
+    and (headerRightExpand, setHeaderRightExpand) = useState(() => false);
+    useEffect0 @@ () =>
+    { setShowLoginButton( _ => !auth.checkAuth());
+      None }
+    ;
+		<div className={"header-right " ++ (headerRightExpand?"expand":"")}>
+      <button className={"header-right-hamburger " ++ (headerRightExpand?"expand":"")}
+        onClick={_ => setHeaderRightExpand((!))}
+      />
+      <div className={"nav-list " ++ (headerRightExpand?"expand":"")}>
+        <a className="place notifications" title="Notifications"/>
+        <span className="separator"/>
+        <a className="place projects" href="/projects/" title="Projects"/>
+        <span className="separator"/>
+        <a className="place notes" href="/notes/" title="Notes"/>
+        <span className="separator"/>
+        <a className="place wiki" href="/wiki/" title="Wiki & Documentation"/>
+        <span className="separator"/>
+        <a className="place settings" href="/settings/" title="Settings"/>
+        <span className="separator"/>
+        <a className="place admin" href="/admin/" title="Admin Dashboard"/>
+        <span className="separator"/>
+        { showLoginButton ?
+          <button className="place auth" title="Log in" onClick={_ => auth.forceAuth()}/>
+          :
+          <button className="place auth" title="Log out" onClick={_ => auth.forceAuth()}>{React.string(Option.value(auth.getUserName(),~default="Guest"))}</button>
+        }
+      </div>
+		</div>
+  }
+}
+
 module Greetings {
 	let flag = storage => {
 		Dom.Storage.setItem("bkhack.cmd-greeting-shown", "y", storage);
@@ -79,32 +117,39 @@ let a = fun
 }
 ;
 
-module Input {
+module Input = {
 	[@react.component]
 	let make = forwardRef((
+    ~value=?,
 		~autoComplete=?, ~autoCapitalize=?,
 		~onInput=?, ~onKeyDown=?, ~spellCheck=?,
 		~forceUpdateState=?, ~id=?, ~className=?, ref) =>
-	{ let ref = Js.Nullable.toOption(ref) |> Option.map(x => ReactDOM.Ref.domRef(x));
-		useEffect1(() =>
-			Option.bind(forceUpdateState, f => {
-			let x = Js.Global.setInterval(~f, 100);
-			Some(() => Js.Global.clearInterval(x)) })
+	{ 
+    let ref = Js.Nullable.toOption(ref) |> Option.map(x => ReactDOM.Ref.domRef(x));
+		useEffect1(() => None
+			// Option.bind(forceUpdateState, f => {
+			// let x = Js.Global.setInterval(~f, 100);
+			// Some(() => Js.Global.clearInterval(x)) })
 		, [|forceUpdateState|]);
-		<input ?autoComplete ?autoCapitalize ?onInput ?onKeyDown ?spellCheck ?id ?className ?ref />
+		<input
+      ?value
+      ?autoComplete 
+      ?autoCapitalize 
+      ?onInput 
+      ?onKeyDown 
+      ?spellCheck 
+      ?id 
+      ?className 
+      ?ref />
 	})
 };
 
 [@react.component]
 let make = (~on_help: bool => unit, ~memo_transition=?) => {
-  let
-		auth = AuthContext.use() and
-		url = ReasonReactRouter.useUrl();
-  let (showLoginButton, setShowLoginButton) = useState(()=>true)
-  and (content, setContent) = useState(() => "") 
+  let url = ReasonReactRouter.useUrl();
+  let (content, setContent) = useState(() => "") 
   and (historyIndex, setHistoryIndex) = useState(Rlwrap.index_init) 
-  and (navigatorError, setNavigatorError) = useState(() => None) 
-  and (headerRightExpand,setHeaderRightExpand) = useState(() => false);
+  and (navigatorError, setNavigatorError) = useState(() => None) ;
 	let bar = useRef(Js.Nullable.null);
 	let setHistoryIndex = useCallback1(k => {
 		let historyLen = Dom.Storage.localStorage
@@ -155,9 +200,6 @@ let make = (~on_help: bool => unit, ~memo_transition=?) => {
 		? (placeholder |> Option.value(~default=null))
 		: content->Shell__pastel.string->Result.value(~default=content->string)
 	);
-  useEffect0 @@ () =>
-	{ setShowLoginButton( _ => !auth.checkAuth());
-    None };
 	[|historyIndex|] |> useEffect1 @@ () =>
 	{ Rlwrap.on_scroll(historyIndex) @@ historyContent =>
 		bar->fakeBarSync @@ () =>
@@ -176,38 +218,20 @@ let make = (~on_help: bool => unit, ~memo_transition=?) => {
 		<div className="header-left">
 			<a className="logo" href="/" />
 			<form onSubmit={e => assert_ @@ _ => url->onSubmit(~on_help, ~memo_transition?, e)}>
-				<Input
-					autoComplete="off" autoCapitalize="off" spellCheck=false
-					onInput={_ => bar->fakeBarSync @@ () => ()} onKeyDown={onKeyDown(setHistoryIndex, completeBarHTMLContent, onKey)}
-					forceUpdateState=inputForceUpdateState ref={ReactDOM.Ref.domRef(bar)}
-					id="siteNavigator" className=errorClass />
-				<div className="displayonly highlight">{innerHTML}</div>
+        <div className="input-spacer">
+          <Input
+            autoComplete="off" autoCapitalize="off" spellCheck=false
+            value=content
+            onInput={_ => bar->fakeBarSync @@ () => ()} 
+            onKeyDown={onKeyDown(setHistoryIndex, completeBarHTMLContent, onKey)}
+            forceUpdateState=inputForceUpdateState 
+            ref={ReactDOM.Ref.domRef(bar)}
+            id="siteNavigator" className=errorClass />
+          <div className="displayonly highlight">{innerHTML}</div>
+        </div>
 				{errorBox}
 			</form>
 		</div>
-		<div className={"header-right " ++ (headerRightExpand?"expand":"")}>
-      <button className={"header-right-hamburger " ++ (headerRightExpand?"expand":"")}
-        onClick={_ => setHeaderRightExpand((!))}
-      />
-      <div className={"nav-list " ++ (headerRightExpand?"expand":"")}>
-        <a className="place notifications" title="Notifications"/>
-        <span className="separator"/>
-        <a className="place projects" href="/projects/" title="Projects"/>
-        <span className="separator"/>
-        <a className="place notes" href="/notes/" title="Notes"/>
-        <span className="separator"/>
-        <a className="place wiki" href="/wiki/" title="Wiki & Documentation"/>
-        <span className="separator"/>
-        <a className="place settings" href="/settings/" title="Settings"/>
-        <span className="separator"/>
-        <a className="place admin" href="/admin/" title="Admin Dashboard"/>
-        <span className="separator"/>
-        { showLoginButton ?
-          <button className="place auth" title="Log in" onClick={_ => auth.forceAuth()}/>
-          :
-          <button className="place auth" title="Log out" onClick={_ => auth.forceAuth()}>{React.string(Option.value(auth.getUserName(),~default="Guest"))}</button>
-        }
-      </div>
-		</div>
+    <HeaderRight />
 	</div>
 }
