@@ -36,19 +36,25 @@
   justify-content: space-between;
 }
 
-#root > header > div > .header-left > form {
-	margin: var(--padding-vertical) 0;
-}
 
+@media (min-width: 48rem){
+  #root > header > div {  
+    grid-area: 1/2/span 1 / span 2;
+  }
+}
 #root > header > div > .header-left {
   /* grid-column: auto/span 1; */
 	display: flex;
 	align-items: center;
-  width: max-content;
 	gap: var(--space-a);
 	flex: 1 1 auto;
 }
-#root > header .logo {
+@media (prefers-color-scheme: dark) {
+  #root[data-tileset="gui"] > header > div > .header-left > .logo {
+	  background-color: var(--sig-blue-deep) !important;
+  }
+}
+#root > header > div > .header-left > .logo {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
@@ -56,15 +62,133 @@
 	flex-shrink: 0;
 }
 
-#root:not([data-tileset="gui"]) > header .logo {
+#root > header > div > .header-left > form {
+	margin: var(--padding-vertical) 0;
+	position: relative;
+  display: grid;
+
+  outline: none;
+	background-color: var(--ctp-crust);
+  border-radius: var(--radius);
+  border: 1px solid var(--ctp-surface0);
+  color: var(--ctp-text);
+  caret-color: var(--ctp-text);
+  padding: var(--space-f) var(--space-a);
+
+}
+form:has( #siteNavigator:focus) {
+  border: 1px solid var(--primary) !important;
+}
+form:has( #siteNavigator.error) {
+  color: var(--ctp-red) !important;
+  border: 1px solid var(--ctp-red) !important;
+}
+/* form:has(> #siteNavigator) > * {
+	max-width: 20rem;
+  width:100%;
+	flex: 1 1 auto;
+} */
+ 
+#root > header > div > .header-left > form > .input-spacer {
+	display: grid;
+  overflow: hidden;
+  /* width: 20ch; */
+}
+#siteNavigator {
+  grid-area: 1/1/2/2;
+	color: rgba(0,0,0,0);
+
+  font-size: var(--text-base);
+  font-family: var(--font-mono);
+  outline: none;
+	background-color: transparent;
+  border-radius: 0;
+  border: 0;
+  color: inherit;
+  caret-color: var(--ctp-text);
+  padding: 0;
+}
+
+#siteNavigator + .displayonly {
+  grid-area: 1/1/2/2;
+  font-size: var(--text-base);
+  font-family: var(--font-mono);
+  padding: 0;
+  border: 0;
+  color: var(--ctp-text);
+	pointer-events: none;
+	/* text-overflow: ellipsis; */
+	white-space: nowrap;
+	/* overflow-x: hidden; */
+	/* position: absolute; */
+	/* left: 0;
+	top: 0; */
+}
+#siteNavigator:focus + .displayonly {
+}
+
+#siteNavigator.error + .displayonly {
+  color: var(--ctp-red);
+}
+
+#siteNavigator + .displayonly a {
+	pointer-events: auto;
+	cursor: help;
+}
+
+/* synchronize style with #siteNavigator */
+#root > header .displayonly .placeholder {
+	font-style: italic;
+}
+#root > header .displayonly .placeholder a.ignore-this {
+	text-decoration: underline;
+}
+
+#root > header .displayonly .placeholder kbd {
+	border: solid 1px var(--ctp-text);
+	border-radius: 0.4rem;
+}
+
+form:has( #siteNavigator) > dialog {
+  position: absolute !important;
+  top: calc(100% + var(--space-a));
+  left: 0 !important;
+  background-color: var(--ctp-crust);
+
+  color: inherit;
+  border: inherit;
+	border-radius: var(--radius);
+	height: fit-content;
+  width: fit-content;
+  padding: var(--space-f) var(--space-a);
+  box-sizing: border-box;
+	margin: 0;
+	transition: none;
+	overflow: hidden;
+}
+
+
+#root[data-tileset="gui"] form:has( #siteNavigator) > dialog {
+  background-color: color-mix(in srgb, var(--ctp-crust), transparent 50%);
+  backdrop-filter: blur(2px);
+}
+
+:has( #siteNavigator) > dialog > div {
+	/* width: 20rem; */
+	height: fit-content;
+  color: inherit;
+}
+
+
+#root:not([data-tileset="gui"]) > header > div > .header-left  .logo {
 	margin-left: var(--space-a);
 }
 
-#root:not([data-tileset="gui"]) > header .logo::after {
+#root:not([data-tileset="gui"]) > header > div > .header-left  .logo::after {
 	content: "bkhack";
 }
 
-#root[data-tileset="gui"] > header .logo {
+#root[data-tileset="gui"] > header > div > .header-left .logo {
 	content: " ";
 	/* margin-left: var(--space-a); */
 	background-image: url("/assets/logo.svg");
@@ -78,16 +202,6 @@
 	padding: var(--padding-vertical) 0;
 }
 
-@media (min-width: 48rem){
-  #root > header > div {  
-    grid-area: 1/2/span 1 / span 2;
-  }
-}
-@media (prefers-color-scheme: dark) {
-  #root[data-tileset="gui"] > header .logo {
-	  background-color: var(--sig-blue-deep);
-  }
-}
 #root > header > div > .header-right {
   /* grid-column: auto/span 1; */
 	display: flex;
@@ -155,6 +269,7 @@
     z-index: 99999;
 }
   .nav-list {
+    text-wrap-mode: nowrap;
     display: none !important;
 	  justify-content: center;
     position: absolute;
@@ -176,8 +291,7 @@
   }
   
   #root > header > div > .header-right > .nav-list > .separator {
-    width: unset !important;
-    height: 1px;
+    display: none;
   }
   .nav-list a.place {
     justify-content: start !important;
@@ -264,40 +378,12 @@
 	content: "đăng nhập";
 }
 
-#siteNavigator {
-  font-size: var(--text-base);
-  font-family: var(--font-mono);
-  outline: none;
-	background-color: var(--ctp-crust);
-  border-radius: var(--radius);
-  border: 1px solid var(--ctp-surface0);
-  color: var(--ctp-text);
-  caret-color: var(--ctp-text);
-  padding: var(--space-f) var(--space-a);
-	/* max-width: 20rem; */
-  width:100%;
-	flex: 1 1 auto;
-}
-
-#root > header .displayonly .placeholder {
-	font-style: italic;
-}
 
 #root > header .displayonly .placeholder .show-all-commands::before {
 	content: " to show all commands. ";
 }
-
-#root > header .displayonly .placeholder a.ignore-this {
-	text-decoration: underline;
-}
-
 #root > header .displayonly .placeholder .ignore-this::before {
 	content: "Ignore this";
-}
-
-#root > header .displayonly .placeholder kbd {
-	border: solid 1px var(--ctp-text);
-	border-radius: 0.4rem;
 }
 
 #root > header .displayonly .placeholder kbd.type_.help::before {
@@ -445,111 +531,37 @@
 	}
 }
 
-#siteNavigator:focus {
-  border: 1px solid var(--primary);
-}
-#siteNavigator.error {
-  color: var(--ctp-red);
-  border: 1px solid var(--ctp-red);
-}
 
-:has(> #siteNavigator) > dialog {
-	margin: 0;
-	height: 0;
-	margin-top: calc(8pt + var(--content-height));
-	width: 100%;
-	padding: 0;
-	border: 0;
-	transition: none;
-	overflow: visible;
-}
-
-:has(> #siteNavigator) > dialog > div {
-	/* width: 20rem; */
-	height: fit-content;
-	max-height: 10rem;
-	overflow-y: auto;
-	background-color: rgba(0,0,0,0);
-	border: solid 1px rgba(0,0,0,0);
-	border-radius: var(--radius);
-}
-
-#siteNavigator {
-	color: rgba(0,0,0,0);
-}
-
-#siteNavigator + .displayonly {
-	pointer-events: none;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	overflow-x: hidden;
-	position: absolute;
-	left: 0;
-	top: 0;
-}
-
-#siteNavigator + .displayonly a {
-	pointer-events: auto;
-	cursor: help;
-}
-
-/* synchronize style with #siteNavigator */
-#siteNavigator + .displayonly {
-  font-size: var(--text-base);
-  font-family: var(--font-mono);
-  padding: var(--space-f) var(--space-a);
-  border: 1px solid rgba(0,0,0,0);
-  color: var(--ctp-text);
-}
-
-#siteNavigator:focus + .displayonly {
-}
-
-#siteNavigator.error + .displayonly {
-  color: var(--ctp-red);
-}
-
-form:has(> #siteNavigator) {
-	position: relative;
-	display: flex;
-}
-
-form:has(> #siteNavigator) > * {
-	/* max-width: 20rem; */
-  width:100%;
-	flex: 1 1 auto;
-}
-
-#siteNavigator.error.unknown-command ~ dialog > div::before {
+:has(#siteNavigator.error.unknown-command) > dialog > div::before {
 	content: "Unknown command '";
 }
 
-#siteNavigator.error.unknown-command ~ dialog > div::after {
+:has(#siteNavigator.error.unknown-command) > dialog > div::after {
 	content: "'";
 }
 
-#root:lang(vi-VN) #siteNavigator.error.unknown-command ~ dialog > div::before {
+#root:lang(vi-VN) :has(#siteNavigator.error.unknown-command) > dialog > div::before {
 	content: "Không biết lệnh '";
 }
 
-#root:lang(vi-VN) #siteNavigator.error.unknown-command ~ dialog > div::after {
+#root:lang(vi-VN) :has(#siteNavigator.error.unknown-command) > dialog > div::after {
 	content: "'";
 }
 
-#siteNavigator.error.invalid-syntax-of-command.cat ~ dialog > div:after {
+:has(#siteNavigator.error.invalid-syntax-of-command.cat) > dialog > div:after {
 	content: "Invalid syntax of the 'cat' command";
 }
 
-#root:lang(vi-VN) #siteNavigator.error.invalid-syntax-of-command.cat ~ dialog > div:after {
+#root:lang(vi-VN) :has(#siteNavigator.error.invalid-syntax-of-command.cat) > dialog > div:after {
 	content: "Sai cú pháp lệnh 'cat' \A cat [ID] ";
 	white-space: pre-wrap;
 }
 
-#siteNavigator.error.invalid-syntax-of-command.feed ~ dialog > div:after {
+:has(#siteNavigator.error.invalid-syntax-of-command.feed) > dialog > div:after {
 	content: "Invalid syntax of the 'feed' command";
 }
 
-#root:lang(vi-VN) #siteNavigator.error.invalid-syntax-of-command.feed ~ dialog > div:after {
+#root:lang(vi-VN) :has(#siteNavigator.error.invalid-syntax-of-command.feed) > dialog > div:after {
 	content: "Sai cú pháp lệnh 'feed' \A feed ";
 	white-space: pre-wrap;
 }
