@@ -22,3 +22,5 @@ storybook-static
 
 /article
 .vscode/settings.json
+
+/_webpackgen2.log

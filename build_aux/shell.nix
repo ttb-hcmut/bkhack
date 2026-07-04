@@ -22,8 +22,12 @@ let
     # { rm package.json && rm pnpm-lock.yaml ;};
     return $sts;
   }
+	rm -rf _build/.webpacking
+	export DUNE_BUILD_DIR=$PWD/_build
+	dune exec src/webpackgen2.exe -- --in=$DUNE_BUILD_DIR/.webpacking/in --out=$DUNE_BUILD_DIR/.webpacking/out >&_webpackgen2.log &
   '';
 	pkgs = with nixpkgs; [
+		zstd
 		elixir erlang
 		pnpm nodejs
 		nixd haskell-language-server

@@ -9,9 +9,10 @@ let attrib_name = Re.(
   alt([str("page"), str("Bkhack.page")]));
 
 /** a [morphism] for JavaScript bundles */
-let morphism_jspages = (~sw,~procm,~clock,~cwd, ~optimization, ~watch=?, ~target_dir, src_dir, ~log_dir=?, dist_dir) =>  {
+let morphism_jspages = (~sw,~procm,~clock,~cwd, ~optimization, ~watch=?, ~target_dir, src_dir, ~log_dir=?, dist_dir):unit =>  {
 	let jspages = () =>
 		List.filter_map(B.is_page'(src_dir))
+		@@ List.filter(x => String.equal(Filename.extension(x), ".re"))
 		@@ Path.read_dir(src_dir);
 	let output_dirs = jspages => jspages |> Fiber.List.map(x' => {
 		let (`fpath(refile'), `fname(refile), _) = x';
@@ -24,6 +25,24 @@ let morphism_jspages = (~sw,~procm,~clock,~cwd, ~optimization, ~watch=?, ~target
 	});
 	Fiber.fork(~sw) @@ () =>
 	output_dirs(jspages()) |> B.compile_jsfile'(~procm,~clock,~cwd, ~watch?, ~optimization, dist_dir, ~log_dir?)
+};
+
+let morphism_jspages'= (~sw,~cwd,~fs,~procm,~net, ~target_dir, src_dir, dist_dir):unit =>  {
+	let jspages = () =>
+		List.filter_map(B.is_page'(src_dir))
+		@@ List.filter(x => String.equal(Filename.extension(x), ".re"))
+		@@ Path.read_dir(src_dir);
+	let output_dirs = jspages => jspages |> Fiber.List.map(x' => {
+		let (`fpath(refile'), `fname(refile), _) = x';
+		let jsfile  = B.Output.src'(~target=target_dir) @@ Filename.chop_extension(refile);
+		let jsfile' = P.(cwd / jsfile);
+		let out_dir =
+			try (B.File_grep.attrib(attrib_name, refile'))
+			{ | Not_found => raise @@ Missing_mapping_entry_for(refile) };
+		(out_dir++"/index", jsfile')
+	});
+	Fiber.fork(~sw) @@ () =>
+	output_dirs(jspages()) |> Webpackgen2__daemon.compile_js_daemon((module Buildlib.Build), ~procm, ~fs, ~net, dist_dir)
 };
 
 /** a [morphism] for lucide icons */
@@ -85,15 +104,17 @@ let morphism_generative = (~sw,~procm, generative_dir, dist_dir) => {
     file did not specify a required `[@Bkhack.page s]` attribute.
     Refer to the guide for more details. */
 let main__ = (~css_only, ~watch, ~dist_dir, ~src_dir, ~generative_dir, ~log_dir, ~lucide_dir, ~verbose, ~optimization, ~target_dir, ()) => Eio_main.run @@ env => {
-  let (procm, clock, cwd, fs) =
-    (Stdenv.process_mgr(env), Stdenv.clock(env), Stdenv.cwd(env), Stdenv.fs(env));
+  let (procm, clock, cwd, fs, net) =
+    (Stdenv.process_mgr(env), Stdenv.clock(env), Stdenv.cwd(env), Stdenv.fs(env), Stdenv.net(env));
   let cache_dir = P.(Stdenv.fs(env) / "/tmp" / "bkcache");
   let (generative_dir, dist_dir, log_dir, src_dir, lucide_dir, target_dir) =
     (generative_dir(fs), dist_dir(cwd), (!verbose ? Some (log_dir(cwd)) : None), src_dir(cwd), lucide_dir(fs), target_dir(fs));
     (css_only,cache_dir |> Path.is_directory) |> fun
     | (false,_) | (_,false) =>  {
       Switch.run @@ sw => {
-        morphism_jspages(~sw,~procm,~clock,~cwd, ~optimization, ~watch, ~target_dir, src_dir, ~log_dir?, dist_dir);
+        // morphism_jspages(~sw,~procm,~clock,~cwd, ~optimization, ~watch, ~target_dir, src_dir, ~log_dir?, dist_dir);
+				ignore(morphism_jspages); ignore(watch); ignore(clock); ignore(log_dir); ignore(optimization);
+        morphism_jspages'(~sw,~cwd,~fs,~procm,~net, ~target_dir, src_dir, dist_dir);
         // morphism_static(~sw,~procm, public_dir, dist_dir, ());
         morphism_generative(~sw,~procm, generative_dir, dist_dir);
         morphism_lucide(~sw,~procm, lucide_dir, dist_dir);

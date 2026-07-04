@@ -34,6 +34,15 @@ module Path {
         )
     );
 
+  let symlink' = (~sw, ~procm, ~link_to, file) =>
+    Fiber.fork(~sw) @@
+    (
+      () => {
+        let link_to = P.native_exn(link_to);
+				Process.run(procm, ["ln", "--symbolic", link_to, Path.native_exn(file)])
+      }
+    );
+
   let symlink = (~sw, ~link_to, file) =>
     Fiber.fork(~sw) @@
     (
@@ -170,14 +179,19 @@ let webpack_template = (~optimization, v) => {
     fun
     | `Production => {|
   output: {
-    filename: '[name].js',
+    filename: 'misc/[name].js',
     path: path.resolve(__dirname, 'dist'),
   },
   optimization: {
     splitChunks: { chunks: 'all' }
   },
 |}
-    | `Development => "";
+    | `Development => {|
+  output: {
+    filename: 'misc/[name].js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+|};
   Printf.sprintf(
 		{|
 			const webpack = require("webpack")
@@ -185,7 +199,7 @@ let webpack_template = (~optimization, v) => {
 
 			module.exports = {
 				entry: {
-					%s
+%s
 				},
 				%s
 			}
@@ -257,7 +271,7 @@ let compile_jsfile' =
           "--mode",
           opt_to_str(optimization),
           "--output-path",
-          Sys.getcwd() ++ "/" ++ Path.native_exn(out_dir),
+          Path.native_exn(out_dir),
         ];
     }
   );

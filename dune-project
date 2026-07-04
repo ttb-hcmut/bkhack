@@ -20,6 +20,7 @@
   (re (>= 1.14.0))
   (uuidm (>= 0.9.10))
   (eio (>= 1.3)) (eio_main (>= 1.3))
+  jsont bytesrw
   bkhack-compiler
   (opam-check-npm-deps (>= 4.1.0))
  ))
