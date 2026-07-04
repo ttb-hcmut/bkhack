@@ -104,7 +104,6 @@ form:has( #siteNavigator.error) {
 	background-color: transparent;
   border-radius: 0;
   border: 0;
-  color: inherit;
   caret-color: var(--ctp-text);
   padding: 0;
 }
