@@ -12,8 +12,8 @@ open Eio
 
 module Chan {
 	open Stream
-	open Webpackgen2__daemon
-	module Buf_read = Webpackgen2__daemon.Buf_read
+	open Webpackgen2__comm
+	module Buf_read = Webpackgen2__comm.Buf_read
 
 	let create = c : t(packet) => create(c)
 
@@ -42,7 +42,7 @@ let listen_at = (~net, ~cwd, ~chan, in_) =>
 	// });
 	}}
 
-exception Jump(Webpackgen2__daemon.packet)
+exception Jump(Webpackgen2__comm.packet)
 
 let main' = (~in_, ~out) =>
 	Eio_main.run @@ env =>
@@ -54,7 +54,7 @@ let main' = (~in_, ~out) =>
 	let f = (~cwd, ~last_spec) => {
 		let v = Chan.take(spec);
 		Option.iter(last_spec' => {
-			if (Webpackgen2__daemon.equal(~cwd, last_spec', v)) () else {
+			if (Webpackgen2__comm.equal(~cwd, last_spec', v)) () else {
 				last_spec := Some(v);
 				raise(Jump(v));
 			}
@@ -70,8 +70,8 @@ let main' = (~in_, ~out) =>
 					~procm=env#process_mgr, ~clock=env#clock,
 					~watch=true, ~optimization=`Development,
 					~cwd=Stdenv.fs(env), out(Stdenv.fs(env)),
-					pak.Webpackgen2__daemon.packet_entries |> List.map(
-						it => (it.Webpackgen2__daemon.entry_modname, it.entry_jsfile(Stdenv.fs(env)))
+					pak.Webpackgen2__comm.packet_entries |> List.map(
+						it => (it.Webpackgen2__comm.entry_modname, it.entry_jsfile(Stdenv.fs(env)))
 					))});
 			f(~cwd=Stdenv.fs(env), ~last_spec)
 		})

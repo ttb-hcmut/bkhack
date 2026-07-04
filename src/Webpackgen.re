@@ -42,7 +42,7 @@ let morphism_jspages'= (~sw,~cwd,~fs,~procm,~net, ~target_dir, src_dir, dist_dir
 		(out_dir++"/index", jsfile')
 	});
 	Fiber.fork(~sw) @@ () =>
-	output_dirs(jspages()) |> Webpackgen2__daemon.compile_js_daemon((module Buildlib.Build), ~procm, ~fs, ~net, dist_dir)
+	output_dirs(jspages()) |> Webpackgen2__comm.compile_js_daemon((module Buildlib.Build), ~procm, ~fs, ~net, dist_dir)
 };
 
 /** a [morphism] for lucide icons */

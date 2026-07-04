@@ -115,7 +115,7 @@
  ; Dependencies of the stanza.
  (libraries reason-react melange-json melange__containers quel melange-fetch
             cprg melange__cmarkit melange__iter melange__re melange.belt)
- (modules :standard \ Fiber__ppx Webpackgen Webpackgen2 Webpackgen2__daemon Css_gen Build Kernel Dune_typst Ppx_comptime Ppx_comptime_core Pp_comptime Gen)
+ (modules :standard \ Fiber__ppx Webpackgen Webpackgen2 Webpackgen2__comm Css_gen Build Kernel Dune_typst Ppx_comptime Ppx_comptime_core Pp_comptime Gen)
  (preprocess
   ; The `pps` field is a list of ppx to apply to the sources before generating JavaScript. melange.ppx allows to use Melange attributes [@mel. ...] (https://melange.re/v2.0.0/communicate-with-javascript/#attributes)
   ; reason-react-ppx allows to use JSX for ReasonReact components by using the [@JSX] attributes from Reason: https://reasonml.github.io/docs/en/jsx
@@ -132,13 +132,13 @@
 
 (executable
  (libraries eio eio_main buildlib
-            cmdliner re containers webpackgen2__daemon)
+            cmdliner re containers webpackgen2__comm)
  (modules webpackgen)
  (name webpackgen))
 
 (library
- (name webpackgen2__daemon)
- (modules Webpackgen2__daemon)
+ (name webpackgen2__comm)
+ (modules Webpackgen2__comm)
  (libraries eio jsont bytesrw jsont.bytesrw containers))
 
 (executable
