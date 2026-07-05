@@ -29,8 +29,7 @@ let
 	opam exec -- dune exec src/webpackgen2.exe -- --in=$DUNE_BUILD_DIR/.webpacking/in --out=$DUNE_BUILD_DIR/.webpacking/out >&$DUNE_BUILD_DIR/.webpacking/log &
   '';
 	pkgs = with nixpkgs; [
-		zstd
-		elixir erlang
+		zstd erlang
 		pnpm nodejs
 		nixd haskell-language-server
 		opam rsync

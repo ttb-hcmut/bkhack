@@ -149,7 +149,9 @@ let make = (~on_help: bool => unit, ~memo_transition=?) => {
   let url = ReasonReactRouter.useUrl();
   let (content, setContent) = useState(() => "") 
   and (historyIndex, setHistoryIndex) = useState(Rlwrap.index_init) 
-  and (navigatorError, setNavigatorError) = useState(() => None) ;
+  and (navigatorError, setNavigatorError) = useState(() => None) 
+  and (mostUsefulUsestateEver, setMUUE) = useState(()=> true);
+  // ^ signal that yes the user wants to ignore the placeholder
 	let bar = useRef(Js.Nullable.null);
 	let setHistoryIndex = useCallback1(k => {
 		let historyLen = Dom.Storage.localStorage
@@ -167,12 +169,19 @@ let make = (~on_help: bool => unit, ~memo_transition=?) => {
 		setNavigatorError @@ prev =>
 		try ({ let () = k(prev); None }) { | e => Some(e) }
 	}, [|setNavigatorError|]);
-	let placeholder = useMemo0(() =>
+	let placeholder = [|mostUsefulUsestateEver|] |> useMemo1(() =>
 		switch (Dom.Storage.sessionStorage |> Greetings.load_from_opt_exn) {
 		| Some() => None
 		| None   => Option.some @@
-			<span className="placeholder">
-				<kbd className="type_ help" /> <span className="show-all-commands"/> <a className="ignore-this"/>
+			<span className="placeholder ">
+				<kbd className="type_ help" />
+        <span className="show-all-commands"/> 
+        <a className="ignore-this"
+          onClick={_ => {
+          Greetings.flag(Dom.Storage.sessionStorage);
+          setMUUE((!))
+          }}
+        />
 			</span>
 		}
 	);
