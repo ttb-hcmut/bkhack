@@ -12,10 +12,13 @@
        (:web distweb)
        (:static (source_tree Static))
        (:devbook Devbook/_output)
+       (:odoc (alias ../doc))
        (:doc %{project_root}/src/Doc/dist))
  (action (concurrent
   (progn (run mkdir -p dist)
          (bash "cd %{project_root} && cp -sr ${PWD}/src/distweb/. src/dist"))
+  (progn (run mkdir -p dist/odoc)
+         (bash "cd %{project_root} && cp -sr ${PWD}/_doc/_html/. src/dist/odoc"))
   (progn (run mkdir -p dist/doc)
          (bash "cd %{project_root} && cp -sr ${PWD}/src/Doc/dist/. src/dist/doc"))
   (progn (run mkdir -p distserve)
