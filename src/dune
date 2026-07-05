@@ -143,7 +143,7 @@
 
 (executable
  (libraries eio eio_main buildlib
-            cmdliner re containers webpackgen2__daemon)
+            cmdliner re containers webpackgen2__comm)
  (modules webpackgen2)
  (name webpackgen2))
 
