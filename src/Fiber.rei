@@ -24,6 +24,8 @@ module With_ctrl1 {
 	let run_promise : 'in_ 'ret 'yield 'yieldback. (~ctrl:ctrl('ret, 'yield, 'yieldback), 'in_, fiber('in_, 'ret, 'yield, 'yieldback)) => Js.promise('ret)
 	let run_promise2 : 'in_1 'in_2 'ret 'yield 'yieldback. (~ctrl:ctrl('ret, 'yield, 'yieldback), 'in_1, 'in_2, fiber(('in_1, 'in_2), 'ret, 'yield, 'yieldback)) => Js.promise('ret)
 	let run_promise3 : 'in_1 'in_2 'in_3 'ret 'yield 'yieldback. (~ctrl:ctrl('ret, 'yield, 'yieldback), 'in_1, 'in_2, 'in_3, fiber(('in_1, 'in_2, 'in_3), 'ret, 'yield, 'yieldback)) => Js.promise('ret)
+	let run_promise4 : 'in_1 'in_2 'in_3 'in_4 'ret 'yield 'yieldback. (~ctrl:ctrl('ret, 'yield, 'yieldback), 'in_1, 'in_2, 'in_3, 'in_4, fiber(('in_1, 'in_2, 'in_3, 'in_4), 'ret, 'yield, 'yieldback)) => Js.promise('ret)
+	let run_promise5 : 'in_1 'in_2 'in_3 'in_4 'in_5 'ret 'yield 'yieldback. (~ctrl:ctrl('ret, 'yield, 'yieldback), 'in_1, 'in_2, 'in_3, 'in_4, 'in_5, fiber(('in_1, 'in_2, 'in_3, 'in_4, 'in_5), 'ret, 'yield, 'yieldback)) => Js.promise('ret)
 
 	module Cancel {
 		let force : (~ctrl:ctrl('ret, 'yield, 'yieldback), fiber('in_, 'ret, 'yield, 'yieldback)) => unit

@@ -128,7 +128,11 @@ module With_ctrl1 {
 
 	let run_promise2 = (~ctrl, arg1, arg2, k) => run_promise(~ctrl, (arg1, arg2), k)
 
-	let run_promise3 = (~ctrl, arg1, arg2, arg3, k) => run_promise(~ctrl, (arg1, arg2, arg3), k)
+	and run_promise3 = (~ctrl, arg1, arg2, arg3, k) => run_promise(~ctrl, (arg1, arg2, arg3), k)
+
+	and run_promise4 = (~ctrl, arg1, arg2, arg3, arg4, k) => run_promise(~ctrl, (arg1, arg2, arg3, arg4), k)
+
+	and run_promise5 = (~ctrl, arg1, arg2, arg3, arg4, arg5, k) => run_promise(~ctrl, (arg1, arg2, arg3, arg4, arg5), k)
 
 	module Cancel {
 		let force = (type in_, type ret, type yield, type yieldback, ~ctrl:ctrl(ret, yield, yieldback), k:fiber(in_, ret, yield, yieldback)) => {
