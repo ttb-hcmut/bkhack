@@ -25,7 +25,7 @@ let
 	rm -rf _build/.webpacking
 	export DUNE_BUILD_DIR=$PWD/_build
 	trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT # https://stackoverflow.com/questions/360201/how-do-i-kill-background-processes-jobs-when-my-shell-script-exits
-	dune exec src/webpackgen2.exe -- --in=$DUNE_BUILD_DIR/.webpacking/in --out=$DUNE_BUILD_DIR/.webpacking/out >&_webpackgen2.log &
+	./_opam/bin/dune exec src/webpackgen2.exe -- --in=$DUNE_BUILD_DIR/.webpacking/in --out=$DUNE_BUILD_DIR/.webpacking/out >&_webpackgen2.log &
   '';
 	pkgs = with nixpkgs; [
 		zstd
