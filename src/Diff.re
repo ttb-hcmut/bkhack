@@ -145,6 +145,39 @@ let evaluateMatrix2 = (array1:array(string),array2:array(string)) => {
   // evalMatrix |> Array.of_list
 }
 
+
+// let evaluateMatrix3 = (arrayA:array(string),arrayB:array(string)) => {
+//   let la = Array.length(arrayA)
+//   and lb = Array.length(arrayB);
+//   let mat = Array.make(l1*l2, false)
+//   let searchFront = Array.make(l1, 0)
+//   and i  = ref(0);
+
+//   let at = (dx:int , dy: int, j: int, arr: array(int)) => {
+//     ((j / l2) + dx, (j mod l2) + dy) |> fun 
+//     | (a',b') when a' >= 0 && b' >= 0 => arr[a'*l2+b'] 
+//     | _ => 0
+//   }
+  
+//   let max = (a: int, b: int) => {
+//     a > b ? a : b
+//   }
+  
+//   while( i^ < l1*l2)
+//   {
+//     arrayA[i^ / l2] == arrayB[i^ mod l2] |> fun
+//     | true  => {
+//       searchFront[i^] = (searchFront |> at(-1,-1,i^)) + 1
+//     }
+//     | false => {
+//       mat[i^] = max(mat|>at(-1,0,i^), mat|>at(0,-1,i^))
+//     }
+//     ;
+//     i := i^ + 1;
+//   }
+//   mat
+// }
+
 // let evaluateMatrixCell = 
 //   ( x: int, y: int
 //   , isSpecial: bool
