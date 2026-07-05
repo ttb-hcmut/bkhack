@@ -36,7 +36,6 @@ let
 		opam rsync
 		gnugrep
 		procps
-		ruby
 	]
 	++ nixpkgs.lib.optionals withDocs docs.packages;
 in
