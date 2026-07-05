@@ -32,7 +32,7 @@ let
 		zstd
 		elixir erlang
 		pnpm nodejs
-		nixd haskell-language-server
+		nixd
 		opam rsync
 		gnugrep
 		procps
