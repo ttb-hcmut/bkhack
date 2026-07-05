@@ -10,6 +10,8 @@ let of_worker : 'in_ 'ret 'yield 'yieldback. (
 	)
 ) => continuation('in_, 'ret, 'yield, 'yieldback)
 
+exception Cancelled
+
 module Ctrl {
 	let create : unit => ctrl('ret, 'yield, 'yieldback)
 }
