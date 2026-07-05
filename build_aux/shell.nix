@@ -22,10 +22,11 @@ let
     # { rm package.json && rm pnpm-lock.yaml ;};
     return $sts;
   }
-	rm -rf _build/.webpacking
+	rm --force _build/.webpacking/in
 	export DUNE_BUILD_DIR=$PWD/_build
-	trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT # https://stackoverflow.com/questions/360201/how-do-i-kill-background-processes-jobs-when-my-shell-script-exits
-	./_opam/bin/dune exec src/webpackgen2.exe -- --in=$DUNE_BUILD_DIR/.webpacking/in --out=$DUNE_BUILD_DIR/.webpacking/out >&_webpackgen2.log &
+	trap "trap - SIGTERM && kill -- -$$" EXIT # https://stackoverflow.com/questions/360201/how-do-i-kill-background-processes-jobs-when-my-shell-script-exits
+	mkdir $DUNE_BUILD_DIR/.webpacking
+	opam exec -- dune exec src/webpackgen2.exe -- --in=$DUNE_BUILD_DIR/.webpacking/in --out=$DUNE_BUILD_DIR/.webpacking/out >&$DUNE_BUILD_DIR/.webpacking/log &
   '';
 	pkgs = with nixpkgs; [
 		zstd
