@@ -286,7 +286,7 @@ form:has( #siteNavigator) > dialog {
     right:0;
   }
   .nav-list.expand {
-    display: flex !important;
+    display: grid !important;
   }
   
   #root > header > div > .header-right > .nav-list > .separator {
