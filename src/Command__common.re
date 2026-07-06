@@ -9,14 +9,16 @@ type Command__sym.tree('t, 'ctx) +=
 module Feed(S : Command__sym.S) {
 	open S
 
-	let feed = info(["feed"], ~doc={|
-		#feed fetches all #o.bkhack posts.
-	|}, unit(() => Tree__feed(Feed_ls)));
+	let feed = info(["feed"],
+		unit(() => Tree__feed(Feed_ls)),
+		~doc={|
+			#feed fetches all #o.bkhack posts. |},
+	);
 
-	let split_count = fd => info(["split", "-c"], ~doc={|
-		#docv controls the pagination by the
-		order at which posts are sorted.
-	|}, int_of(fd, [@warning "-8"] (i, Tree__feed(acc)) => Tree__feed(Split_count(acc, i))));
+	let split_count = fd => info(["split", "-c"],
+		int_of(fd, [@warning "-8"] (i, Tree__feed(acc)) => Tree__feed(Split_count(acc, i))),
+		~doc={|
+			#docv controls the pagination by the order at which posts are sorted. |});
 
 	let sort = fd => info(["sort"], unit_of(fd, [@warning "-8"] (Tree__feed(acc)) => Tree__feed(Sort(acc))));
 

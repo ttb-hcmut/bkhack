@@ -1,4 +1,4 @@
-/** adapted from @storybook/react-webpack5 StorybookConfig */
+/** adapted from [@storybook/react-webpack5 StorybookConfig] */
 module type StorybookConfig {
 	type t and framework
 	let framework : (~name:string, ~options:(Js.t({ .. }))=?, unit) => framework

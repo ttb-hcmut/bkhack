@@ -24,18 +24,25 @@ and ctrl('ret, 'yield, 'yieldback) =
 
 exception Cancelled
 
+open { [@mel.send] external call1 : Js.Fn.arity1('a => 'b) => 'this => 'a => 'b = "call"; };
+
 module Js__worker {
 	include Js__worker
 	module Fiber {
-		type request('in_, 'ret, 'yield, 'yieldback) = Either.t(
+		type worker('in_, 'ret, 'yield, 'yieldback) = Js__worker.worker(request('in_, 'ret, 'yield, 'yieldback), reply('in_, 'ret, 'yield, 'yieldback))
+		and request('in_, 'ret, 'yield, 'yieldback) = Either.t(
 			Fiber__core.comm('in_, 'ret, 'yield, 'yieldback, [ `requested ]),
 			Fiber__core.comm('in_, 'ret, 'yield, 'yieldback, [ `set ])
 		)
-		and  reply('in_, 'ret, 'yield, 'yieldback)   = Fiber__core.comm('in_, 'ret, 'yield, 'yieldback, [ `replied ])
+		and  reply('in_, 'ret, 'yield, 'yieldback)  = Fiber__core.comm('in_, 'ret, 'yield, 'yieldback, [ `replied ])
 	}
 }
 
-let rec of_worker = (mkworker: unit => Js__worker.worker(Js__worker.Fiber.request('in_, 'ret, 'yield, 'yieldback), Js__worker.Fiber.reply('in_, 'ret, 'yield, 'yieldback))) : continuation('in_, 'ret, 'yield, 'yieldback) => {
+let ignore_task = p => {
+	ignore(p |> Js.Promise.then_(() => Js.Promise.resolve()))
+}
+
+let rec of_worker = (mkworker: unit => Js__worker.Fiber.worker('in_, 'ret, 'yield, 'yieldback)) : continuation('in_, 'ret, 'yield, 'yieldback) => {
 	(~tbl) => {
 		let worker = mkworker() |> onmessage(~tbl) |> onerror;
 		let cancel = worker->cancel(~tbl);
@@ -48,19 +55,20 @@ let rec of_worker = (mkworker: unit => Js__worker.worker(Js__worker.Fiber.reques
 
 and submit = (worker, ~idgen, ~tbl, ~handletbl) => {
 	in_ => {
-		open { [@mel.send] external call1 : Js.Fn.arity1('a => 'b) => 'this => 'a => 'b = "call"; };
 		let workid = idgen^;
 		idgen := idgen^ + 1;
 		Js.Promise.make @@ (~resolve, ~reject) => {
 			let resolve = data => resolve->call1(Js.null, data)
-			and reflect = (async_id: int, await_id: int, x: 'yield) => {
-				ignore(Fetch__syntax.({
-					let handle = Hashtbl.find(handletbl, async_id);
-					let* u = handle(x)
-					Js__worker.Worker.postMessage(worker, Either.Right(Fiber__core.Comm__set(await_id, u)));
-					return()
-				}>!= (e => { Js.Console.error(e); return() })) );
-			}
+			and reflect = (async_id: int, await_id: int, x: 'yield) =>
+				ignore_task(Fetch__syntax.({
+				let handle = Hashtbl.find(handletbl, async_id);
+				let* u = handle(x)
+				Js__worker.Worker.postMessage(worker, Either.Right(Fiber__core.Comm__set(await_id, u)));
+				return()
+			} >!= e => {
+				Js.Console.error(e);
+				return()
+			}))
 			and reject  = e => reject->call1(Js.null, e);
 			tbl->Hashtbl.add(workid, (resolve, reflect, reject));
 			Js__worker.Worker.postMessage(worker, Either.Left(Fiber__core.Comm__request(workid, in_)))

@@ -1,4 +1,21 @@
-type fiber('in_, 'ret, 'yield, 'yieldback) and continuation('in_, 'ret, 'yield, 'yieldback) and ctrl('ret, 'yield, 'yieldback);
+/**
+
+{1 Introduction}
+
+Fiber is
+
+ */
+
+/**
+	[fiber] is
+
+	@see </devbook/fiber.pdf> the fiber paper for conceptual overview
+ */
+type fiber('in_, 'ret, 'yield, 'yieldback)
+
+and continuation('in_, 'ret, 'yield, 'yieldback)
+
+and ctrl('ret, 'yield, 'yieldback);
 
 let of_worker : 'in_ 'ret 'yield 'yieldback. (
 	unit => Js__worker.worker(
@@ -34,11 +51,19 @@ module With_ctrl1 {
 	}
 }
 
-//
-// module Syntax {
-// 	
-// }
+/** [ctrl->Fiber.lam(f)] creates a lambda term, a cross-world function
+	implementing callback-based inversion of control.
+
+	{2 Example usage}
+
+	{[
+	let run = () => {
+		let k = Fiber.With_ctrl1.make(~ctrl, k);
+		let* u = Fiber.(With_ctrl1.run_promise2(~ctrl,
+			ctrl->lam(i => setCount(_ => i)), interval, k));
+		return(u)
+	}
+	]} */
+let lam : 'ret 'a 'b. (ctrl('ret, 'a, 'b), 'a => 'b) => Fiber__core.lambda('a, 'b)
 
 let lam' : 'ret 'a 'b. (ctrl('ret, 'a, 'b), 'a => Js.promise('b)) => Fiber__core.lambda('a, 'b)
-
-let lam : 'ret 'a 'b. (ctrl('ret, 'a, 'b), 'a => 'b) => Fiber__core.lambda('a, 'b)
