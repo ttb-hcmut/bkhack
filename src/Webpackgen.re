@@ -24,7 +24,7 @@ let morphism_jspages = (~sw,~procm,~clock,~cwd, ~optimization, ~watch=?, ~target
 		(out_dir++"/index", jsfile')
 	});
 	Fiber.fork(~sw) @@ () =>
-	output_dirs(jspages()) |> B.compile_jsfile'(~procm,~clock,~cwd, ~watch?, ~optimization, dist_dir, ~log_dir?)
+	output_dirs(jspages()) |> B.compile_jsfile'(~procm, ~clock, ~cwd, ~watch?, ~optimization, `cwd(dist_dir), ~log_dir?)
 };
 
 let morphism_jspages'= (~sw,~cwd,~fs,~procm,~net, ~target_dir, src_dir, dist_dir):unit =>  {
@@ -42,7 +42,7 @@ let morphism_jspages'= (~sw,~cwd,~fs,~procm,~net, ~target_dir, src_dir, dist_dir
 		(out_dir++"/index", jsfile')
 	});
 	Fiber.fork(~sw) @@ () =>
-	output_dirs(jspages()) |> Webpackgen2__comm.compile_js_daemon((module Buildlib.Build), ~procm, ~fs, ~net, dist_dir)
+	output_dirs(jspages()) |> Webpackgen2__comm.compile_js_daemon((module Buildlib.Build), ~procm, ~fs, ~net, `raw(dist_dir))
 };
 
 /** a [morphism] for lucide icons */
@@ -103,7 +103,7 @@ let morphism_generative = (~sw,~procm, generative_dir, dist_dir) => {
     @raise Missing_mapping_entry_for(pagefile) when a Reason page
     file did not specify a required `[@Bkhack.page s]` attribute.
     Refer to the guide for more details. */
-let main__ = (~css_only, ~watch, ~dist_dir, ~src_dir, ~generative_dir, ~log_dir, ~lucide_dir, ~verbose, ~optimization, ~target_dir, ()) => Eio_main.run @@ env => {
+let main__ = (~daemon, ~css_only, ~watch, ~dist_dir, ~src_dir, ~generative_dir, ~log_dir, ~lucide_dir, ~verbose, ~optimization, ~target_dir, ()) => Eio_main.run @@ env => {
   let (procm, clock, cwd, fs, net) =
     (Stdenv.process_mgr(env), Stdenv.clock(env), Stdenv.cwd(env), Stdenv.fs(env), Stdenv.net(env));
   let cache_dir = P.(Stdenv.fs(env) / "/tmp" / "bkcache");
@@ -112,9 +112,11 @@ let main__ = (~css_only, ~watch, ~dist_dir, ~src_dir, ~generative_dir, ~log_dir,
     (css_only,cache_dir |> Path.is_directory) |> fun
     | (false,_) | (_,false) =>  {
       Switch.run @@ sw => {
-        // morphism_jspages(~sw,~procm,~clock,~cwd, ~optimization, ~watch, ~target_dir, src_dir, ~log_dir?, dist_dir);
-				ignore(morphism_jspages); ignore(watch); ignore(clock); ignore(log_dir); ignore(optimization);
-        morphism_jspages'(~sw,~cwd,~fs,~procm,~net, ~target_dir, src_dir, dist_dir);
+				if (daemon) {
+					morphism_jspages'(~sw,~cwd,~fs,~procm,~net, ~target_dir, src_dir, dist_dir);
+				} else {
+					morphism_jspages(~sw,~procm,~clock,~cwd, ~optimization, ~watch, ~target_dir, src_dir, ~log_dir?, dist_dir);
+				}
         // morphism_static(~sw,~procm, public_dir, dist_dir, ());
         morphism_generative(~sw,~procm, generative_dir, dist_dir);
         morphism_lucide(~sw,~procm, lucide_dir, dist_dir);
@@ -160,11 +162,13 @@ let main__ = () => Cmd.v(Cmd.info("webpackgen", ~doc="")) @@ {
   and+ lucide_dir = Arg.(required & opt((some(string)), None) &
     info(["lucide_dir"], ~doc=" (DEPRECATED) Lucide icon directory. "))
     |> Term.map(Path.((it, fs) => fs / it))
+  and+ daemon = Arg.(required & opt((some(bool)), None) &
+    info(["experimental_daemon"], ~docv="DAEMON"))
   and+ verbose = Arg.(required & opt((some(bool)), None) &
     info(["verbose"], ~docv="VERBOSE"))
   and+ optimization = Arg.(required & opt((some @@ enum @@ [("dev", `Development), ("release", `Production)]), None) &
     info(["optimization", "O"], ~docv="OPTIMIZATION"));
-  main__(~css_only,~watch=false, ~dist_dir, ~src_dir, ~generative_dir, ~log_dir, ~lucide_dir, ~verbose, ~optimization, ~target_dir, ())
+  main__(~daemon, ~css_only,~watch=false, ~dist_dir, ~src_dir, ~generative_dir, ~log_dir, ~lucide_dir, ~verbose, ~optimization, ~target_dir, ())
 };
 
 /** autorun except in toplevel / interactive mode */

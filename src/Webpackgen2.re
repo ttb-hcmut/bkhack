@@ -69,7 +69,7 @@ let main' = (~in_, ~out) =>
 				Buildlib.Build.compile_jsfile'(
 					~procm=env#process_mgr, ~clock=env#clock,
 					~watch=true, ~optimization=`Development,
-					~cwd=Stdenv.fs(env), out(Stdenv.fs(env)),
+					~cwd=Stdenv.fs(env), `raw(out(Stdenv.fs(env))),
 					pak.Webpackgen2__comm.packet_entries |> List.map(
 						it => (it.Webpackgen2__comm.entry_modname, it.entry_jsfile(Stdenv.fs(env)))
 					))});

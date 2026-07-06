@@ -60,7 +60,7 @@ module type Buildlib {
 	}
 }
 
-let compile_js_daemon = (module Build : Buildlib, ~procm, ~fs, ~net, dist_dir, ls) => {
+let compile_js_daemon = (module Build : Buildlib, ~procm, ~fs, ~net, `raw(dist_dir), ls) => {
 	let server = Path.(fs / Sys.getenv("DUNE_BUILD_DIR") / ".webpacking" / "in");
 	let to_client = sw => Net.connect(~sw, net, `Unix (Path.native_exn @@ server));
 	let ls' = ls |> List.map( ((k, _)) => k++".js" ) |> List.cons("misc");
@@ -68,7 +68,7 @@ let compile_js_daemon = (module Build : Buildlib, ~procm, ~fs, ~net, dist_dir, l
 	Fiber.fork(~sw, () =>
 		Eio.Buf_write.with_flow(to_client(sw), to_client =>
 		Buf_write.packet(to_client, ~cwd=fs, packet(ls |> List.map(
-			((k, v)) => entry("../"++k, (cwd => Path.(cwd / "_build" / "default" / "src" / Path.native_exn(v)) ))
+			((k, v)) => entry(k, (cwd => Path.(cwd / "_build" / "default" / "src" / Path.native_exn(v)) ))
 		)))));
 	Fiber.List.iter(k =>
 		Switch.run @@ sw => {

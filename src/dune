@@ -36,7 +36,7 @@
        (:src (alias react)))
  (action
   (run %{dep:webpackgen.exe}
-   --css_only=%{env:CSS_ONLY=false}
+   --css_only=%{env:CSS_ONLY=false} --experimental_daemon=false
    --verbose=false --optimization=%{profile} --output=%{targets} --src_dir=./ --target_dir=output/
    --generative_dir=%{dep:generative} --lucide_dir=node_modules__lucide-static/))
 )
