@@ -123,7 +123,7 @@
  ; Dependencies of the stanza.
  (libraries reason-react melange-json melange__containers quel melange-fetch
             cprg melange__cmarkit melange__iter melange__re melange.belt)
- (modules :standard \ Fiber__ppx Webpackgen Webpackgen2 Webpackgen2__comm Css_gen Build Kernel Dune_typst Ppx_comptime Ppx_comptime_core Pp_comptime)
+ (modules :standard \ Fiber__ppx Webpackgen Webpackgen2 Webpackgen2__comm Css_gen Build Kernel Dune_typst Ppx_comptime Ppx_comptime_core Pp_comptime Gen)
  (preprocess
   ; The `pps` field is a list of ppx to apply to the sources before generating JavaScript. melange.ppx allows to use Melange attributes [@mel. ...] (https://melange.re/v2.0.0/communicate-with-javascript/#attributes)
   ; reason-react-ppx allows to use JSX for ReasonReact components by using the [@JSX] attributes from Reason: https://reasonml.github.io/docs/en/jsx
@@ -168,6 +168,12 @@
  (public_name bkhack-compiler.css_gen)
  (flags -open Containers.Fun)
  (name css_gen))
+
+(library
+ (name gen) (public_name bkhack-compiler.gen)
+ (modules Gen)
+ (libraries re containers)
+ (flags -open Containers.Fun))
 
 (executable
  (name dune_typst)

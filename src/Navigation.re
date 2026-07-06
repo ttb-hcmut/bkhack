@@ -9,28 +9,13 @@ exception Empty
 module Completion{
 	let%comptime samples_man_3' = {
 		open Containers.Fun;
-		let get_in_build_sandbox_opt = {
-			let pat = Re.compile @@ Re.(seq([any |> rep, str("_build"), str(Filename.dir_sep), str(".sandbox"), str(Filename.dir_sep), alnum |> rep1, str(Filename.dir_sep), group(any |> rep)]));
-			let match_ = Re.exec_opt @@ pat;
-			let map_compensate = g => "../../../"++Re.Group.get(g, 1)++"/";
-			match_ %> Option.map(map_compensate)
-		};
-		let get_in_build_opt = {
-			let pat = Re.compile @@ Re.(seq([any |> rep, str("_build"), str(Filename.dir_sep), group(any |> rep)]));
-			let match_ = Re.exec_opt @@ pat;
-			let map_compensate = g => Re.Group.get(g, 1);
-			match_ %> Option.map(map_compensate)
-		};
-		let output = {
-			let cwd = Sys.getcwd();
-			get_in_build_sandbox_opt(cwd)
-			|> Option.fold(~none=get_in_build_opt(cwd), ~some=Option.some)
-			|> Option.map(compensate => compensate++"src/Devbook/_output")
-		};
-		let entries = output
-			|> Option.map(output => output |> Sys.readdir |> Array.map(Filename.remove_extension))
-			|> Option.value(~default=[||]);
-		Printf.printf("%%BOC%%\"%s\"%%EOC%%", entries |> Array.to_list |> String.concat("/"));
+		let ls = Sys.readdir %> Array.map(Filename.remove_extension);
+		open Gen.Begin((IO: Gen.IO) => {
+			let output = IO.root_opt(module Sys) |> Option.map(compensate => compensate++"src/Devbook/_output");
+			let entries = output |> Option.map(ls) |> Option.value(~default=[||]);
+			IO.capture(entries |> Array.to_list |> String.concat("/"))
+		});
+		()
 	}
 
 	let samples_man_3 = samples_man_3' |> String.split_on_char('/')

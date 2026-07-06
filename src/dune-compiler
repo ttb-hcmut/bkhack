@@ -1,1 +1,1 @@
-(libraries bkhack-compiler.shell bkhack-compiler.css_gen re containers)
+(libraries bkhack-compiler.shell bkhack-compiler.css_gen re containers bkhack-compiler.gen)
