@@ -32,12 +32,11 @@ let
 		zstd
 		elixir erlang
 		pnpm nodejs
-		nixd
 		opam rsync
 		gnugrep
 		procps
 	]
-	++ nixpkgs.lib.optionals withDocs docs.packages;
+	++ nixpkgs.lib.optionals withDocs ([nixd] ++ docs.packages);
 in
 	nixpkgs.mkShell {
 		packages = pkgs;
