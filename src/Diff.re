@@ -52,7 +52,8 @@ module Matrix {
   // }
 };
 
-let rec stringDisassembler = (input:string,split:list(char),index:int,hold:string,list:list(string),nukeDelim:bool) => {
+let rec stringDisassembler = (input:string,split:list(char),index:int,hold:string,list:list(string),nukeDelim:bool) => 
+{
   (index,input.[index],split) |> fun
   | (0,e,[]) => [String.make(1, e),...list]
   | (_,e,[]) => stringDisassembler(input,split,index-1,"",[String.make(1, e),...list],nukeDelim)
@@ -77,7 +78,8 @@ let rec stringDisassembler = (input:string,split:list(char),index:int,hold:strin
 
 
 
-let evaluateMatrix = (array1:array(string),array2:array(string)) => {
+let evaluateMatrix = (array1:array(string),array2:array(string)) => 
+{
   let (_,_,evalMatrix) = array1 |> Array.fold_left(((x:int,prevRow:array(int),matOfRows:list(array(int))),row:string)=>{
     let (_,_,evalRow)  = array2 |> Array.fold_left(((y:int,prevCol:int       ,rowOfCols:list(int)       ),col:string)=>{
       let eval = (row == col,y) |> fun 
@@ -97,7 +99,8 @@ let evaluateMatrix = (array1:array(string),array2:array(string)) => {
   evalMatrix |> List.rev |> Array.of_list
 }
 
-let evaluateMatrix2 = (array1:array(string),array2:array(string)) => {
+let evaluateMatrix2 = (array1:array(string),array2:array(string)) => 
+{
   let l1 = Array.length(array1)
   and l2 = Array.length(array2);
   let mat = Array.make(l1*l2, 0 )
@@ -146,37 +149,52 @@ let evaluateMatrix2 = (array1:array(string),array2:array(string)) => {
 }
 
 
-// let evaluateMatrix3 = (arrayA:array(string),arrayB:array(string)) => {
-//   let la = Array.length(arrayA)
-//   and lb = Array.length(arrayB);
-//   let mat = Array.make(l1*l2, false)
-//   let searchFront = Array.make(l1, 0)
-//   and i  = ref(0);
+let evaluateMatrix3 = (arrayA:array(string),arrayB:array(string)) => 
+{
+  let la = Array.length(arrayA)
+  and lb = Array.length(arrayB);
+  let mat = Array.make(Js.Math.ceil_int(float_of_int(la * lb)/. 32.), 0x00000000)
+  let searchFrontEven = Array.make(lb, 0)
+  let searchFrontOdd  = Array.make(lb, 0)
+  and i  = ref(0);
 
-//   let at = (dx:int , dy: int, j: int, arr: array(int)) => {
-//     ((j / l2) + dx, (j mod l2) + dy) |> fun 
-//     | (a',b') when a' >= 0 && b' >= 0 => arr[a'*l2+b'] 
-//     | _ => 0
-//   }
   
-//   let max = (a: int, b: int) => {
-//     a > b ? a : b
-//   }
-  
-//   while( i^ < l1*l2)
-//   {
-//     arrayA[i^ / l2] == arrayB[i^ mod l2] |> fun
-//     | true  => {
-//       searchFront[i^] = (searchFront |> at(-1,-1,i^)) + 1
-//     }
-//     | false => {
-//       mat[i^] = max(mat|>at(-1,0,i^), mat|>at(0,-1,i^))
-//     }
-//     ;
-//     i := i^ + 1;
-//   }
-//   mat
-// }
+  let searchFrontAt = (dx:int, dy:int, j:int) => {
+    ((j/lb + dx) mod 2 , (j mod lb) + dy) |> fun 
+    | (0, a) when a >= 0 => searchFrontEven[a] 
+    | (1, a) when a >= 0 => searchFrontOdd[a] 
+    | _ => 0
+  }
+  let setSearchFront = (j:int, v:int) => {
+    ((j/lb) mod 2) |> fun 
+    | 0 => searchFrontEven[j mod lb] = v 
+    | 1 => searchFrontOdd[j mod lb] = v
+    | _ => ()
+  }
+  let setMat = (j:int, v:bool) => {
+    if(v) {
+      mat[j / 32] = mat[j / 32] lor (0x00000001 lsl (j mod 32))
+    }
+  }
+  while( i^ < la*lb)
+  {
+    arrayA[i^ / lb] == arrayB[i^ mod lb] |> fun
+    | true  => { // you are my special
+      setSearchFront( i^ , searchFrontAt(-1,-1,i^) + 1);
+    }
+    | false => {
+      setMat( i^
+        , searchFrontAt(-1,0, i^ ) > searchFrontAt(0,-1, i^ ));
+      setSearchFront( i^
+        , searchFrontAt(-1,0, i^ ) > searchFrontAt(0,-1, i^ ) 
+        ? searchFrontAt(-1,0, i^ ) : searchFrontAt(0,-1, i^ ));
+    }
+    ;
+    i := i^ + 1;
+  }
+  mat
+}
+
 
 // let evaluateMatrixCell = 
 //   ( x: int, y: int
@@ -195,75 +213,100 @@ let evaluateMatrix2 = (array1:array(string),array2:array(string)) => {
 //   };
 
 let retraceLCS = 
-  ( 
-    // x':int, y':int
-    array1:array(string)
-  , array2:array(string)
-  // , lcs:list(string)
-  , matrix:matrix(int)
-  ) =>
-  {
-    let x = ref(Array.length(array1)-1)
-    and y = ref(Array.length(array2)-1)
-    and lcs = ref([]);
+( 
+  // x':int, y':int
+  array1:array(string)
+, array2:array(string)
+// , lcs:list(string)
+, matrix:matrix(int)
+) =>
+{
+  let x = ref(Array.length(array1)-1)
+  and y = ref(Array.length(array2)-1)
+  and lcs = ref([]);
 
-    while(x^ >= 0 && y^ >= 0){
-      (x^,y^) |> fun
-      | (x', y') when array1[x'] == array2[y'] =>
-      { x := x'-1 
-        y := y'-1 
-        lcs := [array1[x'],...(lcs^)]}
-      | (x', y') when Matrix.at(x'-1,y',matrix) > Matrix.at(x',y'-1,matrix) =>
-      { x := x'-1}
-      | (_ , y')=>
-      { y := y'-1}
-    }
-    ;
-    lcs^
-  // switch (x',y') {
-  // | (x , y) when x < 0 || y < 0 => lcs
-  // | (x , y) when array1[x] == array2[y] => //you are my special
-  //   retraceLCS( x-1, y-1
-  //   , array1, array2
-  //   , [array1[x], ...lcs]
-  //   , matrix)
-  // | (x , y ) when Matrix.at(x-1,y,matrix) > Matrix.at(x,y-1,matrix) =>
-  //   retraceLCS( x-1, y
-  //   , array1, array2
-  //   , lcs
-  //   , matrix)
-  // | (x, y) =>
-  //   retraceLCS( x, y-1
-  //   , array1, array2
-  //   , lcs
-  //   , matrix)
-  };
+  while(x^ >= 0 && y^ >= 0){
+    (x^,y^) |> fun
+    | (x', y') when array1[x'] == array2[y'] =>
+    { x := x'-1 
+      y := y'-1 
+      lcs := [array1[x'],...(lcs^)]}
+    | (x', y') when Matrix.at(x'-1,y',matrix) > Matrix.at(x',y'-1,matrix) =>
+    { x := x'-1}
+    | (_ , y')=>
+    { y := y'-1}
+  }
+  ;
+  lcs^
+// switch (x',y') {
+// | (x , y) when x < 0 || y < 0 => lcs
+// | (x , y) when array1[x] == array2[y] => //you are my special
+//   retraceLCS( x-1, y-1
+//   , array1, array2
+//   , [array1[x], ...lcs]
+//   , matrix)
+// | (x , y ) when Matrix.at(x-1,y,matrix) > Matrix.at(x,y-1,matrix) =>
+//   retraceLCS( x-1, y
+//   , array1, array2
+//   , lcs
+//   , matrix)
+// | (x, y) =>
+//   retraceLCS( x, y-1
+//   , array1, array2
+//   , lcs
+//   , matrix)
+};
 let retraceLCS2 = (array1:array(string), array2:array(string), matrix:array(int) ) =>
-  {
-    let mlen = Array.length(matrix)
-    let l2 = Array.length(array2)
-    let i = ref(mlen - 1)
-    and lcs = ref([])
+{
+  let mlen = Array.length(matrix)
+  let l2 = Array.length(array2)
+  let i = ref(mlen - 1)
+  and lcs = ref([])
 
-    
-    let at = (dx:int , dy: int, j: int, arr: array(int)) => {
-      ((j / l2) + dx, (j mod l2) + dy) |> fun 
-      | (a',b') when a' >= 0 && b' >= 0 => arr[a'*l2+b'] 
-      | _ => 0
-    }
-    while(i^ >= 0){
-      (i^ / l2 , i^ mod l2) |> fun
-      | (x', y') when array1[x'] == array2[y'] =>
-      { i := i^ - l2 - 1
-        lcs := [array1[x'],...(lcs^)]}
-      | (x', y') when (matrix|>at(x' -1,y',0)) > (matrix|>at(x',y' -1,0)) =>
-      { i := i^ - l2}
-      | _=>
-      { i := i^ - 1}
-    }
-    ;
-    lcs^
-  };
+  
+  let at = (dx:int , dy: int, j: int, arr: array(int)) => {
+    ((j / l2) + dx, (j mod l2) + dy) |> fun 
+    | (a',b') when a' >= 0 && b' >= 0 => arr[a'*l2+b'] 
+    | _ => 0
+  }
+  while(i^ >= 0){
+    (i^ / l2 , i^ mod l2) |> fun
+    | (x', y') when array1[x'] == array2[y'] =>
+    { i := i^ - l2 - 1
+      lcs := [array1[x'],...(lcs^)]}
+    | (x', y') when (matrix|>at(x' -1,y',0)) > (matrix|>at(x',y' -1,0)) =>
+    { i := i^ - l2}
+    | _=>
+    { i := i^ - 1}
+  }
+  ;
+  lcs^
+};
+
+let retraceLCS3 = (arrayA:array(string), arrayB:array(string), matrix:array(int) ) =>
+{
+  let la = Array.length(arrayA)
+  and lb = Array.length(arrayB);
+  let i = ref((la * lb) - 1)
+  and lcs = ref([])
+
+  
+  let matAt = (j: int) => {
+    (matrix[j / 32] land (0x00000001 lsl (j mod 32))) != 0
+  }
+  while(i^ >= 0){
+    (i^ / lb , i^ mod lb) |> fun
+    | (x', y') when arrayA[x'] == arrayB[y'] =>
+    { i := i^ - lb - 1
+      lcs := [arrayA[x'],...(lcs^)]}
+    | _ when matAt(i^) =>
+    { i := i^ - lb}
+    | _=>
+    { i := i^ - 1}
+  }
+  ;
+  lcs^
+};
 
 let diff = ( input1: array(string), input2: array(string), lcs:list(string)) =>
 {
@@ -354,28 +397,74 @@ let compare = (input1, input2, split, nukeDelim) => {
 	res
 }
 
-let compareSplitByRe = (~input1:string, ~input2:string, ~split:Js.Re.t) => {
+let compareSplitByRe = (~setStatus=?, ~input1:string, ~input2:string, ~split:Js.Re.t,()) => {
+  setStatus |> Option.iter(l => l(_ => "Initializing inputs..."));
   let start = Js.Date.now();
   let array1:array(string) = Js.String.match(~regexp=split,input1) |> Option.value(~default= [||]) |> Array.map(x => x |> Option.value(~default="balls"));
   let array2:array(string) = Js.String.match(~regexp=split,input2) |> Option.value(~default= [||]) |> Array.map(x => x |> Option.value(~default="balls"));
   
+  setStatus |> Option.iter(l => l(_ => "Evaluating matrix..."));
   let afterInput = Js.Date.now();
   let evalMatrix = evaluateMatrix2(array1,array2)
 
+  setStatus |> Option.iter(l => l(_ => "Retracing LCS..."));
   let afterEval = Js.Date.now();
   let lcs = retraceLCS2(
     array1, array2
     , evalMatrix);
   // Js.log(lcs|> Array.of_list)
 
+  setStatus |> Option.iter(l => l(_ => "Diffing..."));
   let afterLCS = Js.Date.now();
   let diffList = diff( array1
       , array2
       , lcs)
 
   let afterDiffList = Js.Date.now();
+  
+  setStatus |> Option.iter(l => l(_ => "Finished (" ++ string_of_float(afterDiffList -. start) ++ "ms)"));
   Js.logMany([|
     "Logging Diff2 performance of element count " ++ string_of_int(String.length(input1)) ++ " " ++ string_of_int(String.length(input2))
+  , "\n========================"
+  , "\nInput disassembly: " ++ string_of_float(afterInput -. start)
+  , "\nMatrix eval: " ++ string_of_float(afterEval -. afterInput)
+  , "\nLCS retrace: " ++ string_of_float(afterLCS -. afterEval)
+  , "\nDiff listing: " ++ string_of_float(afterDiffList -. afterLCS)
+  , "\n------------------------"
+  , "\nTotal: " ++ string_of_float(afterDiffList -. start)
+  |])
+  diffList
+};
+
+let compareBitOp = (~setStatus=?, ~input1:string, ~input2:string, ~split:Js.Re.t,()) => {
+  setStatus |> Option.iter(l => l(_ => "Initializing inputs..."));
+  let start = Js.Date.now();
+  let array1:array(string) = Js.String.match(~regexp=split,input1) |> Option.value(~default= [||]) |> Array.map(x => x |> Option.value(~default="balls"))
+  and array2:array(string) = Js.String.match(~regexp=split,input2) |> Option.value(~default= [||]) |> Array.map(x => x |> Option.value(~default="balls"));
+  
+  let l1 = Array.length(array1)
+  and l2 = Array.length(array2);
+
+  setStatus |> Option.iter(l => l(_ => "Evaluating matrix..."));
+  let afterInput = Js.Date.now();
+  let evalMatrix = l1 > l2 ? evaluateMatrix3(array1,array2) : evaluateMatrix3(array2,array1)
+
+  setStatus |> Option.iter(l => l(_ => "Retracing LCS..."));
+  let afterEval = Js.Date.now();
+  let lcs = l1 > l2 ? retraceLCS3(array1, array2, evalMatrix) : retraceLCS3(array2, array1, evalMatrix);
+  // Js.log(lcs|> Array.of_list)
+
+  setStatus |> Option.iter(l => l(_ => "Diffing..."));
+  let afterLCS = Js.Date.now();
+  let diffList = diff( array1
+      , array2
+      , lcs)
+
+  let afterDiffList = Js.Date.now();
+  
+  setStatus |> Option.iter(l => l(_ => "Finished (" ++ string_of_float(afterDiffList -. start) ++ "ms)"));
+  Js.logMany([|
+    "Logging Diff3 performance of element count " ++ string_of_int(String.length(input1)) ++ " " ++ string_of_int(String.length(input2))
   , "\n========================"
   , "\nInput disassembly: " ++ string_of_float(afterInput -. start)
   , "\nMatrix eval: " ++ string_of_float(afterEval -. afterInput)

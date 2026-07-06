@@ -63,7 +63,7 @@ let runtest = (~sw, ~clock, dir, nukeDelim) => Promise.await_exn @@ {
 	and- input3 = () => Path.load(Path.(dir / "split.txt"));
 	let split = String.length(input3)>0? Diff.stringDisassembler(input3,[],String.length(input3)-1,"",[],false) |> List.map(a=>a.[0]):[]
 	let timestart = Eio.Time.now(clock);
-	let (res, `tokens(tokens)) = Diff.compare'(input1,input2,split,nukeDelim);
+	let (res, `tokens(tokens)) = (Diff.compareBitOp(~input1=input, ~input2=input, ~split=[%re {|/(?:(?:[^\n]+)|(?:[\n]))/gm|}],()),[||]);
 	let res = res |>List.map(((d,v))=>d++"|\t"++v)|>String.concat("\n");
 	let timeend = Eio.Time.now(clock);
 	let static_info = ((), `split(split |> List.map(c => String.make(1, c)) |> String.concat("")), `time(timeend -. timestart), `tokencount(Array.length(tokens)));
