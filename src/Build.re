@@ -132,44 +132,6 @@ let is_page' = src_dir =>
        (`fpath(P.(src_dir / x)), `fname(x), y)
      );
 
-let compile_jsfile = (~procm, ~clock, ~watch=false, out_dir, log_dir, entry) => {
-  let mkdirs = x => {
-    let exists_ok = true
-    and perm = 0o700;
-    Path.mkdirs(~exists_ok, ~perm, x);
-  };
-  mkdirs(out_dir);
-  mkdirs(log_dir);
-  Path.with_open_out(
-    P.(log_dir / (idgen'(clock) ++ ".stdout")),
-    ~create=`Exclusive(0o700),
-  ) @@
-  (
-    stdout =>
-      Pnpm.Process.run(procm, ~stdout) @@
-      ["webpack"]
-      @ (
-        if (watch) {
-          ["watch"];
-        } else {
-          [];
-        }
-      )
-      @ [
-        "--config",
-        "build_aux/webpack_preprocessor.js",
-        "--mode",
-        "development",
-        "--entry",
-        Path.native_exn(entry),
-        "--output-path",
-        Path.native_exn(out_dir),
-        "--output-filename",
-        "index.js",
-      ]
-  );
-};
-
 let webpack_template = (~optimization, v) => {
   let s =
     v
