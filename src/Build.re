@@ -171,19 +171,8 @@ let webpack_template = (~optimization, v) => {
   );
 };
 
-let compile_jsfile' =
-    (
-      ~procm,
-      ~clock,
-      ~cwd,
-      ~watch=false,
-      ~optimization,
-      out_dir,
-      ~log_dir=?,
-      entries,
-    ) => {
-  let opt_to_str =
-    fun
+let compile_jsfile' = (~procm, ~clock, ~cwd, ~watch=false, ~optimization, out_dir, ~log_dir=?, entries) => {
+  let opt_to_str = fun
     | `Production => "production"
     | `Development => "development";
   let mkdirs = x => {
@@ -191,6 +180,11 @@ let compile_jsfile' =
     and perm = 0o700;
     Path.mkdirs(~exists_ok, ~perm, x);
   };
+	let outfold = fun
+		| `raw(out_dir) => Path.native_exn(out_dir)
+		| `cwd(out_dir) => Sys.getcwd()++"/"++ Path.native_exn(out_dir);
+	let outextract = fun
+		| `raw(out_dir) | `cwd(out_dir) => out_dir
   let wrapdir = (~log_dir=?, clock, k) =>
     switch (log_dir) {
     | None => k(Pnpm.Process.run(~stdout=?None))
@@ -202,8 +196,7 @@ let compile_jsfile' =
       ) @@
       (stdout => k(Pnpm.Process.run(~stdout)));
     };
-
-  mkdirs(out_dir);
+  mkdirs(outextract @@ out_dir);
   mkdirs(Path.(cwd / "_build_webpack"));
   wrapdir(~log_dir?, clock) @@
   (
@@ -214,7 +207,7 @@ let compile_jsfile' =
       ) @@
       webpack_template(~optimization) @@
       List.map(
-        ((x, y)) => (x, Sys.getcwd() ++ "/" ++ Path.native_exn(y)),
+        ((x, y)) => ("../"++x, Sys.getcwd() ++ "/" ++ Path.native_exn(y)),
         entries,
       );
       run(procm) @@
@@ -228,12 +221,9 @@ let compile_jsfile' =
       )
       @ 
         [
-          "--config",
-          Sys.getcwd() ++ "/_build_webpack/config.js",
-          "--mode",
-          opt_to_str(optimization),
-          "--output-path",
-          Path.native_exn(out_dir),
+          "--config", Sys.getcwd()++"/_build_webpack/config.js",
+          "--mode", opt_to_str(optimization),
+          "--output-path", outfold(out_dir),
         ];
     }
   );
