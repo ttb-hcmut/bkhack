@@ -125,7 +125,7 @@ module App__display = {
       | _ => [%re {|/(?:(?:[^\n]+)|(?:[\n]))/gm|}]
      },[|option|])
     // let (status,setStatus) = React.useState(() => "")
-    let diffList = React.useMemo1(() => Diff.compareSplitByRe(~input1,~input2,~split),[|split|])
+    let diffList = React.useMemo1(() => Diff.compareBitOp(~input1,~input2,~split,()),[|split|])
     ;
     <main>
       // <div> {React.string(status)} </div>

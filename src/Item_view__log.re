@@ -76,9 +76,15 @@ module DiffContext = {
 // 	Diff.compare("a b c","a d c",[' '],true,~setStatus = _ => (),())
 // }
 
+let%Fiber.bind dcomp' = (~ctrl, (setStatus,input1,input2,split)) => Fiber__world.({
+  let setStatus : (string => string) => unit =
+    f => ignore(ctrl->Lam.app(f(""), setStatus));
+  return(Diff.compareSplitByRe(~setStatus,~input1, ~input2, ~split,())|> Array.of_list)
+});
+
 module Inspectview = {
 	[@react.component]
-	let make = () => {
+	let make = () => { 
     // let (status, setStatus) = React.useState(() => "")
 		// let ctrl = React.useMemo0(Fiber.Ctrl.create);
 		// let k = React.useMemo0(() => Fiber.With_ctrl.make(~ctrl, k'));
@@ -91,25 +97,61 @@ module Inspectview = {
 		// 	}>!= (e => { Js.Console.error(e); return(()) })));
 		// 	None
 		// });
+
+
+
+
+    let (diffList, setDiffList) = React.useState(() => [])
     let (option,setOption) = React.useState(()=> 0)
     let diff = DiffContext.use()
-    let (split, nukeDelim) = React.useMemo1(()=>{ 
+    let _ = Js.log("Reloaded item log page!")
+    let split = React.useMemo1(()=>{ 
       option |> fun
-      | 0 => (['\n'],false)
-      | 1 => (['\n'    ,'.',':',',','!','?',';','"','(',')','[',']','{','}'],false)
-      | 2 => (['\n',' ','.',':',',','!','?',';','"','(',')','[',']','{','}'],false)
-      | _ => (['\n'],false)
-     },[|option|])
-    let diffList = React.useMemo3(() => {
-    (diff.cid1,diff.cid2)|> fun
-      | (Some(_),Some(_)) => Diff.compare(diff.input1,diff.input2,split,nukeDelim)
-      | _ => []
+      | 0 => [%re {|/(?:(?:[^\n]+)|(?:[\n]))/gm|}]
+      | 1 => [%re {|/(?:(?:[\w\t ]+)|(?:[^\w\t ]))/gm|}]
+      | 2 => [%re {|/(?:(?:\w+)|(?:\W))/gm|}]
+      | _ => [%re {|/(?:(?:[^\n]+)|(?:[\n]))/gm|}]
+    },[|option|])
+    let (status,setStatus) = React.useState(() => "")
+    let isBusy = ref(false);
+    let ctrl = React.useMemo0(Fiber.Ctrl.create)
+    let fib = React.useMemo0(() => Fiber.With_ctrl1.make(~ctrl,dcomp'));
+    let run = () => ignore @@ Fetch__syntax.({
+      isBusy:= true;
+      let* res = Fiber.(With_ctrl1.run_promise(~ctrl,
+				(ctrl->lam(i => setStatus(_ => i)),diff.input1,diff.input2,split)
+        , fib));
+      isBusy:= false;
+			setDiffList(_ => res|>Array.to_list);
+			return(())
+    } >!= (e => { 
+      Js.Console.error(e)
+      setStatus(_ => "Cancelled...")
+      isBusy:= false;
+      setDiffList(_ => [])
+      ; 
+      return(()) 
+    }))
+    let cancel = () => {
+      Fiber.With_ctrl1.Cancel.force(~ctrl, fib)
+    }
+
+
+
+    React.useEffect3(() => {
+    (diff.cid1,diff.cid2,isBusy^)|> fun
+      | (Some(_),Some(_),false) => run()
+      | (Some(_),Some(_),true) => {cancel();run()}
+      | _ => ()
+      ;
+      // Some(cancel)
+      None
     },(split,diff.cid1,diff.cid2))
     ;
     <div className="diff-box">
       <Component__diff.App__controls option setOption />
       <main>
-        // <div> {React.string(status)} </div>
+        <div> {React.string(status)} </div>
         <div className="side-by-side">
           <div className="diff1">
           {

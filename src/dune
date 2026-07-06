@@ -56,6 +56,11 @@
  (target Fiberlet__src__Test_timer__re__q'.ml)
  (deps Test_timer.re.pp.ml)
  (action (run cp -s /tmp/%{target} %{target})))
+ 
+(rule
+ (target Fiberlet__src__Item_view__log__re__dcomp'.ml)
+ (deps Item_view__log.re.pp.ml)
+ (action (run cp -s /tmp/%{target} %{target})))
 
 (rule
  (targets (dir generative))
