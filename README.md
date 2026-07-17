@@ -59,13 +59,6 @@ opam install bkhack
 This produces a `_build/${context}/${src}/dist/` directory containing static HTML and JavaScript bundles
 suitable for deployment platforms such as Firebase Hosting or Netlify, and a `_build/${context}/${src}/distserve/` directory containing a dockerized Elixir bundle suitable for deployment platforms such as GCP Compute Engine or Fly.io.
 
-For demonstration, let's assume you want to run the website locally
-
-```sh
-(cp -rf _build/${context}/${src}/dist dist && pnpm exec live-server --cors dist 8080) &
-({ cp -rf _build/${context}/${src}/distserve distserve && cp _build/${context}/${src}/distserve/config/shell.nix.ex distserve.nix ;} && nix-shell distserve.nix --run "cd distserve && mix deps.get && mix run --no-halt"); wait
-```
-
 ---
 
 ## Development
