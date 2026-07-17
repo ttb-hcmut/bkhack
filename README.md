@@ -33,7 +33,7 @@ opam install bkhack
 
 ## Usage
 
-`bkhack` is distributed as both reusable OCaml/Reason library. You can integrate it into your own Reason application:
+`bkhack` is distributed as a reusable OCaml/Reason library. You can integrate it into your own Reason application:
 
 ```dune
 (rule
@@ -56,12 +56,6 @@ opam install bkhack
  (libraries bkhack))
 ```
 
-Bundle the application for deployment:
-
-```sh
-dune build @bundle
-```
-
 This produces a `_build/${context}/${src}/dist/` directory containing static HTML and JavaScript bundles
 suitable for deployment platforms such as Firebase Hosting or Netlify, and a `_build/${context}/${src}/distserve/` directory containing a dockerized Elixir bundle suitable for deployment platforms such as GCP Compute Engine or Fly.io.
 
@@ -75,6 +69,14 @@ For demonstration, let's assume you want to run the website locally
 ---
 
 ## Development
+
+Running
+
+```sh
+dune build @all
+```
+
+will run through all parts of the build system. This will compile source, bundle them into necessary bundles and deploy them to (default) hosting services.
 
 See [./doc/development.md](./doc/development.md) for more details.
 
