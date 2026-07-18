@@ -81,4 +81,4 @@ The current deployment is [available here!][bkhack-firebase]
 
 [bkhack-repo]: https://github.com/ttb-hcmut/bkhack
 [bkhack-paper]: https://baorepo.web.app/~ttb-hcmut/bkhack.pdf
-[bkhack-firebase]: https://bkhack-2eb8c.web.app
+[bkhack-firebase]: https://bkhack.ttkb-hcmut.online
