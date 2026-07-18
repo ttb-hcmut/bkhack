@@ -15,3 +15,7 @@ module String {
 		ignore(regexp); ignore(s); failwith("unimplemented")
 	}
 }
+
+module Math {
+	let ceil_int = x => x |> Stdlib.ceil |> Float.to_int
+}
