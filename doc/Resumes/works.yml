@@ -1,8 +1,105 @@
+ttkb-hcmut:
+  type: Repository
+  title: TTKB-HCMUT
+  url: "https://github.com/ttkb-hcmut"
+
+bkhack:
+  type: Repository
+  title: bkhack
+  url: "https://github.com/ttkb-hcmut/bkhack"
+
 utopk-baorepo:
   type: Repository
   title: The Utopk interpreter
+  author: Le Nguyen Gia Bao "Kinten Le"
   url: "https://baorepo.web.app/~kinten/u/utop"
+
 tree-sitter-quarkdown-github:
   type: Repository
   title: Quarkdown grammar for tree-sitter
   url: "https://github.com/kinten108101/tree-sitter-quarkdown"
+
+microcluster:
+  type: Repository
+  title: Microcluster
+  url: "https://github.com/ttkb-hcmut/microcluster"
+
+simglobe:
+  type: Repository
+  title: SimGlobe
+  author: SimGlobe Developers
+  url: "https://github.com/simglobe/simglobe"
+
+tagless-final:
+  type: Article
+  title: Tagless-final style
+  author: https://okmij.org/ftp/tagless-final/index.html
+  url: https://okmij.org/ftp/tagless-final/index.html
+
+quel:
+  type: Article
+  title: Finally, Safely-Extensible and Efficient Language-Integrated Query
+  author: [Kenichi Suzuki, Oleg Kiselyov, Yukiyoshi Kameyama]
+  url: https://okmij.org/ftp/meta-programming/quel.pdf
+
+fork-of-quel:
+  type: Repository
+  title: Fork of QueL
+  url: https://github.com/ttkb-hcmut/quel
+
+oglsl:
+  type: Repository
+  title: oglsl - Embedding GLSL in OCaml
+  publisher: OPAM
+  author: Le Nguyen Gia Bao "Kinten Le"
+  url: "https://opam.ocaml.org/packages/oglsl/"
+
+unity.peripherals:
+  type: Repository
+  title: Unity Peripherals
+  author: Le Nguyen Gia Bao "Kinten Le"
+  url: "https://baorepo.web.app/~kinten/u/unity.peripherals"
+
+dan:
+  type: Article
+  title: Spring interpolation
+  author: [Le Nguyen Gia Bao "Kinten Le", Nguyen Minh Triet]
+  url: "https://baorepo.web.app/~kinten/dan.pdf"
+
+abstraction-fullstack:
+  type: Article
+  title: Abstraction full-stack
+  author: Le Nguyen Gia Bao "Kinten Le"
+  url: https://bkhack-2eb8c.web.app/devbook/abstraction-fullstack.pdf
+
+fiber:
+  type: Article
+  title: Sewing in-browser parallelism and more with fibers
+  author: Le Nguyen Gia Bao "Kinten Le"
+  url: https://github.com/ttkb-hcmut/bkhack/blob/main/src/Devbook/fiber.pdf
+
+fiber-sig:
+  type: Repository
+  url: https://github.com/ttkb-hcmut/bkhack/blob/main/src/Fiber.rei
+
+layer9-preview:
+  type: Repository
+  title: Layer9
+  url: "https://baorepo.web.app/~kinten/u/layer9"
+
+oar:
+  type: Repository
+  title: Oar
+  url: "https://baorepo.web.app/~kinten/u/oar"
+
+oar-preview:
+  type: Article
+  title: Introduction to Oar
+  author: Le Nguyen Gia Bao "Kinten Le"
+  url: "https://baorepo.web.app/~kinten/u/oar/about.pdf"
+
+topcore-man:
+  type: Article
+  title: Biphasic Interpreter
+  author: Le Nguyen Gia Bao "Kinten Le"
+  url: "https://baorepo.web.app/~kinten/u/topcore/man.pdf"
