@@ -85,22 +85,6 @@ let%Fiber.bind dcomp' = (~ctrl, (setStatus,input1,input2,split)) => Fiber__world
 module Inspectview = {
 	[@react.component]
 	let make = () => { 
-    // let (status, setStatus) = React.useState(() => "")
-		// let ctrl = React.useMemo0(Fiber.Ctrl.create);
-		// let k = React.useMemo0(() => Fiber.With_ctrl.make(~ctrl, k'));
-		// let () = React.useEffect0(() => {
-		// 	ignore(Fetch__syntax.({
-		// 		let* u = Fiber.With_ctrl.run_promise(~ctrl, (), k);
-		// 		if (false) { ignore(u+1) };
-		// 		Js.Console.log(u);
-		// 		return(())
-		// 	}>!= (e => { Js.Console.error(e); return(()) })));
-		// 	None
-		// });
-
-
-
-
     let (diffList, setDiffList) = React.useState(() => [])
     let (option,setOption) = React.useState(()=> 0)
     let diff = DiffContext.use()
@@ -135,9 +119,6 @@ module Inspectview = {
     let cancel = () => {
       Fiber.With_ctrl1.Cancel.force(~ctrl, fib)
     }
-
-
-
     React.useEffect3(() => {
     (diff.cid1,diff.cid2,isBusy^)|> fun
       | (Some(_),Some(_),false) => run()
