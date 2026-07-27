@@ -1,4 +1,4 @@
-type 'a code =
+type (_, 'a) code =
   { code_parse :
       time:time -> peek:(unit -> char) -> advance:(unit -> unit) -> unit -> ('a, string) result }
 
@@ -9,6 +9,8 @@ and time =
 
 and snapshot =
   { snapshot_i : int }
+
+and normal and fixed
 
 let advance n =
   let code_parse ~time:_ ~peek:_ ~advance () =
@@ -65,7 +67,7 @@ let map t f =
     Result.map f @@ t.code_parse ~time ~peek ~advance () in
   { code_parse }
 
-let fix f =
+let fix (type a) (f : (fixed, a) code -> ('ctx, a) code) : ('ctx, a) code =
   let last = ref None in
   let rec_ =
     let code_parse ~time ~peek ~advance () =
@@ -99,7 +101,7 @@ let discard_first a b = lift2 (fun _a b -> b) a b
 
 let discard_second a b = lift2 (fun a _b -> a) a b
 
-let always_ignore (x: 't code) =
+let always_ignore (x: (_, 't) code) =
   lift (fun _ -> ()) x
 
 module Syntax_0 =
@@ -156,7 +158,7 @@ let peek_char_fail =
 
 let end_of_input = lift (fun _ -> ()) @@ char '\x1B'
 
-let parse_string ~consume:(_consume:[`All | `Prefix]) (t: 'a code) : string -> ('a, string) result =
+let parse_string ~consume:(_consume:[`All | `Prefix]) (t: (normal, 'a) code) : string -> ('a, string) result =
   fun s ->
   let s = String.to_seq (s ^ "\x1B") |> Array.of_seq in
   let i = ref 0 in
